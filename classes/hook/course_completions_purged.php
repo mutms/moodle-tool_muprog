@@ -24,6 +24,8 @@ namespace enrol_programs\hook;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\core\attribute\tags('openlms')]
+#[\core\attribute\label('Notification that completion of courses in programs was purged for given user')]
 final class course_completions_purged {
     /** @var int user id */
     public $userid;
@@ -39,15 +41,5 @@ final class course_completions_purged {
     public function __construct(int $userid, int $programid) {
         $this->userid = $userid;
         $this->programid = $programid;
-    }
-
-    /**
-     * Hook purpose description in Markdown format
-     * used on Hooks overview page.
-     *
-     * @return string
-     */
-    public static function get_hook_description(): string {
-        return 'Notification that completion of courses in programs was purged for given user';
     }
 }

@@ -24,6 +24,8 @@ namespace enrol_programs\hook\extra_menu;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[\core\attribute\tags('openlms')]
+#[\core\attribute\label('Additions to "Users actions" extra menu in Users tab in program.')]
 final class management_program_users extends \local_openlms\hook\extra_menu {
     /** @var \stdClass program record */
     protected $program;
@@ -47,15 +49,5 @@ final class management_program_users extends \local_openlms\hook\extra_menu {
      */
     public function get_program(): \stdClass {
         return $this->program;
-    }
-
-    /**
-     * Hook purpose description in Markdown format
-     * used on Hooks overview page.
-     *
-     * @return string
-     */
-    public static function get_hook_description(): string {
-        return 'Additions to "Users actions" extra menu in Users tab in program.';
     }
 }
