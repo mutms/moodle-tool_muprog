@@ -169,6 +169,19 @@ $capabilities = [
     ],
 
     /*
+     * Reset program progress manually.
+     */
+    'enrol/programs:reset' => [
+        'riskbitmask' => RISK_CONFIG | RISK_DATALOSS,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSECAT,
+        'archetypes' => [
+        ],
+
+        'clonepermissionsfrom' =>  'enrol/programs:admin'
+    ],
+
+    /*
      * All other advanced functionality not intended for regular managers,
      * such as overriding of item and program completion dates.
      */

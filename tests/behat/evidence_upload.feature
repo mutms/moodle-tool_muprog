@@ -96,7 +96,8 @@ Feature: Upload program completion evidence using csv
     And I should see "Upload completion evidences"
 
     And I follow "Student 3"
-    And I press "Archive"
+    And I click on "Allocation actions" "link"
+    And I click on "Archive" "link"
     And I press dialog form button "Archive"
     And I click on "Users" "link" in the "#region-main" "css_element"
     And I click on "Users actions" "link"

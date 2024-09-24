@@ -49,6 +49,7 @@ final class notification_manager extends \local_openlms\notification\manager {
             'endfailed' => notification\endfailed::class,
             'endfailed_relateduser' => notification\endfailed_relateduser::class,
             'deallocation' => notification\deallocation::class,
+            'reset' => notification\reset::class,
         ];
     }
 

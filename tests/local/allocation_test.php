@@ -529,6 +529,92 @@ final class allocation_test extends \advanced_testcase {
         $this->assertSame((array)$allocation, (array)$newallocation);
     }
 
+    public function test_reset() {
+        global $DB;
+
+        /** @var \enrol_programs_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('enrol_programs');
+
+        $now = time();
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $course1 = $this->getDataGenerator()->create_course();
+        $course2 = $this->getDataGenerator()->create_course();
+
+        $this->getDataGenerator()->enrol_user($user1->id, $course2->id, 'student');
+        $this->getDataGenerator()->enrol_user($user2->id, $course2->id, 'student');
+
+        $ccompletion = new \completion_completion(['course' => $course2->id, 'userid' => $user1->id]);
+        $ccompletion->mark_complete();
+        $ccompletion = new \completion_completion(['course' => $course2->id, 'userid' => $user2->id]);
+        $ccompletion->mark_complete();
+
+        $program1 = $generator->create_program(['fullname' => 'hokus', 'sources' => ['manual' => []]]);
+        $item1 = $generator->create_program_item(['programid' => $program1->id, 'courseid' => $course1->id]);
+        $source1 = $DB->get_record('enrol_programs_sources', ['programid' => $program1->id, 'type' => 'manual'], '*', MUST_EXIST);
+        manual::allocate_users($program1->id, $source1->id, [$user1->id, $user2->id]);
+        $allocation1 = $DB->get_record('enrol_programs_allocations', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
+        $allocation2 = $DB->get_record('enrol_programs_allocations', ['programid' => $program1->id, 'userid' => $user2->id], '*', MUST_EXIST);
+
+        $data = (object)[
+            'id' => $allocation1->id,
+            'userid' => $user1->id,
+            'resettype' => course_reset::RESETTYPE_STANDARD,
+        ];
+        $allocation1x = allocation::reset($data);
+        $this->assertSame((array)$allocation1, (array)$allocation1x);
+
+        $data2 = (object)[
+            'allocationid' => $allocation1->id,
+            'itemid' => $item1->get_id(),
+            'evidencetimecompleted' => (string)($now - 60 * 60 * 2),
+            'evidencedetails' => 'hmmm',
+        ];
+        allocation::update_item_evidence($data2);
+        $allocation1y = $DB->get_record('enrol_programs_allocations', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
+        $this->assertNotNull($allocation1y->timecompleted);
+        $data = (object)[
+            'id' => $allocation1->id,
+            'userid' => $user1->id,
+            'resettype' => course_reset::RESETTYPE_FULL,
+        ];
+        $allocation1x = allocation::reset($data);
+        $this->assertSame((array)$allocation1, (array)$allocation1x);
+
+        $ccompletion = new \completion_completion(['course' => $course1->id, 'userid' => $user1->id]);
+        $ccompletion->mark_complete();
+        $this->assertTrue($DB->record_exists('course_completions', ['userid' => $user1->id, 'course' => $course1->id]));
+        $data = (object)[
+            'id' => $allocation1->id,
+            'userid' => $user1->id,
+            'resettype' => course_reset::RESETTYPE_STANDARD,
+        ];
+        $allocation1x = allocation::reset($data);
+        $this->assertSame((array)$allocation1, (array)$allocation1x);
+        $this->assertFalse($DB->record_exists('course_completions', ['userid' => $user1->id, 'course' => $course1->id]));
+        $this->assertSame((array)$allocation1, (array)$allocation1x);
+
+        $data = (object)[
+            'id' => $allocation1->id,
+            'userid' => $user1->id,
+            'resettype' => course_reset::RESETTYPE_STANDARD,
+            'updateallocation' => 1,
+            'timestart' => (string)($now - DAYSECS * 3),
+            'timedue' => (string)($now + DAYSECS * 1),
+            'timeend' => (string)($now + DAYSECS * 2),
+        ];
+        $allocation1x = allocation::reset($data);
+        $this->assertSame($data->timestart, $allocation1x->timestart);
+        $this->assertSame($data->timedue, $allocation1x->timedue);
+        $this->assertSame($data->timeend, $allocation1x->timeend);
+
+        $allocation2x = $DB->get_record('enrol_programs_allocations', ['programid' => $program1->id, 'userid' => $user2->id], '*', MUST_EXIST);
+        $this->assertSame((array)$allocation2, (array)$allocation2x);
+        $this->assertTrue($DB->record_exists('course_completions', ['userid' => $user1->id, 'course' => $course2->id]));
+        $this->assertTrue($DB->record_exists('course_completions', ['userid' => $user2->id, 'course' => $course2->id]));
+    }
+
     public function test_update_item_completion() {
         global $DB;
 

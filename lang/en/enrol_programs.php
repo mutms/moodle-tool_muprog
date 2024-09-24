@@ -105,6 +105,7 @@ $string['evidenceupload_updated'] = 'Completion evidence updated for {$a} users'
 $string['evidence_details'] = 'Details';
 $string['evidence_detailsdefault'] = 'Default details';
 $string['extra_menu_management_program_users'] = 'Users actions';
+$string['extra_menu_management_program_allocation'] = 'Allocation actions';
 $string['fixeddate'] = 'At a fixed date';
 $string['importallocationend'] = 'Allocation end ({$a})';
 $string['importallocationstart'] = 'Allocation start ({$a})';
@@ -140,6 +141,7 @@ $string['messageprovider:endsoon_relateduser_notification'] = 'Program end date 
 $string['messageprovider:endcompleted_notification'] = 'Completed program ended notification';
 $string['messageprovider:endfailed_notification'] = 'Failed program ended notification';
 $string['messageprovider:endfailed_relateduser_notification'] = 'Failed program ended notification - related user';
+$string['messageprovider:reset_notification'] = 'Program reset notification';
 $string['messageprovider:start_notification'] = 'Program started notification';
 $string['moveitem'] = 'Move item';
 $string['moveitemcancel'] = 'Cancel moving';
@@ -240,6 +242,13 @@ program "{$a->program_fullname}" ended and user {$a->user_fullname} failed to co
 $string['notification_endfailed_relateduser_description'] = 'Notification sent to users related to user when program they failed to complete ends.';
 $string['notification_relateduserfield'] = 'Notification related user field';
 $string['notification_relateduserfield_desc'] = 'Select related users profile field to be used for notification of related users.';
+$string['notification_reset'] = 'User progress reset';
+$string['notification_reset_subject'] = 'Program reset notification';
+$string['notification_reset_body'] = 'Hello {$a->user_fullname},
+
+your progress in program "{$a->program_fullname}" was reset.
+';
+$string['notification_reset_description'] = 'Notification sent to users when their program progress is reset.';
 $string['notification_start'] = 'Program started';
 $string['notification_start_subject'] = 'Program started';
 $string['notification_start_body'] = 'Hello {$a->user_fullname},
@@ -344,6 +353,7 @@ $string['programs:edit'] = 'Add and update programs';
 $string['programs:admin'] = 'Advanced program administration';
 $string['programs:manageallocation'] = 'Manage user allocations';
 $string['programs:manageevidence'] = 'Manage other completion evidence';
+$string['programs:reset'] = 'Reset program progress';
 $string['programs:view'] = 'View program management';
 $string['programs:viewcatalogue'] = 'Access program catalogue';
 $string['public'] = 'Public';
@@ -351,6 +361,8 @@ $string['public_help'] = 'Public programs are visible to all users.
 
 Visibility status does not affect already allocated programs.';
 $string['purchaseaccess'] = 'Purchase access';
+$string['resetallocation'] = 'Reset program progress';
+$string['resettype'] = 'Reset type';
 $string['resettype_deallocate'] = 'Program de-allocation only';
 $string['resettype_full'] = 'Full course purge';
 $string['resettype_none'] = 'None';

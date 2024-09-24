@@ -126,6 +126,7 @@ Feature: Program completion by managers tests
     And I follow "Program 000"
     And I follow "Users"
     And I follow "Student 1"
+    And I click on "Allocation actions" "link"
     And I click on "Override program completion" "link"
     And I set the following fields to these values:
       | timecompleted[enabled] | 1    |

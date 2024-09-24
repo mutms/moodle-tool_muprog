@@ -511,49 +511,12 @@ class renderer extends \plugin_renderer_base {
     public function render_user_allocation(stdClass $program, stdClass $source, stdClass $allocation): string {
         global $DB;
 
-        /** @var \local_openlms\output\dialog_form\renderer $dialogformoutput */
-        $dialogformoutput = $this->page->get_renderer('local_openlms', 'dialog_form');
-        /** @var \enrol_programs\output\catalogue\renderer $catalogueoutput */
-        $catalogueoutput = $this->page->get_renderer('enrol_programs', 'catalogue');
-
         $strnotset = get_string('notset', 'enrol_programs');
         $sourceclasses = allocation::get_source_classes();
-        $sourcenames = allocation::get_source_names();
         $context = \context::instance_by_id($program->contextid);
         $source = $DB->get_record('enrol_programs_sources', ['id' => $allocation->sourceid], '*', MUST_EXIST);
         /** @var \enrol_programs\local\source\base $sourceclass */
         $sourceclass = $sourceclasses[$source->type];
-
-        $buttons = [];
-        if (has_capability('enrol/programs:manageallocation', $context)) {
-            if ($sourceclass::allocation_edit_supported($program, $source, $allocation)
-                && !$program->archived && !$allocation->archived) {
-                $url = new \moodle_url('/enrol/programs/management/user_allocation_edit.php', ['id' => $allocation->id]);
-                $button = new \local_openlms\output\dialog_form\button($url, get_string('updateallocation', 'enrol_programs'));
-                $buttons[] = $dialogformoutput->render($button);
-            }
-        }
-        if (has_capability('enrol/programs:archive', $context)) {
-            if ($sourceclass::allocation_archiving_supported($program, $source, $allocation)) {
-                if ($allocation->archived) {
-                    $url = new \moodle_url('/enrol/programs/management/user_allocation_unarchive.php', ['id' => $allocation->id]);
-                    $button = new \local_openlms\output\dialog_form\button($url, get_string('unarchive', 'enrol_programs'));
-                    $buttons[] = $dialogformoutput->render($button);
-                } else {
-                    $url = new \moodle_url('/enrol/programs/management/user_allocation_archive.php', ['id' => $allocation->id]);
-                    $button = new \local_openlms\output\dialog_form\button($url, get_string('archive', 'enrol_programs'));
-                    $buttons[] = $dialogformoutput->render($button);
-                }
-            }
-        }
-        if (has_capability('enrol/programs:manageallocation', $context)) {
-            if ($sourceclass::allocation_delete_supported($program, $source, $allocation)) {
-                $url = new \moodle_url('/enrol/programs/management/user_allocation_delete.php', ['id' => $allocation->id]);
-                $button = new \local_openlms\output\dialog_form\button($url, get_string('deleteallocation', 'enrol_programs'));
-                $button->set_after_submit($button::AFTER_SUBMIT_REDIRECT);
-                $buttons[] = $dialogformoutput->render($button);
-            }
-        }
 
         $result = '';
 
@@ -571,22 +534,9 @@ class renderer extends \plugin_renderer_base {
         $result .= '<dt class="col-3">' . get_string('programend', 'enrol_programs') . ':</dt><dd class="col-9">'
             . (isset($allocation->timeend) ? userdate($allocation->timeend) : $strnotset) . '</dd>';
 
-        if (has_capability('enrol/programs:admin', $context)) {
-            $editurl = new moodle_url('/enrol/programs/management/program_completion_override.php', ['id' => $allocation->id]);
-            $editaction = new \local_openlms\output\dialog_form\icon($editurl, 'i/settings', get_string('programcompletionoverride', 'enrol_programs'));
-            $override = $dialogformoutput->render($editaction);
-        } else {
-            $override = '';
-        }
         $result .= '<dt class="col-3">' . get_string('programcompletion', 'enrol_programs') . ':</dt><dd class="col-9">'
-            . (isset($allocation->timecompleted) ? userdate($allocation->timecompleted) : $strnotset) . ' '. $override . '</dd>';
+            . (isset($allocation->timecompleted) ? userdate($allocation->timecompleted) : $strnotset) . '</dd>';
         $result .= '</dl>';
-
-        if ($buttons) {
-            $result .= '<div class="buttons mb-5">';
-            $result .= implode(' ', $buttons);
-            $result .= '</div>';
-        }
 
         return $result;
     }

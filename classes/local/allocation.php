@@ -1003,6 +1003,76 @@ final class allocation {
     }
 
     /**
+     * Reset user program progress.
+     *
+     * @param stdClass $data
+     * @return stdClass allocation record
+     */
+    public static function reset(stdClass $data): stdClass {
+        global $DB;
+
+        $record = $DB->get_record('enrol_programs_allocations', ['id' => $data->id], '*', MUST_EXIST);
+        $program = $DB->get_record('enrol_programs_programs', ['id' => $record->programid], '*', MUST_EXIST);
+        $source = $DB->get_record('enrol_programs_sources', ['id' => $record->sourceid]);
+        $user = $DB->get_record('user', ['id' => $record->userid, 'deleted' => 0], '*', MUST_EXIST);
+
+        if ($data->resettype != course_reset::RESETTYPE_STANDARD && $data->resettype != course_reset::RESETTYPE_FULL) {
+            throw new \coding_exception('invalid reset type');
+        }
+
+        if (!empty($data->updateallocation)) {
+            $record->timestart = $data->timestart;
+            $record->timedue = $data->timedue;
+            if (!$record->timedue) {
+                $record->timedue = null;
+            } else if ($record->timedue <= $record->timestart) {
+                throw new \coding_exception('invalid due date');
+            }
+            $record->timeend = $data->timeend;
+            if (!$record->timeend) {
+                $record->timeend = null;
+            } else if ($record->timeend <= $record->timestart) {
+                throw new \coding_exception('invalid end date');
+            }
+            if ($record->timedue && $record->timeend && $record->timedue > $record->timeend) {
+                throw new \coding_exception('invalid due date');
+            }
+        }
+
+        $trans = $DB->start_delegated_transaction();
+
+        self::make_snapshot($record->id, 'allocation_reset_before');
+
+        course_reset::purge_enrolments($user, $record->programid);
+        if ($data->resettype == course_reset::RESETTYPE_STANDARD) {
+            course_reset::purge_standard($user, $record->programid);
+        } else {
+            course_reset::purge_full($user, $record->programid);
+        }
+        course_reset::purge_completions($user, $record->programid);
+
+        $select = "userid = :userid AND itemid IN (SELECT id FROM {enrol_programs_items} WHERE programid = :programid)";
+        $params = ['programid' => $program->id, 'userid' => $user->id];
+        $DB->delete_records_select('enrol_programs_evidences', $select, $params);
+        $DB->delete_records('enrol_programs_completions', ['allocationid' => $record->id]);
+
+        $record->timecompleted = null;
+        $DB->update_record('enrol_programs_allocations', $record);
+
+        $allocation = self::make_snapshot($record->id, 'allocation_reset');
+
+        $trans->allow_commit();
+
+        self::fix_allocation_sources($allocation->programid, $allocation->userid);
+        self::fix_user_enrolments($allocation->programid, $allocation->userid);
+        calendar::fix_allocation_events($allocation, $program);
+
+        notification\reset::notify_now($user, $program, $source, $allocation);
+
+        return $allocation;
+    }
+
+    /**
      * Manually update item completion time.
      *
      * @param stdClass $data
