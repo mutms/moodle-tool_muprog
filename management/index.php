@@ -108,7 +108,7 @@ if (!$archived && has_capability('enrol/programs:upload', $context)) {
 
 $contextoptions = management::get_used_contexts_menu($context);
 
-echo '<div class="program-category-selector float-right">';
+echo '<div class="program-category-selector float-end">';
 $changecontexturl = new moodle_url($currenturl);
 $changecontexturl->remove_all_params();
 echo $OUTPUT->single_select($changecontexturl, 'contextid', $contextoptions, $contextid, [], 'programcategoryselect',
@@ -122,7 +122,7 @@ $tabs[] = new tabobject('active', $taburl, get_string('programsactive', 'enrol_p
 $tabs[] = new tabobject('archived', new moodle_url($taburl, ['archived' => 1]), get_string('programsarchived', 'enrol_programs'));
 echo $OUTPUT->render(new \tabtree($tabs, ($archived ? 'archived' : 'active')));
 
-echo '<div class="buttons float-right">';
+echo '<div class="buttons float-end">';
 if ($dropdown->has_items()) {
     echo $OUTPUT->render($dropdown);
 }

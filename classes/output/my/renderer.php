@@ -58,7 +58,7 @@ class renderer extends \plugin_renderer_base {
         if (!empty($presentation['image'])) {
             $imageurl = \moodle_url::make_file_url("$CFG->wwwroot/pluginfile.php",
                 '/' . $context->id . '/enrol_programs/image/' . $program->id . '/'. $presentation['image'], false);
-            $programimage = '<div class="float-right programimage">' . \html_writer::img($imageurl, '') . '</div>';
+            $programimage = '<div class="float-end programimage">' . \html_writer::img($imageurl, '') . '</div>';
         }
 
         $result = '';
@@ -260,7 +260,7 @@ EOT;
     public function render_block_footer(): string {
         $url = \enrol_programs\local\catalogue::get_catalogue_url();
         if ($url) {
-            return '<div class="float-right">' . \html_writer::link($url, get_string('catalogue', 'enrol_programs')) . '</div>';
+            return '<div class="float-end">' . \html_writer::link($url, get_string('catalogue', 'enrol_programs')) . '</div>';
         }
         return '';
     }

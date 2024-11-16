@@ -207,7 +207,7 @@ $data = [
         (object)['name' => 'dir', 'value' => $dir],
         (object)['name' => 'status', 'value' => $status],
     ],
-    'extraclasses' => 'mb-3 float-left'
+    'extraclasses' => 'mb-3 float-start'
 ];
 echo $OUTPUT->render_from_template('core/search_input', $data);
 $changestatus = new moodle_url($currenturl);
@@ -225,7 +225,7 @@ if (!isset($statusoptions[$status])) {
 echo '&nbsp';
 echo $OUTPUT->single_select($currenturl, 'status', $statusoptions, $status, []);
 if ($extramenu->has_items()) {
-    echo '<div class="float-right">';
+    echo '<div class="float-end">';
     echo $OUTPUT->render($extramenu->get_dropdown());
     echo '</div>';
 }

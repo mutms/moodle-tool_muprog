@@ -57,7 +57,7 @@ echo $managementoutput->render_management_program_tabs($program, 'notifications'
 
 $dropdown = \enrol_programs\local\notification_manager::get_extra_actions($program->id);
 if ($dropdown) {
-    echo '<div class="float-right">';
+    echo '<div class="float-end">';
     echo $OUTPUT->render($dropdown);
     echo '</div>';
     echo '<div class="clearfix"></div>';

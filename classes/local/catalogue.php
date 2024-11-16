@@ -220,7 +220,7 @@ final class catalogue {
             if (!empty($presentation['image'])) {
                 $imageurl = \moodle_url::make_file_url("$CFG->wwwroot/pluginfile.php",
                     '/' . $context->id . '/enrol_programs/image/' . $program->id . '/'. $presentation['image'], false);
-                $programimage = '<div class="float-right programimage">' . \html_writer::img($imageurl, '') . '</div>';
+                $programimage = '<div class="float-end programimage">' . \html_writer::img($imageurl, '') . '</div>';
             }
 
             $result .= <<<EOT

@@ -70,7 +70,7 @@ if (has_capability('enrol/programs:export', $context)) {
     $dropdown->add_item(get_string('export', 'enrol_programs'), $url);
 }
 if ($dropdown->has_items()) {
-    echo '<div class="float-right">';
+    echo '<div class="float-end">';
     echo $OUTPUT->render($dropdown);
     echo '</div>';
 }
