@@ -289,7 +289,7 @@ class renderer extends \plugin_renderer_base {
                         $actions[] = $dialogformoutput->render($importaction);
                     }
                 } else {
-                    $actions[] = $output->pix_icon('i/empty', '') . ' ';
+                    $actions[] = $output->pix_icon('i/navigationitem', '') . ' ';
                 }
                 if ($item->is_deletable()) {
                     if ($item instanceof course) {
@@ -304,16 +304,16 @@ class renderer extends \plugin_renderer_base {
                     $actions[] = $dialogformoutput->render($deleteaction);
                 } else {
                     if (!$importurl) {
-                        $actions[] = $output->pix_icon('i/empty', '') . ' ';
+                        $actions[] = $output->pix_icon('i/navigationitem', '') . ' ';
                     }
                 }
 
                 $targetpre = false;
                 $targetpost = false;
                 if ($item instanceof top) {
-                    $actions[] = $output->pix_icon('i/empty', '') . ' ';
+                    $actions[] = $output->pix_icon('i/navigationitem', '') . ' ';
                 } else if ($movetargetsfor) {
-                    $actions[] = $output->pix_icon('i/empty', '') . ' ';
+                    $actions[] = $output->pix_icon('i/navigationitem', '') . ' ';
                     if ($showtargets) {
                         if ($position == 0 || $parent->get_children()[$position - 1]->get_id() != $movetargetsfor) {
                             $targetpre = true;
@@ -336,14 +336,14 @@ class renderer extends \plugin_renderer_base {
                     $editurl = new moodle_url('/enrol/programs/management/item_course_edit.php', ['id' => $id]);
                     $editaction = new \local_openlms\output\dialog_form\icon($editurl, 'i/settings', get_string('updatecourse', 'enrol_programs'));
                     $actions[] = $dialogformoutput->render($editaction);
-                    $actions[] = $output->pix_icon('i/empty', '') . ' ';
+                    $actions[] = $output->pix_icon('i/navigationitem', '') . ' ';
                 } else if ($item instanceof training) {
                     $editurl = new moodle_url('/enrol/programs/management/item_training_edit.php', ['id' => $id]);
                     $editaction = new \local_openlms\output\dialog_form\icon($editurl, 'i/settings', get_string('updatetraining', 'enrol_programs'));
                     $actions[] = $dialogformoutput->render($editaction);
-                    $actions[] = $output->pix_icon('i/empty', '') . ' ';
+                    $actions[] = $output->pix_icon('i/navigationitem', '') . ' ';
                 } else {
-                    $actions[] = $output->pix_icon('i/empty', '') . ' ';
+                    $actions[] = $output->pix_icon('i/navigationitem', '') . ' ';
                 }
             }
 
