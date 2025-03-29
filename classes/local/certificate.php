@@ -1,28 +1,17 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace enrol_programs\local;
+namespace tool_muprog\local;
 
 /**
  * Program certificate awarded via tool_certificate.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class certificate {
     /**
@@ -31,7 +20,7 @@ final class certificate {
      * @return bool
      */
     public static function is_available(): bool {
-        if (!file_exists(__DIR__ . '/../../../../admin/tool/certificate/version.php')) {
+        if (!file_exists(__DIR__ . '/../../../certificate/version.php')) {
             return false;
         }
         $version = get_config('tool_certificate', 'version');
@@ -45,14 +34,14 @@ final class certificate {
      * Enable or update issuing of certificates for program completion.
      *
      * @param array $data
-     * @return \stdClass record from enrol_programs_certs
+     * @return \stdClass record from tool_muprog_cert
      */
     public static function update_program_certificate(array $data): \stdClass {
         global $DB;
 
         $data = (object)$data;
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $data->id], '*', MUST_EXIST);
-        $cert = $DB->get_record('enrol_programs_certs', ['programid' => $program->id]);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $data->id], '*', MUST_EXIST);
+        $cert = $DB->get_record('tool_muprog_cert', ['programid' => $program->id]);
         if (!$cert) {
             $cert = new \stdClass();
             $cert->id = null;
@@ -71,12 +60,12 @@ final class certificate {
         }
 
         if ($cert->id) {
-            $DB->update_record('enrol_programs_certs', $cert);
+            $DB->update_record('tool_muprog_cert', $cert);
         } else {
-            $cert->id = $DB->insert_record('enrol_programs_certs', $cert);
+            $cert->id = $DB->insert_record('tool_muprog_cert', $cert);
         }
 
-        return $DB->get_record('enrol_programs_certs', ['id' => $cert->id], '*', MUST_EXIST);
+        return $DB->get_record('tool_muprog_cert', ['id' => $cert->id], '*', MUST_EXIST);
     }
 
     /**
@@ -87,7 +76,7 @@ final class certificate {
      */
     public static function delete_program_certificate(int $programid): void {
         global $DB;
-        $DB->delete_records('enrol_programs_certs', ['programid' => $programid]);
+        $DB->delete_records('tool_muprog_cert', ['programid' => $programid]);
     }
 
     /**
@@ -104,34 +93,34 @@ final class certificate {
             throw new \coding_exception('Certificates cannot be awarded from normal web pages');
         }
 
-        $allocation = $DB->get_record('enrol_programs_allocations', ['programid' => $programid, 'userid' => $userid]);
+        $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $programid, 'userid' => $userid]);
         if (!$allocation) {
             return false;
         }
 
-        $lockfactory = \core\lock\lock_config::get_lock_factory('enrol_programs_certificate_lock');
+        $lockfactory = \core\lock\lock_config::get_lock_factory('tool_muprog_certificate_lock');
         $lock = $lockfactory->get_lock("allocation_{$allocation->id}", MINSECS);
         if (!$lock) {
             debugging('locktimeout when issuing certificate for allocation ' . $allocation->id, DEBUG_DEVELOPER);
             return false;
         }
-        if ($DB->record_exists('enrol_programs_certs_issues', ['allocationid' => $allocation->id])) {
+        if ($DB->record_exists('tool_muprog_cert_issue', ['allocationid' => $allocation->id])) {
             // Prevent multiple certificates for program completion at the same time of one user.
             $lock->release();
             return false;
         }
 
-        $allocation = $DB->get_record('enrol_programs_allocations', ['id' => $allocation->id]);
+        $allocation = $DB->get_record('tool_muprog_allocation', ['id' => $allocation->id]);
         if (!$allocation || $allocation->archived || !$allocation->timecompleted) {
             $lock->release();
             return false;
         }
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $allocation->programid]);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $allocation->programid]);
         if (!$program || $program->archived) {
             $lock->release();
             return false;
         }
-        $cert = $DB->get_record('enrol_programs_certs', ['programid' => $programid]);
+        $cert = $DB->get_record('tool_muprog_cert', ['programid' => $programid]);
         if (!$cert) {
             $lock->release();
             return false;
@@ -160,7 +149,7 @@ final class certificate {
             $cert->expirydateoffset,
             $cert->expirydateoffset
         );
-        $issueid = $template->issue_certificate($user->id, $expirydate, $issuedata, 'enrol_programs');
+        $issueid = $template->issue_certificate($user->id, $expirydate, $issuedata, 'tool_muprog');
 
         $issue = new \stdClass();
         $issue->programid = $program->id;
@@ -168,7 +157,7 @@ final class certificate {
         $issue->timecompleted = $allocation->timecompleted;
         $issue->issueid = $issueid;
         $issue->timecreated = time();
-        $DB->insert_record('enrol_programs_certs_issues', $issue);
+        $DB->insert_record('tool_muprog_cert_issue', $issue);
 
         $lock->release();
 
@@ -183,7 +172,7 @@ final class certificate {
      */
     public static function template_deleted(\tool_certificate\event\template_deleted $event): void {
         global $DB;
-        $DB->delete_records('enrol_programs_certs', ['templateid' => $event->objectid]);
+        $DB->delete_records('tool_muprog_cert', ['templateid' => $event->objectid]);
     }
 
     /**
@@ -200,12 +189,12 @@ final class certificate {
 
         $params = ['now' => time()];
         $sql = "SELECT a.id, a.programid, a.userid
-                  FROM {enrol_programs_programs} p
-                  JOIN {enrol_programs_allocations} a ON a.programid = p.id AND a.archived = 0 AND a.timecompleted <= :now
+                  FROM {tool_muprog_program} p
+                  JOIN {tool_muprog_allocation} a ON a.programid = p.id AND a.archived = 0 AND a.timecompleted <= :now
                   JOIN {user} u ON u.id = a.userid AND u.deleted = 0 and u.confirmed = 1
-                  JOIN {enrol_programs_certs} c ON c.programid = p.id
+                  JOIN {tool_muprog_cert} c ON c.programid = p.id
                   JOIN {tool_certificate_templates} t ON t.id = c.templateid
-             LEFT JOIN {enrol_programs_certs_issues} ci ON ci.allocationid = a.id AND ci.programid = p.id
+             LEFT JOIN {tool_muprog_cert_issue} ci ON ci.allocationid = a.id AND ci.programid = p.id
                  WHERE p.archived = 0 AND ci.id IS NULL
               ORDER BY p.id ASC, u.id ASC";
         $issues = $DB->get_records_sql($sql, $params);
@@ -215,10 +204,10 @@ final class certificate {
 
         $sql = "SELECT i.id
                   FROM {tool_certificate_issues} i
-             LEFT JOIN {enrol_programs_certs_issues} ci ON ci.issueid = i.id
-             LEFT JOIN {enrol_programs_programs} p ON p.id = ci.programid
-             LEFT JOIN {enrol_programs_allocations} a ON a.id = ci.allocationid
-                 WHERE i.component = 'enrol_programs' AND i.archived = 0
+             LEFT JOIN {tool_muprog_cert_issue} ci ON ci.issueid = i.id
+             LEFT JOIN {tool_muprog_program} p ON p.id = ci.programid
+             LEFT JOIN {tool_muprog_allocation} a ON a.id = ci.allocationid
+                 WHERE i.component = 'tool_muprog' AND i.archived = 0
                        AND (ci.id IS NULL OR p.id IS NULL OR a.id IS NULL)
               ORDER BY i.id ASC";
         $issues = $DB->get_records_sql($sql, []);

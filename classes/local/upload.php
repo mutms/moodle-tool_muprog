@@ -1,30 +1,19 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace enrol_programs\local;
+namespace tool_muprog\local;
 
 use stdClass;
 
 /**
  * Programs upload helper.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2024 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class upload {
     /**
@@ -74,7 +63,7 @@ final class upload {
                 }
             }
 
-            $cfhandler = \enrol_programs\customfield\fields_handler::create();
+            $cfhandler = \tool_muprog\customfield\fields_handler::create();
             foreach ($cfhandler->get_fields() as $cfield) {
                 $cfname = 'customfield_' . $cfield->get('shortname');
                 if (isset($rawprogram->$cfname)) {
@@ -100,8 +89,8 @@ final class upload {
                 $top->update_set($top, $update);
 
                 $addfunction = function(
-                    \enrol_programs\local\content\top $top,
-                    \enrol_programs\local\content\set $parent,
+                    \tool_muprog\local\content\top $top,
+                    \tool_muprog\local\content\set $parent,
                     stdClass $item) use (&$addfunction): void {
 
                     if ($item->itemtype === 'course') {
@@ -116,7 +105,7 @@ final class upload {
                             'points' => $item->points ?? 1,
                             'completiondelay' => $item->completiondelay ?? 0,
                         ];
-                        $top->append_training($parent, $item->frameworkid, $data);
+                        $top->append_training($parent, $item->trainingid, $data);
 
                     } else if ($item->itemtype === 'set') {
                         $data = [
@@ -140,7 +129,7 @@ final class upload {
                 }
             }
 
-            if (isset($rawprogram->sources) and is_array($rawprogram->sources)) {
+            if (isset($rawprogram->sources) && is_array($rawprogram->sources)) {
                 foreach ($rawprogram->sources as $source) {
                     $record = (object)[
                         'programid' => $program->id,
@@ -154,7 +143,7 @@ final class upload {
                         $record->selfallocation_key = $source->data->key ?? '';
                         $record->selfallocation_allowsignup = $source->data->allowsignup ?? 0;
                     }
-                    \enrol_programs\local\source\base::update_source($record);
+                    \tool_muprog\local\source\base::update_source($record);
                 }
             }
         }
@@ -169,7 +158,7 @@ final class upload {
     public static function preview(array $filedata): string {
         // NOTE: let's not localise the column names for now.
         $columns = [
-            get_string('upload_status', 'enrol_programs'),
+            get_string('upload_status', 'tool_muprog'),
             'idnumber',
             'fullname',
             'category',
@@ -184,7 +173,7 @@ final class upload {
             'enddate',
             'sources',
         ];
-        $cfhandler = \enrol_programs\customfield\fields_handler::create();
+        $cfhandler = \tool_muprog\customfield\fields_handler::create();
         foreach ($cfhandler->get_fields() as $cfield) {
             $columns[] = 'customfield_' . $cfield->get('shortname');
         }
@@ -212,7 +201,7 @@ final class upload {
         foreach ($filedata as $program) {
             $program->errors = (array)$program->errors;
             if ($program->errors) {
-                $status = '<div class="badge badge-danger">' . get_string('upload_status_invalid', 'enrol_programs') . '</div>';
+                $status = '<div class="badge badge-danger">' . get_string('upload_status_invalid', 'tool_muprog') . '</div>';
             } else {
                 $status = '<div class="badge badge-info">' . get_string('ok') . '</div>';
             }
@@ -271,8 +260,8 @@ final class upload {
             }
 
             $allowed = ['manual', 'selfallocation', 'approval'];
-            if (get_config('tool_certify', 'version')) {
-                $allowed[] = 'certify';
+            if (get_config('tool_mucertify', 'version')) {
+                $allowed[] = 'mucertify';
             }
             $sources = '';
             if (!empty($program->sources)) {
@@ -283,7 +272,7 @@ final class upload {
                         $sources = [$formaterror(get_string('error'))];
                         break;
                     }
-                    $sources[] = get_string('source_' . $source->sourcetype, 'enrol_programs');
+                    $sources[] = get_string('source_' . $source->sourcetype, 'tool_muprog');
                 }
                 $sources = implode(', ', $sources);
             }
@@ -300,12 +289,16 @@ final class upload {
                         $coursename = $DB->get_field('course', 'fullname', ['id' => $item->courseid]);
                         return [$padding. format_string($coursename)];
                     } else if ($item->itemtype === 'training') {
-                        $frameworkname = $DB->get_field('customfield_training_frameworks', 'name', ['id' => $item->frameworkid]);
-                        return [$padding. format_string($frameworkname)];
+                        if (util::is_mutrain_available()) {
+                            $frameworkname = $DB->get_field('customfield_mutrain_framework', 'name', ['id' => $item->trainingid]);
+                            return [$padding. format_string($frameworkname)];
+                        } else {
+                            return [$padding. get_string('error')];
+                        }
                     } else if ($item->itemtype === 'set') {
-                        $result[] = $padding . s($item->fullname ?? get_string('set', 'enrol_programs'));
+                        $result[] = $padding . s($item->fullname ?? get_string('set', 'tool_muprog'));
                         foreach ($item->items as $child) {
-                            $result = array_merge($result, $itemformatter((object)$child, $level+1));
+                            $result = array_merge($result, $itemformatter((object)$child, $level + 1));
                         }
                         return $result;
                     } else {
@@ -368,7 +361,7 @@ final class upload {
         $fs = get_file_storage();
         $context = \context_user::instance($USER->id);
 
-        $fs->delete_area_files($context->id, 'enrol_programs', 'upload', $draftid);
+        $fs->delete_area_files($context->id, 'tool_muprog', 'upload', $draftid);
 
         $files = $fs->get_area_files($context->id, 'user', 'draft', $draftid, 'id DESC', false);
         if (!$files) {
@@ -399,7 +392,7 @@ final class upload {
 
         if ($zipfiles) {
             if (count($zipfiles) > 1 || $textfiles || $jsonfiles || $otherfiles) {
-                return get_string('upload_files_error', 'enrol_programs');
+                return get_string('upload_files_error', 'tool_muprog');
             }
 
             $zipfile = $zipfiles[0];
@@ -427,17 +420,17 @@ final class upload {
 
         if ($textfiles) {
             if ($jsonfiles || $otherfiles) {
-                return get_string('upload_files_error', 'enrol_programs');
+                return get_string('upload_files_error', 'tool_muprog');
             }
 
             $programs = self::decode_csv_files($textfiles, $encoding);
             if ($programs === null) {
-                return get_string('upload_files_error', 'enrol_programs');
+                return get_string('upload_files_error', 'tool_muprog');
             }
 
         } else if ($jsonfiles) {
             if ($otherfiles) {
-                return get_string('upload_files_error', 'enrol_programs');
+                return get_string('upload_files_error', 'tool_muprog');
             }
 
             // There might be schema file, so try to parse all json files.
@@ -449,20 +442,20 @@ final class upload {
                 }
             }
             if ($programs === null) {
-                return get_string('upload_files_error', 'enrol_programs');
+                return get_string('upload_files_error', 'tool_muprog');
             }
 
         } else {
-            return get_string('upload_files_error', 'enrol_programs');
+            return get_string('upload_files_error', 'tool_muprog');
         }
 
-        $programs = \local_openlms\json_schema::normalise_data($programs);
+        $programs = \tool_mulib\local\json_schema::normalise_data($programs);
 
         $json = (object)[
             'programs' => $programs,
         ];
         $schema = file_get_contents(__DIR__ . '/../../db/programs_schema.json');
-        list($valid, $errors) = \local_openlms\json_schema::validate($json, $schema);
+        list($valid, $errors) = \tool_mulib\local\json_schema::validate($json, $schema);
         if (!$valid) {
             $debug = [];
             foreach ($errors as $i => $lines) {
@@ -490,7 +483,7 @@ final class upload {
     public static function validate_references(array $programs): void {
         global $DB;
 
-        $allprograms = $DB->get_fieldset_select('enrol_programs_programs', 'idnumber', '1=1');
+        $allprograms = $DB->get_fieldset_select('tool_muprog_program', 'idnumber', '1=1');
         $allprograms = array_map([\core_text::class, 'strtolower'], $allprograms);
 
         $programs = array_values($programs);
@@ -522,7 +515,7 @@ final class upload {
                 $program->contextid = null;
             } else if ($program->category === '') {
                 $context = \context_system::instance();
-                if (has_capability('enrol/programs:upload', $context)) {
+                if (has_capability('tool/muprog:upload', $context)) {
                     $program->contextid = $context->id;
                 } else {
                     $program->contextid = null;
@@ -534,7 +527,7 @@ final class upload {
                 } else if (count($categories) === 1) {
                     $category = reset($categories);
                     $context = \context_coursecat::instance($category->id, IGNORE_MISSING);
-                    if ($context && has_capability('enrol/programs:upload', $context)) {
+                    if ($context && has_capability('tool/muprog:upload', $context)) {
                         $program->contextid = $context->id;
                     } else {
                         $program->contextid = null;
@@ -544,7 +537,7 @@ final class upload {
                     if (count($categories) === 1) {
                         $category = reset($categories);
                         $context = \context_coursecat::instance($category->id, IGNORE_MISSING);
-                        if ($context && has_capability('enrol/programs:upload', $context)) {
+                        if ($context && has_capability('tool/muprog:upload', $context)) {
                             $program->contextid = $context->id;
                         } else {
                             $program->contextid = null;
@@ -572,17 +565,17 @@ final class upload {
                         }
                         return null;
 
-                    } else if ($item->itemtype === 'training') {
+                    } else if ($item->itemtype === 'training' && util::is_mutrain_available()) {
                         unset($item->items);
-                        $frameworks = $DB->get_records('customfield_training_frameworks', ['idnumber' => $item->reference]);
+                        $frameworks = $DB->get_records('customfield_mutrain_framework', ['idnumber' => $item->reference]);
                         if (count($frameworks) === 1) {
                             $framework = reset($frameworks);
-                            $item->frameworkid = $framework->id;
+                            $item->trainingid = $framework->id;
                         } else if (count($frameworks) === 0) {
-                            $frameworks = $DB->get_records('customfield_training_frameworks', ['name' => $item->reference]);
+                            $frameworks = $DB->get_records('customfield_mutrain_framework', ['name' => $item->reference]);
                             if (count($frameworks) === 1) {
                                 $framework = reset($frameworks);
-                                $item->frameworkid = $framework->id;
+                                $item->trainingid = $framework->id;
                             } else {
                                 return get_string('error');
                             }

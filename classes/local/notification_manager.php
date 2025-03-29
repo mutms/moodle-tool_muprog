@@ -1,32 +1,21 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace enrol_programs\local;
+namespace tool_muprog\local;
 
 use stdClass;
 
 /**
  * Programs notification manager.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2023 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class notification_manager extends \local_openlms\notification\manager {
+final class notification_manager extends \tool_mulib\local\notification\manager {
     /**
      * Returns list of all notifications in plugin.
      *
@@ -38,16 +27,11 @@ final class notification_manager extends \local_openlms\notification\manager {
             'allocation' => notification\allocation::class,
             'start' => notification\start::class,
             'completion' => notification\completion::class,
-            'completion_relateduser' => notification\completion_relateduser::class,
             'duesoon' => notification\duesoon::class,
-            'duesoon_relateduser' => notification\duesoon_relateduser::class,
             'due' => notification\due::class,
-            'due_relateduser' => notification\due_relateduser::class,
             'endsoon' => notification\endsoon::class,
-            'endsoon_relateduser' => notification\endsoon_relateduser::class,
             'endcompleted' => notification\endcompleted::class,
             'endfailed' => notification\endfailed::class,
-            'endfailed_relateduser' => notification\endfailed_relateduser::class,
             'deallocation' => notification\deallocation::class,
             'reset' => notification\reset::class,
         ];
@@ -56,6 +40,7 @@ final class notification_manager extends \local_openlms\notification\manager {
     /**
      * Returns list of candidate types for adding of new notifications.
      *
+     * @param int $instanceid
      * @return array of type names with notificationtype as keys
      */
     public static function get_candidate_types(int $instanceid): array {
@@ -63,21 +48,13 @@ final class notification_manager extends \local_openlms\notification\manager {
 
         $types = self::get_all_types();
 
-        $fieldid = notification\base::get_relateduser_fieldid();
-        if (!$fieldid) {
-            foreach ($types as $k => $v) {
-                if (str_ends_with($k, '_relateduser')) {
-                    unset($types[$k]);
-                }
-            }
-        }
-
-        $existing = $DB->get_records('local_openlms_notifications',
-            ['component' => 'enrol_programs', 'instanceid' => $instanceid]);
+        $existing = $DB->get_records('tool_mulib_notification',
+            ['component' => 'tool_muprog', 'instanceid' => $instanceid]);
         foreach ($existing as $notification) {
             unset($types[$notification->notificationtype]);
         }
 
+        // phpcs:ignore moodle.Commenting.InlineComment.TypeHintingForeach
         /** @var class-string<notification\base> $classname */
         foreach ($types as $type => $classname) {
             $types[$type] = $classname::get_name();
@@ -95,7 +72,7 @@ final class notification_manager extends \local_openlms\notification\manager {
     public static function get_instance_context(int $instanceid): ?\context {
         global $DB;
 
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $instanceid]);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $instanceid]);
         if (!$program) {
             return null;
         }
@@ -111,13 +88,13 @@ final class notification_manager extends \local_openlms\notification\manager {
      */
     public static function can_view(int $instanceid): bool {
         global $DB;
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $instanceid]);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $instanceid]);
         if (!$program) {
             return false;
         }
 
         $context = \context::instance_by_id($program->contextid);
-        return has_capability('enrol/programs:view', $context);
+        return has_capability('tool/muprog:view', $context);
     }
 
     /**
@@ -128,13 +105,13 @@ final class notification_manager extends \local_openlms\notification\manager {
      */
     public static function can_manage(int $instanceid): bool {
         global $DB;
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $instanceid]);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $instanceid]);
         if (!$program) {
             return false;
         }
 
         $context = \context::instance_by_id($program->contextid);
-        return has_capability('enrol/programs:edit', $context);
+        return has_capability('tool/muprog:edit', $context);
     }
 
     /**
@@ -145,7 +122,7 @@ final class notification_manager extends \local_openlms\notification\manager {
      */
     public static function get_instance_name(int $instanceid): ?string {
         global $DB;
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $instanceid]);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $instanceid]);
         if (!$program) {
             return null;
         }
@@ -160,17 +137,17 @@ final class notification_manager extends \local_openlms\notification\manager {
      */
     public static function get_instance_management_url(int $instanceid): ?\moodle_url {
         global $DB;
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $instanceid]);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $instanceid]);
         if (!$program) {
             return null;
         }
 
         $context = \context::instance_by_id($program->contextid);
-        if (!has_capability('enrol/programs:view', $context)) {
+        if (!has_capability('tool/muprog:view', $context)) {
             return null;
         }
 
-        return new \moodle_url('/enrol/programs/management/program_notifications.php', ['id' => $program->id]);
+        return new \moodle_url('/admin/tool/muprog/management/program_notifications.php', ['id' => $program->id]);
     }
 
     /**
@@ -182,7 +159,7 @@ final class notification_manager extends \local_openlms\notification\manager {
     public static function setup_view_page(\stdClass $notification): void {
         global $PAGE, $DB, $OUTPUT;
 
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $notification->instanceid]);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $notification->instanceid]);
         if (!$program) {
             return;
         }
@@ -190,15 +167,10 @@ final class notification_manager extends \local_openlms\notification\manager {
         $context = \context::instance_by_id($program->contextid);
         $manageurl = self::get_instance_management_url($notification->instanceid);
 
-        management::setup_program_page($manageurl, $context, $program);
-        $PAGE->set_url('/local/openlms/notification/view.php', ['id' => $notification->id]);
+        management::setup_program_page($manageurl, $context, $program, 'program_notifications');
+        $PAGE->set_url('/admin/tool/mulib/notification/view.php', ['id' => $notification->id]);
 
         echo $OUTPUT->header();
-
-        /** @var \enrol_programs\output\management\renderer $managementoutput */
-        $managementoutput = $PAGE->get_renderer('enrol_programs', 'management');
-
-        echo $managementoutput->render_management_program_tabs($program, 'notifications');
     }
 
     /**
@@ -211,13 +183,13 @@ final class notification_manager extends \local_openlms\notification\manager {
     public static function trigger_notifications(?int $programid, ?int $userid): void {
         global $DB;
 
-        if (!enrol_is_enabled('programs')) {
+        if (!enrol_is_enabled('muprog')) {
             return;
         }
 
         $program = null;
         if ($programid) {
-            $program = $DB->get_record('enrol_programs_programs', ['id' => $programid], '*', MUST_EXIST);
+            $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
             if ($program->archived) {
                 return;
             }
@@ -248,8 +220,8 @@ final class notification_manager extends \local_openlms\notification\manager {
     public static function delete_allocation_notifications(\stdClass $allocation) {
         global $DB;
 
-        $notifications = $DB->get_records('local_openlms_notifications',
-            ['component' => 'enrol_programs', 'instanceid' => $allocation->programid]);
+        $notifications = $DB->get_records('tool_mulib_notification',
+            ['component' => 'tool_muprog', 'instanceid' => $allocation->programid]);
         foreach ($notifications as $notification) {
             /** @var class-string<notification\base> $classname */
             $classname = self::get_classname($notification->notificationtype);
@@ -269,10 +241,10 @@ final class notification_manager extends \local_openlms\notification\manager {
     public static function delete_program_notifications(\stdClass $program) {
         global $DB;
 
-        $notifications = $DB->get_records('local_openlms_notifications',
-            ['component' => 'enrol_programs', 'instanceid' => $program->id]);
+        $notifications = $DB->get_records('tool_mulib_notification',
+            ['component' => 'tool_muprog', 'instanceid' => $program->id]);
         foreach ($notifications as $notification) {
-            \local_openlms\notification\util::notification_delete($notification->id);
+            \tool_mulib\local\notification\util::notification_delete($notification->id);
         }
     }
 
@@ -289,11 +261,11 @@ final class notification_manager extends \local_openlms\notification\manager {
 
         $params = ['programid' => $programid, 'allocateduserid' => $allocateduserid, 'type' => $notificationtype];
         $sql = "SELECT MAX(un.timenotified)
-                  FROM {enrol_programs_allocations} pa
-                  JOIN {enrol_programs_programs} p ON p.id = pa.programid
-                  JOIN {local_openlms_notifications} n
-                       ON n.component = 'enrol_programs' AND n.notificationtype = :type AND n.instanceid = p.id
-                  JOIN {local_openlms_user_notified} un
+                  FROM {tool_muprog_allocation} pa
+                  JOIN {tool_muprog_program} p ON p.id = pa.programid
+                  JOIN {tool_mulib_notification} n
+                       ON n.component = 'tool_muprog' AND n.notificationtype = :type AND n.instanceid = p.id
+                  JOIN {tool_mulib_notification_user} un
                        ON un.notificationid = n.id AND un.otherid1 = pa.id
                  WHERE p.id = :programid AND pa.userid = :allocateduserid";
         return $DB->get_field_sql($sql, $params);
@@ -322,12 +294,12 @@ final class notification_manager extends \local_openlms\notification\manager {
             return false;
         }
 
-        $programcontextid = $DB->get_field('enrol_programs_programs', 'contextid', ['id' => $frominstanceid]);
+        $programcontextid = $DB->get_field('tool_muprog_program', 'contextid', ['id' => $frominstanceid]);
         if (!$programcontextid) {
             return false;
         }
 
         $context = \context::instance_by_id($programcontextid);
-        return has_capability('enrol/programs:clone', $context);
+        return has_capability('tool/muprog:clone', $context);
     }
 }

@@ -1,37 +1,26 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace enrol_programs\local\form;
+namespace tool_muprog\local\form;
 
 /**
  * Add program content items.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2023 Open LMS (https://www.openlms.net/)
  * @author     Farhan Karmali
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class program_content_import extends \local_openlms\dialog_form {
+final class program_content_import extends \tool_mulib\local\dialog_form {
+    #[\Override]
     protected function definition() {
         $mform = $this->_form;
         $customdata = $this->_customdata;
 
         $arguments = ['programid' => $customdata['id']];
-        \enrol_programs\external\form_program_content_import_fromprogram::add_form_element(
-            $mform, $arguments, 'fromprogram', get_string('importselectprogram', 'enrol_programs'));
+        \tool_muprog\external\form_program_content_import_fromprogram::add_form_element(
+            $mform, $arguments, 'fromprogram', get_string('importselectprogram', 'tool_muprog'));
         $mform->addRule('fromprogram', null, 'required', null, 'client');
 
         $mform->addElement('hidden', 'id');
@@ -41,15 +30,16 @@ final class program_content_import extends \local_openlms\dialog_form {
         $this->add_action_buttons(true, get_string('continue'));
     }
 
+    #[\Override]
     public function validation($data, $files) {
         global $DB;
         $errors = parent::validation($data, $files);
 
         // Check if the user has capability to copy the selected program.
         $programid = $data['fromprogram'];
-        $programcontextid = $DB->get_field('enrol_programs_programs', 'contextid', ['id' => $programid]);
+        $programcontextid = $DB->get_field('tool_muprog_program', 'contextid', ['id' => $programid]);
         $context = \context::instance_by_id($programcontextid);
-        if (!has_capability('enrol/programs:clone', $context )) {
+        if (!has_capability('tool/muprog:clone', $context )) {
             $errors['fromprogram'] = get_string('error');
         }
         return $errors;

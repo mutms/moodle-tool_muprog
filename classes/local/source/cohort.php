@@ -1,30 +1,20 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace enrol_programs\local\source;
+namespace tool_muprog\local\source;
 
 use stdClass;
 
 /**
  * Program allocation for all visible cohort members.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class cohort extends base {
     /**
@@ -51,11 +41,11 @@ final class cohort extends base {
     public static function is_import_allowed(stdClass $fromprogram, stdClass $targetprogram): bool {
         global $DB;
 
-        if (!$DB->record_exists('enrol_programs_sources', ['type' => static::get_type(), 'programid' => $fromprogram->id])) {
+        if (!$DB->record_exists('tool_muprog_source', ['type' => static::get_type(), 'programid' => $fromprogram->id])) {
             return false;
         }
 
-        if (!$DB->record_exists('enrol_programs_sources', ['type' => static::get_type(), 'programid' => $targetprogram->id])) {
+        if (!$DB->record_exists('tool_muprog_source', ['type' => static::get_type(), 'programid' => $targetprogram->id])) {
             if (!static::is_new_allowed($targetprogram)) {
                 return false;
             }
@@ -77,9 +67,9 @@ final class cohort extends base {
         $targetsource = parent::import_source_data($fromprogramid, $targetprogramid);
 
         $sql = "SELECT fc.*
-                  FROM {enrol_programs_src_cohorts} fc
-                  JOIN {enrol_programs_sources} fs ON fs.id = fc.sourceid AND fs.programid = :fromprogramid AND fs.type = 'cohort'
-             LEFT JOIN {enrol_programs_src_cohorts} tc ON tc.cohortid = fc.cohortid AND tc.sourceid = :targetsourceid
+                  FROM {tool_muprog_src_cohort} fc
+                  JOIN {tool_muprog_source} fs ON fs.id = fc.sourceid AND fs.programid = :fromprogramid AND fs.type = 'cohort'
+             LEFT JOIN {tool_muprog_src_cohort} tc ON tc.cohortid = fc.cohortid AND tc.sourceid = :targetsourceid
                  WHERE tc.id IS NULL
               ORDER BY fc.id ASC";
         $params = ['fromprogramid' => $fromprogramid, 'targetsourceid' => $targetsource->id];
@@ -87,14 +77,14 @@ final class cohort extends base {
         foreach ($records as $record) {
             unset($record->id);
             $record->sourceid = $targetsource->id;
-            $DB->insert_record('enrol_programs_src_cohorts', $record);
+            $DB->insert_record('tool_muprog_src_cohort', $record);
         }
 
         return $targetsource;
     }
 
     /**
-     * Render details about this enabled source in a program management ui.
+     * Render details about this enabled source in a programs management ui.
      *
      * @param stdClass $program
      * @param stdClass|null $source
@@ -104,7 +94,7 @@ final class cohort extends base {
         $result = parent::render_status_details($program, $source);
 
         if ($source) {
-            $cohorts = cohort::fetch_allocation_cohorts_menu($source->id);
+            $cohorts = self::fetch_allocation_cohorts_menu($source->id);
             \core_collator::asort($cohorts);
             if ($cohorts) {
                 $cohorts = array_map('format_string', $cohorts);
@@ -170,8 +160,8 @@ final class cohort extends base {
             return;
         }
 
-        $oldcohorts = cohort::fetch_allocation_cohorts_menu($source->id);
-        $sourceid = $DB->get_field('enrol_programs_sources', 'id', ['programid' => $data->programid, 'type' => 'cohort']);
+        $oldcohorts = self::fetch_allocation_cohorts_menu($source->id);
+        $sourceid = $DB->get_field('tool_muprog_source', 'id', ['programid' => $data->programid, 'type' => 'cohort']);
         $data->cohorts = $data->cohorts ?? [];
         foreach ($data->cohorts as $cid) {
             if (isset($oldcohorts[$cid])) {
@@ -179,10 +169,10 @@ final class cohort extends base {
                 continue;
             }
             $record = (object)['sourceid' => $sourceid, 'cohortid' => $cid];
-            $DB->insert_record('enrol_programs_src_cohorts', $record);
+            $DB->insert_record('tool_muprog_src_cohort', $record);
         }
         foreach ($oldcohorts as $cid => $unused) {
-            $DB->delete_records('enrol_programs_src_cohorts', ['sourceid' => $sourceid, 'cohortid' => $cid]);
+            $DB->delete_records('tool_muprog_src_cohort', ['sourceid' => $sourceid, 'cohortid' => $cid]);
         }
     }
 
@@ -197,7 +187,7 @@ final class cohort extends base {
 
         $sql = "SELECT c.id, c.name
                   FROM {cohort} c
-                  JOIN {enrol_programs_src_cohorts} pc ON c.id = pc.cohortid                                    
+                  JOIN {tool_muprog_src_cohort} pc ON c.id = pc.cohortid
                  WHERE pc.sourceid = :sourceid
               ORDER BY c.name ASC, c.id ASC";
         $params = ['sourceid' => $sourceid];
@@ -237,10 +227,10 @@ final class cohort extends base {
         $params['now2'] = $now;
         $sql = "SELECT DISTINCT p.id, cm.userid, s.id AS sourceid, pa.id AS allocationid
                   FROM {cohort_members} cm
-                  JOIN {enrol_programs_src_cohorts} psc ON psc.cohortid = cm.cohortid
-                  JOIN {enrol_programs_sources} s ON s.id = psc.sourceid AND s.type = 'cohort'
-                  JOIN {enrol_programs_programs} p ON p.id = s.programid
-             LEFT JOIN {enrol_programs_allocations} pa ON pa.programid = p.id AND pa.userid = cm.userid
+                  JOIN {tool_muprog_src_cohort} psc ON psc.cohortid = cm.cohortid
+                  JOIN {tool_muprog_source} s ON s.id = psc.sourceid AND s.type = 'cohort'
+                  JOIN {tool_muprog_program} p ON p.id = s.programid
+             LEFT JOIN {tool_muprog_allocation} pa ON pa.programid = p.id AND pa.userid = cm.userid
                  WHERE (pa.id IS NULL OR (pa.archived = 1 AND pa.sourceid = s.id))
                        AND p.archived = 0
                        AND (p.timeallocationstart IS NULL OR p.timeallocationstart <= :now1)
@@ -252,18 +242,18 @@ final class cohort extends base {
         $lastsource = null;
         foreach ($rs as $record) {
             if ($record->allocationid) {
-                $DB->set_field('enrol_programs_allocations', 'archived', 0, ['id' => $record->allocationid]);
+                $DB->set_field('tool_muprog_allocation', 'archived', 0, ['id' => $record->allocationid]);
             } else {
                 if ($lastprogram && $lastprogram->id == $record->id) {
                     $program = $lastprogram;
                 } else {
-                    $program = $DB->get_record('enrol_programs_programs', ['id' => $record->id], '*', MUST_EXIST);
+                    $program = $DB->get_record('tool_muprog_program', ['id' => $record->id], '*', MUST_EXIST);
                     $lastprogram = $program;
                 }
                 if ($lastsource && $lastsource->id == $record->sourceid) {
                     $source = $lastsource;
                 } else {
-                    $source = $DB->get_record('enrol_programs_sources', ['id' => $record->sourceid], '*', MUST_EXIST);
+                    $source = $DB->get_record('tool_muprog_source', ['id' => $record->sourceid], '*', MUST_EXIST);
                     $lastsource = $source;
                 }
                 self::allocate_user($program, $source, $record->userid, []);
@@ -288,14 +278,14 @@ final class cohort extends base {
         $params['now1'] = $now;
         $params['now2'] = $now;
         $sql = "SELECT pa.id
-                  FROM {enrol_programs_allocations} pa
-                  JOIN {enrol_programs_sources} s ON s.programid = pa.programid AND s.type = 'cohort' AND s.id = pa.sourceid
-                  JOIN {enrol_programs_programs} p ON p.id = pa.programid
+                  FROM {tool_muprog_allocation} pa
+                  JOIN {tool_muprog_source} s ON s.programid = pa.programid AND s.type = 'cohort' AND s.id = pa.sourceid
+                  JOIN {tool_muprog_program} p ON p.id = pa.programid
                  WHERE p.archived = 0 AND pa.archived = 0
                        AND NOT EXISTS (
                             SELECT 1
                               FROM {cohort_members} cm
-                              JOIN {enrol_programs_src_cohorts} psc ON psc.cohortid = cm.cohortid
+                              JOIN {tool_muprog_src_cohort} psc ON psc.cohortid = cm.cohortid
                              WHERE cm.userid = pa.userid AND psc.sourceid = s.id
                        )
                        AND (p.timeallocationstart IS NULL OR p.timeallocationstart <= :now1)
@@ -305,7 +295,7 @@ final class cohort extends base {
         $rs = $DB->get_recordset_sql($sql, $params);
         foreach ($rs as $pa) {
             // NOTE: it is expected that enrolment fixing is executed right after this method.
-            $DB->set_field('enrol_programs_allocations', 'archived', 1, ['id' => $pa->id]);
+            $DB->set_field('tool_muprog_allocation', 'archived', 1, ['id' => $pa->id]);
             $updated = true;
         }
         $rs->close();

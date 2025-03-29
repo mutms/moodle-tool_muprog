@@ -1,33 +1,23 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace enrol_programs\local\form;
+namespace tool_muprog\local\form;
 
-use enrol_programs\local\content\set;
-use enrol_programs\local\content\top;
+use tool_muprog\local\content\set;
+use tool_muprog\local\content\top;
 
 /**
  * Edit program content item.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class item_set_edit extends \local_openlms\dialog_form {
+final class item_set_edit extends \tool_mulib\local\dialog_form {
+    #[\Override]
     protected function definition() {
         $mform = $this->_form;
         /** @var set $set */
@@ -43,13 +33,13 @@ final class item_set_edit extends \local_openlms\dialog_form {
         }
 
         if (!$set instanceof top) {
-            $mform->addElement('text', 'points', get_string('itempoints', 'enrol_programs'));
+            $mform->addElement('text', 'points', get_string('itempoints', 'tool_muprog'));
             $mform->setType('points', PARAM_INT);
             $mform->setDefault('points', $set->get_points());
         }
 
         $stypes = set::get_sequencetype_types();
-        $mform->addElement('select', 'sequencetype', get_string('sequencetype', 'enrol_programs'), $stypes);
+        $mform->addElement('select', 'sequencetype', get_string('sequencetype', 'tool_muprog'), $stypes);
         $mform->setDefault('sequencetype', $set->get_sequencetype());
 
         $mform->addElement('text', 'minprerequisites', $stypes[set::SEQUENCE_TYPE_ATLEAST]);
@@ -75,7 +65,7 @@ final class item_set_edit extends \local_openlms\dialog_form {
         }
         $mform->setDefault('minpoints', $minpoints);
 
-        $mform->addElement('duration', 'completiondelay', get_string('completiondelay', 'enrol_programs'),
+        $mform->addElement('duration', 'completiondelay', get_string('completiondelay', 'tool_muprog'),
             ['optional' => true, 'defaultunit' => DAYSECS]);
         $mform->setDefault('completiondelay', $set->get_completiondelay());
 
@@ -83,9 +73,10 @@ final class item_set_edit extends \local_openlms\dialog_form {
         $mform->setType('id', PARAM_INT);
         $mform->setDefault('id', $set->get_id());
 
-        $this->add_action_buttons(true, get_string('updateset', 'enrol_programs'));
+        $this->add_action_buttons(true, get_string('updateset', 'tool_muprog'));
     }
 
+    #[\Override]
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
@@ -105,7 +96,7 @@ final class item_set_edit extends \local_openlms\dialog_form {
             if ($data['minprerequisites'] <= 0) {
                 $errors['minprerequisites'] = get_string('required');
             }
-        }  else if ($data['sequencetype'] === set::SEQUENCE_TYPE_MINPOINTS) {
+        } else if ($data['sequencetype'] === set::SEQUENCE_TYPE_MINPOINTS) {
             if ($data['minpoints'] <= 0) {
                 $errors['minpoints'] = get_string('required');
             }

@@ -173,18 +173,6 @@
                 "completiondelay": 0,
                 "sequencetype": "allinanyorder",
                 "items": [
-                    {
-                        "itemtype": "training",
-                        "reference": "TFW1",
-                        "points": 1,
-                        "completiondelay": 0
-                    },
-                    {
-                        "itemtype": "training",
-                        "reference": "Training FW2",
-                        "points": 2,
-                        "completiondelay": 86400
-                    }
                 ]
             },
             "sources": [

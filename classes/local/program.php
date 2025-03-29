@@ -1,30 +1,20 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace enrol_programs\local;
+namespace tool_muprog\local;
 
 use stdClass;
 
 /**
  * Program helper.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class program {
     /**
@@ -60,7 +50,7 @@ final class program {
         $catcontext = \context_coursecat::instance($category->id, MUST_EXIST);
         $parentcontext = $catcontext->get_parent_context();
 
-        $programs = $DB->get_records('enrol_programs_programs', ['contextid' => $catcontext->id]);
+        $programs = $DB->get_records('tool_muprog_program', ['contextid' => $catcontext->id]);
         foreach ($programs as $program) {
             $data = (object)[
                 'id' => $program->id,
@@ -193,20 +183,20 @@ final class program {
         $data->enddatejson = util::json_encode($json);
 
         $data->timecreated = time();
-        $data->id = $DB->insert_record('enrol_programs_programs', $data);
+        $data->id = $DB->insert_record('tool_muprog_program', $data);
 
         $program = self::update_program_image($data);
 
         if ($CFG->usetags && isset($data->tags)) {
-            \core_tag_tag::set_item_tags('enrol_programs', 'program', $data->id, $context, $data->tags);
+            \core_tag_tag::set_item_tags('tool_muprog', 'program', $data->id, $context, $data->tags);
         }
 
         if ($editorused) {
             $editoroptions = self::get_description_editor_options($data->contextid);
             $data = file_postupdate_standard_editor($data, 'description', $editoroptions, $editoroptions['context'],
-                'enrol_programs', 'description', $data->id);
+                'tool_muprog', 'description', $data->id);
             if ($rawdescription !== $data->description) {
-                $DB->set_field('enrol_programs_programs', 'description', $data->description, ['id' => $data->id]);
+                $DB->set_field('tool_muprog_program', 'description', $data->description, ['id' => $data->id]);
             }
         }
 
@@ -224,18 +214,18 @@ final class program {
         $item->minprerequisites = 1; // Prevent completion.
         $item->points = 1;
         $item->minpoints = null;
-        $DB->insert_record('enrol_programs_items', $item);
+        $DB->insert_record('tool_muprog_item', $item);
 
         $program = self::make_snapshot($data->id, 'add');
 
         // Save custom fields if there are any of them in the form.
-        $handler = \enrol_programs\customfield\fields_handler::create();
+        $handler = \tool_muprog\customfield\fields_handler::create();
         $data->id = $program->id;
         $handler->instance_form_save($data);
 
         $trans->allow_commit();
 
-        $event = \enrol_programs\event\program_created::create_from_program($program);
+        $event = \tool_muprog\event\program_created::create_from_program($program);
         $event->trigger();
 
         allocation::fix_allocation_sources($program->id, null);
@@ -259,7 +249,7 @@ final class program {
 
         $trans = $DB->start_delegated_transaction();
 
-        $oldprogram = $DB->get_record('enrol_programs_programs', ['id' => $data->id], '*', MUST_EXIST);
+        $oldprogram = $DB->get_record('tool_muprog_program', ['id' => $data->id], '*', MUST_EXIST);
 
         $record = new stdClass();
         $record->id = $oldprogram->id;
@@ -275,11 +265,11 @@ final class program {
             $oldcontext = \context::instance_by_id($oldprogram->contextid, IGNORE_MISSING);
             if ($oldcontext) {
                 get_file_storage()->move_area_files_to_new_context($oldprogram->contextid, $context->id,
-                    'enrol_programs', 'description', $data->id);
+                    'tool_muprog', 'description', $data->id);
                 // Delete tags even if they are not enabled before move,
                 // tags API is not designed to deal with this,
                 // we cannot create instance of deleted context.
-                \core_tag_tag::set_item_tags('enrol_programs', 'program', $data->id, $oldcontext, null);
+                \core_tag_tag::set_item_tags('tool_muprog', 'program', $data->id, $oldcontext, null);
             }
             $record->contextid = $context->id;
         } else {
@@ -305,7 +295,7 @@ final class program {
             $data->descriptionformat = $data->description_editor['format'];
             $editoroptions = self::get_description_editor_options($data->contextid);
             $data = file_postupdate_standard_editor($data, 'description', $editoroptions, $editoroptions['context'],
-                'enrol_programs', 'description', $data->id);
+                'tool_muprog', 'description', $data->id);
         }
         if (isset($data->description)) {
             $record->description = $data->description;
@@ -327,29 +317,29 @@ final class program {
             $invalidatecalendarevents = true;
         }
 
-        $DB->update_record('enrol_programs_programs', $record);
+        $DB->update_record('tool_muprog_program', $record);
 
         if ($CFG->usetags && isset($data->tags)) {
-            \core_tag_tag::set_item_tags('enrol_programs', 'program', $data->id, $context, $data->tags);
+            \core_tag_tag::set_item_tags('tool_muprog', 'program', $data->id, $context, $data->tags);
         }
 
         $program = self::update_program_image($data);
 
         // Save custom fields if there are any of them in the form.
-        $handler = \enrol_programs\customfield\fields_handler::create();
+        $handler = \tool_muprog\customfield\fields_handler::create();
         $handler->instance_form_save($data);
 
-        $item = $DB->get_record('enrol_programs_items', ['programid' => $program->id, 'topitem' => 1], '*', MUST_EXIST);
+        $item = $DB->get_record('tool_muprog_item', ['programid' => $program->id, 'topitem' => 1], '*', MUST_EXIST);
         if ($item->fullname !== $program->fullname) {
             $item->fullname = $program->fullname;
-            $DB->update_record('enrol_programs_items', $item);
+            $DB->update_record('tool_muprog_item', $item);
         }
 
         // Update group names only if program name changed.
         if ($oldprogram->fullname !== $program->fullname) {
             $sql = "SELECT g.*
                       FROM {groups} g
-                      JOIN {enrol_programs_groups} pg ON pg.groupid = g.id
+                      JOIN {tool_muprog_group} pg ON pg.groupid = g.id
                      WHERE pg.programid = :programid
                   ORDER BY g.id ASC";
             $params = ['programid' => $program->id];
@@ -375,7 +365,7 @@ final class program {
         allocation::fix_user_enrolments($program->id, null);
         calendar::fix_program_events($program);
 
-        $event = \enrol_programs\event\program_updated::create_from_program($program);
+        $event = \tool_muprog\event\program_updated::create_from_program($program);
         $event->trigger();
 
         return $program;
@@ -390,12 +380,12 @@ final class program {
     private static function update_program_image(stdClass $data): stdClass {
         global $DB;
 
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $data->id], '*', MUST_EXIST);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $data->id], '*', MUST_EXIST);
         $context = \context::instance_by_id($program->contextid);
 
         if (isset($data->image)) {
-            file_save_draft_area_files($data->image, $context->id, 'enrol_programs', 'image', $data->id, array('subdirs' => 0, 'maxfiles' => 1));
-            $files = get_file_storage()->get_area_files($context->id, 'enrol_programs', 'image', $data->id, '', false);
+            file_save_draft_area_files($data->image, $context->id, 'tool_muprog', 'image', $data->id, ['subdirs' => 0, 'maxfiles' => 1]);
+            $files = get_file_storage()->get_area_files($context->id, 'tool_muprog', 'image', $data->id, '', false);
             $presenation = (array)json_decode($program->presentationjson);
             if ($files) {
                 $file = reset($files);
@@ -403,8 +393,8 @@ final class program {
             } else {
                 unset($presenation['image']);
             }
-            $DB->set_field('enrol_programs_programs', 'presentationjson', util::json_encode($presenation), ['id' => $program->id]);
-            $program = $DB->get_record('enrol_programs_programs', ['id' => $data->id], '*', MUST_EXIST);
+            $DB->set_field('tool_muprog_program', 'presentationjson', util::json_encode($presenation), ['id' => $program->id]);
+            $program = $DB->get_record('tool_muprog_program', ['id' => $data->id], '*', MUST_EXIST);
         }
 
         return $program;
@@ -427,10 +417,10 @@ final class program {
 
         $trans = $DB->start_delegated_transaction();
 
-        $oldprogram = $DB->get_record('enrol_programs_programs', ['id' => $data->id], '*', MUST_EXIST);
+        $oldprogram = $DB->get_record('tool_muprog_program', ['id' => $data->id], '*', MUST_EXIST);
 
         if ($oldprogram->public != $data->public) {
-            $DB->set_field('enrol_programs_programs', 'public', (int)(bool)$data->public, ['id' => $data->id]);
+            $DB->set_field('tool_muprog_program', 'public', (int)(bool)$data->public, ['id' => $data->id]);
         }
 
         if (isset($data->cohorts)) {
@@ -443,10 +433,10 @@ final class program {
                     continue;
                 }
                 $record = (object)['programid' => $data->id, 'cohortid' => $cid];
-                $DB->insert_record('enrol_programs_cohorts', $record);
+                $DB->insert_record('tool_muprog_cohort', $record);
             }
             foreach ($oldcohorts as $cid => $unused) {
-                $DB->delete_records('enrol_programs_cohorts', ['programid' => $data->id, 'cohortid' => $cid]);
+                $DB->delete_records('tool_muprog_cohort', ['programid' => $data->id, 'cohortid' => $cid]);
             }
         }
 
@@ -458,7 +448,7 @@ final class program {
         allocation::fix_enrol_instances($program->id);
         allocation::fix_user_enrolments($program->id, null);
 
-        $event = \enrol_programs\event\program_updated::create_from_program($program);
+        $event = \tool_muprog\event\program_updated::create_from_program($program);
         $event->trigger();
 
         return $program;
@@ -477,7 +467,7 @@ final class program {
             throw new \coding_exception('Invalid data');
         }
 
-        $oldprogram = $DB->get_record('enrol_programs_programs', ['id' => $data->id], '*', MUST_EXIST);
+        $oldprogram = $DB->get_record('tool_muprog_program', ['id' => $data->id], '*', MUST_EXIST);
 
         $updated = false;
         $record = new \stdClass();
@@ -512,7 +502,7 @@ final class program {
         if ($updated) {
             $trans = $DB->start_delegated_transaction();
 
-            $DB->update_record('enrol_programs_programs', $record);
+            $DB->update_record('tool_muprog_program', $record);
             $program = self::make_snapshot($data->id, 'update_allocation');
 
             $trans->allow_commit();
@@ -526,7 +516,7 @@ final class program {
 
         if ($updated) {
             calendar::fix_program_events($program);
-            $event = \enrol_programs\event\program_updated::create_from_program($program);
+            $event = \tool_muprog\event\program_updated::create_from_program($program);
             $event->trigger();
         }
 
@@ -538,14 +528,14 @@ final class program {
      *
      * NOTE: this does not trigger fixing of enrolments and allocations.
      *
-     * @param stdClass $data data from \enrol_programs\local\form\program_allocation_import_confirmation
+     * @param stdClass $data data from \tool_muprog\local\form\program_allocation_import_confirmation
      * @return stdClass updated program record
      */
     public static function import_program_allocation(stdClass $data): stdClass {
         global $DB;
 
-        $targetprogram = $DB->get_record('enrol_programs_programs', ['id' => $data->id], '*', MUST_EXIST);
-        $fromprogram = $DB->get_record('enrol_programs_programs', ['id' => $data->fromprogram], '*', MUST_EXIST);
+        $targetprogram = $DB->get_record('tool_muprog_program', ['id' => $data->id], '*', MUST_EXIST);
+        $fromprogram = $DB->get_record('tool_muprog_program', ['id' => $data->fromprogram], '*', MUST_EXIST);
 
         $record = [];
 
@@ -582,12 +572,12 @@ final class program {
                 throw new \coding_exception('Allocation start must be earlier than end');
             }
             $updated = true;
-            $DB->update_record('enrol_programs_programs', $record);
-            $targetprogram = $DB->get_record('enrol_programs_programs', ['id' => $record->id], '*', MUST_EXIST);
+            $DB->update_record('tool_muprog_program', $record);
+            $targetprogram = $DB->get_record('tool_muprog_program', ['id' => $record->id], '*', MUST_EXIST);
         }
 
-        /** @var \enrol_programs\local\source\base[] $sourceclasses */
-        $sourceclasses = \enrol_programs\local\allocation::get_source_classes();
+        /** @var \tool_muprog\local\source\base[] $sourceclasses */
+        $sourceclasses = \tool_muprog\local\allocation::get_source_classes();
         foreach ($sourceclasses as $sourcetype => $sourceclass) {
             if (empty($data->{'importsource' . $sourcetype})) {
                 continue;
@@ -602,7 +592,7 @@ final class program {
         $trans->allow_commit();
 
         if ($updated) {
-            $targetprogram = program::make_snapshot($targetprogram->id, 'import_allocation');
+            $targetprogram = self::make_snapshot($targetprogram->id, 'import_allocation');
         }
 
         allocation::fix_allocation_sources($targetprogram->id, null);
@@ -611,7 +601,7 @@ final class program {
 
         if ($updated) {
             calendar::fix_program_events($targetprogram);
-            $event = \enrol_programs\event\program_updated::create_from_program($targetprogram);
+            $event = \tool_muprog\event\program_updated::create_from_program($targetprogram);
             $event->trigger();
         }
 
@@ -624,9 +614,9 @@ final class program {
      */
     public static function get_program_startdate_types(): array {
         return [
-            'allocation' => get_string('programstart_allocation', 'enrol_programs'),
-            'date' => get_string('fixeddate', 'enrol_programs'),
-            'delay' => get_string('programstart_delay', 'enrol_programs'),
+            'allocation' => get_string('programstart_allocation', 'tool_muprog'),
+            'date' => get_string('fixeddate', 'tool_muprog'),
+            'delay' => get_string('programstart_delay', 'tool_muprog'),
         ];
     }
 
@@ -636,9 +626,9 @@ final class program {
      */
     public static function get_program_duedate_types(): array {
         return [
-            'notset' => get_string('notset', 'enrol_programs'),
-            'date' => get_string('fixeddate', 'enrol_programs'),
-            'delay' => get_string('programdue_delay', 'enrol_programs'),
+            'notset' => get_string('notset', 'tool_muprog'),
+            'date' => get_string('fixeddate', 'tool_muprog'),
+            'delay' => get_string('programdue_delay', 'tool_muprog'),
         ];
     }
 
@@ -648,9 +638,9 @@ final class program {
      */
     public static function get_program_enddate_types(): array {
         return [
-            'notset' => get_string('notset', 'enrol_programs'),
-            'date' => get_string('fixeddate', 'enrol_programs'),
-            'delay' => get_string('programend_delay', 'enrol_programs'),
+            'notset' => get_string('notset', 'tool_muprog'),
+            'date' => get_string('fixeddate', 'tool_muprog'),
+            'delay' => get_string('programend_delay', 'tool_muprog'),
         ];
     }
 
@@ -709,7 +699,7 @@ final class program {
 
         $trans = $DB->start_delegated_transaction();
 
-        $oldprogram = $DB->get_record('enrol_programs_programs', ['id' => $data->id], '*', MUST_EXIST);
+        $oldprogram = $DB->get_record('tool_muprog_program', ['id' => $data->id], '*', MUST_EXIST);
 
         $record = new \stdClass();
         $record->id = $data->id;
@@ -750,7 +740,7 @@ final class program {
         }
         $record->enddatejson = util::json_encode($json);
 
-        $DB->update_record('enrol_programs_programs', $record);
+        $DB->update_record('tool_muprog_program', $record);
 
         $program = self::make_snapshot($data->id, 'update_scheduling');
 
@@ -761,7 +751,7 @@ final class program {
         allocation::fix_user_enrolments($program->id, null);
         calendar::fix_program_events($program);
 
-        $event = \enrol_programs\event\program_updated::create_from_program($program);
+        $event = \tool_muprog\event\program_updated::create_from_program($program);
         $event->trigger();
 
         return $program;
@@ -779,18 +769,18 @@ final class program {
 
         $trans = $DB->start_delegated_transaction();
 
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $id], '*', MUST_EXIST);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $id], '*', MUST_EXIST);
         $context = \context::instance_by_id($program->contextid);
 
         self::make_snapshot($program->id, 'delete_before');
 
-        $allocations = $DB->get_records('enrol_programs_allocations', ['programid' => $program->id], 'userid ASC', 'id');
+        $allocations = $DB->get_records('tool_muprog_allocation', ['programid' => $program->id], 'userid ASC', 'id');
         foreach ($allocations as $allocation) {
             allocation::make_snapshot($allocation->id, 'program_delete');
         }
         unset($allocations);
 
-        $pgs = $DB->get_records('enrol_programs_groups', ['programid' => $program->id]);
+        $pgs = $DB->get_records('tool_muprog_group', ['programid' => $program->id]);
         foreach ($pgs as $pg) {
             groups_delete_group($pg->groupid);
         }
@@ -798,39 +788,39 @@ final class program {
         // Delete notifications configuration and data.
         notification_manager::delete_program_notifications($program);
 
-        $items = $DB->get_records('enrol_programs_items', ['programid' => $program->id]);
+        $items = $DB->get_records('tool_muprog_item', ['programid' => $program->id]);
         foreach ($items as $item) {
-            $DB->delete_records('enrol_programs_evidences', ['itemid' => $item->id]);
-            $DB->delete_records('enrol_programs_completions', ['itemid' => $item->id]);
-            $DB->delete_records('enrol_programs_prerequisites', ['itemid' => $item->id]);
-            $DB->delete_records('enrol_programs_prerequisites', ['prerequisiteitemid' => $item->id]);
+            $DB->delete_records('tool_muprog_evidence', ['itemid' => $item->id]);
+            $DB->delete_records('tool_muprog_completion', ['itemid' => $item->id]);
+            $DB->delete_records('tool_muprog_prerequisite', ['itemid' => $item->id]);
+            $DB->delete_records('tool_muprog_prerequisite', ['prerequisiteitemid' => $item->id]);
         }
         unset($items);
-        $DB->delete_records('enrol_programs_allocations', ['programid' => $program->id]);
-        $sources = $DB->get_records('enrol_programs_sources', ['programid' => $program->id]);
+        $DB->delete_records('tool_muprog_allocation', ['programid' => $program->id]);
+        $sources = $DB->get_records('tool_muprog_source', ['programid' => $program->id]);
         foreach ($sources as $source) {
-            $DB->delete_records('enrol_programs_requests', ['sourceid' => $source->id]);
-            $DB->delete_records('enrol_programs_src_cohorts', ['sourceid' => $source->id]);
+            $DB->delete_records('tool_muprog_request', ['sourceid' => $source->id]);
+            $DB->delete_records('tool_muprog_src_cohort', ['sourceid' => $source->id]);
         }
         unset($sources);
-        $DB->delete_records('enrol_programs_sources', ['programid' => $program->id]);
-        $DB->delete_records('enrol_programs_cohorts', ['programid' => $program->id]);
-        $DB->delete_records('enrol_programs_items', ['programid' => $program->id]);
+        $DB->delete_records('tool_muprog_source', ['programid' => $program->id]);
+        $DB->delete_records('tool_muprog_cohort', ['programid' => $program->id]);
+        $DB->delete_records('tool_muprog_item', ['programid' => $program->id]);
 
-        $DB->delete_records('enrol_programs_certs_issues', ['programid' => $program->id]);
-        $DB->delete_records('enrol_programs_certs', ['programid' => $program->id]);
+        $DB->delete_records('tool_muprog_cert_issue', ['programid' => $program->id]);
+        $DB->delete_records('tool_muprog_cert', ['programid' => $program->id]);
 
         // Program details last.
-        \core_tag_tag::set_item_tags('enrol_programs', 'program', $program->id, $context, null);
+        \core_tag_tag::set_item_tags('tool_muprog', 'program', $program->id, $context, null);
         $fs = get_file_storage();
-        $fs->delete_area_files($context->id, 'enrol_programs', 'description', $program->id);
-        $fs->delete_area_files($context->id, 'enrol_programs', 'image', $program->id);
+        $fs->delete_area_files($context->id, 'tool_muprog', 'description', $program->id);
+        $fs->delete_area_files($context->id, 'tool_muprog', 'image', $program->id);
 
-        $DB->delete_records('enrol_programs_programs', ['id' => $program->id]);
+        $DB->delete_records('tool_muprog_program', ['id' => $program->id]);
 
         self::make_snapshot($program->id, 'delete');
 
-        $handler = \enrol_programs\customfield\fields_handler::create();
+        $handler = \tool_muprog\customfield\fields_handler::create();
         $handler->delete_instance($program->id);
 
         $trans->allow_commit();
@@ -840,7 +830,7 @@ final class program {
 
         calendar::delete_program_events($program->id);
 
-        $event = \enrol_programs\event\program_deleted::create_from_program($program);
+        $event = \tool_muprog\event\program_deleted::create_from_program($program);
         $event->trigger();
     }
 
@@ -865,21 +855,21 @@ final class program {
         $data->explanation = $explanation;
 
         if ($reason === 'delete') {
-            if ($DB->record_exists('enrol_programs_programs', ['id' => $programid])) {
+            if ($DB->record_exists('tool_muprog_program', ['id' => $programid])) {
                 throw new \coding_exception('deleted program must not exist');
             }
-            $DB->insert_record('enrol_programs_prg_snapshots', $data);
+            $DB->insert_record('tool_muprog_prg_snapshot', $data);
             return null;
         }
 
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $programid], '*', MUST_EXIST);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
 
         $data->programjson = util::json_encode($program);
-        $data->itemsjson = util::json_encode($DB->get_records('enrol_programs_items', ['programid' => $program->id], 'id ASC'));
-        $data->cohortsjson = util::json_encode($DB->get_records('enrol_programs_cohorts', ['programid' => $program->id], 'id ASC'));
-        $data->sourcesjson = util::json_encode($DB->get_records('enrol_programs_sources', ['programid' => $program->id], 'id ASC'));
+        $data->itemsjson = util::json_encode($DB->get_records('tool_muprog_item', ['programid' => $program->id], 'id ASC'));
+        $data->cohortsjson = util::json_encode($DB->get_records('tool_muprog_cohort', ['programid' => $program->id], 'id ASC'));
+        $data->sourcesjson = util::json_encode($DB->get_records('tool_muprog_source', ['programid' => $program->id], 'id ASC'));
 
-        $DB->insert_record('enrol_programs_prg_snapshots', $data);
+        $DB->insert_record('tool_muprog_prg_snapshot', $data);
 
         return $program;
     }

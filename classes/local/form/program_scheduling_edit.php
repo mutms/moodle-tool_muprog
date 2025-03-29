@@ -1,33 +1,24 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace enrol_programs\local\form;
+namespace tool_muprog\local\form;
 
-use enrol_programs\local\program;
-use enrol_programs\local\allocation;
+use tool_muprog\local\program;
+use tool_muprog\local\allocation;
 
 /**
  * Edit program scheduling settings.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class program_scheduling_edit extends \local_openlms\dialog_form {
+final class program_scheduling_edit extends \tool_mulib\local\dialog_form {
+    #[\Override]
     protected function definition() {
         $mform = $this->_form;
         $data = $this->_customdata['data'];
@@ -46,11 +37,12 @@ final class program_scheduling_edit extends \local_openlms\dialog_form {
         $mform->setType('id', PARAM_INT);
         $mform->setDefault('id', $data->id);
 
-        $this->add_action_buttons(true, get_string('updatescheduling', 'enrol_programs'));
+        $this->add_action_buttons(true, get_string('updatescheduling', 'tool_muprog'));
 
         $this->set_data($data);
     }
 
+    #[\Override]
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
@@ -61,6 +53,12 @@ final class program_scheduling_edit extends \local_openlms\dialog_form {
         return $errors;
     }
 
+    /**
+     * Add program date.
+     *
+     * @param string $name
+     * @return void
+     */
     protected function add_program_date(string $name): void {
         $mform = $this->_form;
 
@@ -72,17 +70,25 @@ final class program_scheduling_edit extends \local_openlms\dialog_form {
 
         $datetypes = program::{'get_program_' . $name . 'date_types'}();
 
-        $mform->addElement('select', 'program' . $name. '_type', get_string('program' . $name, 'enrol_programs'), $datetypes);
-        $mform->addHelpButton('program' . $name. '_type', 'program' . $name, 'enrol_programs');
-        $mform->addElement('date_time_selector', 'program' . $name . '_date', get_string('program' . $name . '_date', 'enrol_programs'), ['optional' => false]);
+        $mform->addElement('select', 'program' . $name. '_type', get_string('program' . $name, 'tool_muprog'), $datetypes);
+        $mform->addHelpButton('program' . $name. '_type', 'program' . $name, 'tool_muprog');
+        $mform->addElement('date_time_selector', 'program' . $name . '_date', get_string('program' . $name . '_date', 'tool_muprog'), ['optional' => false]);
         $mform->hideIf('program' . $name . '_date', 'program' . $name . '_type', 'notequal', 'date');
         $dvalue = $mform->createElement('text', 'value', '');
         $dtype = $mform->createElement('select', 'type', '', $delaytypes);
-        $mform->addGroup([$dvalue, $dtype], 'program' . $name . '_delay', get_string('program' . $name . '_delay', 'enrol_programs'));
+        $mform->addGroup([$dvalue, $dtype], 'program' . $name . '_delay', get_string('program' . $name . '_delay', 'tool_muprog'));
         $mform->setType('program' . $name . '_delay[value]', PARAM_INT);
         $mform->hideIf('program' . $name . '_delay', 'program' . $name . '_type', 'notequal', 'delay');
     }
 
+    /**
+     * Validate date.
+     *
+     * @param string $name
+     * @param array $data
+     * @param array $errors
+     * @return void
+     */
     protected function validate_program_date(string $name, array $data, array &$errors): void {
         if ($data['program' . $name . '_type'] === 'delay') {
             if ($data['program' . $name . '_delay']['value'] <= 0) {
@@ -107,6 +113,13 @@ final class program_scheduling_edit extends \local_openlms\dialog_form {
         }
     }
 
+    /**
+     * Parse date.
+     *
+     * @param \stdClass $program
+     * @param string $name
+     * @return void
+     */
     protected function parse_program_allocation_date(\stdClass $program, string $name): void {
         if (!$program->{$name . 'datejson'}) {
             return;

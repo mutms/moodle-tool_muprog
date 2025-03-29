@@ -1,23 +1,11 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace enrol_programs\external;
+namespace tool_muprog\external;
 
-use enrol_programs\local\allocation;
-use enrol_programs\local\source\manual;
+use tool_muprog\local\allocation;
+use tool_muprog\local\source\manual;
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_value;
@@ -26,7 +14,7 @@ use core_external\external_single_structure;
 /**
  * Updates the allocation for the given userid and program id.
  *
- * @package     enrol_programs
+ * @package     tool_muprog
  * @copyright   2023 Open LMS (https://www.openlms.net/)
  * @author      Farhan Karmali
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -46,7 +34,7 @@ final class update_program_allocation extends external_api {
                 'timedue' => new external_value(PARAM_INT, 'time due', VALUE_OPTIONAL),
                 'timeend' => new external_value(PARAM_INT, 'time start', VALUE_OPTIONAL),
             ], 'Array of updates for timestart, timedue, timeend can be passed as unix timestamps', VALUE_DEFAULT, []),
-            'archived' => new external_value(PARAM_BOOL, 'Archived flag', VALUE_DEFAULT, null)
+            'archived' => new external_value(PARAM_BOOL, 'Archived flag', VALUE_DEFAULT, null),
         ]);
     }
 
@@ -68,23 +56,23 @@ final class update_program_allocation extends external_api {
         $allocationdates = $params['allocationdates'];
         $archived = $params['archived'];
 
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $programid], '*', MUST_EXIST);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
 
         // Validate context.
         $context = \context::instance_by_id($program->contextid);
         self::validate_context($context);
-        require_capability('enrol/programs:admin', $context);
+        require_capability('tool/muprog:admin', $context);
 
-        $allocation = $DB->get_record('enrol_programs_allocations',
+        $allocation = $DB->get_record('tool_muprog_allocation',
             ['programid' => $programid, 'userid' => $userid], '*', MUST_EXIST);
 
         $sourceclasses = allocation::get_source_classes();
-        $source = $DB->get_record('enrol_programs_sources', ['id' => $allocation->sourceid]);
+        $source = $DB->get_record('tool_muprog_source', ['id' => $allocation->sourceid]);
         if (!$source || !isset($sourceclasses[$source->type])) {
             throw new \invalid_parameter_exception('Invalid allocation data');
         }
 
-        /** @var class-string<\enrol_programs\local\source\base> $sourceclass */
+        /** @var class-string<\tool_muprog\local\source\base> $sourceclass */
         $sourceclass = $sourceclasses[$source->type];
 
         if (!$sourceclass::allocation_edit_supported($program, $source, $allocation)) {
@@ -120,7 +108,7 @@ final class update_program_allocation extends external_api {
      * @return external_single_structure
      */
     public static function execute_returns(): external_single_structure {
-        // NOTE: This matches \enrol_programs\external\get_program_allocations::execute_returns().
+        // NOTE: This matches \tool_muprog\external\get_program_allocations::execute_returns().
         return new external_single_structure([
             'id' => new external_value(PARAM_INT, 'Program allocation id'),
             'programid' => new external_value(PARAM_INT, 'Program id'),

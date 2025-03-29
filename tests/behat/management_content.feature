@@ -1,4 +1,4 @@
-@enrol @enrol_programs @openlms
+@tool @tool_muprog @muTMS
 Feature: Program content management tests
 
   Background:
@@ -28,12 +28,12 @@ Feature: Program content management tests
       | Program manager | pmanager  |
     And the following "permission overrides" exist:
       | capability                     | permission | role     | contextlevel | reference |
-      | enrol/programs:view            | Allow      | pviewer  | System       |           |
-      | enrol/programs:view            | Allow      | pmanager | System       |           |
-      | enrol/programs:edit            | Allow      | pmanager | System       |           |
-      | enrol/programs:delete          | Allow      | pmanager | System       |           |
-      | enrol/programs:addcourse       | Allow      | pmanager | System       |           |
-      | enrol/programs:allocate        | Allow      | pmanager | System       |           |
+      | tool/muprog:view            | Allow      | pviewer  | System       |           |
+      | tool/muprog:view            | Allow      | pmanager | System       |           |
+      | tool/muprog:edit            | Allow      | pmanager | System       |           |
+      | tool/muprog:delete          | Allow      | pmanager | System       |           |
+      | tool/muprog:addcourse       | Allow      | pmanager | System       |           |
+      | tool/muprog:allocate        | Allow      | pmanager | System       |           |
     And the following "role assigns" exist:
       | user      | role          | contextlevel | reference |
       | manager   | manager       | System       |           |
@@ -41,7 +41,7 @@ Feature: Program content management tests
       | manager2  | pmanager      | Category     | CAT2      |
       | manager2  | pmanager      | Category     | CAT3      |
       | viewer1   | pviewer       | System       |           |
-    And the following "enrol_programs > programs" exist:
+    And the following "tool_muprog > programs" exist:
       | fullname    | idnumber | category |
       | Program 000 | PR0      |          |
       | Program 001 | PR1      | Cat 1    |
@@ -51,17 +51,17 @@ Feature: Program content management tests
   @javascript
   Scenario: Manager may edit program content
     Given I log in as "manager1"
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
     And I click on "Content" "link" in the ".nav-tabs" "css_element"
     And I should see "All in any order" in the "Program 000" "table_row"
 
     # Add courses and sets
     When I click on "Append item" "link" in the "Program 000" "table_row"
-    And the following fields match these values:
+    And the following fields in the ".modal-dialog" "css_element" match these values:
       | Points                    | 1            |
       | completiondelay[enabled]  | 0            |
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Courses                   | Course 1     |
       | Points                    | 123          |
       | completiondelay[enabled]  | 1            |
@@ -72,7 +72,7 @@ Feature: Program content management tests
     And I should see "Completion delay: 3 days" in the "Course 1" "table_row"
 
     When I click on "Append item" "link" in the "Program 000" "table_row"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Add new set               | 1            |
       | Full name                 | First set    |
       | Completion type           | All in order |
@@ -86,7 +86,7 @@ Feature: Program content management tests
     And I should see "Completion delay: 7 days" in the "First set" "table_row"
 
     When I click on "Append item" "link" in the "First set" "table_row"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Courses                   | Course 2, Course 3, Course 4 |
       | Add new set               | 1            |
       | Full name                 | Second set   |
@@ -100,7 +100,7 @@ Feature: Program content management tests
     And I should see "Completion delay: 5 days" in the "Second set" "table_row"
 
     When I click on "Append item" "link" in the "Program 000" "table_row"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Courses         | Course 5         |
       | Add new set     | 1                |
       | Full name       | Third set        |
@@ -109,7 +109,7 @@ Feature: Program content management tests
     Then I should see "All in any order" in the "Third set" "table_row"
 
     When I click on "Append item" "link" in the "Program 000" "table_row"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Add new set      | 1                |
       | Full name        | Fourth set       |
       | Completion type  | Minimum X points |
@@ -121,10 +121,10 @@ Feature: Program content management tests
 
     # Update sets
     When I click on "Update set" "link" in the "Program 000" "table_row"
-    And the following fields match these values:
+    And the following fields in the ".modal-dialog" "css_element" match these values:
       | Completion type           | All in any order |
       | completiondelay[enabled]  | 0            |
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Completion type           | All in order |
       | completiondelay[enabled]  | 1            |
       | completiondelay[number]   | 2            |
@@ -134,13 +134,13 @@ Feature: Program content management tests
     And I should see "Completion delay: 2 days" in the "Program 000" "table_row"
 
     When I click on "Update set" "link" in the "Third set" "table_row"
-    And the following fields match these values:
+    And the following fields in the ".modal-dialog" "css_element" match these values:
       | Completion type           | All in any order |
       | Full name                 | Third set        |
       | Completion type           | All in any order |
       | Points                    | 1                |
       | completiondelay[enabled]  | 0                |
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Full name                 | Treti set        |
       | Completion type           | All in order     |
       | Points                    | 77               |
@@ -153,14 +153,14 @@ Feature: Program content management tests
     And I should see "Completion delay: 11 days" in the "Treti set" "table_row"
 
     When I click on "Update set" "link" in the "Treti set" "table_row"
-    And the following fields match these values:
+    And the following fields in the ".modal-dialog" "css_element" match these values:
       | Full name                 | Treti set        |
       | Completion type           | All in order     |
       | Points                    | 77               |
       | completiondelay[enabled]  | 1                |
       | completiondelay[number]   | 11               |
       | completiondelay[timeunit] | days             |
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Full name                 | Third set        |
       | Completion type           | At least X       |
       | At least X                | 3                |
@@ -172,12 +172,12 @@ Feature: Program content management tests
     And I should not see "Completion delay" in the "Third set" "table_row"
 
     When I click on "Update set" "link" in the "Third set" "table_row"
-    And the following fields match these values:
+    And the following fields in the ".modal-dialog" "css_element" match these values:
       | Full name       | Third set        |
       | Completion type | At least X       |
       | At least X      | 3                |
       | Points          | 0                |
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Completion type | Minimum X points |
       | Minimum X points| 10               |
       | Points          | 11               |
@@ -186,7 +186,7 @@ Feature: Program content management tests
     And I should see "11" in the "Third set" "table_row"
 
     When I click on "Update course" "link" in the "Course 1" "table_row"
-    And the following fields match these values:
+    And the following fields in the ".modal-dialog" "css_element" match these values:
       | Points                    | 123              |
       | completiondelay[enabled]  | 1                |
       | completiondelay[number]   | 3                |
@@ -199,7 +199,7 @@ Feature: Program content management tests
     And I should not see "Completion delay" in the "Course 1" "table_row"
 
     When I click on "Update course" "link" in the "Course 1" "table_row"
-    And the following fields match these values:
+    And the following fields in the ".modal-dialog" "css_element" match these values:
       | Points                    | 789              |
       | completiondelay[enabled]  | 0                |
     And I set the following fields to these values:
@@ -290,7 +290,7 @@ Feature: Program content management tests
 
   @javascript
   Scenario: Manager may add deleted references to missing courses from program
-    Given the following "enrol_programs > program_items" exist:
+    Given the following "tool_muprog > program_items" exist:
       | program     | parent     | course   | fullname   | sequencetype     | minprerequisites |
       | Program 001 |            | Course 1 |            |                  |                  |
       | Program 001 |            | Course 2 |            |                  |                  |
@@ -304,7 +304,7 @@ Feature: Program content management tests
     And I log out
 
     When I log in as "manager1"
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 001"
     And I click on "Content" "link" in the ".nav-tabs" "css_element"
     Then I should see "Course is missing" in the "Course 1" "table_row"
@@ -319,15 +319,16 @@ Feature: Program content management tests
 
   @javascript
   Scenario: Manager may add, update and delete training in program
-    Given the following "custom field categories" exist:
+    Given I skip tests if "customfield_mutrain" is not installed
+    And the following "custom field categories" exist:
       | name              | component   | area   | itemid |
       | Category for test | core_course | course | 0      |
     And the following "custom fields" exist:
       | name             | category           | type     | shortname | configdata            |
-      | Training Field 1 | Category for test  | training | training1 |                       |
-      | Training Field 2 | Category for test  | training | training2 |                       |
-      | Training Field 3 | Category for test  | training | training3 |                       |
-    And the following "customfield_training > frameworks" exist:
+      | Training Field 1 | Category for test  | mutrain | training1 |                       |
+      | Training Field 2 | Category for test  | mutrain | training2 |                       |
+      | Training Field 3 | Category for test  | mutrain | training3 |                       |
+    And the following "customfield_mutrain > frameworks" exist:
       | name    | fields    | category | public | requiredtraining | restrictedcompletion |
       | TFR 001 | training1 |          | 1      | 10               | 0                    |
       | TFR 002 | training2 | Cat 2    | 1      | 20               | 1                    |
@@ -338,7 +339,7 @@ Feature: Program content management tests
       | Course 8 | C8        | topics | CAT2     | 13                    | 2                     |
       | Course 9 | C9        | topics | CAT2     | 29                    | 3                     |
     And I log in as "manager1"
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
     And I click on "Content" "link" in the ".nav-tabs" "css_element"
 
@@ -363,22 +364,21 @@ Feature: Program content management tests
     And I press dialog form button "Remove training"
     Then I should not see "TFR 001"
 
-  @javascript @tool_olms_tenant
+  @javascript @tool_mutenancy
   Scenario: Tenant manager may add program courses from non-conflicting tenants
-    Given tenant support was activated
-    And the following "tool_olms_tenant > tenants" exist:
+    Given the following "tool_mutenancy > tenants" exist:
       | name     | idnumber | category |
-      | Tenant 1 | TEN1     | CAT1     |
-      | Tenant 2 | TEN2     | CAT2     |
+      | Tenant 1 | ten1     | CAT1     |
+      | Tenant 2 | ten2     | CAT2     |
     And I log in as "manager"
-    And I click on "Select a tenant" "link"
+    And I click on "Switch tenant" "link"
     And I set the following fields to these values:
       | Tenant      | Tenant 1         |
-    And I press dialog form button "Switch"
+    And I press dialog form button "Switch tenant"
 
-    When I am on all programs management page
+    When I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
-    And I click on "Content" "link" in the "#region-main .nav-tabs" "css_element"
+    And I click on "Content" "link" in the ".secondary-navigation" "css_element"
     And I click on "Append item" "link" in the "Program 000" "table_row"
     And I set the following fields to these values:
       | Courses | Course 1 |

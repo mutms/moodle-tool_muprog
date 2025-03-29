@@ -1,4 +1,4 @@
-@enrol @enrol_programs @openlms @tool_certificate
+@tool @tool_muprog @muTMS @tool_certificate
 Feature: Issuing of certificates for program completion
 
   Background:
@@ -16,13 +16,13 @@ Feature: Issuing of certificates for program completion
       | Program manager | pmanager  |
     And the following "permission overrides" exist:
       | capability                     | permission | role     | contextlevel | reference |
-      | enrol/programs:view            | Allow      | pviewer  | System       |           |
-      | enrol/programs:view            | Allow      | pmanager | System       |           |
-      | enrol/programs:edit            | Allow      | pmanager | System       |           |
-      | enrol/programs:delete          | Allow      | pmanager | System       |           |
-      | enrol/programs:addcourse       | Allow      | pmanager | System       |           |
-      | enrol/programs:allocate        | Allow      | pmanager | System       |           |
-      | enrol/programs:manageevidence  | Allow      | pmanager | System       |           |
+      | tool/muprog:view               | Allow      | pviewer  | System       |           |
+      | tool/muprog:view               | Allow      | pmanager | System       |           |
+      | tool/muprog:edit               | Allow      | pmanager | System       |           |
+      | tool/muprog:delete             | Allow      | pmanager | System       |           |
+      | tool/muprog:addcourse          | Allow      | pmanager | System       |           |
+      | tool/muprog:allocate           | Allow      | pmanager | System       |           |
+      | tool/muprog:manageevidence     | Allow      | pmanager | System       |           |
       | tool/certificate:manage        | Allow      | pmanager | System       |           |
       | moodle/site:configview         | Allow      | pmanager | System       |           |
       | tool/certificate:issue         | Allow      | pmanager | System       |           |
@@ -31,7 +31,7 @@ Feature: Issuing of certificates for program completion
       | user      | role          | contextlevel | reference |
       | manager1  | pmanager      | System       |           |
       | viewer1   | pviewer       | System       |           |
-    And the following "enrol_programs > programs" exist:
+    And the following "tool_muprog > programs" exist:
       | fullname    | idnumber | category |
       | Program 000 | PR0      |          |
       | Program 001 | PR1      |          |
@@ -47,23 +47,23 @@ Feature: Issuing of certificates for program completion
     And I follow "New certificate template"
     And I set the field "Name" to "Certificate 2"
     And I click on "Save" "button" in the ".modal.show .modal-footer" "css_element"
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
     And I follow "Certificate"
 
     When I press "Edit"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Certificate template | Certificate 1 |
       | Expiry date          | Never         |
     And I press dialog form button "Update program"
-    Then I should see "Certificate 1" in the "Certificate template:" definition list item
-    And I should see "Never" in the "Expiry date:" definition list item
+    Then I should see "Certificate 1" in the "Certificate template" definition list item
+    And I should see "Never" in the "Expiry date" definition list item
 
     When I press "Edit"
-    And the following fields match these values:
+    And the following fields in the ".modal-dialog" "css_element" match these values:
       | Certificate template | Certificate 1 |
       | Expiry date          | Never         |
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Certificate template        | Certificate 2 |
       | Expiry date                 | Select date   |
       | expirydateabsolute[day]     | 5             |
@@ -72,11 +72,11 @@ Feature: Issuing of certificates for program completion
       | expirydateabsolute[hour]    | 09            |
       | expirydateabsolute[minute]  | 00            |
     And I press dialog form button "Update program"
-    Then I should see "Certificate 2" in the "Certificate template:" definition list item
-    And I should see "Friday, 5 November 2032, 9:00" in the "Expiry date:" definition list item
+    Then I should see "Certificate 2" in the "Certificate template" definition list item
+    And I should see "Friday, 5 November 2032, 9:00" in the "Expiry date" definition list item
 
     When I press "Edit"
-    And the following fields match these values:
+    And the following fields in the ".modal-dialog" "css_element" match these values:
       | Certificate template        | Certificate 2 |
       | Expiry date                 | Select date   |
       | expirydateabsolute[day]     | 5             |
@@ -84,18 +84,18 @@ Feature: Issuing of certificates for program completion
       | expirydateabsolute[year]    | 2032          |
       | expirydateabsolute[hour]    | 09            |
       | expirydateabsolute[minute]  | 00            |
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Certificate template         | Certificate 1 |
       | Expiry date                  | After         |
       | expirydaterelative[number]   | 5             |
       | expirydaterelative[timeunit] | 86400         |
     And I press dialog form button "Update program"
-    Then I should see "Certificate 1" in the "Certificate template:" definition list item
-    And I should see "5 days" in the "Expiry date:" definition list item
+    Then I should see "Certificate 1" in the "Certificate template" definition list item
+    And I should see "5 days" in the "Expiry date" definition list item
 
     When I press "Delete"
     And I press dialog form button "Delete"
-    Then I should see "Not set" in the "Certificate template:" definition list item
+    Then I should see "Not set" in the "Certificate template" definition list item
 
   @javascript
   Scenario: User is issued a program certificate
@@ -104,24 +104,24 @@ Feature: Issuing of certificates for program completion
     And I follow "New certificate template"
     And I set the field "Name" to "Certificate 1"
     And I click on "Save" "button" in the ".modal.show .modal-footer" "css_element"
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
     And I follow "Certificate"
 
     And I press "Edit"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Certificate template | Certificate 1 |
       | Expiry date          | Never         |
     And I press dialog form button "Update program"
-    And I should see "Certificate 1" in the "Certificate template:" definition list item
-    And I should see "Never" in the "Expiry date:" definition list item
+    And I should see "Certificate 1" in the "Certificate template" definition list item
+    And I should see "Never" in the "Expiry date" definition list item
 
     And I follow "Allocation settings"
     And I click on "Update Manual allocation" "link"
     And I set the following fields to these values:
       | Active | Yes |
     And I press dialog form button "Update"
-    And I should see "Active" in the "Manual allocation:" definition list item
+    And I should see "Active" in the "Manual allocation" definition list item
     And I follow "Users"
     And I click on "Users actions" "link"
     And I click on "Allocate users" "link"
@@ -136,11 +136,11 @@ Feature: Issuing of certificates for program completion
       | evidencetimecompleted[enabled] | 1        |
       | Details                        | no need! |
     And I press dialog form button "Update"
-    And I should see "Completed" in the "Program status:" definition list item
+    And I should see "Completed" in the "Program status" definition list item
 
     And I log out
 
-    When I run the "enrol_programs\task\certificate" task
+    When I run the "tool_muprog\task\certificate" task
     And I log in as "student1"
     And I follow "Profile" in the user menu
     And I click on "//a[contains(.,'My certificates') and contains(@href,'tool/certificate')]" "xpath_element"

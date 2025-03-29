@@ -1,20 +1,9 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace enrol_programs\external;
+namespace tool_muprog\external;
 
 use core_external\external_function_parameters;
 use core_external\external_value;
@@ -25,7 +14,7 @@ use core_external\external_single_structure;
 /**
  * Provides list of programs based on search parameters.
  *
- * @package     enrol_programs
+ * @package     tool_muprog
  * @copyright   2023 Open LMS (https://www.openlms.net/)
  * @author      Farhan Karmali
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -44,9 +33,9 @@ final class get_programs extends external_api {
                     [
                         'field' => new external_value(PARAM_ALPHANUM, 'The name of the field to be searched by list of'
                             . ' acceptable fields is : id, contextid, fullname, idnumber, public, archived, tenantid'),
-                        'value' => new external_value(PARAM_RAW, 'Value of the field to be searched, NULL allowed only for tenantid')
+                        'value' => new external_value(PARAM_RAW, 'Value of the field to be searched, NULL allowed only for tenantid'),
                     ]), 'Program search parameters'
-            )
+            ),
         ]);
     }
 
@@ -74,7 +63,7 @@ final class get_programs extends external_api {
                 throw new \invalid_parameter_exception('Invalid duplicate field name: '. $field);
             }
             if ($field === 'tenantid') {
-                if (!\enrol_programs\local\tenant::is_available()) {
+                if (!\tool_muprog\local\util::is_mutenancy_active()) {
                     throw new \invalid_parameter_exception('Invalid field name: '. $field);
                 }
                 if ($value === null) {
@@ -96,7 +85,7 @@ final class get_programs extends external_api {
             $where = '';
         }
         $sql = "SELECT p.*
-                  FROM {enrol_programs_programs} p
+                  FROM {tool_muprog_program} p
            $tenantjoin
                 $where
               ORDER BY p.id ASC";
@@ -105,15 +94,15 @@ final class get_programs extends external_api {
         $results = [];
         foreach ($programs as $program) {
             $context = \context::instance_by_id($program->contextid);
-            if (has_capability('enrol/programs:view', $context)) {
+            if (has_capability('tool/muprog:view', $context)) {
                 self::validate_context($context);
-                $sources = $DB->get_records_menu('enrol_programs_sources',
+                $sources = $DB->get_records_menu('tool_muprog_source',
                     ['programid' => $program->id], 'type ASC', 'type');
                 $program->sources = array_keys($sources);
                 if ($program->public) {
                     $program->cohortids = [];
                 } else {
-                    $cohorts = $DB->get_records_menu('enrol_programs_cohorts',
+                    $cohorts = $DB->get_records_menu('tool_muprog_cohort',
                         ['programid' => $program->id], 'cohortid ASC', 'cohortid');
                     $program->cohortids = array_keys($cohorts);
                 }
@@ -135,7 +124,7 @@ final class get_programs extends external_api {
                 'id' => new external_value(PARAM_INT, 'Program id'),
                 'contextid' => new external_value(PARAM_INT, 'Program context id'),
                 'fullname' => new external_value(PARAM_TEXT, 'Program fullname'),
-                'idnumber' => new external_value(PARAM_RAW, 'Program idnumber'),
+                'idnumber' => new external_value(PARAM_RAW, 'Program ID'),
                 'description' => new external_value(PARAM_RAW, 'Program description text (in original text format)'),
                 'descriptionformat' => new external_value(PARAM_INT, 'Program description text format'),
                 'presentationjson' => new external_value(PARAM_RAW, 'Presentation json (not stable internal API data)'),

@@ -1,29 +1,18 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace enrol_programs\local;
+namespace tool_muprog\local;
 
 use stdClass;
-use tool_certify\local\certification;
+use tool_mucertify\local\certification;
 
 /**
  * Course reset helper.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2024 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -72,9 +61,9 @@ final class course_reset {
     public static function purge_enrolments(stdClass $user, int $programid): void {
         global $DB;
         $sql = "SELECT DISTINCT ue.*
-                  FROM {enrol_programs_items} i
+                  FROM {tool_muprog_item} i
                   JOIN {course} c ON c.id = i.courseid
-                  JOIN {enrol} e ON e.courseid = c.id   
+                  JOIN {enrol} e ON e.courseid = c.id
                   JOIN {user_enrolments} ue ON ue.enrolid = e.id
                  WHERE i.programid = :programid AND ue.userid = :userid
               ORDER BY ue.id ASC";
@@ -102,13 +91,13 @@ final class course_reset {
 
         $modules = $DB->get_records_menu('modules', [], 'id ASC', 'id, name');
         foreach ($modules as $mid => $module) {
-            $resetclassname = '\\enrol_programs\\local\\reset\\mod_' . $module;
+            $resetclassname = '\\tool_muprog\\local\\reset\\mod_' . $module;
             if (!class_exists($resetclassname)) {
                 continue;
             }
             $sql = "SELECT DISTINCT cm.course
                       FROM {course_modules} cm
-                      JOIN {enrol_programs_items} i ON i.courseid = cm.course
+                      JOIN {tool_muprog_item} i ON i.courseid = cm.course
                      WHERE cm.module = :mid AND i.programid = :programid";
             $courseids = $DB->get_fieldset_sql($sql, ['mid' => $mid, 'programid' => $programid]);
             if (!$courseids) {
@@ -132,7 +121,7 @@ final class course_reset {
 
         $modules = $DB->get_records_menu('modules', [], 'id ASC', 'id, name');
         foreach ($modules as $mid => $module) {
-            $resetclassname = '\\enrol_programs\\local\\reset\\mod_' . $module;
+            $resetclassname = '\\tool_muprog\\local\\reset\\mod_' . $module;
             if (class_exists($resetclassname)) {
                 // Already purged.
                 continue;
@@ -150,10 +139,11 @@ final class course_reset {
             }
             $sql = "SELECT DISTINCT ctx.id
                       FROM {course_modules} cm
-                      JOIN {enrol_programs_items} i ON i.courseid = cm.course
-                      JOIN {context} ctx ON ctx.instanceid = cm.id AND ctx.contextlevel = :modulecontext 
+                      JOIN {tool_muprog_item} i ON i.courseid = cm.course
+                      JOIN {context} ctx ON ctx.instanceid = cm.id AND ctx.contextlevel = :modulecontext
                      WHERE cm.module = :mid AND i.programid = :programid";
-            $contextids = $DB->get_fieldset_sql($sql, ['mid' => $mid, 'programid' => $programid, 'modulecontext' => CONTEXT_MODULE]);
+            $contextids = $DB->get_fieldset_sql($sql,
+                ['mid' => $mid, 'programid' => $programid, 'modulecontext' => CONTEXT_MODULE]);
             if (!$contextids) {
                 continue;
             }
@@ -182,11 +172,11 @@ final class course_reset {
         $courses =
             "SELECT c.id
                FROM {course} c
-               JOIN {enrol_programs_items} i ON i.courseid = c.id AND i.programid = :programid";
+               JOIN {tool_muprog_item} i ON i.courseid = c.id AND i.programid = :programid";
         $coursemodules =
             "SELECT cm.id
                FROM {course_modules} cm
-               JOIN {enrol_programs_items} i ON i.courseid = cm.course AND i.programid = :programid";
+               JOIN {tool_muprog_item} i ON i.courseid = cm.course AND i.programid = :programid";
 
         $sql = "DELETE
                   FROM {course_modules_completion}
@@ -209,7 +199,7 @@ final class course_reset {
         $DB->execute($sql, $params);
 
         $sql = "SELECT DISTINCT c.id
-                  FROM {enrol_programs_items} i
+                  FROM {tool_muprog_item} i
                   JOIN {course} c ON c.id = i.courseid
                  WHERE i.programid = :programid
               ORDER BY c.id ASC";
@@ -226,7 +216,7 @@ final class course_reset {
         $cache3 = \cache::make('availability_grade', 'scores');
         $cache3->delete($user->id);
 
-        $hook = new \enrol_programs\hook\course_completions_purged($user->id, $programid);
+        $hook = new \tool_muprog\hook\course_completions_purged($user->id, $programid);
         \core\di::get(\core\hook\manager::class)->dispatch($hook);
     }
 }

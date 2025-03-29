@@ -1,4 +1,4 @@
-@enrol @enrol_programs @openlms @javascript
+@tool @tool_muprog @muTMS @javascript
 Feature: Program minimal upload tests
 
   Background:
@@ -25,26 +25,22 @@ Feature: Program minimal upload tests
       | Program manager | pmanager  |
     And the following "permission overrides" exist:
       | capability                     | permission | role     | contextlevel | reference |
-      | enrol/programs:view            | Allow      | pmanager | System       |           |
-      | enrol/programs:upload          | Allow      | pmanager | System       |           |
+      | tool/muprog:view            | Allow      | pmanager | System       |           |
+      | tool/muprog:upload          | Allow      | pmanager | System       |           |
     And the following "role assigns" exist:
       | user      | role          | contextlevel | reference |
       | manager1  | pmanager      | System       |           |
       | manager2  | pmanager      | Category     | CAT2      |
       | manager2  | pmanager      | Category     | CAT3      |
-    And the following "customfield_training > frameworks" exist:
-      | name         | idnumber | public | requiredtraining |
-      | Training FW1 | TFW1     | 1      | 10               |
-      | Training FW2 |          | 1      | 20               |
 
   @_file_upload
   Scenario: Program manager can upload minimal programs via JSON
     Given I log in as "manager2"
-    And I am on programs management page in "Category 2"
+    And I am on the "Category 2" "tool_muprog > Programs management" page
 
     When I click on "Programs actions" "link"
     And I click on "Upload programs" "link"
-    And I upload "enrol/programs/tests/fixtures/upload/minimal.json" file to "Files" filemanager
+    And I upload "admin/tool/muprog/tests/fixtures/upload/minimal.json" file to "Files" filemanager
     And I press "Continue"
     And I set the following fields to these values:
       | usecategory | 0          |
@@ -55,14 +51,14 @@ Feature: Program minimal upload tests
       | P01      | OK     | Program 01 | -          |
       | P02      | OK     | Program 02 | -          |
     And I press "Upload programs"
-    Then the following should exist in the "management_programs" table:
-      | Program name | ID number | Description  | Courses | Allocations | Public |
-      | Program 00   | P00       |              | 2       | 0           | No     |
-      | Program 01   | P01       |              | 0       | 0           | No     |
-      | Program 02   | P02       |              | 0       | 0           | No     |
+    Then the following should exist in the "reportbuilder-table" table:
+      | Program name | Program ID | Courses | Allocations | Public |
+      | Program 00   | P00        | 2       | 0           | No     |
+      | Program 01   | P01        | 0       | 0           | No     |
+      | Program 02   | P02        | 0       | 0           | No     |
     And I follow "Program 00"
-    And I should see "Program 00" in the "Full name:" definition list item
-    And I should see "No" in the "Archived:" definition list item
+    And I should see "Program 00" in the "Full name" definition list item
+    And I should see "No" in the "Archived" definition list item
     And I follow "Content"
     And the following should exist in the "program_content" table:
       | Item       | Points | Completion type         |
@@ -70,24 +66,24 @@ Feature: Program minimal upload tests
       | Course 01  | 1      |                         |
       | Course 02  | 1      |                         |
     And I follow "Allocation settings"
-    And I should see "Not set" in the "Allocation start:" definition list item
-    And I should see "Not set" in the "Allocation end:" definition list item
-    And I should see "Start immediately after allocation" in the "Program start:" definition list item
-    And I should see "Not set" in the "Program due:" definition list item
-    And I should see "Not set" in the "Program end:" definition list item
-    And I should see "Inactive" in the "Manual allocation:" definition list item
-    And I should see "Inactive" in the "Self allocation:" definition list item
-    And I should see "Inactive" in the "Requests with approval:" definition list item
-    And I should see "Inactive" in the "Automatic cohort allocation:" definition list item
+    And I should see "Not set" in the "Allocation start" definition list item
+    And I should see "Not set" in the "Allocation end" definition list item
+    And I should see "Start immediately after allocation" in the "Program start" definition list item
+    And I should see "Not set" in the "Program due" definition list item
+    And I should see "Not set" in the "Program end" definition list item
+    And I should see "Inactive" in the "Manual allocation" definition list item
+    And I should see "Inactive" in the "Self allocation" definition list item
+    And I should see "Inactive" in the "Requests with approval" definition list item
+    And I should see "Inactive" in the "Automatic cohort allocation" definition list item
 
   @_file_upload
   Scenario: Program manager can upload minimal programs via CSV
     Given I log in as "manager2"
-    And I am on programs management page in "Category 2"
+    And I am on the "Category 2" "tool_muprog > Programs management" page
 
     When I click on "Programs actions" "link"
     And I click on "Upload programs" "link"
-    And I upload "enrol/programs/tests/fixtures/upload/minimal.csv" file to "Files" filemanager
+    And I upload "admin/tool/muprog/tests/fixtures/upload/minimal.csv" file to "Files" filemanager
     And I press "Continue"
     And I set the following fields to these values:
       | usecategory | 0          |
@@ -98,8 +94,8 @@ Feature: Program minimal upload tests
       | P01      | OK     | Program 01 | -          |
       | P02      | OK     | Program 02 | -          |
     And I press "Upload programs"
-    Then the following should exist in the "management_programs" table:
-      | Program name | ID number | Description  | Courses | Allocations | Public |
-      | Program 00   | P00       |              | 0       | 0           | No     |
-      | Program 01   | P01       |              | 0       | 0           | No     |
-      | Program 02   | P02       |              | 0       | 0           | No     |
+    Then the following should exist in the "reportbuilder-table" table:
+      | Program name | Program ID | Courses | Allocations | Public |
+      | Program 00   | P00        | 0       | 0           | No     |
+      | Program 01   | P01        | 0       | 0           | No     |
+      | Program 02   | P02        | 0       | 0           | No     |

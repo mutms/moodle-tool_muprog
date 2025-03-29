@@ -1,20 +1,9 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace enrol_programs\privacy;
+namespace tool_muprog\privacy;
 
 use context_user;
 use core_privacy\local\metadata\collection;
@@ -27,10 +16,11 @@ use core_privacy\local\request\writer;
 /**
  * Programs privacy info.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements
         // Transactions store user data.
@@ -48,9 +38,9 @@ class provider implements
      * @param collection $collection The initialised collection to add items to.
      * @return collection A listing of user data stored through this system.
      */
-    public static function get_metadata(collection $collection) : collection {
+    public static function get_metadata(collection $collection): collection {
         $collection->add_database_table(
-                'enrol_programs_allocations',
+                'tool_muprog_allocation',
                 [
                     'programid' => 'privacy:metadata:field:programid',
                     'userid' => 'privacy:metadata:field:userid',
@@ -64,11 +54,11 @@ class provider implements
                     'timecompleted' => 'privacy:metadata:field:timecompleted',
                     'timecreated' => 'privacy:metadata:field:timecreated',
                 ],
-                'privacy:metadata:table:enrol_programs_allocations'
+                'privacy:metadata:table:tool_muprog_allocation'
         );
 
         $collection->add_database_table(
-            'enrol_programs_certs_issues',
+            'tool_muprog_cert_issue',
             [
                 'programid' => 'privacy:metadata:field:programid',
                 'allocationid' => 'privacy:metadata:field:allocationid',
@@ -76,21 +66,21 @@ class provider implements
                 'issueid' => 'privacy:metadata:field:issueid',
                 'timecreated' => 'privacy:metadata:field:timecreated',
             ],
-            'privacy:metadata:table:enrol_programs_certs_issues'
+            'privacy:metadata:table:tool_muprog_cert_issue'
         );
 
         $collection->add_database_table(
-            'enrol_programs_completions',
+            'tool_muprog_completion',
             [
                 'itemid' => 'privacy:metadata:field:itemid',
                 'allocationid' => 'privacy:metadata:field:allocationid',
                 'timecompleted' => 'privacy:metadata:field:timecompleted',
             ],
-            'privacy:metadata:table:enrol_programs_completions'
+            'privacy:metadata:table:tool_muprog_completion'
         );
 
         $collection->add_database_table(
-            'enrol_programs_evidences',
+            'tool_muprog_evidence',
             [
                 'itemid' => 'privacy:metadata:field:itemid',
                 'userid' => 'privacy:metadata:field:userid',
@@ -99,11 +89,11 @@ class provider implements
                 'timecreated' => 'privacy:metadata:field:timecreated',
                 'createdby' => 'privacy:metadata:field:createdby',
             ],
-            'privacy:metadata:table:enrol_programs_evidences'
+            'privacy:metadata:table:tool_muprog_evidence'
         );
 
         $collection->add_database_table(
-            'enrol_programs_requests',
+            'tool_muprog_request',
             [
                 'sourceid' => 'privacy:metadata:field:sourceid',
                 'userid' => 'privacy:metadata:field:userid',
@@ -112,11 +102,11 @@ class provider implements
                 'timerejected' => 'privacy:metadata:field:timerejected',
                 'rejectedby' => 'privacy:metadata:field:rejectedby',
             ],
-            'privacy:metadata:table:enrol_programs_requests'
+            'privacy:metadata:table:tool_muprog_request'
         );
 
         $collection->add_database_table(
-            'enrol_programs_usr_snapshots',
+            'tool_muprog_usr_snapshot',
             [
                 'allocationid' => 'privacy:metadata:field:allocationid',
                 'reason' => 'privacy:metadata:field:reason',
@@ -136,17 +126,7 @@ class provider implements
                 'completionsjson' => 'privacy:metadata:field:completionsjson',
                 'evidencesjson' => 'privacy:metadata:field:evidencesjson',
                             ],
-            'privacy:metadata:table:enrol_programs_usr_snapshots'
-        );
-
-        $collection->add_database_table(
-            'enrol_programs_src_commholds',
-            [
-                'userid' => 'privacy:metadata:field:userid',
-                'quantity' => 'privacy:metadata:field:quantity',
-                'programid' => 'privacy:metadata:field:programid',
-            ],
-            'privacy:metadata:table:enrol_programs_src_commholds'
+            'privacy:metadata:table:tool_muprog_usr_snapshot'
         );
 
         return $collection;
@@ -158,10 +138,10 @@ class provider implements
      * @param int $userid The user to search.
      * @return contextlist The contextlist containing the list of contexts used in this plugin.
      */
-    public static function get_contexts_for_userid(int $userid) : contextlist {
+    public static function get_contexts_for_userid(int $userid): contextlist {
         $sql = "SELECT ctx.id
-                  FROM {enrol_programs_programs} p
-                  JOIN {enrol_programs_allocations} pa ON pa.programid = p.id
+                  FROM {tool_muprog_program} p
+                  JOIN {tool_muprog_allocation} pa ON pa.programid = p.id
                   JOIN {context} ctx ON p.contextid = ctx.id
                   JOIN {user} u ON u.id = pa.userid AND u.deleted = 0
                  WHERE u.id = :userid";
@@ -182,8 +162,8 @@ class provider implements
         $context = $userlist->get_context();
 
         $sql = "SELECT u.id
-                  FROM {enrol_programs_programs} p
-                  JOIN {enrol_programs_allocations} pa ON pa.programid = p.id
+                  FROM {tool_muprog_program} p
+                  JOIN {tool_muprog_allocation} pa ON pa.programid = p.id
                   JOIN {context} ctx ON p.contextid = ctx.id
                   JOIN {user} u ON u.id = pa.userid AND u.deleted = 0
                  WHERE ctx.id = :contextid";
@@ -212,9 +192,9 @@ class provider implements
                     pa.sourceid, pa.archived, pa.sourcedatajson, pa.timeallocated, pa.timestart, pa.timedue, pa.timeend,
                     pa.timecompleted, pa.timecreated,
                     pci.timecompleted AS certificateissuetimecompleted, pci.issueid AS certificateissueid, pci.timecreated AS certificateissuetimecreated
-                  FROM {enrol_programs_programs} p
-                  JOIN {enrol_programs_allocations} pa ON pa.programid = p.id
-                  LEFT JOIN {enrol_programs_certs_issues} pci ON pa.id = pci.allocationid
+                  FROM {tool_muprog_program} p
+                  JOIN {tool_muprog_allocation} pa ON pa.programid = p.id
+                  LEFT JOIN {tool_muprog_cert_issue} pci ON pa.id = pci.allocationid
                   JOIN {context} ctx ON p.contextid = ctx.id
                   JOIN {user} u ON u.id = pa.userid AND u.deleted = 0
                  WHERE ctx.id {$contextsql} AND u.id = :userid
@@ -222,8 +202,8 @@ class provider implements
         $params = ['userid' => $user->id];
         $params += $contextparams;
 
-        $strallocation = get_string('programallocations', 'enrol_programs');
-        $strprogramrequests = get_string('source_approval_requests', 'enrol_programs');
+        $strallocation = get_string('programallocations', 'tool_muprog');
+        $strprogramrequests = get_string('source_approval_requests', 'tool_muprog');
 
         $rs = $DB->get_recordset_sql($sql, $params);
         foreach ($rs as $allocation) {
@@ -239,7 +219,7 @@ class provider implements
 
             // Add user completion data.
             $sql = "SELECT itemid, timecompleted
-                    FROM {enrol_programs_completions}
+                    FROM {tool_muprog_completion}
                     WHERE allocationid = :allocationid
                     ORDER BY timecompleted ASC";
             $params = ['allocationid' => $allocation->id];
@@ -256,9 +236,9 @@ class provider implements
 
             // Add user evidence data.
             $sql = "SELECT pe.itemid, pe.evidencejson, pe.timecompleted, pe.timecreated, pe.createdby
-                    FROM {enrol_programs_evidences} pe
-                    JOIN {enrol_programs_items} pri ON pe.itemid = pri.id
-                    JOIN {enrol_programs_allocations} pa ON pa.programid = pri.programid
+                    FROM {tool_muprog_evidence} pe
+                    JOIN {tool_muprog_item} pri ON pe.itemid = pri.id
+                    JOIN {tool_muprog_allocation} pa ON pa.programid = pri.programid
                     WHERE pa.id = :allocationid
                     ORDER BY pe.timecreated ASC";
             $params = ['allocationid' => $allocation->id];
@@ -278,7 +258,7 @@ class provider implements
             $sql = "SELECT reason, timesnapshot, snapshotby, explanation, programid, userid, sourceid,
                         archived, sourcedatajson, timeallocated, timestart, timedue, timeend,
                         timecompleted, completionsjson, evidencesjson
-                    FROM {enrol_programs_usr_snapshots}
+                    FROM {tool_muprog_usr_snapshot}
                     WHERE allocationid = :allocationid
                     ORDER BY timesnapshot ASC";
             $params = ['allocationid' => $allocation->id];
@@ -309,10 +289,10 @@ class provider implements
 
         // Add user request data.
         $sql = "SELECT p.contextid, p.fullname, pr.sourceid, pr.datajson, pr.timerequested, pr.timerejected, pr.rejectedby
-                FROM {enrol_programs_requests} pr
+                FROM {tool_muprog_request} pr
                 JOIN {user} u ON u.id = pr.userid AND u.deleted = 0
-                JOIN {enrol_programs_sources} ps ON pr.sourceid = ps.id
-                JOIN {enrol_programs_programs} p ON ps.programid = p.id
+                JOIN {tool_muprog_source} ps ON pr.sourceid = ps.id
+                JOIN {tool_muprog_program} p ON ps.programid = p.id
                 WHERE u.id = :userid
                 ORDER BY pr.id ASC";
         $params = ['userid' => $user->id];
@@ -341,30 +321,30 @@ class provider implements
         global $DB;
 
         $sql = "SELECT pa.*
-                  FROM {enrol_programs_programs} p
-                  JOIN {enrol_programs_allocations} pa ON pa.programid = p.id
-                  JOIN {enrol_programs_sources} s ON s.id = pa.sourceid AND s.programid = p.id
+                  FROM {tool_muprog_program} p
+                  JOIN {tool_muprog_allocation} pa ON pa.programid = p.id
+                  JOIN {tool_muprog_source} s ON s.id = pa.sourceid AND s.programid = p.id
                   JOIN {context} ctx ON p.contextid = ctx.id
                   JOIN {user} u ON u.id = pa.userid AND u.deleted = 0
                  WHERE ctx.id = :contextid
               ORDER BY pa.id ASC, u.id ASC";
         $params = ['contextid' => $context->id];
 
-        $allclasses = \enrol_programs\local\allocation::get_source_classes();
+        $allclasses = \tool_muprog\local\allocation::get_source_classes();
         $rs = $DB->get_recordset_sql($sql, $params);
         foreach ($rs as $allocation) {
-            $program = $DB->get_record('enrol_programs_programs', ['id' => $allocation->programid]);
-            $source = $DB->get_record('enrol_programs_sources', ['id' => $allocation->sourceid]);
+            $program = $DB->get_record('tool_muprog_program', ['id' => $allocation->programid]);
+            $source = $DB->get_record('tool_muprog_source', ['id' => $allocation->sourceid]);
             if (!isset($allclasses[$source->type])) {
                 continue;
             }
-            /** @var \enrol_programs\local\source\base $coursceclass */
+            /** @var \tool_muprog\local\source\base $coursceclass */
             $coursceclass = $allclasses[$source->type];
             $coursceclass::deallocate_user($program, $source, $allocation);
 
             $params = ['allocationid' => $allocation->id];
-            $DB->delete_records('enrol_programs_certs_issues', $params);
-            $DB->delete_records('enrol_programs_usr_snapshots', $params);
+            $DB->delete_records('tool_muprog_cert_issue', $params);
+            $DB->delete_records('tool_muprog_usr_snapshot', $params);
         }
         $rs->close();
     }
@@ -385,9 +365,9 @@ class provider implements
         list($contextsql, $contextparams) = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
 
         $sql = "SELECT pa.*
-                  FROM {enrol_programs_programs} p
-                  JOIN {enrol_programs_allocations} pa ON pa.programid = p.id
-                  JOIN {enrol_programs_sources} s ON s.id = pa.sourceid AND s.programid = p.id
+                  FROM {tool_muprog_program} p
+                  JOIN {tool_muprog_allocation} pa ON pa.programid = p.id
+                  JOIN {tool_muprog_source} s ON s.id = pa.sourceid AND s.programid = p.id
                   JOIN {context} ctx ON p.contextid = ctx.id
                   JOIN {user} u ON u.id = pa.userid AND u.deleted = 0
                  WHERE u.id = :userid AND ctx.id {$contextsql}
@@ -395,25 +375,25 @@ class provider implements
         $params = ['userid' => $user->id];
         $params += $contextparams;
 
-        $allclasses = \enrol_programs\local\allocation::get_source_classes();
+        $allclasses = \tool_muprog\local\allocation::get_source_classes();
         $rs = $DB->get_recordset_sql($sql, $params);
         foreach ($rs as $allocation) {
-            $program = $DB->get_record('enrol_programs_programs', ['id' => $allocation->programid]);
-            $source = $DB->get_record('enrol_programs_sources', ['id' => $allocation->sourceid]);
+            $program = $DB->get_record('tool_muprog_program', ['id' => $allocation->programid]);
+            $source = $DB->get_record('tool_muprog_source', ['id' => $allocation->sourceid]);
             if (!isset($allclasses[$source->type])) {
                 continue;
             }
-            /** @var \enrol_programs\local\source\base $coursceclass */
+            /** @var \tool_muprog\local\source\base $coursceclass */
             $coursceclass = $allclasses[$source->type];
             $coursceclass::deallocate_user($program, $source, $allocation);
 
             $params = ['allocationid' => $allocation->id];
-            $DB->delete_records('enrol_programs_certs_issues', $params);
+            $DB->delete_records('tool_muprog_cert_issue', $params);
         }
         $rs->close();
 
         $params = ['userid' => $user->id];
-        $DB->delete_records('enrol_programs_usr_snapshots', $params);
+        $DB->delete_records('tool_muprog_usr_snapshot', $params);
     }
 
     /**
@@ -429,9 +409,9 @@ class provider implements
         list($usersql, $userparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
 
         $sql = "SELECT pa.*
-                  FROM {enrol_programs_programs} p
-                  JOIN {enrol_programs_allocations} pa ON pa.programid = p.id
-                  JOIN {enrol_programs_sources} s ON s.id = pa.sourceid AND s.programid = p.id
+                  FROM {tool_muprog_program} p
+                  JOIN {tool_muprog_allocation} pa ON pa.programid = p.id
+                  JOIN {tool_muprog_source} s ON s.id = pa.sourceid AND s.programid = p.id
                   JOIN {context} ctx ON p.contextid = ctx.id
                   JOIN {user} u ON u.id = pa.userid AND u.deleted = 0
                  WHERE ctx.id = :contextid AND u.id {$usersql}
@@ -439,23 +419,23 @@ class provider implements
         $params = ['contextid' => $context->id];
         $params += $userparams;
 
-        $allclasses = \enrol_programs\local\allocation::get_source_classes();
+        $allclasses = \tool_muprog\local\allocation::get_source_classes();
         $rs = $DB->get_recordset_sql($sql, $params);
         foreach ($rs as $allocation) {
-            $program = $DB->get_record('enrol_programs_programs', ['id' => $allocation->programid]);
-            $source = $DB->get_record('enrol_programs_sources', ['id' => $allocation->sourceid]);
+            $program = $DB->get_record('tool_muprog_program', ['id' => $allocation->programid]);
+            $source = $DB->get_record('tool_muprog_source', ['id' => $allocation->sourceid]);
             if (!isset($allclasses[$source->type])) {
                 continue;
             }
-            /** @var \enrol_programs\local\source\base $coursceclass */
+            /** @var \tool_muprog\local\source\base $coursceclass */
             $coursceclass = $allclasses[$source->type];
             $coursceclass::deallocate_user($program, $source, $allocation);
 
             $params = ['allocationid' => $allocation->id];
-            $DB->delete_records('enrol_programs_certs_issues', $params);
+            $DB->delete_records('tool_muprog_cert_issue', $params);
             $params = ['userid' => $allocation->userid];
-            $DB->delete_records('enrol_programs_usr_snapshots', $params);
-            $DB->delete_records('enrol_programs_requests', $params);
+            $DB->delete_records('tool_muprog_usr_snapshot', $params);
+            $DB->delete_records('tool_muprog_request', $params);
         }
         $rs->close();
     }

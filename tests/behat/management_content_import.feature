@@ -1,4 +1,4 @@
-@enrol @enrol_programs @openlms
+@tool @tool_muprog @muTMS
 Feature: Import program content
 
   Background:
@@ -28,13 +28,13 @@ Feature: Import program content
       | Program manager | pmanager  |
     And the following "permission overrides" exist:
       | capability                     | permission | role     | contextlevel | reference |
-      | enrol/programs:view            | Allow      | pviewer  | System       |           |
-      | enrol/programs:view            | Allow      | pmanager | System       |           |
-      | enrol/programs:edit            | Allow      | pmanager | System       |           |
-      | enrol/programs:delete          | Allow      | pmanager | System       |           |
-      | enrol/programs:addcourse       | Allow      | pmanager | System       |           |
-      | enrol/programs:allocate        | Allow      | pmanager | System       |           |
-      | enrol/programs:clone           | Allow      | pmanager | System       |           |
+      | tool/muprog:view            | Allow      | pviewer  | System       |           |
+      | tool/muprog:view            | Allow      | pmanager | System       |           |
+      | tool/muprog:edit            | Allow      | pmanager | System       |           |
+      | tool/muprog:delete          | Allow      | pmanager | System       |           |
+      | tool/muprog:addcourse       | Allow      | pmanager | System       |           |
+      | tool/muprog:allocate        | Allow      | pmanager | System       |           |
+      | tool/muprog:clone           | Allow      | pmanager | System       |           |
     And the following "role assigns" exist:
       | user      | role          | contextlevel | reference |
       | manager   | manager       | System       |           |
@@ -42,7 +42,7 @@ Feature: Import program content
       | manager2  | pmanager      | Category     | CAT2      |
       | manager2  | pmanager      | Category     | CAT3      |
       | viewer1   | pviewer       | System       |           |
-    And the following "enrol_programs > programs" exist:
+    And the following "tool_muprog > programs" exist:
       | fullname    | idnumber | category |
       | Program 000 | PR0      |          |
       | Program 001 | PR1      |          |
@@ -54,23 +54,23 @@ Feature: Import program content
     Given I log in as "manager1"
 
     # Add courses and sets
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
     And I click on "Content" "link" in the ".nav-tabs" "css_element"
     And I should see "All in any order" in the "Program 000" "table_row"
     And I click on "Append item" "link" in the "Program 000" "table_row"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Courses | Course 1 |
     And I press dialog form button "Append item"
     And I click on "Append item" "link" in the "Program 000" "table_row"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Add new set     | 1            |
       | Full name       | First set    |
       | Completion type | All in order |
     And I press dialog form button "Append item"
     And I should see "All in order" in the "First set" "table_row"
     And I click on "Append item" "link" in the "First set" "table_row"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Courses         | Course 2, Course 3, Course 4 |
       | Add new set     | 1            |
       | Full name       | Second set   |
@@ -79,7 +79,7 @@ Feature: Import program content
     And I press dialog form button "Append item"
     And I should see "At least 2" in the "Second set" "table_row"
     And I click on "Append item" "link" in the "Program 000" "table_row"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Courses         | Course 5         |
       | Add new set     | 1                |
       | Full name       | Third set        |
@@ -87,20 +87,20 @@ Feature: Import program content
     And I press dialog form button "Append item"
     And I should see "All in any order" in the "Third set" "table_row"
 
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 002"
     And I click on "Content" "link" in the ".nav-tabs" "css_element"
     And I click on "Append item" "link" in the "Program 002" "table_row"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Courses | Course 6 |
     And I press dialog form button "Append item"
 
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 001"
     And I click on "Content" "link" in the ".nav-tabs" "css_element"
 
     When I click on "Import program content" "link" in the "Program 001" "table_row"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
      | Select program | Program 000 |
     And I press dialog form button "Continue"
     And I press dialog form button "Import program content"
@@ -109,7 +109,7 @@ Feature: Import program content
     And I should see "Second set"
 
     When I click on "Import program content" "link" in the "Program 001" "table_row"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Select program | Program 002 |
     And I press dialog form button "Continue"
     And I press dialog form button "Import program content"
@@ -118,10 +118,10 @@ Feature: Import program content
 
   @javascript
   Scenario: Deleted courses are skipped during content import from another program
-    Given the following "enrol_programs > programs" exist:
+    Given the following "tool_muprog > programs" exist:
       | fullname    | idnumber |
       | Program 004 | PR4      |
-    And the following "enrol_programs > program_items" exist:
+    And the following "tool_muprog > program_items" exist:
       | program     | parent     | course   | fullname   | sequencetype     | minprerequisites |
       | Program 004 |            | Course 1 |            |                  |                  |
       | Program 004 |            | Course 2 |            |                  |                  |
@@ -135,12 +135,12 @@ Feature: Import program content
     And I log out
 
     And I log in as "manager1"
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
     And I click on "Content" "link" in the ".nav-tabs" "css_element"
 
     When I click on "Import program content" "link" in the "Program 000" "table_row"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Select program | Program 004 |
     And I press dialog form button "Continue"
     And I press dialog form button "Import program content"

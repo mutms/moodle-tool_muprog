@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="enrol/programs/db" VERSION="20240325" COMMENT="XMLDB file for Open LMS enrol/programs"
+<XMLDB PATH="admin/tool/muprog/db" VERSION="20240325" COMMENT="XMLDB file for programs"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+    xsi:noNamespaceSchemaLocation="../../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="enrol_programs_programs" COMMENT="List of programs">
+    <TABLE NAME="tool_muprog_program" COMMENT="List of programs">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Context for program management access control, will also be used for multi-tenancy"/>
+        <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Context for programs management access control, will also be used for multi-tenancy"/>
         <FIELD NAME="fullname" TYPE="char" LENGTH="254" NOTNULL="true" SEQUENCE="false" COMMENT="Human readable name of the program, does not have to be unique"/>
         <FIELD NAME="idnumber" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Unique identifier of a program, multilang definitely not supported"/>
         <FIELD NAME="description" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Program description text"/>
@@ -32,13 +32,13 @@
         <INDEX NAME="archived" UNIQUE="false" FIELDS="archived"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="enrol_programs_items" COMMENT="Structure of programs - items representing courses and course-sets with their ordering and completion rules.">
+    <TABLE NAME="tool_muprog_item" COMMENT="Structure of programs - items representing courses and course-sets with their ordering and completion rules.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="programid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="topitem" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="1 for top most item representing program itself, NULL for all other items"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Course reference, NULL if item is course-set (must not be set for top item)"/>
-        <FIELD NAME="frameworkid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Training reference, NULL for sets (must not be set for top item)"/>
+        <FIELD NAME="trainingid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Training framework reference, NULL for sets (must not be set for top item)"/>
         <FIELD NAME="previtemid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Previous item needs to be completed in order to allow courseid access, this is ignored for sets"/>
         <FIELD NAME="fullname" TYPE="char" LENGTH="254" NOTNULL="true" SEQUENCE="false" COMMENT="Human readable name of course-set, copy of course.fullname if courseid set, copy of program name for top item"/>
         <FIELD NAME="sequencejson" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="List of children with ordering and completion rules, optional start delay info if courseid set"/>
@@ -49,10 +49,10 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="programid" TYPE="foreign" FIELDS="programid" REFTABLE="enrol_programs_programs" REFFIELDS="id"/>
+        <KEY NAME="programid" TYPE="foreign" FIELDS="programid" REFTABLE="tool_muprog_program" REFFIELDS="id"/>
         <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
-        <KEY NAME="frameworkid" TYPE="foreign" FIELDS="frameworkid" REFTABLE="customfield_training_frameworks" REFFIELDS="id"/>
-        <KEY NAME="previtemid" TYPE="foreign" FIELDS="previtemid" REFTABLE="enrol_programs_items" REFFIELDS="id"/>
+        <KEY NAME="trainingid" TYPE="foreign" FIELDS="trainingid" REFTABLE="customfield_mutrain_framework" REFFIELDS="id"/>
+        <KEY NAME="previtemid" TYPE="foreign" FIELDS="previtemid" REFTABLE="tool_muprog_item" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="minprerequisites" UNIQUE="false" FIELDS="minprerequisites"/>
@@ -61,7 +61,7 @@
         <INDEX NAME="programid-courseid" UNIQUE="false" FIELDS="programid, courseid"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="enrol_programs_groups" COMMENT="Course groups that were created for course items">
+    <TABLE NAME="tool_muprog_group" COMMENT="Course groups that were created for course items">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="programid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -70,7 +70,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="programid" TYPE="foreign" FIELDS="programid" REFTABLE="enrol_programs_programs" REFFIELDS="id"/>
+        <KEY NAME="programid" TYPE="foreign" FIELDS="programid" REFTABLE="tool_muprog_program" REFFIELDS="id"/>
         <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
         <KEY NAME="groupid" TYPE="foreign-unique" FIELDS="groupid" REFTABLE="groups" REFFIELDS="id"/>
       </KEYS>
@@ -78,7 +78,7 @@
         <INDEX NAME="programid-courseid" UNIQUE="true" FIELDS="programid, courseid" COMMENT="Only one group for program-course combination"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="enrol_programs_prerequisites" COMMENT="Internal item dependency map - it is built automatically from program items using sequencejson">
+    <TABLE NAME="tool_muprog_prerequisite" COMMENT="Internal item dependency map - it is built automatically from program items using sequencejson">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="itemid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -86,14 +86,14 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="itemid" TYPE="foreign" FIELDS="itemid" REFTABLE="enrol_programs_items" REFFIELDS="id"/>
-        <KEY NAME="prerequisiteitemid" TYPE="foreign" FIELDS="prerequisiteitemid" REFTABLE="enrol_programs_items" REFFIELDS="id"/>
+        <KEY NAME="itemid" TYPE="foreign" FIELDS="itemid" REFTABLE="tool_muprog_item" REFFIELDS="id"/>
+        <KEY NAME="prerequisiteitemid" TYPE="foreign" FIELDS="prerequisiteitemid" REFTABLE="tool_muprog_item" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="itemid-prerequisiteitemid" UNIQUE="true" FIELDS="itemid, prerequisiteitemid" COMMENT="Prevent duplicates"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="enrol_programs_cohorts" COMMENT="Members of these cohorts may browse non-public programs before allocation">
+    <TABLE NAME="tool_muprog_cohort" COMMENT="Members of these cohorts may browse non-public programs before allocation">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="programid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -101,14 +101,14 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="programid" TYPE="foreign" FIELDS="programid" REFTABLE="enrol_programs_programs" REFFIELDS="id"/>
+        <KEY NAME="programid" TYPE="foreign" FIELDS="programid" REFTABLE="tool_muprog_program" REFFIELDS="id"/>
         <KEY NAME="cohortid" TYPE="foreign" FIELDS="cohortid" REFTABLE="cohort" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="programid-cohortid" UNIQUE="true" FIELDS="programid, cohortid" COMMENT="Prevent duplicates"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="enrol_programs_sources" COMMENT="Program allocation sources representing different means of user allocation">
+    <TABLE NAME="tool_muprog_source" COMMENT="Program allocation sources representing different means of user allocation">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="programid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -120,25 +120,10 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="programid" TYPE="foreign" FIELDS="programid" REFTABLE="enrol_programs_programs" REFFIELDS="id"/>
+        <KEY NAME="programid" TYPE="foreign" FIELDS="programid" REFTABLE="tool_muprog_program" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="enrol_programs_frameworks" COMMENT="Allowed UDP frameworks to use with udplans source">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="sourceid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="frameworkid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="requirecap" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" COMMENT="0 means that anybody who can use framework can add program to plan, 1 means Add program to plan capability is required in program context"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="sourceid" TYPE="foreign" FIELDS="sourceid" REFTABLE="enrol_programs_sources" REFFIELDS="id"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="frameworkid-sourceid" UNIQUE="true" FIELDS="frameworkid, sourceid"/>
-      </INDEXES>
-    </TABLE>
-    <TABLE NAME="enrol_programs_requests" COMMENT="List of people waiting for allocation to programs, entry is deleted after allocation, there are no historic snapshots for requests">
+    <TABLE NAME="tool_muprog_request" COMMENT="List of people waiting for allocation to programs, entry is deleted after allocation, there are no historic snapshots for requests">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="sourceid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -150,7 +135,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="sourceid" TYPE="foreign" FIELDS="sourceid" REFTABLE="enrol_programs_sources" REFFIELDS="id"/>
+        <KEY NAME="sourceid" TYPE="foreign" FIELDS="sourceid" REFTABLE="tool_muprog_source" REFFIELDS="id"/>
         <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="users" REFFIELDS="id"/>
         <KEY NAME="rejectedby" TYPE="foreign" FIELDS="rejectedby" REFTABLE="users" REFFIELDS="id"/>
       </KEYS>
@@ -158,7 +143,7 @@
         <INDEX NAME="sourceid-userid" UNIQUE="true" FIELDS="sourceid, userid" COMMENT="Only one request for allocation of user per source, delete rejection if they are allowed to retry"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="enrol_programs_allocations" COMMENT="User allocations to programs">
+    <TABLE NAME="tool_muprog_allocation" COMMENT="User allocations to programs">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="programid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -176,9 +161,9 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="programid" TYPE="foreign" FIELDS="programid" REFTABLE="enrol_programs_programs" REFFIELDS="id"/>
+        <KEY NAME="programid" TYPE="foreign" FIELDS="programid" REFTABLE="tool_muprog_program" REFFIELDS="id"/>
         <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="users" REFFIELDS="id"/>
-        <KEY NAME="sourceid" TYPE="foreign" FIELDS="sourceid" REFTABLE="enrol_programs_sources" REFFIELDS="id"/>
+        <KEY NAME="sourceid" TYPE="foreign" FIELDS="sourceid" REFTABLE="tool_muprog_source" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="programid-userid" UNIQUE="true" FIELDS="programid, userid" COMMENT="Only one allocation of user per program, archive and delete allocation if change needed, or use other evidence in case of certification certification"/>
@@ -186,7 +171,7 @@
         <INDEX NAME="sourceinstanceid" UNIQUE="false" FIELDS="sourceinstanceid"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="enrol_programs_completions" COMMENT="Program item completions, added after item completion">
+    <TABLE NAME="tool_muprog_completion" COMMENT="Program item completions, added after item completion">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="itemid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -195,15 +180,15 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="itemid" TYPE="foreign" FIELDS="itemid" REFTABLE="enrol_programs_items" REFFIELDS="id"/>
-        <KEY NAME="allocationid" TYPE="foreign" FIELDS="allocationid" REFTABLE="enrol_programs_allocations" REFFIELDS="id"/>
+        <KEY NAME="itemid" TYPE="foreign" FIELDS="itemid" REFTABLE="tool_muprog_item" REFFIELDS="id"/>
+        <KEY NAME="allocationid" TYPE="foreign" FIELDS="allocationid" REFTABLE="tool_muprog_allocation" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="itemid-allocationid" UNIQUE="true" FIELDS="itemid, allocationid" COMMENT="Only one completion per item and user"/>
         <INDEX NAME="timecompleted" UNIQUE="false" FIELDS="timecompleted"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="enrol_programs_evidences" COMMENT="Alternative evidence for completion of a program item">
+    <TABLE NAME="tool_muprog_evidence" COMMENT="Alternative evidence for completion of a program item">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="itemid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -215,7 +200,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="itemid" TYPE="foreign" FIELDS="itemid" REFTABLE="enrol_programs_items" REFFIELDS="id"/>
+        <KEY NAME="itemid" TYPE="foreign" FIELDS="itemid" REFTABLE="tool_muprog_item" REFFIELDS="id"/>
         <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="users" REFFIELDS="id"/>
         <KEY NAME="createdby" TYPE="foreign" FIELDS="createdby" REFTABLE="users" REFFIELDS="id"/>
       </KEYS>
@@ -223,7 +208,7 @@
         <INDEX NAME="itemid-userid" UNIQUE="true" FIELDS="itemid, userid" COMMENT="Only one evidence per item and user allowed"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="enrol_programs_prg_snapshots" COMMENT="Archive of ALL program entity snapshots after modification including items, sources and cohorts">
+    <TABLE NAME="tool_muprog_prg_snapshot" COMMENT="Archive of ALL program entity snapshots after modification including items, sources and cohorts">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="programid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -231,18 +216,18 @@
         <FIELD NAME="timesnapshot" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="When was the program modified"/>
         <FIELD NAME="snapshotby" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Who modified the program, NULL means system action"/>
         <FIELD NAME="explanation" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Extra explanation"/>
-        <FIELD NAME="programjson" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Serialised data from enrol_programs_programs, NULL after program deletion"/>
-        <FIELD NAME="itemsjson" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Serialised data from enrol_programs_items"/>
-        <FIELD NAME="cohortsjson" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Serialised data from enrol_programs_cohorts"/>
-        <FIELD NAME="sourcesjson" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Serialised data from enrol_programs_sources"/>
+        <FIELD NAME="programjson" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Serialised data from tool_muprog_program, NULL after program deletion"/>
+        <FIELD NAME="itemsjson" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Serialised data from tool_muprog_item"/>
+        <FIELD NAME="cohortsjson" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Serialised data from tool_muprog_cohort"/>
+        <FIELD NAME="sourcesjson" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Serialised data from tool_muprog_source"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="programid" TYPE="foreign" FIELDS="programid" REFTABLE="enrol_programs_programs" REFFIELDS="id"/>
+        <KEY NAME="programid" TYPE="foreign" FIELDS="programid" REFTABLE="tool_muprog_program" REFFIELDS="id"/>
         <KEY NAME="snapshotby" TYPE="foreign" FIELDS="snapshotby" REFTABLE="users" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="enrol_programs_usr_snapshots" COMMENT="Archive of SOME user allocation/progress snapshots - only important stuff is recorded">
+    <TABLE NAME="tool_muprog_usr_snapshot" COMMENT="Archive of SOME user allocation/progress snapshots - only important stuff is recorded">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="allocationid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="id of original user allocation, it is handy to have it after it gets deleted"/>
@@ -266,17 +251,17 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="allocationid" TYPE="foreign" FIELDS="allocationid" REFTABLE="enrol_programs_allocations" REFFIELDS="id"/>
+        <KEY NAME="allocationid" TYPE="foreign" FIELDS="allocationid" REFTABLE="tool_muprog_allocation" REFFIELDS="id"/>
         <KEY NAME="snapshotby" TYPE="foreign" FIELDS="snapshotby" REFTABLE="users" REFFIELDS="id"/>
-        <KEY NAME="programid" TYPE="foreign" FIELDS="programid" REFTABLE="enrol_programs_programs" REFFIELDS="id"/>
+        <KEY NAME="programid" TYPE="foreign" FIELDS="programid" REFTABLE="tool_muprog_program" REFFIELDS="id"/>
         <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="users" REFFIELDS="id"/>
-        <KEY NAME="sourceid" TYPE="foreign" FIELDS="sourceid" REFTABLE="enrol_programs_sources" REFFIELDS="id"/>
+        <KEY NAME="sourceid" TYPE="foreign" FIELDS="sourceid" REFTABLE="tool_muprog_source" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="reason-userid-programid" UNIQUE="false" FIELDS="reason, userid, programid" COMMENT="Faster lookup by reason and userid"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="enrol_programs_certs" COMMENT="List of certificate templates used for program completions">
+    <TABLE NAME="tool_muprog_cert" COMMENT="List of certificate templates used for program completions">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="programid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -287,13 +272,13 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="programid" TYPE="foreign-unique" FIELDS="programid" REFTABLE="enrol_programs_programs" REFFIELDS="id"/>
+        <KEY NAME="programid" TYPE="foreign-unique" FIELDS="programid" REFTABLE="tool_muprog_program" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="templateid" UNIQUE="false" FIELDS="templateid" COMMENT="Soft reference to tool_certificate_templates.id, one template can be used in multiple programs"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="enrol_programs_certs_issues" COMMENT="Issued certificates created via tool_certificate">
+    <TABLE NAME="tool_muprog_cert_issue" COMMENT="Issued certificates created via tool_certificate">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="programid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -304,14 +289,14 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="programid" TYPE="foreign" FIELDS="programid" REFTABLE="enrol_programs_programs" REFFIELDS="id"/>
-        <KEY NAME="allocationid" TYPE="foreign" FIELDS="allocationid" REFTABLE="enrol_programs_allocations" REFFIELDS="id"/>
+        <KEY NAME="programid" TYPE="foreign" FIELDS="programid" REFTABLE="tool_muprog_program" REFFIELDS="id"/>
+        <KEY NAME="allocationid" TYPE="foreign" FIELDS="allocationid" REFTABLE="tool_muprog_allocation" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="issueid" UNIQUE="true" FIELDS="issueid" COMMENT="Soft reference to tool_certificate_issues.id"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="enrol_programs_src_cohorts" COMMENT="Program can be automatically allocated to the members of these cohorts if configured in that way">
+    <TABLE NAME="tool_muprog_src_cohort" COMMENT="Program can be automatically allocated to the members of these cohorts if configured in that way">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="sourceid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -320,27 +305,10 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="cohortid" TYPE="foreign" FIELDS="cohortid" REFTABLE="cohort" REFFIELDS="id"/>
-        <KEY NAME="sourceid" TYPE="foreign" FIELDS="sourceid" REFTABLE="enrol_programs_sources" REFFIELDS="id"/>
+        <KEY NAME="sourceid" TYPE="foreign" FIELDS="sourceid" REFTABLE="tool_muprog_source" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="sourceid-cohortid" UNIQUE="true" FIELDS="sourceid, cohortid"/>
-      </INDEXES>
-    </TABLE>
-    <TABLE NAME="enrol_programs_src_commholds" COMMENT="Reserve spaces from the maximum allocated users for a hold key.">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="quantity" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="holdkey" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="programid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="id" TYPE="primary" FIELDS="id" COMMENT="primary key"/>
-        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
-        <KEY NAME="programid" TYPE="foreign" FIELDS="programid" REFTABLE="enrol_programs_programs" REFFIELDS="id"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="holdkey" UNIQUE="false" FIELDS="holdkey" COMMENT="index instead of key because commerce is optional"/>
       </INDEXES>
     </TABLE>
   </TABLES>

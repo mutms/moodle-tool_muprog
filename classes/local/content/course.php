@@ -1,30 +1,20 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace enrol_programs\local\content;
+namespace tool_muprog\local\content;
 
-use enrol_programs\local\util;
+use tool_muprog\local\util;
 
 /**
  * Program course item.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class course extends item {
     /** @var int */
@@ -33,6 +23,11 @@ final class course extends item {
     /** @var ?item Previous item needs to be completed in order to allow course access */
     protected $previous;
 
+    /**
+     * Get course id.
+     *
+     * @return int
+     */
     public function get_courseid(): int {
         return $this->courseid;
     }
@@ -78,7 +73,7 @@ final class course extends item {
      * @return course
      */
     protected static function init_from_record(\stdClass $record, ?item $previous, array &$unusedrecords, array &$prerequisites): item {
-        if ($record->topitem || !$record->courseid || $record->frameworkid !== null) {
+        if ($record->topitem || !$record->courseid || $record->trainingid !== null) {
             throw new \coding_exception('Invalid course item');
         }
         $item = new course();
@@ -143,7 +138,7 @@ final class course extends item {
             'programid' => (string)$this->programid,
             'topitem' => null,
             'courseid' => (string)$this->courseid,
-            'frameworkid' => null,
+            'trainingid' => null,
             'previtemid' => (isset($this->previous) ? (string)$this->previous->id : null),
             'fullname' => $fullname,
             'sequencejson' => util::json_encode([]),

@@ -1,35 +1,25 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace enrol_programs\local\form;
+namespace tool_muprog\local\form;
 
-use enrol_programs\local\content\set;
-use enrol_programs\local\content\course;
-use enrol_programs\local\content\training;
-use enrol_programs\local\content\top;
+use tool_muprog\local\content\set;
+use tool_muprog\local\content\course;
+use tool_muprog\local\content\training;
+use tool_muprog\local\content\top;
 
 /**
  * Delete program content item.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class item_delete extends \local_openlms\dialog_form {
+final class item_delete extends \tool_mulib\local\dialog_form {
+    #[\Override]
     protected function definition() {
         $mform = $this->_form;
         $item = $this->_customdata['item'];
@@ -44,11 +34,11 @@ final class item_delete extends \local_openlms\dialog_form {
         $mform->setDefault('id', $item->get_id());
 
         if ($item instanceof course) {
-            $deletestr = get_string('deletecourse', 'enrol_programs');
+            $deletestr = get_string('deletecourse', 'tool_muprog');
         } else if ($item instanceof training) {
-            $deletestr = get_string('deletetraining', 'enrol_programs');
+            $deletestr = get_string('deletetraining', 'tool_muprog');
         } else {
-            $deletestr = get_string('deleteset', 'enrol_programs');
+            $deletestr = get_string('deleteset', 'tool_muprog');
         }
 
         $this->add_action_buttons(true, $deletestr);

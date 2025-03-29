@@ -1,20 +1,9 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace enrol_programs\local\notification;
+namespace tool_muprog\local\notification;
 
 use stdClass;
 use moodle_url;
@@ -22,12 +11,13 @@ use moodle_url;
 /**
  * Program notification base.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2023 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class base extends \local_openlms\notification\notificationtype {
+abstract class base extends \tool_mulib\local\notification\notificationtype {
     /** @var int "soon" means in 3 days from now */
     public const TIME_SOON = (60 * 60 * 24 * 3);
 
@@ -55,58 +45,18 @@ abstract class base extends \local_openlms\notification\notificationtype {
     }
 
     /**
-     * Returns relateduser field id.
-     * @return int|null
-     */
-    public static function get_relateduser_fieldid(): ?int {
-        if (!get_config('profilefield_relateduser', 'version')) {
-            return null;
-        }
-        $fieldid = (int)get_config('enrol_programs', 'notification_relateduserfield');
-        if ($fieldid > 0) {
-            return $fieldid;
-        }
-        return null;
-    }
-
-    /**
-     * Returns relateduser.
-     *
-     * @param int $userid
-     * @return stdClass|null
-     */
-    public static function get_relateduser(int $userid): ?stdClass {
-        global $DB;
-
-        $fieldid = self::get_relateduser_fieldid();
-        if (!$fieldid) {
-            return null;
-        }
-        $ruid = $DB->get_field('user_info_data', 'data', ['fieldid' => $fieldid, 'userid' => $userid]);
-        if (!$ruid) {
-            return null;
-        }
-        $relateduser = $DB->get_record('user', ['id' => $ruid, 'deleted' => 0, 'confirmed' => 1]);
-        if (!$relateduser) {
-            return null;
-        }
-        return $relateduser;
-    }
-
-    /**
      * Returns standard program allocation placeholders.
      *
      * @param stdClass $program
      * @param stdClass $source
      * @param stdClass $allocation
      * @param stdClass $user
-     * @param stdClass|null $relateduser
      * @return array
      */
     public static function get_allocation_placeholders(stdClass $program, stdClass $source, stdClass $allocation,
-                                                       stdClass $user, ?stdClass $relateduser = null): array {
-        /** @var \enrol_programs\local\source\base[] $sourceclasses */
-        $sourceclasses = \enrol_programs\local\allocation::get_source_classes();
+                                                       stdClass $user): array {
+        /** @var \tool_muprog\local\source\base[] $sourceclasses */
+        $sourceclasses = \tool_muprog\local\allocation::get_source_classes();
         if (isset($sourceclasses[$source->type])) {
             $classname = $sourceclasses[$source->type];
             $sourcename = $classname::get_name();
@@ -118,7 +68,7 @@ abstract class base extends \local_openlms\notification\notificationtype {
             throw new \coding_exception('invalid parameter mix');
         }
 
-        $strnotset = get_string('notset', 'enrol_programs');
+        $strnotset = get_string('notset', 'tool_muprog');
 
         $a = [];
         $a['user_fullname'] = s(fullname($user));
@@ -126,26 +76,14 @@ abstract class base extends \local_openlms\notification\notificationtype {
         $a['user_lastname'] = s($user->lastname);
         $a['program_fullname'] = format_string($program->fullname);
         $a['program_idnumber'] = s($program->idnumber);
-        $a['program_url'] = (new moodle_url('/enrol/programs/my/program.php', ['id' => $program->id]))->out(false);
+        $a['program_url'] = (new moodle_url('/admin/tool/muprog/my/program.php', ['id' => $program->id]))->out(false);
         $a['program_sourcename'] = $sourcename;
-        $a['program_status'] = \enrol_programs\local\allocation::get_completion_status_plain($program, $allocation);
+        $a['program_status'] = \tool_muprog\local\allocation::get_completion_status_plain($program, $allocation);
         $a['program_allocationdate'] = userdate($allocation->timeallocated);
         $a['program_startdate'] = userdate($allocation->timestart);
         $a['program_duedate'] = (isset($allocation->timedue) ? userdate($allocation->timedue) : $strnotset);
         $a['program_enddate'] = (isset($allocation->timeend) ? userdate($allocation->timeend) : $strnotset);
         $a['program_completeddate'] = (isset($allocation->timecompleted) ? userdate($allocation->timecompleted) : $strnotset);
-
-        if ($relateduser) {
-            $context = \context::instance_by_id($program->contextid);
-            $a['relateduser_fullname'] = s(fullname($relateduser));
-            $a['relateduser_firstname'] = s($relateduser->firstname);
-            $a['relateduser_lastname'] = s($relateduser->lastname);
-            if (has_capability('enrol/programs:view', $context, $relateduser)) {
-                $a['program_url'] = (new moodle_url('/enrol/programs/management/user_allocation.php', ['id' => $allocation->id]))->out(false);
-            } else {
-                $a['program_url'] = (new moodle_url('/enrol/programs/catalogue/program.php', ['id' => $program->id]))->out(false);
-            }
-        }
 
         return $a;
     }
@@ -179,7 +117,7 @@ abstract class base extends \local_openlms\notification\notificationtype {
             return;
         }
 
-        $notification = $DB->get_record('local_openlms_notifications', [
+        $notification = $DB->get_record('tool_mulib_notification', [
             'instanceid' => $program->id,
             'component' => static::get_component(),
             'notificationtype' => static::get_notificationtype(),
@@ -216,76 +154,6 @@ abstract class base extends \local_openlms\notification\notificationtype {
     }
 
     /**
-     * Send notification to user related to allocated user.
-     *
-     * @param stdClass $program
-     * @param stdClass $source
-     * @param stdClass $allocation
-     * @param stdClass $user
-     * @param stdClass $relateduser
-     * @param bool $alowmultiple
-     * @return void
-     */
-    protected static function notify_related_user(stdClass $program, stdClass $source, stdClass $allocation,
-                                                  stdClass $user, stdClass $relateduser, bool $alowmultiple = false): void {
-        global $DB;
-
-        if ($program->archived) {
-            // Never send notifications for archived program.
-            return;
-        }
-
-        if ($allocation->archived && static::get_notificationtype() !== 'deallocation') {
-            // Notification for deallocation is different because we require archiving before deallocation.
-            return;
-        }
-
-        if ($user->deleted) {
-            // Do not skip suspended users here, the managers might want to know what is going on with suspended users.
-            return;
-        }
-
-        if (!$relateduser || $relateduser->suspended) {
-            return;
-        }
-
-        $notification = $DB->get_record('local_openlms_notifications', [
-            'instanceid' => $program->id,
-            'component' => static::get_component(),
-            'notificationtype' => static::get_notificationtype(),
-        ]);
-        if (!$notification || !$notification->enabled) {
-            return;
-        }
-
-        try {
-            self::force_language($relateduser->lang);
-
-            $a = static::get_allocation_placeholders($program, $source, $allocation, $user, $relateduser);
-            $subject = static::get_subject($notification, $a);
-            $body = static::get_body($notification, $a);
-
-            $message = new \core\message\message();
-            $message->notification = '1';
-            $message->component = static::get_component();
-            $message->name = static::get_provider();
-            $message->userfrom = static::get_notifier($program, $allocation);
-            $message->userto = $relateduser;
-            $message->subject = $subject;
-            $message->fullmessage = $body;
-            $message->fullmessageformat = FORMAT_HTML;
-            $message->fullmessagehtml = $body;
-            $message->smallmessage = $subject;
-            $message->contexturlname = $a['program_fullname'];
-            $message->contexturl = $a['program_url'];
-
-            self::message_send($message, $notification->id, $relateduser->id, $allocation->id, null, $alowmultiple);
-        } finally {
-            self::revert_language();
-        }
-    }
-
-    /**
      * Send notifications.
      *
      * @param stdClass|null $program
@@ -303,15 +171,15 @@ abstract class base extends \local_openlms\notification\notificationtype {
     public static function delete_allocation_notifications(\stdClass $allocation) {
         global $DB;
 
-        $notification = $DB->get_record('local_openlms_notifications', [
-            'component' => 'enrol_programs',
+        $notification = $DB->get_record('tool_mulib_notification', [
+            'component' => 'tool_muprog',
             'instanceid' => $allocation->programid,
             'notificationtype' => static::get_notificationtype(),
         ]);
         if (!$notification) {
             return;
         }
-        $DB->delete_records('local_openlms_user_notified', [
+        $DB->delete_records('tool_mulib_notification_user', [
             'notificationid' => $notification->id,
             'otherid1' => $allocation->id,
         ]);
@@ -323,7 +191,7 @@ abstract class base extends \local_openlms\notification\notificationtype {
      * @return string HTML text converted from Markdown lang string value
      */
     public static function get_description(): string {
-        $description = get_string('notification_' . static::get_notificationtype() . '_description', 'enrol_programs');
+        $description = get_string('notification_' . static::get_notificationtype() . '_description', 'tool_muprog');
         $description = markdown_to_html($description);
         return $description;
     }
@@ -335,6 +203,6 @@ abstract class base extends \local_openlms\notification\notificationtype {
      * @return string as plain text
      */
     public static function get_default_subject(): string {
-        return get_string('notification_' . static::get_notificationtype() . '_subject', 'enrol_programs');
+        return get_string('notification_' . static::get_notificationtype() . '_subject', 'tool_muprog');
     }
 }

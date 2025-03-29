@@ -1,4 +1,4 @@
-@enrol @enrol_programs @openlms
+@tool @tool_muprog @muTMS
 Feature: Import program allocation
 
   Background:
@@ -35,13 +35,13 @@ Feature: Import program allocation
       | Program manager | pmanager  |
     And the following "permission overrides" exist:
       | capability                     | permission | role     | contextlevel | reference |
-      | enrol/programs:view            | Allow      | pviewer  | System       |           |
-      | enrol/programs:view            | Allow      | pmanager | System       |           |
-      | enrol/programs:edit            | Allow      | pmanager | System       |           |
-      | enrol/programs:delete          | Allow      | pmanager | System       |           |
-      | enrol/programs:addcourse       | Allow      | pmanager | System       |           |
-      | enrol/programs:allocate        | Allow      | pmanager | System       |           |
-      | enrol/programs:clone           | Allow      | pmanager | System       |           |
+      | tool/muprog:view            | Allow      | pviewer  | System       |           |
+      | tool/muprog:view            | Allow      | pmanager | System       |           |
+      | tool/muprog:edit            | Allow      | pmanager | System       |           |
+      | tool/muprog:delete          | Allow      | pmanager | System       |           |
+      | tool/muprog:addcourse       | Allow      | pmanager | System       |           |
+      | tool/muprog:allocate        | Allow      | pmanager | System       |           |
+      | tool/muprog:clone           | Allow      | pmanager | System       |           |
       | moodle/cohort:view             | Allow      | pmanager | System       |           |
     And the following "role assigns" exist:
       | user      | role          | contextlevel | reference |
@@ -50,7 +50,7 @@ Feature: Import program allocation
       | manager2  | pmanager      | Category     | CAT2      |
       | manager2  | pmanager      | Category     | CAT3      |
       | viewer1   | pviewer       | System       |           |
-    And the following "enrol_programs > programs" exist:
+    And the following "tool_muprog > programs" exist:
       | fullname    | idnumber | category |
       | Program 000 | PR0      |          |
       | Program 001 | PR1      |          |
@@ -61,18 +61,18 @@ Feature: Import program allocation
   Scenario: Manager may import allocation settings from another program
     Given I log in as "manager1"
 
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
-    And I click on "Allocation settings" "link" in the "#region-main" "css_element"
+    And I click on "Allocation settings" "link" in the ".secondary-navigation" "css_element"
     And I click on "Update allocations" "link"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | timeallocationstart[enabled] | 1    |
       | timeallocationstart[day]     | 5    |
       | timeallocationstart[month]   | 11   |
       | timeallocationstart[year]    | 2020 |
       | timeallocationstart[hour]    | 09   |
       | timeallocationstart[minute]  | 00   |
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | timeallocationend[enabled] | 1    |
       | timeallocationend[day]     | 5    |
       | timeallocationend[month]   | 11   |
@@ -111,28 +111,28 @@ Feature: Import program allocation
       | Active             | Yes |
       | Allow new sign ups | No  |
     And I press dialog form button "Update"
-    And I should see "Thursday, 5 November 2020, 9:00" in the "Allocation start:" definition list item
-    And I should see "Sunday, 5 November 2028, 9:00" in the "Allocation end:" definition list item
-    And I should see "Delay start after allocation - 5 months" in the "Program start:" definition list item
-    And I should see "Due after start - 8 months" in the "Program due:" definition list item
-    And I should see "End after start - 10 months" in the "Program end:" definition list item
-    And I should see "Active; Requests are not allowed" in the "Requests with approval:" definition list item
-    And I should see "Active (Cohort 1, Cohort 2)" in the "Automatic cohort allocation:" definition list item
-    And I should see "Active" in the "Manual allocation:" definition list item
-    And I should see "Active; Sign ups are not allowed" in the "Self allocation:" definition list item
+    And I should see "Thursday, 5 November 2020, 9:00" in the "Allocation start" definition list item
+    And I should see "Sunday, 5 November 2028, 9:00" in the "Allocation end" definition list item
+    And I should see "Delay start after allocation - 5 months" in the "Program start" definition list item
+    And I should see "Due after start - 8 months" in the "Program due" definition list item
+    And I should see "End after start - 10 months" in the "Program end" definition list item
+    And I should see "Active; Requests are not allowed" in the "Requests with approval" definition list item
+    And I should see "Active (Cohort 1, Cohort 2)" in the "Automatic cohort allocation" definition list item
+    And I should see "Active" in the "Manual allocation" definition list item
+    And I should see "Active; Sign ups are not allowed" in the "Self allocation" definition list item
 
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 001"
-    And I click on "Allocation settings" "link" in the "#region-main" "css_element"
-    And I should see "Not set" in the "Allocation start:" definition list item
-    And I should see "Not set" in the "Allocation end:" definition list item
-    And I should see "Start immediately after allocation" in the "Program start:" definition list item
-    And I should see "Not set" in the "Program due:" definition list item
-    And I should see "Not set" in the "Program end:" definition list item
-    And I should see "Inactive" in the "Manual allocation:" definition list item
-    And I should see "Inactive" in the "Self allocation:" definition list item
-    And I should see "Inactive" in the "Requests with approval:" definition list item
-    And I should see "Inactive" in the "Automatic cohort allocation:" definition list item
+    And I click on "Allocation settings" "link" in the ".secondary-navigation" "css_element"
+    And I should see "Not set" in the "Allocation start" definition list item
+    And I should see "Not set" in the "Allocation end" definition list item
+    And I should see "Start immediately after allocation" in the "Program start" definition list item
+    And I should see "Not set" in the "Program due" definition list item
+    And I should see "Not set" in the "Program end" definition list item
+    And I should see "Inactive" in the "Manual allocation" definition list item
+    And I should see "Inactive" in the "Self allocation" definition list item
+    And I should see "Inactive" in the "Requests with approval" definition list item
+    And I should see "Inactive" in the "Automatic cohort allocation" definition list item
 
     When I click on "Import program allocation" "button"
     And I set the following fields to these values:
@@ -141,15 +141,15 @@ Feature: Import program allocation
     And I set the following fields to these values:
       | Allocation start | 1 |
     And I press dialog form button "Import program allocation"
-    Then I should see "Thursday, 5 November 2020, 9:00" in the "Allocation start:" definition list item
-    And I should see "Not set" in the "Allocation end:" definition list item
-    And I should see "Start immediately after allocation" in the "Program start:" definition list item
-    And I should see "Not set" in the "Program due:" definition list item
-    And I should see "Not set" in the "Program end:" definition list item
-    And I should see "Inactive" in the "Manual allocation:" definition list item
-    And I should see "Inactive" in the "Self allocation:" definition list item
-    And I should see "Inactive" in the "Requests with approval:" definition list item
-    And I should see "Inactive" in the "Automatic cohort allocation:" definition list item
+    Then I should see "Thursday, 5 November 2020, 9:00" in the "Allocation start" definition list item
+    And I should see "Not set" in the "Allocation end" definition list item
+    And I should see "Start immediately after allocation" in the "Program start" definition list item
+    And I should see "Not set" in the "Program due" definition list item
+    And I should see "Not set" in the "Program end" definition list item
+    And I should see "Inactive" in the "Manual allocation" definition list item
+    And I should see "Inactive" in the "Self allocation" definition list item
+    And I should see "Inactive" in the "Requests with approval" definition list item
+    And I should see "Inactive" in the "Automatic cohort allocation" definition list item
 
     When I click on "Import program allocation" "button"
     And I set the following fields to these values:
@@ -166,12 +166,12 @@ Feature: Import program allocation
       | Manual allocation           | 1 |
       | Self allocation             | 1 |
     And I press dialog form button "Import program allocation"
-    Then I should see "Thursday, 5 November 2020, 9:00" in the "Allocation start:" definition list item
-    And I should see "Sunday, 5 November 2028, 9:00" in the "Allocation end:" definition list item
-    And I should see "Delay start after allocation - 5 months" in the "Program start:" definition list item
-    And I should see "Due after start - 8 months" in the "Program due:" definition list item
-    And I should see "End after start - 10 months" in the "Program end:" definition list item
-    And I should see "Active; Requests are not allowed" in the "Requests with approval:" definition list item
-    And I should see "Active (Cohort 1, Cohort 2)" in the "Automatic cohort allocation:" definition list item
-    And I should see "Active" in the "Manual allocation:" definition list item
-    And I should see "Active; Sign ups are not allowed" in the "Self allocation:" definition list item
+    Then I should see "Thursday, 5 November 2020, 9:00" in the "Allocation start" definition list item
+    And I should see "Sunday, 5 November 2028, 9:00" in the "Allocation end" definition list item
+    And I should see "Delay start after allocation - 5 months" in the "Program start" definition list item
+    And I should see "Due after start - 8 months" in the "Program due" definition list item
+    And I should see "End after start - 10 months" in the "Program end" definition list item
+    And I should see "Active; Requests are not allowed" in the "Requests with approval" definition list item
+    And I should see "Active (Cohort 1, Cohort 2)" in the "Automatic cohort allocation" definition list item
+    And I should see "Active" in the "Manual allocation" definition list item
+    And I should see "Active; Sign ups are not allowed" in the "Self allocation" definition list item

@@ -1,20 +1,8 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace enrol_programs\external;
+namespace tool_muprog\external;
 
 use core_external\external_function_parameters;
 use core_external\external_value;
@@ -22,12 +10,13 @@ use core_external\external_value;
 /**
  * Provides list of programs that can be exported.
  *
- * @package     enrol_programs
+ * @package     tool_muprog
  * @copyright   2024 Open LMS (https://www.openlms.net/)
  * @author      Farhan Karmali
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class form_export_programids extends \local_openlms\external\form_autocomplete_field {
+final class form_export_programids extends \tool_mulib\external\form_autocomplete_field {
+    /** @var int max results */
     const MAX_RESULTS = 20;
 
     /**
@@ -65,10 +54,10 @@ final class form_export_programids extends \local_openlms\external\form_autocomp
         $syscontext = \context_system::instance();
         self::validate_context($syscontext);
 
-        list($searchsql, $params) = \enrol_programs\local\management::get_program_search_query(null, $query, 'p');
+        list($searchsql, $params) = \tool_muprog\local\management::get_program_search_query(null, $query, 'p');
 
         $sql = "SELECT p.id, p.fullname, p.contextid
-                  FROM {enrol_programs_programs} p
+                  FROM {tool_muprog_program} p
                   JOIN {context} c ON c.id = p.contextid
                  WHERE $searchsql
               ORDER BY p.fullname ASC";
@@ -79,12 +68,12 @@ final class form_export_programids extends \local_openlms\external\form_autocomp
         $count = 0;
         foreach ($rs as $program) {
             $context = \context::instance_by_id($program->contextid);
-            if (!has_capability('enrol/programs:export', $context)) {
+            if (!has_capability('tool/muprog:export', $context)) {
                 continue;
             }
             $count++;
             if ($count > self::MAX_RESULTS) {
-                $notice = get_string('toomanyrecords', 'local_openlms', self::MAX_RESULTS);
+                $notice = get_string('toomanyrecords', 'tool_mulib', self::MAX_RESULTS);
                 break;
             }
             $list[] = ['value' => $program->id, 'label' => format_string($program->fullname)];
@@ -107,7 +96,7 @@ final class form_export_programids extends \local_openlms\external\form_autocomp
         return function($value) use ($arguments): string {
             global $DB;
 
-            $program = $DB->get_record('enrol_programs_programs', ['id' => $value]);
+            $program = $DB->get_record('tool_muprog_program', ['id' => $value]);
             if (!$program) {
                 return get_string('error');
             }
@@ -124,12 +113,12 @@ final class form_export_programids extends \local_openlms\external\form_autocomp
     public static function validate_programids(array $programids): ?string {
         global $DB;
         foreach ($programids as $programid) {
-            $program = $DB->get_record('enrol_programs_programs', ['id' => $programid]);
+            $program = $DB->get_record('tool_muprog_program', ['id' => $programid]);
             if (!$program) {
                 return get_string('error');
             }
             $context = \context::instance_by_id($program->contextid);
-            if (!has_capability('enrol/programs:export', $context)) {
+            if (!has_capability('tool/muprog:export', $context)) {
                 return get_string('error');
             }
         }

@@ -1,54 +1,50 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace enrol_programs\output\catalogue;
+namespace tool_muprog\output\catalogue;
 
-use enrol_programs\local\allocation;
-use enrol_programs\local\program;
-use enrol_programs\local\util;
-use enrol_programs\local\content\item,
-    enrol_programs\local\content\top,
-    enrol_programs\local\content\set,
-    enrol_programs\local\content\course;
-use stdClass, moodle_url, tabobject;
+use tool_muprog\local\allocation;
+use tool_muprog\local\program;
+use tool_muprog\local\util;
+use tool_muprog\local\content\item,
+    tool_muprog\local\content\top,
+    tool_muprog\local\content\set,
+    tool_muprog\local\content\course;
+use stdClass;
 
 /**
  * Program catalogue renderer.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class renderer extends \plugin_renderer_base {
+    /**
+     * Render program general.
+     *
+     * @param stdClass $program
+     * @return string
+     */
     public function render_program(\stdClass $program): string {
-        global $CFG, $DB, $PAGE;
+        global $CFG, $DB;
 
-        $strnotset = get_string('notset', 'enrol_programs');
+        $strnotset = get_string('notset', 'tool_muprog');
 
         $context = \context::instance_by_id($program->contextid);
         $fullname = format_string($program->fullname);
-        $programicon = $this->output->pix_icon('program', '', 'enrol_programs');
+        $programicon = $this->output->pix_icon('program', '', 'tool_muprog');
 
-        $description = file_rewrite_pluginfile_urls($program->description, 'pluginfile.php', $context->id, 'enrol_programs', 'description', $program->id);
+        $description = file_rewrite_pluginfile_urls($program->description, 'pluginfile.php', $context->id, 'tool_muprog', 'description', $program->id);
         $description = format_text($description, $program->descriptionformat, ['context' => $context]);
 
         $tagsdiv = '';
         if ($CFG->usetags) {
-            $tags = \core_tag_tag::get_item_tags('enrol_programs', 'program', $program->id);
+            $tags = \core_tag_tag::get_item_tags('tool_muprog', 'program', $program->id);
             if ($tags) {
                 $tagsdiv = $this->output->tag_list($tags, '', 'program-tags');
             }
@@ -58,7 +54,7 @@ class renderer extends \plugin_renderer_base {
         $presentation = (array)json_decode($program->presentationjson);
         if (!empty($presentation['image'])) {
             $imageurl = \moodle_url::make_file_url("$CFG->wwwroot/pluginfile.php",
-                '/' . $context->id . '/enrol_programs/image/' . $program->id . '/'. $presentation['image'], false);
+                '/' . $context->id . '/tool_muprog/image/' . $program->id . '/'. $presentation['image'], false);
             $programimage = '<div class="float-end programimage">' . \html_writer::img($imageurl, '') . '</div>';
         }
 
@@ -77,21 +73,21 @@ class renderer extends \plugin_renderer_base {
 EOT;
 
         $result .= '<dl class="row">';
-        $result .= '<dt class="col-3">' . get_string('programstatus', 'enrol_programs') . ':</dt><dd class="col-9">'
-            . get_string('errornoallocation', 'enrol_programs') . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('allocationstart', 'enrol_programs') . ':</dt><dd class="col-9">'
+        $result .= '<dt class="col-3">' . get_string('programstatus', 'tool_muprog') . '</dt><dd class="col-9">'
+            . get_string('errornoallocation', 'tool_muprog') . '</dd>';
+        $result .= '<dt class="col-3">' . get_string('allocationstart', 'tool_muprog') . '</dt><dd class="col-9">'
             . (isset($program->timeallocationstart) ? userdate($program->timeallocationstart) : $strnotset) . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('allocationend', 'enrol_programs') . ':</dt><dd class="col-9">'
+        $result .= '<dt class="col-3">' . get_string('allocationend', 'tool_muprog') . '</dt><dd class="col-9">'
             . (isset($program->timeallocationend) ? userdate($program->timeallocationend) : $strnotset) . '</dd>';
-        $customfieldoutput = $PAGE->get_renderer('enrol_programs', 'customfield');
+        $customfieldoutput = $this->page->get_renderer('tool_muprog', 'customfield');
         $result .= $customfieldoutput->render_customfields($program->id);
         $result .= '</dl>';
 
         $actions = [];
-        /** @var \enrol_programs\local\source\base[] $sourceclasses */ // Type hack.
+        /** @var \tool_muprog\local\source\base[] $sourceclasses */ // Type hack.
         $sourceclasses = allocation::get_source_classes();
         foreach ($sourceclasses as $type => $classname) {
-            $source = $DB->get_record('enrol_programs_sources', ['programid' => $program->id, 'type' => $type]);
+            $source = $DB->get_record('tool_muprog_source', ['programid' => $program->id, 'type' => $type]);
             if (!$source) {
                 continue;
             }
@@ -104,13 +100,19 @@ EOT;
             $result .= '</div>';
         }
 
-        $result .= $this->output->heading(get_string('tabcontent', 'enrol_programs'), 3);
+        $result .= $this->output->heading(get_string('tabcontent', 'tool_muprog'), 3);
 
         $result .= $this->render_program_content($program);
 
         return $result;
     }
 
+    /**
+     * Render program content.
+     *
+     * @param stdClass $program
+     * @return string
+     */
     public function render_program_content(stdClass $program): string {
         global $DB;
 
@@ -130,7 +132,7 @@ EOT;
                 if ($completiontype !== '') {
                     $completiontype .= '<br />';
                 }
-                $completiontype .= '<small>' . get_string('completiondelay', 'enrol_programs') . ': ' . util::format_duration($completiondelay) . '</small>';
+                $completiontype .= '<small>' . get_string('completiondelay', 'tool_muprog') . ': ' . util::format_duration($completiondelay) . '</small>';
             }
 
             if ($item instanceof course) {
@@ -151,16 +153,16 @@ EOT;
                         $fullname = \html_writer::link($detailurl, $fullname);
                     }
                 } else {
-                    $fullname .= ' <span class="badge badge-danger">' . get_string('errorcoursemissing', 'enrol_programs') . '</span>';
+                    $fullname .= ' <span class="badge badge-danger">' . get_string('errorcoursemissing', 'tool_muprog') . '</span>';
                 }
             }
 
             if ($item instanceof top) {
-                $itemname = $this->output->pix_icon('itemtop', get_string('program', 'enrol_programs'), 'enrol_programs') . '&nbsp;' . $fullname;
+                $itemname = $this->output->pix_icon('itemtop', get_string('program', 'tool_muprog'), 'tool_muprog') . '&nbsp;' . $fullname;
             } else if ($item instanceof course) {
-                $itemname = $padding . $this->output->pix_icon('itemcourse', get_string('course'), 'enrol_programs') . $fullname;
+                $itemname = $padding . $this->output->pix_icon('itemcourse', get_string('course'), 'tool_muprog') . $fullname;
             } else {
-                $itemname = $padding . $this->output->pix_icon('itemset', get_string('set', 'enrol_programs'), 'enrol_programs') . $fullname;
+                $itemname = $padding . $this->output->pix_icon('itemset', get_string('set', 'tool_muprog'), 'tool_muprog') . $fullname;
             }
 
             $row = [$itemname, $completiontype];
@@ -174,7 +176,7 @@ EOT;
         $renderercolumns($top, 0);
 
         $table = new \html_table();
-        $table->head = [get_string('item', 'enrol_programs'), get_string('sequencetype', 'enrol_programs')];
+        $table->head = [get_string('item', 'tool_muprog'), get_string('sequencetype', 'tool_muprog')];
         $table->id = 'program_content';
         $table->attributes['class'] = 'admintable generaltable';
         $table->data = $rows;

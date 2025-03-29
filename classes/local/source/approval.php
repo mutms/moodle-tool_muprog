@@ -1,31 +1,21 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace enrol_programs\local\source;
+namespace tool_muprog\local\source;
 
-use enrol_programs\local\util;
+use tool_muprog\local\util;
 use stdClass;
 
 /**
  * Program allocation with approval source.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class approval extends base {
     /**
@@ -107,20 +97,20 @@ final class approval extends base {
             return false;
         }
 
-        if (!\enrol_programs\local\catalogue::is_program_visible($program, $userid)) {
+        if (!\tool_muprog\local\catalogue::is_program_visible($program, $userid)) {
             return false;
         }
 
-        if ($DB->record_exists('enrol_programs_allocations', ['programid' => $program->id, 'userid' => $userid])) {
+        if ($DB->record_exists('tool_muprog_allocation', ['programid' => $program->id, 'userid' => $userid])) {
             return false;
         }
 
-        $request = $DB->get_record('enrol_programs_requests', ['sourceid' => $source->id, 'userid' => $userid]);
+        $request = $DB->get_record('tool_muprog_request', ['sourceid' => $source->id, 'userid' => $userid]);
         if ($request) {
             if ($request->timerejected) {
-                $info = get_string('source_approval_requestrejected', 'enrol_programs');
+                $info = get_string('source_approval_requestrejected', 'tool_muprog');
             } else {
-                $info = get_string('source_approval_requestpending', 'enrol_programs');
+                $info = get_string('source_approval_requestpending', 'tool_muprog');
             }
             $failurereason = '<em><strong>' . $info . '</strong></em>';
             return false;
@@ -144,7 +134,7 @@ final class approval extends base {
      * @return string[]
      */
     public static function get_catalogue_actions(\stdClass $program, \stdClass $source): array {
-        global $USER, $DB, $PAGE;
+        global $USER, $OUTPUT;
 
         $failurereason = null;
         if (!self::can_user_request($program, $source, (int)$USER->id, $failurereason)) {
@@ -155,12 +145,10 @@ final class approval extends base {
             }
         }
 
-        $url = new \moodle_url('/enrol/programs/catalogue/source_approval_request.php', ['sourceid' => $source->id]);
-        $button = new \local_openlms\output\dialog_form\button($url, get_string('source_approval_makerequest', 'enrol_programs'));
+        $url = new \moodle_url('/admin/tool/muprog/catalogue/source_approval_request.php', ['sourceid' => $source->id]);
+        $button = new \tool_mulib\output\dialog_form\button($url, get_string('source_approval_makerequest', 'tool_muprog'));
 
-        /** @var \local_openlms\output\dialog_form\renderer $dialogformoutput */
-        $dialogformoutput = $PAGE->get_renderer('local_openlms', 'dialog_form');
-        $button = $dialogformoutput->render($button);
+        $button = $OUTPUT->render($button);
 
         return [$button];
     }
@@ -168,20 +156,19 @@ final class approval extends base {
     /**
      * Return request approval tab link.
      *
+    /**
+     * Return extra tab for managing the source data in program.
+     *
+     * @param \tool_muprog\navigation\views\program_secondary $secondary
      * @param stdClass $program
-     * @return array
      */
-    public static function get_extra_management_tabs(stdClass $program): array {
+    public static function add_program_secondary_tabs(\tool_muprog\navigation\views\program_secondary $secondary, stdClass $program): void {
         global $DB;
 
-        $tabs = [];
-
-        if ($DB->record_exists('enrol_programs_sources', ['programid' => $program->id, 'type' => 'approval'])) {
-            $url = new \moodle_url('/enrol/programs/management/source_approval_requests.php', ['id' => $program->id]);
-            $tabs[] = new \tabobject('requests', $url, get_string('source_approval_requests', 'enrol_programs'));
+        if ($DB->record_exists('tool_muprog_source', ['programid' => $program->id, 'type' => 'approval'])) {
+            $url = new \moodle_url('/admin/tool/muprog/management/source_approval_requests.php', ['id' => $program->id]);
+            $secondary->add(get_string('source_approval_requests', 'tool_muprog'), $url, \navigation_node::TYPE_SETTING, null, 'program_approval_requests');
         }
-
-        return $tabs;
     }
 
     /**
@@ -214,7 +201,7 @@ final class approval extends base {
         if (isset($formdata->approval_allowrequest)) {
             $data['allowrequest'] = (int)(bool)$formdata->approval_allowrequest;
         }
-        return \enrol_programs\local\util::json_encode($data);
+        return \tool_muprog\local\util::json_encode($data);
     }
 
     /**
@@ -231,17 +218,17 @@ final class approval extends base {
             return null;
         }
 
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $programid], '*', MUST_EXIST);
-        $source = $DB->get_record('enrol_programs_sources',
+        $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
+        $source = $DB->get_record('tool_muprog_source',
             ['id' => $sourceid, 'type' => static::get_type(), 'programid' => $program->id], '*', MUST_EXIST);
 
         $user = $DB->get_record('user', ['id' => $USER->id, 'deleted' => 0], '*', MUST_EXIST);
-        if ($DB->record_exists('enrol_programs_allocations', ['programid' => $program->id, 'userid' => $user->id])) {
+        if ($DB->record_exists('tool_muprog_allocation', ['programid' => $program->id, 'userid' => $user->id])) {
             // One allocation per program only.
             return null;
         }
 
-        if ($DB->record_exists('enrol_programs_requests', ['sourceid' => $source->id, 'userid' => $user->id])) {
+        if ($DB->record_exists('tool_muprog_request', ['sourceid' => $source->id, 'userid' => $user->id])) {
             // Cannot request repeatedly.
             return null;
         }
@@ -251,11 +238,11 @@ final class approval extends base {
         $record->userid = $user->id;
         $record->timerequested = time();
         $record->datajson = util::json_encode([]);
-        $record->id = $DB->insert_record('enrol_programs_requests', $record);
+        $record->id = $DB->insert_record('tool_muprog_request', $record);
 
         // Send notification.
         $context = \context::instance_by_id($program->contextid);
-        $targets = get_users_by_capability($context, 'enrol/programs:allocate');
+        $targets = get_users_by_capability($context, 'tool/muprog:allocate');
         foreach ($targets as $target) {
             $oldforcelang = force_current_language($target->lang);
 
@@ -265,15 +252,15 @@ final class approval extends base {
             $a->user_lastname = s($user->lastname);
             $a->program_fullname = format_string($program->fullname);
             $a->program_idnumber = s($program->idnumber);
-            $a->program_url = (new \moodle_url('/enrol/programs/catalogue/program.php', ['id' => $program->id]))->out(false);
-            $a->requests_url = (new \moodle_url('/enrol/programs/management/source_approval_requests.php', ['id' => $program->id]))->out(false);
+            $a->program_url = (new \moodle_url('/admin/tool/muprog/catalogue/program.php', ['id' => $program->id]))->out(false);
+            $a->requests_url = (new \moodle_url('/admin/tool/muprog/management/source_approval_requests.php', ['id' => $program->id]))->out(false);
 
-            $subject = get_string('source_approval_notification_approval_request_subject', 'enrol_programs', $a);
-            $body = get_string('source_approval_notification_approval_request_body', 'enrol_programs', $a);
+            $subject = get_string('source_approval_notification_approval_request_subject', 'tool_muprog', $a);
+            $body = get_string('source_approval_notification_approval_request_body', 'tool_muprog', $a);
 
             $message = new \core\message\message();
             $message->notification = 1;
-            $message->component = 'enrol_programs';
+            $message->component = 'tool_muprog';
             $message->name = 'approval_request_notification';
             $message->userfrom = $user;
             $message->userto = $target;
@@ -289,7 +276,7 @@ final class approval extends base {
             force_current_language($oldforcelang);
         }
 
-        return $DB->get_record('enrol_programs_requests', ['id' => $record->id], '*', MUST_EXIST);
+        return $DB->get_record('tool_muprog_request', ['id' => $record->id], '*', MUST_EXIST);
     }
 
     /**
@@ -301,22 +288,22 @@ final class approval extends base {
     public static function approve_request(int $requestid): ?stdClass {
         global $DB;
 
-        $request = $DB->get_record('enrol_programs_requests', ['id' => $requestid], '*', MUST_EXIST);
+        $request = $DB->get_record('tool_muprog_request', ['id' => $requestid], '*', MUST_EXIST);
         $user = $DB->get_record('user', ['id' => $request->userid], '*', MUST_EXIST);
-        $source = $DB->get_record('enrol_programs_sources', ['id' => $request->sourceid], '*', MUST_EXIST);
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $source->programid], '*', MUST_EXIST);
+        $source = $DB->get_record('tool_muprog_source', ['id' => $request->sourceid], '*', MUST_EXIST);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $source->programid], '*', MUST_EXIST);
 
-        if ($DB->record_exists('enrol_programs_allocations', ['programid' => $program->id, 'userid' => $user->id])) {
+        if ($DB->record_exists('tool_muprog_allocation', ['programid' => $program->id, 'userid' => $user->id])) {
             return null;
         }
 
         $trans = $DB->start_delegated_transaction();
         $allocation = self::allocate_user($program, $source, $user->id, []);
-        $DB->delete_records('enrol_programs_requests', ['id' => $request->id]);
+        $DB->delete_records('tool_muprog_request', ['id' => $request->id]);
         $trans->allow_commit();
 
-        \enrol_programs\local\allocation::fix_user_enrolments($program->id, $user->id);
-        \enrol_programs\local\notification_manager::trigger_notifications($program->id, $user->id);
+        \tool_muprog\local\allocation::fix_user_enrolments($program->id, $user->id);
+        \tool_muprog\local\notification_manager::trigger_notifications($program->id, $user->id);
 
         return $allocation;
     }
@@ -352,16 +339,16 @@ final class approval extends base {
     public static function reject_request(int $requestid, string $reason): void {
         global $DB, $USER;
 
-        $request = $DB->get_record('enrol_programs_requests', ['id' => $requestid], '*', MUST_EXIST);
+        $request = $DB->get_record('tool_muprog_request', ['id' => $requestid], '*', MUST_EXIST);
         if ($request->timerejected) {
             return;
         }
         $request->timerejected = time();
         $request->rejectedby = $USER->id;
-        $DB->update_record('enrol_programs_requests', $request);
+        $DB->update_record('tool_muprog_request', $request);
 
-        $source = $DB->get_record('enrol_programs_sources', ['id' => $request->sourceid], '*', MUST_EXIST);
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $source->programid], '*', MUST_EXIST);
+        $source = $DB->get_record('tool_muprog_source', ['id' => $request->sourceid], '*', MUST_EXIST);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $source->programid], '*', MUST_EXIST);
         $user = $DB->get_record('user', ['id' => $request->userid], '*', MUST_EXIST);
 
         $oldforcelang = force_current_language($user->lang);
@@ -372,15 +359,15 @@ final class approval extends base {
         $a->user_lastname = s($user->lastname);
         $a->program_fullname = format_string($program->fullname);
         $a->program_idnumber = s($program->idnumber);
-        $a->program_url = (new \moodle_url('/enrol/programs/catalogue/program.php', ['id' => $program->id]))->out(false);
+        $a->program_url = (new \moodle_url('/admin/tool/muprog/catalogue/program.php', ['id' => $program->id]))->out(false);
         $a->reason = $reason;
 
-        $subject = get_string('source_approval_notification_approval_reject_subject', 'enrol_programs', $a);
-        $body = get_string('source_approval_notification_approval_reject_body', 'enrol_programs', $a);
+        $subject = get_string('source_approval_notification_approval_reject_subject', 'tool_muprog', $a);
+        $body = get_string('source_approval_notification_approval_reject_body', 'tool_muprog', $a);
 
         $message = new \core\message\message();
         $message->notification = 1;
-        $message->component = 'enrol_programs';
+        $message->component = 'tool_muprog';
         $message->name = 'approval_reject_notification';
         $message->userfrom = $USER;
         $message->userto = $user;
@@ -405,12 +392,12 @@ final class approval extends base {
     public static function delete_request(int $requestid): void {
         global $DB;
 
-        $request = $DB->get_record('enrol_programs_requests', ['id' => $requestid]);
+        $request = $DB->get_record('tool_muprog_request', ['id' => $requestid]);
         if (!$request) {
             return;
         }
 
-        $DB->delete_records('enrol_programs_requests', ['id' => $request->id]);
+        $DB->delete_records('tool_muprog_request', ['id' => $request->id]);
     }
 
     /**
@@ -423,11 +410,11 @@ final class approval extends base {
     public static function is_import_allowed(stdClass $fromprogram, stdClass $targetprogram): bool {
         global $DB;
 
-        if (!$DB->record_exists('enrol_programs_sources', ['type' => static::get_type(), 'programid' => $fromprogram->id])) {
+        if (!$DB->record_exists('tool_muprog_source', ['type' => static::get_type(), 'programid' => $fromprogram->id])) {
             return false;
         }
 
-        if (!$DB->record_exists('enrol_programs_sources', ['type' => static::get_type(), 'programid' => $targetprogram->id])) {
+        if (!$DB->record_exists('tool_muprog_source', ['type' => static::get_type(), 'programid' => $targetprogram->id])) {
             if (!static::is_new_allowed($targetprogram)) {
                 return false;
             }
@@ -437,7 +424,7 @@ final class approval extends base {
     }
 
     /**
-     * Render details about this enabled source in a program management ui.
+     * Render details about this enabled source in a programs management ui.
      *
      * @param stdClass $program
      * @param stdClass|null $source
@@ -451,9 +438,9 @@ final class approval extends base {
         if ($source) {
             $data = (object)json_decode($source->datajson);
             if (!isset($data->allowrequest) || $data->allowrequest) {
-                $result .= '; ' . get_string('source_approval_requestallowed', 'enrol_programs');
+                $result .= '; ' . get_string('source_approval_requestallowed', 'tool_muprog');
             } else {
-                $result .= '; ' . get_string('source_approval_requestnotallowed', 'enrol_programs');
+                $result .= '; ' . get_string('source_approval_requestnotallowed', 'tool_muprog');
             }
         }
 

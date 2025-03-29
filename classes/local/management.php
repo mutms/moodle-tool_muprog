@@ -1,38 +1,28 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace enrol_programs\local;
+namespace tool_muprog\local;
 
-use enrol_programs\local\content\course;
-use enrol_programs\local\content\item;
-use enrol_programs\local\content\set;
-use enrol_programs\local\content\top;
+use tool_muprog\local\content\course;
+use tool_muprog\local\content\item;
+use tool_muprog\local\content\set;
+use tool_muprog\local\content\top;
 use moodle_url, stdClass;
 
 /**
- * Program management helper.
+ * Programs management helper.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class management {
     /**
-     * Guess if user can access program management UI.
+     * Guess if user can access programs management UI.
      *
      * @return moodle_url|null
      */
@@ -40,18 +30,18 @@ final class management {
         if (isguestuser() || !isloggedin()) {
             return null;
         }
-        if (has_capability('enrol/programs:view', \context_system::instance())) {
-            return new moodle_url('/enrol/programs/management/index.php');
+        if (has_capability('tool/muprog:view', \context_system::instance())) {
+            return new moodle_url('/admin/tool/muprog/management/index.php');
         } else {
             // This is not very fast, but we need to let users somehow access program
             // management if they can do so in course category only.
-            $categories = \core_course_category::make_categories_list('enrol/programs:view');
+            $categories = \core_course_category::make_categories_list('tool/muprog:view');
             // NOTE: Add some better logic here looking for categories with programs or remember which one was accessed before.
             if ($categories) {
                 foreach ($categories as $cid => $unusedname) {
                     $catcontext = \context_coursecat::instance($cid, IGNORE_MISSING);
                     if ($catcontext) {
-                        return new moodle_url('/enrol/programs/management/index.php', ['contextid' => $catcontext->id]);
+                        return new moodle_url('/admin/tool/muprog/management/index.php', ['contextid' => $catcontext->id]);
                     }
                 }
             }
@@ -63,9 +53,11 @@ final class management {
      * Fetch list of programs.
      *
      * @param \context|null $context null means all contexts
+     * @param bool $archived
      * @param string $search search string
      * @param int $page
      * @param int $perpage
+     * @param string $orderby
      * @return array ['programs' => array, 'totalcount' => int]
      */
     public static function fetch_programs(?\context $context, bool $archived, string $search, int $page, int $perpage, string $orderby = 'fullname ASC'): array {
@@ -76,8 +68,8 @@ final class management {
         $select .= ' AND archived = :archived';
         $params['archived'] = (int)$archived;
 
-        $programs = $DB->get_records_select('enrol_programs_programs', $select, $params, $orderby, '*', $page * $perpage, $perpage);
-        $totalcount = $DB->count_records_select('enrol_programs_programs', $select, $params);
+        $programs = $DB->get_records_select('tool_muprog_program', $select, $params, $orderby, '*', $page * $perpage, $perpage);
+        $totalcount = $DB->count_records_select('tool_muprog_program', $select, $params);
 
         return ['programs' => $programs, 'totalcount' => $totalcount];
     }
@@ -95,15 +87,15 @@ final class management {
 
         $result = [];
 
-        if (has_capability('enrol/programs:view', $syscontext)) {
-            $allcount = $DB->count_records('enrol_programs_programs', []);
-            $result[0] = get_string('allprograms', 'enrol_programs') . ' (' . $allcount . ')';
+        if (has_capability('tool/muprog:view', $syscontext)) {
+            $allcount = $DB->count_records('tool_muprog_program', []);
+            $result[0] = get_string('allprograms', 'tool_muprog') . ' (' . $allcount . ')';
 
-            $syscount = $DB->count_records('enrol_programs_programs', ['contextid' => $syscontext->id]);
+            $syscount = $DB->count_records('tool_muprog_program', ['contextid' => $syscontext->id]);
             $result[$syscontext->id] = $syscontext->get_context_name() . ' (' . $syscount .')';
         }
 
-        $categories = \core_course_category::make_categories_list('enrol/programs:view');
+        $categories = \core_course_category::make_categories_list('tool/muprog:view');
         if (!$categories) {
             return $result;
         }
@@ -111,7 +103,7 @@ final class management {
         $sql = "SELECT cat.id, COUNT(p.id)
                   FROM {course_categories} cat
                   JOIN {context} ctx ON ctx.instanceid = cat.id AND ctx.contextlevel = 40
-                  JOIN {enrol_programs_programs} p ON p.contextid = ctx.id
+                  JOIN {tool_muprog_program} p ON p.contextid = ctx.id
               GROUP BY cat.id
                 HAVING COUNT(p.id) > 0";
         $programcounts = $DB->get_records_sql_menu($sql);
@@ -192,7 +184,7 @@ final class management {
 
         $sql = "SELECT c.id, c.name
                   FROM {cohort} c
-                  JOIN {enrol_programs_cohorts} pc ON c.id = pc.cohortid
+                  JOIN {tool_muprog_cohort} pc ON c.id = pc.cohortid
                  WHERE pc.programid = :programid
               ORDER BY c.name ASC, c.id ASC";
         $params = ['programid' => $programid];
@@ -201,81 +193,87 @@ final class management {
     }
 
     /**
-     * Set up $PAGE for program management UI.
+     * Set up $PAGE for programs management UI.
      *
      * @param moodle_url $pageurl
      * @param \context $context
-     * @param int $contextid
      * @return void
      */
-    public static function setup_index_page(\moodle_url $pageurl, \context $context, int $contextid): void {
-        global $PAGE, $CFG;
+    public static function setup_index_page(\moodle_url $pageurl, \context $context): void {
+        global $PAGE;
 
-        if (!enrol_is_enabled('programs')) {
-            redirect(new moodle_url('/'));
-        }
-
-        $syscontext = \context_system::instance();
-
-        if (has_capability('enrol/programs:view', $syscontext) && has_capability('moodle/site:config', $syscontext)) {
-            require_once($CFG->libdir . '/adminlib.php');
-            admin_externalpage_setup('programsmanagement', '', null, $pageurl, ['pagelayout' => 'admin', 'nosearch' => true]);
-            $PAGE->set_heading(get_string('management', 'enrol_programs'));
-        } else {
-            $PAGE->set_pagelayout('admin');
-            $PAGE->set_context($context);
-            $PAGE->set_url($pageurl);
-            $PAGE->set_title(get_string('programs', 'enrol_programs'));
-            $PAGE->set_heading(get_string('management', 'enrol_programs'));
-            if ($contextid) {
-                if (has_capability('enrol/programs:view', $syscontext)) {
-                    $url = new moodle_url('/enrol/programs/management/index.php');
-                    $PAGE->navbar->add(get_string('management', 'enrol_programs'), $url);
-                } else {
-                    $PAGE->navbar->add(get_string('management', 'enrol_programs'));
-                }
-            } else {
-                $PAGE->navbar->add(get_string('management', 'enrol_programs'));
-            }
-        }
+        $PAGE->set_pagelayout('admin');
+        $PAGE->set_context($context);
+        $PAGE->set_url($pageurl);
+        $PAGE->set_title(get_string('programs', 'tool_muprog'));
+        $PAGE->set_heading(get_string('programs', 'tool_muprog'));
         $PAGE->set_secondary_navigation(false);
 
-        $PAGE->set_docs_path("$CFG->wwwroot/enrol/programs/documentation.php/management.md");
+        $contexts = [];
+        while (true) {
+            $contexts[] = $context;
+            $parent = $context->get_parent_context();
+            if (!$parent) {
+                break;
+            }
+            $context = $parent;
+        }
+
+        $contexts = array_reverse($contexts);
+
+        /** @var \context $context */
+        foreach ($contexts as $context) {
+            $url = null;
+            if (has_capability('tool/muprog:view', $context)) {
+                $url = new moodle_url('/admin/tool/muprog/management/index.php', ['id' => $context->id]);
+            }
+            $PAGE->navbar->add($context->get_context_name(false), $url);
+        }
     }
 
     /**
-     * Set up $PAGE for program management UI.
+     * Set up $PAGE for programs management UI.
      *
      * @param moodle_url $pageurl
      * @param \context $context
      * @param stdClass $program
+     * @param string $secondarytab
      * @return void
      */
-    public static function setup_program_page(\moodle_url $pageurl, \context $context, stdClass $program): void {
-        global $PAGE, $CFG;
+    public static function setup_program_page(moodle_url $pageurl, \context $context, stdClass $program, string $secondarytab): void {
+        global $PAGE;
 
-        if (!enrol_is_enabled('programs')) {
-            redirect(new moodle_url('/'));
+        $PAGE->set_pagelayout('admin');
+        $PAGE->set_context($context);
+        $PAGE->set_url($pageurl);
+        $PAGE->set_title(get_string('programs', 'tool_muprog'));
+        $PAGE->set_heading(format_string($program->fullname));
+
+        $secondarynav = new \tool_muprog\navigation\views\program_secondary($PAGE, $program);
+        $PAGE->set_secondarynav($secondarynav);
+        $PAGE->set_secondary_active_tab($secondarytab);
+        $secondarynav->initialise();
+
+        $contexts = [];
+        while (true) {
+            $contexts[] = $context;
+            $parent = $context->get_parent_context();
+            if (!$parent) {
+                break;
+            }
+            $context = $parent;
         }
 
-        $syscontext = \context_system::instance();
+        $contexts = array_reverse($contexts);
 
-        if (has_capability('enrol/programs:view', $syscontext) && has_capability('moodle/site:config', $syscontext)) {
-            require_once($CFG->libdir . '/adminlib.php');
-            admin_externalpage_setup('programsmanagement', '', null, $pageurl, ['pagelayout' => 'admin', 'nosearch' => true]);
-            $PAGE->set_heading(format_string($program->fullname));
-        } else {
-            $PAGE->set_pagelayout('admin');
-            $PAGE->set_context($context);
-            $PAGE->set_url($pageurl);
-            $PAGE->set_title(get_string('programs', 'enrol_programs'));
-            $PAGE->set_heading(format_string($program->fullname));
-            $url = new moodle_url('/enrol/programs/management/index.php', ['contextid' => $context->id]);
-            $PAGE->navbar->add(get_string('management', 'enrol_programs'), $url);
+        /** @var \context $context */
+        foreach ($contexts as $context) {
+            $url = null;
+            if (has_capability('tool/muprog:view', $context)) {
+                $url = new moodle_url('/admin/tool/muprog/management/index.php', ['id' => $context->id]);
+            }
+            $PAGE->navbar->add($context->get_context_name(false), $url);
         }
-        $PAGE->set_secondary_navigation(false);
         $PAGE->navbar->add(format_string($program->fullname));
-
-        $PAGE->set_docs_path("$CFG->wwwroot/enrol/programs/documentation.php/management.md");
     }
 }

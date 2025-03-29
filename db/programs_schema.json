@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Open LMS Programs",
-  "description": "This schema describes the export and upload format of programs used in Open LMS Programs plugin",
+  "title": "Programs",
+  "description": "This schema describes the export and upload format of programs",
   "type": "object",
   "properties": {
     "programs": {

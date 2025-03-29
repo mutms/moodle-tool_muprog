@@ -1,28 +1,17 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace enrol_programs\event;
+namespace tool_muprog\event;
 
 /**
  * Program completed event.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class program_completed extends \core\event\base {
     /**
@@ -38,16 +27,16 @@ final class program_completed extends \core\event\base {
             throw new \coding_exception('user must have already completed the program');
         }
         $context = \context::instance_by_id($program->contextid);
-        $data = array(
+        $data = [
             'context' => $context,
             'objectid' => $allocation->id,
             'relateduserid' => $allocation->userid,
-            'other' => ['programid' => $program->id, 'timecompleted' => $allocation->timecompleted]
-        );
+            'other' => ['programid' => $program->id, 'timecompleted' => $allocation->timecompleted],
+        ];
         /** @var static $event */
         $event = self::create($data);
-        $event->add_record_snapshot('enrol_programs_allocations', $allocation);
-        $event->add_record_snapshot('enrol_programs_programs', $program);
+        $event->add_record_snapshot('tool_muprog_allocation', $allocation);
+        $event->add_record_snapshot('tool_muprog_program', $program);
         return $event;
     }
 
@@ -66,7 +55,7 @@ final class program_completed extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('event_program_completed', 'enrol_programs');
+        return get_string('event_program_completed', 'tool_muprog');
     }
 
     /**
@@ -75,7 +64,7 @@ final class program_completed extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/enrol/programs/management/user_allocation.php', ['id' => $this->objectid]);
+        return new \moodle_url('/admin/tool/muprog/management/user_allocation.php', ['id' => $this->objectid]);
     }
 
     /**
@@ -86,6 +75,6 @@ final class program_completed extends \core\event\base {
     protected function init() {
         $this->data['crud'] = 'c';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
-        $this->data['objecttable'] = 'enrol_programs_allocations';
+        $this->data['objecttable'] = 'tool_muprog_allocation';
     }
 }

@@ -1,34 +1,29 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace enrol_programs\local;
+namespace tool_muprog\local;
 
 /**
  * Program event observer.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class event_observer {
-    public static function course_updated(\core\event\course_updated $event) {
+    /**
+     * Course updated observer.
+     *
+     * @param \core\event\course_updated $event
+     * @return void
+     */
+    public static function course_updated(\core\event\course_updated $event): void {
         global $DB;
 
-        if (!get_config('enrol_programs')) {
+        if (!get_config('tool_muprog')) {
             return;
         }
 
@@ -37,27 +32,38 @@ class event_observer {
             return;
         }
 
-        $items = $DB->get_records('enrol_programs_items', ['courseid' => $course->id]);
+        $items = $DB->get_records('tool_muprog_item', ['courseid' => $course->id]);
         foreach ($items as $item) {
             if ($item->fullname !== $course->fullname) {
                 // No need for snapshot, the course fullname is just a perfomrance thing
                 // and a fallback for deleted courses.
-                $DB->set_field('enrol_programs_items', 'fullname', $course->fullname, ['id' => $item->id]);
+                $DB->set_field('tool_muprog_item', 'fullname', $course->fullname, ['id' => $item->id]);
             }
         }
     }
 
-    public static function course_deleted(\core\event\course_deleted $event) {
+    /**
+     * Course deleted observer.
+     *
+     * @param \core\event\course_deleted $event
+     */
+    public static function course_deleted(\core\event\course_deleted $event): void {
         // Not sure what to do here...
     }
 
-    public static function course_category_deleted(\core\event\course_category_deleted $event) {
+    /**
+     * Category deleted observer.
+     *
+     * @param \core\event\course_category_deleted $event
+     * @return void
+     */
+    public static function course_category_deleted(\core\event\course_category_deleted $event): void {
         global $DB;
 
         // Programs should have been already moved to the deleted category context,
         // let's move them to system as a fallback.
         $syscontext = \context_system::instance();
-        $programs = $DB->get_records('enrol_programs_programs', ['contextid' => $event->contextid]);
+        $programs = $DB->get_records('tool_muprog_program', ['contextid' => $event->contextid]);
         foreach ($programs as $program) {
             $data = (object)[
                 'id' => $program->id,
@@ -67,31 +73,55 @@ class event_observer {
         }
     }
 
-    public static function user_deleted(\core\event\user_deleted $event) {
+    /**
+     * User deleted observer.
+     *
+     * @param \core\event\user_deleted $event
+     */
+    public static function user_deleted(\core\event\user_deleted $event): void {
         allocation::deleted_user_cleanup($event->objectid);
     }
 
-    public static function cohort_member_added(\core\event\cohort_member_added $event) {
-        $updated = \enrol_programs\local\source\cohort::fix_allocations(null, $event->relateduserid);
+    /**
+     * Cohort member removed observer.
+     *
+     * @param \core\event\cohort_member_added $event
+     */
+    public static function cohort_member_added(\core\event\cohort_member_added $event): void {
+        $updated = \tool_muprog\local\source\cohort::fix_allocations(null, $event->relateduserid);
         if ($updated) {
             allocation::fix_user_enrolments(null, $event->relateduserid);
         }
     }
 
-    public static function cohort_member_removed(\core\event\cohort_member_removed $event) {
-        $updated = \enrol_programs\local\source\cohort::fix_allocations(null, $event->relateduserid);
+    /**
+     * Cohort member added observer.
+     *
+     * @param \core\event\cohort_member_removed $event
+     */
+    public static function cohort_member_removed(\core\event\cohort_member_removed $event): void {
+        $updated = \tool_muprog\local\source\cohort::fix_allocations(null, $event->relateduserid);
         if ($updated) {
             allocation::fix_user_enrolments(null, $event->relateduserid);
         }
     }
 
-    public static function course_completed(\core\event\course_completed $event) {
+    /**
+     * Course completed observer.
+     *
+     * @param \core\event\course_completed $event
+     */
+    public static function course_completed(\core\event\course_completed $event): void {
         allocation::fix_user_enrolments(null, $event->relateduserid);
     }
 
-    public static function group_deleted(\core\event\group_deleted $event) {
+    /**
+     * Group deleted observer.
+     * @param \core\event\group_deleted $event
+     */
+    public static function group_deleted(\core\event\group_deleted $event): void {
         global $DB;
         // We cannot do much to prevent the deletion, the group will be recreated if necessary.
-        $DB->delete_records('enrol_programs_groups', ['groupid' => $event->objectid]);
+        $DB->delete_records('tool_muprog_group', ['groupid' => $event->objectid]);
     }
 }

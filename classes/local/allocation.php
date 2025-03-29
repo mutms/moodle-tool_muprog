@@ -1,42 +1,30 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace enrol_programs\local;
+namespace tool_muprog\local;
 
-use enrol_programs\local\source\approval;
-use enrol_programs\local\source\base;
-use enrol_programs\local\source\cohort;
-use enrol_programs\local\source\ecommerce;
-use enrol_programs\local\source\manual;
-use enrol_programs\local\source\selfallocation;
-use enrol_programs\local\source\udplans;
-use enrol_programs\local\source\certify;
-use enrol_programs\local\content\course;
-use enrol_programs\local\content\top;
-use enrol_programs\local\content\set;
-use enrol_programs\local\allocation_calendar_event;
+use tool_muprog\local\source\approval;
+use tool_muprog\local\source\base;
+use tool_muprog\local\source\cohort;
+use tool_muprog\local\source\manual;
+use tool_muprog\local\source\selfallocation;
+use tool_muprog\local\source\mucertify;
+use tool_muprog\local\content\course;
+use tool_muprog\local\content\top;
+use tool_muprog\local\content\set;
+use tool_muprog\local\allocation_calendar_event;
 use stdClass;
 
 /**
  * Program allocation abstraction.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class allocation {
     /**
@@ -53,19 +41,22 @@ final class allocation {
             cohort::get_type() => cohort::class,
         ];
 
-        if (ecommerce::is_commerce_enabled()) {
-            $types[ecommerce::get_type()] = ecommerce::class;
-        }
-
-        if (file_exists(__DIR__ . '/../../../../admin/tool/udplans/version.php')) {
-            $types[udplans::get_type()] = udplans::class;
-        }
-
-        if (file_exists(__DIR__ . '/../../../../admin/tool/certify/version.php')) {
-            $types[certify::get_type()] = certify::class;
+        if (file_exists(__DIR__ . '/../../../mucertify/version.php')) {
+            $types[mucertify::get_type()] = mucertify::class;
         }
 
         return $types;
+    }
+
+    /**
+     * Find allocation source class.
+     *
+     * @param string $type
+     * @return null|class-string<\tool_muprog\local\source\base>
+     */
+    public static function get_source_classname(string $type): ?string {
+        $types = self::get_source_classes();
+        return $types[$type] ?? null;
     }
 
     /**
@@ -197,7 +188,7 @@ final class allocation {
             debugging('allocation::fix_enrol_instances() is not supposed to be used in transactions', DEBUG_DEVELOPER);
         }
 
-        $plugin = enrol_get_plugin('programs');
+        $plugin = enrol_get_plugin('muprog');
 
         // Add new instances.
         $params = [];
@@ -208,9 +199,9 @@ final class allocation {
         }
         $sql = "SELECT c.*, pi.programid, p.archived AS programarchived
                   FROM {course} c
-                  JOIN {enrol_programs_items} pi ON pi.courseid = c.id
-                  JOIN {enrol_programs_programs} p ON p.id = pi.programid
-             LEFT JOIN {enrol} e ON e.courseid = c.id AND e.enrol = 'programs' AND e.customint1 = pi.programid
+                  JOIN {tool_muprog_item} pi ON pi.courseid = c.id
+                  JOIN {tool_muprog_program} p ON p.id = pi.programid
+             LEFT JOIN {enrol} e ON e.courseid = c.id AND e.enrol = 'muprog' AND e.customint1 = pi.programid
                  WHERE e.id IS NULL $programselect
               ORDER BY pi.programid ASC";
         $rs = $DB->get_recordset_sql($sql, $params);
@@ -238,8 +229,8 @@ final class allocation {
         }
         $sql = "SELECT e.*
                   FROM {enrol} e
-             LEFT JOIN {enrol_programs_items} pi ON pi.courseid = e.courseid AND pi.programid = e.customint1
-                 WHERE e.enrol = 'programs' AND pi.id IS NULL $programselect
+             LEFT JOIN {tool_muprog_item} pi ON pi.courseid = e.courseid AND pi.programid = e.customint1
+                 WHERE e.enrol = 'muprog' AND pi.id IS NULL $programselect
               ORDER BY e.id ASC";
         $rs = $DB->get_recordset_sql($sql, $params);
         foreach ($rs as $enrol) {
@@ -256,9 +247,9 @@ final class allocation {
         }
         $sql = "SELECT e.*
                   FROM {enrol} e
-                  JOIN {enrol_programs_items} pi ON pi.courseid = e.courseid AND pi.programid = e.customint1
-                  JOIN {enrol_programs_programs} p ON p.id = pi.programid
-                 WHERE e.enrol = 'programs' AND p.archived = 1 AND e.status = :enabled $programselect
+                  JOIN {tool_muprog_item} pi ON pi.courseid = e.courseid AND pi.programid = e.customint1
+                  JOIN {tool_muprog_program} p ON p.id = pi.programid
+                 WHERE e.enrol = 'muprog' AND p.archived = 1 AND e.status = :enabled $programselect
               ORDER BY e.id ASC";
         $rs = $DB->get_recordset_sql($sql, $params);
         foreach ($rs as $enrol) {
@@ -266,7 +257,7 @@ final class allocation {
             $context = \context_course::instance($enrol->courseid);
             role_unassign_all([
                 'contextid' => $context->id,
-                'component' => 'enrol_programs',
+                'component' => 'enrol_muprog',
                 'itemid' => $enrol->id,
             ]);
         }
@@ -281,9 +272,9 @@ final class allocation {
         }
         $sql = "SELECT e.*
                   FROM {enrol} e
-                  JOIN {enrol_programs_items} pi ON pi.courseid = e.courseid AND pi.programid = e.customint1
-                  JOIN {enrol_programs_programs} p ON p.id = pi.programid
-                 WHERE e.enrol = 'programs' AND p.archived = 0 AND e.status = :disabled $programselect
+                  JOIN {tool_muprog_item} pi ON pi.courseid = e.courseid AND pi.programid = e.customint1
+                  JOIN {tool_muprog_program} p ON p.id = pi.programid
+                 WHERE e.enrol = 'muprog' AND p.archived = 0 AND e.status = :disabled $programselect
               ORDER BY e.id ASC";
         $rs = $DB->get_recordset_sql($sql, $params);
         foreach ($rs as $enrol) {
@@ -300,10 +291,10 @@ final class allocation {
             $params['programid'] = $programid;
         }
         $sql = "SELECT pi.courseid, pi.programid, p.fullname, pg.id
-                  FROM {enrol_programs_items} pi
-                  JOIN {course} c ON c.id = pi.courseid    
-                  JOIN {enrol_programs_programs} p ON p.id = pi.programid
-             LEFT JOIN {enrol_programs_groups} pg ON pg.programid = p.id AND pg.courseid = pi.courseid
+                  FROM {tool_muprog_item} pi
+                  JOIN {course} c ON c.id = pi.courseid
+                  JOIN {tool_muprog_program} p ON p.id = pi.programid
+             LEFT JOIN {tool_muprog_group} pg ON pg.programid = p.id AND pg.courseid = pi.courseid
              LEFT JOIN {groups} g ON g.id = pg.groupid
                  WHERE p.archived = 0 AND p.creategroups = 1 AND pi.courseid IS NOT NULL
                        AND (pg.id IS NULL OR g.id IS NULL)
@@ -319,14 +310,14 @@ final class allocation {
             ];
             $gid = groups_create_group($data);
             if ($pg->id) {
-                $DB->set_field('enrol_programs_groups', 'groupid', $gid, ['id' => $pg->id]);
+                $DB->set_field('tool_muprog_group', 'groupid', $gid, ['id' => $pg->id]);
             } else {
                 $data = (object)[
                     'programid' => $pg->programid,
                     'courseid' => $pg->courseid,
                     'groupid' => $gid,
                 ];
-                $DB->insert_record('enrol_programs_groups', $data);
+                $DB->insert_record('tool_muprog_group', $data);
             }
             $trans->allow_commit();
         }
@@ -340,9 +331,9 @@ final class allocation {
             $params['programid'] = $programid;
         }
         $sql = "SELECT pg.id, pg.groupid
-                  FROM {enrol_programs_groups} pg
-             LEFT JOIN {enrol_programs_programs} p ON p.id = pg.programid
-             LEFT JOIN {enrol_programs_items} pi ON pi.programid = pg.programid AND pi.courseid = pg.courseid
+                  FROM {tool_muprog_group} pg
+             LEFT JOIN {tool_muprog_program} p ON p.id = pg.programid
+             LEFT JOIN {tool_muprog_item} pi ON pi.programid = pg.programid AND pi.courseid = pg.courseid
                  WHERE (p.id IS NULL OR pi.id IS NULL OR p.creategroups = 0)
                        $programselect
               ORDER BY pg.id ASC";
@@ -350,7 +341,7 @@ final class allocation {
         foreach ($rs as $pg) {
             $trans = $DB->start_delegated_transaction();
             groups_delete_group($pg->groupid);
-            $DB->delete_records('enrol_programs_groups', ['id' => $pg->id]);
+            $DB->delete_records('tool_muprog_group', ['id' => $pg->id]);
             $trans->allow_commit();
         }
         $rs->close();
@@ -367,7 +358,7 @@ final class allocation {
      * @param \progress_trace|null $trace
      * @return void
      */
-    public static function fix_user_enrolments(?int $programid, ?int $userid, \progress_trace $trace = null): void {
+    public static function fix_user_enrolments(?int $programid, ?int $userid, ?\progress_trace $trace = null): void {
         global $DB, $CFG;
         require_once($CFG->dirroot . '/group/lib.php');
 
@@ -375,8 +366,8 @@ final class allocation {
             debugging('allocation::fix_user_enrolments() is not supposed to be used in transactions without userid', DEBUG_DEVELOPER);
         }
 
-        $plugin = enrol_get_plugin('programs');
-        $roleid = get_config('enrol_programs', 'roleid');
+        $plugin = enrol_get_plugin('muprog');
+        $roleid = get_config('tool_muprog', 'roleid');
         $enrol = null; // Cached last used enrol instance.
         $program = null;  // Cached last used program instance.
 
@@ -397,10 +388,10 @@ final class allocation {
         }
         $sql = "SELECT e.id, ue.userid, gm.groupid
                   FROM {user_enrolments} ue
-                  JOIN {enrol} e ON e.id = ue.enrolid AND e.enrol = 'programs'
-                  JOIN {enrol_programs_items} pi ON pi.courseid = e.courseid AND pi.programid = e.customint1
-             LEFT JOIN {enrol_programs_allocations} pa ON pa.programid = pi.programid AND pa.userid = ue.userid
-             LEFT JOIN {enrol_programs_groups} pg ON pg.programid = pi.programid AND pg.courseid = pi.courseid
+                  JOIN {enrol} e ON e.id = ue.enrolid AND e.enrol = 'muprog'
+                  JOIN {tool_muprog_item} pi ON pi.courseid = e.courseid AND pi.programid = e.customint1
+             LEFT JOIN {tool_muprog_allocation} pa ON pa.programid = pi.programid AND pa.userid = ue.userid
+             LEFT JOIN {tool_muprog_group} pg ON pg.programid = pi.programid AND pg.courseid = pi.courseid
              LEFT JOIN {groups_members} gm ON gm.groupid = pg.groupid AND gm.userid = ue.userid
                  WHERE pa.id IS NULL
                        $programselect $userselect
@@ -417,7 +408,7 @@ final class allocation {
             $context = \context_course::instance($enrol->courseid);
             role_unassign_all([
                 'contextid' => $context->id,
-                'component' => 'enrol_programs',
+                'component' => 'enrol_muprog',
                 'itemid' => $enrol->id,
                 'userid' => $e->userid,
             ]);
@@ -441,10 +432,10 @@ final class allocation {
             $params['userid'] = $userid;
         }
         $sql = "SELECT e.id, pa.userid
-                  FROM {enrol_programs_allocations} pa
-                  JOIN {enrol_programs_programs} p ON p.id = pa.programid
-                  JOIN {enrol_programs_items} pi ON pi.programid = pa.programid
-                  JOIN {enrol} e ON e.enrol = 'programs' AND e.customint1 = pi.programid AND e.courseid = pi.courseid
+                  FROM {tool_muprog_allocation} pa
+                  JOIN {tool_muprog_program} p ON p.id = pa.programid
+                  JOIN {tool_muprog_item} pi ON pi.programid = pa.programid
+                  JOIN {enrol} e ON e.enrol = 'muprog' AND e.customint1 = pi.programid AND e.courseid = pi.courseid
              LEFT JOIN {user_enrolments} ue ON ue.userid = pa.userid AND ue.enrolid = e.id
                  WHERE ue.id IS NULL
                        AND p.archived = 0 AND pa.archived = 0
@@ -481,9 +472,9 @@ final class allocation {
         $params['now2'] = $now;
         $sql = "SELECT e.id, ue.userid
                   FROM {user_enrolments} ue
-                  JOIN {enrol} e ON e.id = ue.enrolid AND e.enrol = 'programs'
-                  JOIN {enrol_programs_items} pi ON pi.courseid = e.courseid AND pi.programid = e.customint1
-                  JOIN {enrol_programs_allocations} pa ON pa.programid = pi.programid AND pa.userid = ue.userid
+                  JOIN {enrol} e ON e.id = ue.enrolid AND e.enrol = 'muprog'
+                  JOIN {tool_muprog_item} pi ON pi.courseid = e.courseid AND pi.programid = e.customint1
+                  JOIN {tool_muprog_allocation} pa ON pa.programid = pi.programid AND pa.userid = ue.userid
                  WHERE ue.status = :active
                        AND (pa.archived = 1 OR pa.timestart > :now1 OR (pa.timeend IS NOT NULL AND pa.timeend < :now2))
                        $programselect $userselect
@@ -497,7 +488,7 @@ final class allocation {
             $context = \context_course::instance($enrol->courseid);
             role_unassign_all([
                 'contextid' => $context->id,
-                'component' => 'enrol_programs',
+                'component' => 'enrol_muprog',
                 'itemid' => $enrol->id,
                 'userid' => $e->userid,
             ]);
@@ -523,14 +514,14 @@ final class allocation {
         $params['now1'] = $now;
         $params['now2'] = $now;
         $params['now3'] = $now;
-        $sql = "INSERT INTO {enrol_programs_completions} (itemid, allocationid, timecompleted)
+        $sql = "INSERT INTO {tool_muprog_completion} (itemid, allocationid, timecompleted)
 
                 SELECT pi.id AS itemid, pa.id AS allocationid, pe.timecompleted
-                  FROM {enrol_programs_allocations} pa
-                  JOIN {enrol_programs_programs} p ON p.id = pa.programid
-                  JOIN {enrol_programs_items} pi ON pi.programid = pa.programid
-                  JOIN {enrol_programs_evidences} pe ON pe.userid = pa.userid AND pe.itemid = pi.id
-             LEFT JOIN {enrol_programs_completions} pc ON pc.allocationid = pa.id AND pc.itemid = pi.id
+                  FROM {tool_muprog_allocation} pa
+                  JOIN {tool_muprog_program} p ON p.id = pa.programid
+                  JOIN {tool_muprog_item} pi ON pi.programid = pa.programid
+                  JOIN {tool_muprog_evidence} pe ON pe.userid = pa.userid AND pe.itemid = pi.id
+             LEFT JOIN {tool_muprog_completion} pc ON pc.allocationid = pa.id AND pc.itemid = pi.id
                  WHERE pc.id IS NULL
                        AND p.archived = 0 AND pa.archived = 0
                        AND (pa.timestart <= :now1)
@@ -538,13 +529,13 @@ final class allocation {
                        $programselect $userselect";
         $DB->execute($sql, $params);
 
-        $select = "frameworkid IS NOT NULL";
+        $select = "trainingid IS NOT NULL";
         $params = [];
         if ($programid) {
             $select .= " AND programid = :programid";
             $params['programid'] = $programid;
         }
-        if ($DB->record_exists_select('enrol_programs_items', $select, $params)) {
+        if ($DB->record_exists_select('tool_muprog_item', $select, $params)) {
             // Aggregate training progress unless the training framework is archived.
             if ($trace) {
                 $trace->output('aggregating training progress', 1);
@@ -566,22 +557,22 @@ final class allocation {
             $params['now3'] = $now;
             $params['now4'] = $now;
 
-            $sql = "INSERT INTO {enrol_programs_completions} (itemid, allocationid, timecompleted)
+            $sql = "INSERT INTO {tool_muprog_completion} (itemid, allocationid, timecompleted)
 
                     SELECT pi.id AS itemid, pa.id AS allocationid, (:now3 + pi.completiondelay) AS timecompleted
-                      FROM {enrol_programs_allocations} pa
-                      JOIN {enrol_programs_programs} p ON p.id = pa.programid
-                      JOIN {enrol_programs_items} pi ON pi.programid = pa.programid
-                      JOIN {customfield_training_frameworks} tfr ON tfr.id = pi.frameworkid
-                 LEFT JOIN {enrol_programs_completions} pc ON pc.allocationid = pa.id AND pc.itemid = pi.id
+                      FROM {tool_muprog_allocation} pa
+                      JOIN {tool_muprog_program} p ON p.id = pa.programid
+                      JOIN {tool_muprog_item} pi ON pi.programid = pa.programid
+                      JOIN {customfield_mutrain_framework} tfr ON tfr.id = pi.trainingid
+                 LEFT JOIN {tool_muprog_completion} pc ON pc.allocationid = pa.id AND pc.itemid = pi.id
                      WHERE pc.id IS NULL
                            AND EXISTS (
 
                                SELECT SUM(cd.intvalue)
-                                 FROM {customfield_training_completions} ctc
+                                 FROM {customfield_mutrain_completion} ctc
                                  JOIN {customfield_field} cf ON cf.id = ctc.fieldid
                                  JOIN {customfield_data} cd ON cd.fieldid = cf.id AND cd.instanceid = ctc.instanceid
-                                 JOIN {customfield_training_fields} tf ON tf.fieldid = cf.id
+                                 JOIN {customfield_mutrain_field} tf ON tf.fieldid = cf.id
                                 WHERE tf.frameworkid = tfr.id AND ctc.userid = pa.userid AND cd.intvalue IS NOT NULL
                                       AND (tfr.restrictedcompletion = 0 OR ctc.timecompleted >= pa.timestart)
                                HAVING SUM(cd.intvalue) >= tfr.requiredtraining
@@ -614,14 +605,14 @@ final class allocation {
         $params['now1'] = $now;
         $params['now2'] = $now;
         $params['now3'] = $now;
-        $sql = "INSERT INTO {enrol_programs_completions} (itemid, allocationid, timecompleted)
+        $sql = "INSERT INTO {tool_muprog_completion} (itemid, allocationid, timecompleted)
 
                 SELECT pi.id AS itemid, pa.id AS allocationid, (:now3 + pi.completiondelay) AS timecompleted
-                  FROM {enrol_programs_allocations} pa
-                  JOIN {enrol_programs_programs} p ON p.id = pa.programid
-                  JOIN {enrol_programs_items} pi ON pi.programid = pa.programid
+                  FROM {tool_muprog_allocation} pa
+                  JOIN {tool_muprog_program} p ON p.id = pa.programid
+                  JOIN {tool_muprog_item} pi ON pi.programid = pa.programid
                   JOIN {course_completions} cc ON cc.userid = pa.userid AND cc.course = pi.courseid
-             LEFT JOIN {enrol_programs_completions} pc ON pc.allocationid = pa.id AND pc.itemid = pi.id
+             LEFT JOIN {tool_muprog_completion} pc ON pc.allocationid = pa.id AND pc.itemid = pi.id
                  WHERE pc.id IS NULL AND cc.reaggregate = 0 AND cc.timecompleted > 0
                        AND p.archived = 0 AND pa.archived = 0
                        AND (pa.timestart <= :now1)
@@ -646,9 +637,9 @@ final class allocation {
             $params['userid'] = $userid;
         }
         $sql = "SELECT 1
-                  FROM {enrol_programs_items} pi
-                  JOIN {enrol_programs_programs} p ON p.id = pi.programid
-                  JOIN {enrol_programs_allocations} pa ON pa.programid = p.id
+                  FROM {tool_muprog_item} pi
+                  JOIN {tool_muprog_program} p ON p.id = pi.programid
+                  JOIN {tool_muprog_allocation} pa ON pa.programid = p.id
                  WHERE pi.minpoints IS NOT NULL
                        $programselect $userselect";
         $minpointsfound = $DB->record_exists_sql($sql, $params);
@@ -663,12 +654,12 @@ final class allocation {
             $params['now2'] = $now;
             $params['now3'] = $now;
             $sql = "SELECT psi.id AS itemid, pa.id AS allocationid, psi.minprerequisites, psi.completiondelay, COUNT(pric.id) AS precount
-                      FROM {enrol_programs_items} psi
-                      JOIN {enrol_programs_programs} p ON p.id = psi.programid
-                      JOIN {enrol_programs_allocations} pa ON pa.programid = p.id
-                 LEFT JOIN {enrol_programs_completions} psic ON psic.itemid = psi.id AND psic.allocationid = pa.id
-                      JOIN {enrol_programs_prerequisites} pr ON pr.itemid = psi.id
-                      JOIN {enrol_programs_completions} pric ON pric.itemid = pr.prerequisiteitemid AND pric.allocationid = pa.id AND pric.timecompleted <= :now3
+                      FROM {tool_muprog_item} psi
+                      JOIN {tool_muprog_program} p ON p.id = psi.programid
+                      JOIN {tool_muprog_allocation} pa ON pa.programid = p.id
+                 LEFT JOIN {tool_muprog_completion} psic ON psic.itemid = psi.id AND psic.allocationid = pa.id
+                      JOIN {tool_muprog_prerequisite} pr ON pr.itemid = psi.id
+                      JOIN {tool_muprog_completion} pric ON pric.itemid = pr.prerequisiteitemid AND pric.allocationid = pa.id AND pric.timecompleted <= :now3
                      WHERE psi.minprerequisites IS NOT NULL AND psic.id IS NULL
                            AND p.archived = 0 AND pa.archived = 0
                            AND (pa.timestart <= :now1)
@@ -685,7 +676,7 @@ final class allocation {
                 $record->itemid = $completion->itemid;
                 $record->allocationid = $completion->allocationid;
                 $record->timecompleted = time() + $completion->completiondelay; // Use real time, we are not in a transaction here.
-                $DB->insert_record('enrol_programs_completions', $record);
+                $DB->insert_record('tool_muprog_completion', $record);
                 $count++;
             }
             $rs->close();
@@ -696,13 +687,13 @@ final class allocation {
                 $params['now2'] = $now;
                 $params['now3'] = $now;
                 $sql = "SELECT psi.id AS itemid, pa.id AS allocationid, psi.minpoints, psi.completiondelay, SUM(pri.points) AS pointcount
-                          FROM {enrol_programs_items} psi
-                          JOIN {enrol_programs_programs} p ON p.id = psi.programid
-                          JOIN {enrol_programs_allocations} pa ON pa.programid = p.id
-                     LEFT JOIN {enrol_programs_completions} psic ON psic.itemid = psi.id AND psic.allocationid = pa.id
-                          JOIN {enrol_programs_prerequisites} pr ON pr.itemid = psi.id
-                          JOIN {enrol_programs_items} pri ON pri.id = pr.prerequisiteitemid    
-                          JOIN {enrol_programs_completions} pric ON pric.itemid = pr.prerequisiteitemid AND pric.allocationid = pa.id AND pric.timecompleted <= :now3
+                          FROM {tool_muprog_item} psi
+                          JOIN {tool_muprog_program} p ON p.id = psi.programid
+                          JOIN {tool_muprog_allocation} pa ON pa.programid = p.id
+                     LEFT JOIN {tool_muprog_completion} psic ON psic.itemid = psi.id AND psic.allocationid = pa.id
+                          JOIN {tool_muprog_prerequisite} pr ON pr.itemid = psi.id
+                          JOIN {tool_muprog_item} pri ON pri.id = pr.prerequisiteitemid
+                          JOIN {tool_muprog_completion} pric ON pric.itemid = pr.prerequisiteitemid AND pric.allocationid = pa.id AND pric.timecompleted <= :now3
                          WHERE psi.minpoints IS NOT NULL AND psic.id IS NULL
                                AND p.archived = 0 AND pa.archived = 0
                                AND (pa.timestart <= :now1)
@@ -719,7 +710,7 @@ final class allocation {
                     $record->itemid = $completion->itemid;
                     $record->allocationid = $completion->allocationid;
                     $record->timecompleted = time() + $completion->completiondelay; // Use real time, we are not in a transaction here.
-                    $DB->insert_record('enrol_programs_completions', $record);
+                    $DB->insert_record('tool_muprog_completion', $record);
                     $count++;
                 }
                 $rs->close();
@@ -752,12 +743,12 @@ final class allocation {
         $params['now3'] = $now;
         $sql = "SELECT e.id, pa.userid
                   FROM {user_enrolments} ue
-                  JOIN {enrol} e ON e.enrol = 'programs' AND e.id = ue.enrolid
-                  JOIN {enrol_programs_items} pi ON pi.programid = e.customint1 AND pi.courseid = e.courseid
-                  JOIN {enrol_programs_allocations} pa ON pa.userid = ue.userid AND pa.programid = pi.programid
-                  JOIN {enrol_programs_programs} p ON p.id = pa.programid
-             LEFT JOIN {enrol_programs_items} previ ON previ.programid = p.id AND previ.id = pi.previtemid
-             LEFT JOIN {enrol_programs_completions} previc ON previc.itemid = previ.id AND previc.allocationid = pa.id
+                  JOIN {enrol} e ON e.enrol = 'muprog' AND e.id = ue.enrolid
+                  JOIN {tool_muprog_item} pi ON pi.programid = e.customint1 AND pi.courseid = e.courseid
+                  JOIN {tool_muprog_allocation} pa ON pa.userid = ue.userid AND pa.programid = pi.programid
+                  JOIN {tool_muprog_program} p ON p.id = pa.programid
+             LEFT JOIN {tool_muprog_item} previ ON previ.programid = p.id AND previ.id = pi.previtemid
+             LEFT JOIN {tool_muprog_completion} previc ON previc.itemid = previ.id AND previc.allocationid = pa.id
                  WHERE ue.status = :suspended
                        AND (pi.previtemid IS NULL OR previc.timecompleted <= :now3)
                        AND p.archived = 0 AND pa.archived = 0
@@ -791,19 +782,19 @@ final class allocation {
         }
         $sql = "SELECT ra.roleid, ra.userid, ra.contextid, ra.itemid
                   FROM {user_enrolments} ue
-                  JOIN {enrol} e ON e.enrol = 'programs' AND e.id = ue.enrolid
-                  JOIN {enrol_programs_items} pi ON pi.programid = e.customint1 AND pi.courseid = e.courseid
-             LEFT JOIN {enrol_programs_allocations} pa ON pa.userid = ue.userid AND pa.programid = pi.programid AND pa.archived = 0
-             LEFT JOIN {enrol_programs_programs} p ON p.id = pa.programid AND p.archived = 0
+                  JOIN {enrol} e ON e.enrol = 'muprog' AND e.id = ue.enrolid
+                  JOIN {tool_muprog_item} pi ON pi.programid = e.customint1 AND pi.courseid = e.courseid
+             LEFT JOIN {tool_muprog_allocation} pa ON pa.userid = ue.userid AND pa.programid = pi.programid AND pa.archived = 0
+             LEFT JOIN {tool_muprog_program} p ON p.id = pa.programid AND p.archived = 0
                   JOIN {context} c ON c.instanceid = e.courseid AND c.contextlevel = 50
-                  JOIN {role_assignments} ra ON ra.contextid = c.id AND ra.component = 'enrol_programs' AND ra.userid = ue.userid AND ra.itemid = e.id
+                  JOIN {role_assignments} ra ON ra.contextid = c.id AND ra.component = 'enrol_muprog' AND ra.userid = ue.userid AND ra.itemid = e.id
                  WHERE (ue.status = :suspended OR e.status = :disabled OR p.id IS NULL OR pa.id IS NULL
                         OR ra.roleid <> :roleid)
                        $programselect $userselect
               ORDER BY ra.id ASC";
         $rs = $DB->get_recordset_sql($sql, $params);
         foreach ($rs as $ra) {
-            role_unassign($ra->roleid, $ra->userid, $ra->contextid, 'enrol_programs', $ra->itemid);
+            role_unassign($ra->roleid, $ra->userid, $ra->contextid, 'enrol_muprog', $ra->itemid);
         }
         $rs->close();
 
@@ -824,19 +815,19 @@ final class allocation {
         }
         $sql = "SELECT ue.userid, c.id AS contextid, e.id AS itemid
                   FROM {user_enrolments} ue
-                  JOIN {enrol} e ON e.enrol = 'programs' AND e.id = ue.enrolid
-                  JOIN {enrol_programs_items} pi ON pi.programid = e.customint1 AND pi.courseid = e.courseid
-                  JOIN {enrol_programs_allocations} pa ON pa.programid = pi.programid AND pa.userid = ue.userid AND pa.archived = 0
-                  JOIN {enrol_programs_programs} p ON p.id = pa.programid AND p.archived = 0
+                  JOIN {enrol} e ON e.enrol = 'muprog' AND e.id = ue.enrolid
+                  JOIN {tool_muprog_item} pi ON pi.programid = e.customint1 AND pi.courseid = e.courseid
+                  JOIN {tool_muprog_allocation} pa ON pa.programid = pi.programid AND pa.userid = ue.userid AND pa.archived = 0
+                  JOIN {tool_muprog_program} p ON p.id = pa.programid AND p.archived = 0
                   JOIN {context} c ON c.instanceid = e.courseid AND c.contextlevel = 50
-             LEFT JOIN {role_assignments} ra ON ra.contextid = c.id AND ra.component = 'enrol_programs' AND ra.userid = ue.userid AND ra.itemid = e.id
+             LEFT JOIN {role_assignments} ra ON ra.contextid = c.id AND ra.component = 'enrol_muprog' AND ra.userid = ue.userid AND ra.itemid = e.id
                  WHERE ra.id IS NULL
                        AND ue.status = :active AND e.status = :enabled
                        $programselect $userselect
               ORDER BY e.id ASC, pa.id ASC";
         $rs = $DB->get_recordset_sql($sql, $params);
         foreach ($rs as $ra) {
-            role_assign($roleid, $ra->userid, $ra->contextid, 'enrol_programs', $ra->itemid);
+            role_assign($roleid, $ra->userid, $ra->contextid, 'enrol_muprog', $ra->itemid);
         }
         $rs->close();
 
@@ -858,10 +849,10 @@ final class allocation {
             $params['userid'] = $userid;
         }
         $sql = "SELECT p.id, pc.timecompleted, pa.id AS allocationid
-                  FROM {enrol_programs_allocations} pa
-                  JOIN {enrol_programs_programs} p ON p.id = pa.programid
-                  JOIN {enrol_programs_items} pi ON pi.programid = pa.programid AND pi.topitem = 1
-                  JOIN {enrol_programs_completions} pc ON pc.allocationid = pa.id AND pc.itemid = pi.id AND pc.timecompleted <= :now
+                  FROM {tool_muprog_allocation} pa
+                  JOIN {tool_muprog_program} p ON p.id = pa.programid
+                  JOIN {tool_muprog_item} pi ON pi.programid = pa.programid AND pi.topitem = 1
+                  JOIN {tool_muprog_completion} pc ON pc.allocationid = pa.id AND pc.itemid = pi.id AND pc.timecompleted <= :now
                  WHERE pa.timecompleted IS NULL
                        AND p.archived = 0 AND pa.archived = 0
                        $programselect $userselect
@@ -869,19 +860,18 @@ final class allocation {
         $rs = $DB->get_recordset_sql($sql, $params);
         foreach ($rs as $p) {
             if (!$program || $program->id != $p->id) {
-                $program = $DB->get_record('enrol_programs_programs', ['id' => $p->id], '*', MUST_EXIST);
+                $program = $DB->get_record('tool_muprog_program', ['id' => $p->id], '*', MUST_EXIST);
             }
-            $allocation = $DB->get_record('enrol_programs_allocations', ['id' => $p->allocationid]);
+            $allocation = $DB->get_record('tool_muprog_allocation', ['id' => $p->allocationid]);
             $allocation->timecompleted = (string)$p->timecompleted;
-            $DB->set_field('enrol_programs_allocations', 'timecompleted', $p->timecompleted, ['id' => $allocation->id]);
-            $source = $DB->get_record('enrol_programs_sources', ['id' => $allocation->sourceid]);
+            $DB->set_field('tool_muprog_allocation', 'timecompleted', $p->timecompleted, ['id' => $allocation->id]);
+            $source = $DB->get_record('tool_muprog_source', ['id' => $allocation->sourceid]);
             $user = $DB->get_record('user', ['id' => $allocation->userid]);
 
             self::make_snapshot($allocation->id, 'completion');
-            $event = \enrol_programs\event\program_completed::create_from_allocation($allocation, $program);
+            $event = \tool_muprog\event\program_completed::create_from_allocation($allocation, $program);
             $event->trigger();
             notification\completion::notify_now($user, $program, $source, $allocation);
-            notification\completion_relateduser::notify_now($user, $program, $source, $allocation);
             calendar::delete_allocation_events($allocation->id);
         }
         $rs->close();
@@ -904,18 +894,18 @@ final class allocation {
         }
         $sql = "SELECT ue.userid, pg.groupid, p.id AS programid
                   FROM {user_enrolments} ue
-                  JOIN {enrol} e ON e.enrol = 'programs' AND e.id = ue.enrolid
-                  JOIN {enrol_programs_items} pi ON pi.programid = e.customint1 AND pi.courseid = e.courseid
-                  JOIN {enrol_programs_programs} p ON p.id = pi.programid
-                  JOIN {enrol_programs_allocations} pa ON pa.userid = ue.userid AND pa.programid = pi.programid
-                  JOIN {enrol_programs_groups} pg ON pg.programid = pi.programid AND pg.courseid = pi.courseid
+                  JOIN {enrol} e ON e.enrol = 'muprog' AND e.id = ue.enrolid
+                  JOIN {tool_muprog_item} pi ON pi.programid = e.customint1 AND pi.courseid = e.courseid
+                  JOIN {tool_muprog_program} p ON p.id = pi.programid
+                  JOIN {tool_muprog_allocation} pa ON pa.userid = ue.userid AND pa.programid = pi.programid
+                  JOIN {tool_muprog_group} pg ON pg.programid = pi.programid AND pg.courseid = pi.courseid
              LEFT JOIN {groups_members} gm ON gm.groupid = pg.groupid AND gm.userid = ue.userid
                  WHERE gm.id IS NULL AND p.archived = 0 AND pa.archived = 0
                        $programselect $userselect
               ORDER BY ue.userid ASC, pg.groupid ASC";
         $rs = $DB->get_recordset_sql($sql, $params);
         foreach ($rs as $cm) {
-            groups_add_member($cm->groupid, $cm->userid, 'enrol_programs', $cm->programid);
+            groups_add_member($cm->groupid, $cm->userid, 'tool_muprog', $cm->programid);
         }
         $rs->close();
     }
@@ -949,8 +939,8 @@ final class allocation {
 
         $allocation = (object)(array)$allocation;
 
-        $record = $DB->get_record('enrol_programs_allocations', ['id' => $allocation->id], '*', MUST_EXIST);
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $record->programid], '*', MUST_EXIST);
+        $record = $DB->get_record('tool_muprog_allocation', ['id' => $allocation->id], '*', MUST_EXIST);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $record->programid], '*', MUST_EXIST);
 
         unset($allocation->userid);
         unset($allocation->sourceid);
@@ -987,7 +977,7 @@ final class allocation {
             $record->timecompleted = null;
         }
 
-        $DB->update_record('enrol_programs_allocations', $record);
+        $DB->update_record('tool_muprog_allocation', $record);
 
         $allocation = self::make_snapshot($record->id, 'allocation_edit');
 
@@ -1011,9 +1001,9 @@ final class allocation {
     public static function reset(stdClass $data): stdClass {
         global $DB;
 
-        $record = $DB->get_record('enrol_programs_allocations', ['id' => $data->id], '*', MUST_EXIST);
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $record->programid], '*', MUST_EXIST);
-        $source = $DB->get_record('enrol_programs_sources', ['id' => $record->sourceid]);
+        $record = $DB->get_record('tool_muprog_allocation', ['id' => $data->id], '*', MUST_EXIST);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $record->programid], '*', MUST_EXIST);
+        $source = $DB->get_record('tool_muprog_source', ['id' => $record->sourceid]);
         $user = $DB->get_record('user', ['id' => $record->userid, 'deleted' => 0], '*', MUST_EXIST);
 
         if ($data->resettype != course_reset::RESETTYPE_STANDARD && $data->resettype != course_reset::RESETTYPE_FULL) {
@@ -1051,13 +1041,13 @@ final class allocation {
         }
         course_reset::purge_completions($user, $record->programid);
 
-        $select = "userid = :userid AND itemid IN (SELECT id FROM {enrol_programs_items} WHERE programid = :programid)";
+        $select = "userid = :userid AND itemid IN (SELECT id FROM {tool_muprog_item} WHERE programid = :programid)";
         $params = ['programid' => $program->id, 'userid' => $user->id];
-        $DB->delete_records_select('enrol_programs_evidences', $select, $params);
-        $DB->delete_records('enrol_programs_completions', ['allocationid' => $record->id]);
+        $DB->delete_records_select('tool_muprog_evidence', $select, $params);
+        $DB->delete_records('tool_muprog_completion', ['allocationid' => $record->id]);
 
         $record->timecompleted = null;
-        $DB->update_record('enrol_programs_allocations', $record);
+        $DB->update_record('tool_muprog_allocation', $record);
 
         $allocation = self::make_snapshot($record->id, 'allocation_reset');
 
@@ -1083,26 +1073,26 @@ final class allocation {
 
         $trans = $DB->start_delegated_transaction();
 
-        $allocation = $DB->get_record('enrol_programs_allocations', ['id' => $data->allocationid], '*', MUST_EXIST);
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $allocation->programid], '*', MUST_EXIST);
-        $item = $DB->get_record('enrol_programs_items', ['id' => $data->itemid, 'programid' => $allocation->programid], '*', MUST_EXIST);
-        $completion = $DB->get_record('enrol_programs_completions', ['allocationid' => $allocation->id, 'itemid' => $item->id]);
+        $allocation = $DB->get_record('tool_muprog_allocation', ['id' => $data->allocationid], '*', MUST_EXIST);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $allocation->programid], '*', MUST_EXIST);
+        $item = $DB->get_record('tool_muprog_item', ['id' => $data->itemid, 'programid' => $allocation->programid], '*', MUST_EXIST);
+        $completion = $DB->get_record('tool_muprog_completion', ['allocationid' => $allocation->id, 'itemid' => $item->id]);
 
         self::make_snapshot($allocation->id, 'completion_edit_before');
 
         if ($data->timecompleted) {
             if ($completion) {
-                $DB->set_field('enrol_programs_completions', 'timecompleted', $data->timecompleted, ['id' => $completion->id]);
+                $DB->set_field('tool_muprog_completion', 'timecompleted', $data->timecompleted, ['id' => $completion->id]);
             } else {
                 $record = new stdClass();
                 $record->allocationid = $allocation->id;
                 $record->itemid = $item->id;
                 $record->timecompleted = $data->timecompleted;
-                $DB->insert_record('enrol_programs_completions', $record);
+                $DB->insert_record('tool_muprog_completion', $record);
             }
         } else {
             if ($completion) {
-                $DB->delete_records('enrol_programs_completions', ['id' => $completion->id]);
+                $DB->delete_records('tool_muprog_completion', ['id' => $completion->id]);
             }
         }
 
@@ -1125,11 +1115,11 @@ final class allocation {
 
         $trans = $DB->start_delegated_transaction();
 
-        $allocation = $DB->get_record('enrol_programs_allocations', ['id' => $data->allocationid], '*', MUST_EXIST);
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $allocation->programid], '*', MUST_EXIST);
-        $item = $DB->get_record('enrol_programs_items', ['id' => $data->itemid, 'programid' => $allocation->programid], '*', MUST_EXIST);
-        $completion = $DB->get_record('enrol_programs_completions', ['allocationid' => $allocation->id, 'itemid' => $item->id]);
-        $evidence = $DB->get_record('enrol_programs_evidences', ['userid' => $allocation->userid, 'itemid' => $item->id]);
+        $allocation = $DB->get_record('tool_muprog_allocation', ['id' => $data->allocationid], '*', MUST_EXIST);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $allocation->programid], '*', MUST_EXIST);
+        $item = $DB->get_record('tool_muprog_item', ['id' => $data->itemid, 'programid' => $allocation->programid], '*', MUST_EXIST);
+        $completion = $DB->get_record('tool_muprog_completion', ['allocationid' => $allocation->id, 'itemid' => $item->id]);
+        $evidence = $DB->get_record('tool_muprog_evidence', ['userid' => $allocation->userid, 'itemid' => $item->id]);
 
         self::make_snapshot($allocation->id, 'evidence_edit_before');
 
@@ -1138,8 +1128,8 @@ final class allocation {
             if ($evidence) {
                 $evidence->timecompleted = $data->evidencetimecompleted;
                 $evidence->evidencejson = $evidencejson;
-                $DB->update_record('enrol_programs_evidences', $evidence);
-                $evidence = $DB->get_record('enrol_programs_evidences', ['id' => $evidence->id], '*', MUST_EXIST);
+                $DB->update_record('tool_muprog_evidence', $evidence);
+                $evidence = $DB->get_record('tool_muprog_evidence', ['id' => $evidence->id], '*', MUST_EXIST);
             } else {
                 $record = new stdClass();
                 $record->userid = $allocation->userid;
@@ -1148,12 +1138,12 @@ final class allocation {
                 $record->evidencejson = $evidencejson;
                 $record->timecreated = time();
                 $record->createdby = $USER->id;
-                $record->id = $DB->insert_record('enrol_programs_evidences', $record);
-                $evidence = $DB->get_record('enrol_programs_evidences', ['id' => $record->id], '*', MUST_EXIST);
+                $record->id = $DB->insert_record('tool_muprog_evidence', $record);
+                $evidence = $DB->get_record('tool_muprog_evidence', ['id' => $record->id], '*', MUST_EXIST);
             }
         } else {
             if ($evidence) {
-                $DB->delete_records('enrol_programs_evidences', ['id' => $evidence->id]);
+                $DB->delete_records('tool_muprog_evidence', ['id' => $evidence->id]);
                 $evidence = false;
             }
         }
@@ -1162,7 +1152,7 @@ final class allocation {
             if ($evidence) {
                 if ($completion) {
                     if ($evidence->timecompleted != $completion->timecompleted) {
-                        $DB->set_field('enrol_programs_completions',
+                        $DB->set_field('tool_muprog_completion',
                             'timecompleted', $evidence->timecompleted,
                             ['id' => $completion->id]);
                     }
@@ -1171,11 +1161,11 @@ final class allocation {
                     $record->allocationid = $allocation->id;
                     $record->itemid = $item->id;
                     $record->timecompleted = $evidence->timecompleted;
-                    $record->id = $DB->insert_record('enrol_programs_completions', $record);
+                    $record->id = $DB->insert_record('tool_muprog_completion', $record);
                 }
             } else {
                 if ($completion) {
-                    $DB->delete_records('enrol_programs_completions', ['id' => $completion->id]);
+                    $DB->delete_records('tool_muprog_completion', ['id' => $completion->id]);
                 }
             }
         }
@@ -1190,8 +1180,8 @@ final class allocation {
         // Recalculate program completions if top item only,
         // note future program completions are ignored here because they are invalid.
         if ($item->topitem && !empty($data->itemrecalculate)) {
-            $allocation = $DB->get_record('enrol_programs_allocations', ['id' => $data->allocationid], '*', MUST_EXIST);
-            $completion = $DB->get_record('enrol_programs_completions', ['allocationid' => $allocation->id, 'itemid' => $item->id]);
+            $allocation = $DB->get_record('tool_muprog_allocation', ['id' => $data->allocationid], '*', MUST_EXIST);
+            $completion = $DB->get_record('tool_muprog_completion', ['allocationid' => $allocation->id, 'itemid' => $item->id]);
             if ($allocation->timecompleted && !$completion) {
                 $allocation->timecompleted = null;
                 self::update_user($allocation);
@@ -1216,23 +1206,23 @@ final class allocation {
 
         if ($program->archived || $allocation->archived) {
             if ($allocation->timecompleted) {
-                return get_string('programstatus_archivedcompleted', 'enrol_programs');
+                return get_string('programstatus_archivedcompleted', 'tool_muprog');
             } else {
-                return get_string('programstatus_archived', 'enrol_programs');
+                return get_string('programstatus_archived', 'tool_muprog');
             }
         }
 
         if ($allocation->timecompleted) {
-            return get_string('programstatus_completed', 'enrol_programs');
+            return get_string('programstatus_completed', 'tool_muprog');
         } else if ($allocation->timestart > $now) {
-            return get_string('programstatus_future', 'enrol_programs');
+            return get_string('programstatus_future', 'tool_muprog');
         } else if ($allocation->timeend && $allocation->timeend < $now) {
-            return get_string('programstatus_failed', 'enrol_programs');
+            return get_string('programstatus_failed', 'tool_muprog');
         } else if ($allocation->timedue && $allocation->timedue < $now) {
-            return get_string('programstatus_overdue', 'enrol_programs');
+            return get_string('programstatus_overdue', 'tool_muprog');
         } else {
             // We need something different from tags that use 'badge-info'.
-            return get_string('programstatus_open', 'enrol_programs');
+            return get_string('programstatus_open', 'tool_muprog');
         }
     }
 
@@ -1250,21 +1240,21 @@ final class allocation {
 
         if ($program->archived || $allocation->archived) {
             if ($allocation->timecompleted) {
-                $result[] = '<span class="badge badge-success">' . get_string('programstatus_archivedcompleted', 'enrol_programs') . '</span>';
+                $result[] = '<span class="badge badge-success">' . get_string('programstatus_archivedcompleted', 'tool_muprog') . '</span>';
             } else {
-                $result[] = '<span class="badge badge-dark">' . get_string('programstatus_archived', 'enrol_programs') . '</span>';
+                $result[] = '<span class="badge badge-dark">' . get_string('programstatus_archived', 'tool_muprog') . '</span>';
             }
         } else if ($allocation->timecompleted) {
-            $result[] = '<div class="badge badge-success">' . get_string('programstatus_completed', 'enrol_programs') . '</div>';
+            $result[] = '<div class="badge badge-success">' . get_string('programstatus_completed', 'tool_muprog') . '</div>';
         } else if ($allocation->timestart > $now) {
-            $result[] = '<div class="badge badge-light">' . get_string('programstatus_future', 'enrol_programs') . '</div>';
+            $result[] = '<div class="badge badge-light">' . get_string('programstatus_future', 'tool_muprog') . '</div>';
         } else if ($allocation->timeend && $allocation->timeend < $now) {
-            $result[] = '<div class="badge badge-danger">' . get_string('programstatus_failed', 'enrol_programs') . '</div>';
+            $result[] = '<div class="badge badge-danger">' . get_string('programstatus_failed', 'tool_muprog') . '</div>';
         } else if ($allocation->timedue && $allocation->timedue < $now) {
-            $result[] = '<div class="badge badge-warning">' . get_string('programstatus_overdue', 'enrol_programs') . '</div>';
+            $result[] = '<div class="badge badge-warning">' . get_string('programstatus_overdue', 'tool_muprog') . '</div>';
         } else {
             // We need something different from tags that use 'badge-info'.
-            $result[] = '<div class="badge badge-primary">' . get_string('programstatus_open', 'enrol_programs') . '</div>';
+            $result[] = '<div class="badge badge-primary">' . get_string('programstatus_open', 'tool_muprog') . '</div>';
         }
 
         return implode(' ', $result);
@@ -1285,14 +1275,14 @@ final class allocation {
             return;
         }
 
-        $allocations = $DB->get_records('enrol_programs_allocations', ['userid' => $userid]);
+        $allocations = $DB->get_records('tool_muprog_allocation', ['userid' => $userid]);
         foreach ($allocations as $allocation) {
             self::make_snapshot($allocation->id, 'user_deleted');
-            $DB->delete_records('enrol_programs_completions', ['allocationid' => $allocation->id]);
+            $DB->delete_records('tool_muprog_completion', ['allocationid' => $allocation->id]);
         }
-        $DB->delete_records('enrol_programs_evidences', ['userid' => $userid]);
-        $DB->delete_records('enrol_programs_allocations', ['userid' => $userid]);
-        $DB->delete_records('enrol_programs_requests', ['userid' => $userid]);
+        $DB->delete_records('tool_muprog_evidence', ['userid' => $userid]);
+        $DB->delete_records('tool_muprog_allocation', ['userid' => $userid]);
+        $DB->delete_records('tool_muprog_request', ['userid' => $userid]);
     }
 
     /**
@@ -1306,7 +1296,7 @@ final class allocation {
     public static function make_snapshot(int $allocationid, string $reason, ?string $explanation = null): ?\stdClass {
         global $DB, $USER;
 
-        $allocation = $DB->get_record('enrol_programs_allocations', ['id' => $allocationid]);
+        $allocation = $DB->get_record('tool_muprog_allocation', ['id' => $allocationid]);
         if (!$allocation) {
             // Must have been just deleted.
             return null;
@@ -1328,33 +1318,34 @@ final class allocation {
             $data->{$k} = $v;
         }
 
-        $data->completionsjson = util::json_encode($DB->get_records('enrol_programs_completions', ['allocationid' => $allocation->id], 'id ASC'));
+        $data->completionsjson = util::json_encode($DB->get_records('tool_muprog_completion', ['allocationid' => $allocation->id], 'id ASC'));
         $sql = "SELECT e.*
-                  FROM {enrol_programs_evidences} e
-                  JOIN {enrol_programs_items} i ON i.id = e.itemid
+                  FROM {tool_muprog_evidence} e
+                  JOIN {tool_muprog_item} i ON i.id = e.itemid
                  WHERE e.userid = :userid AND i.programid = :programid
               ORDER BY e.id ASC";
         $data->evidencesjson = util::json_encode($DB->get_records_sql($sql, ['userid' => $allocation->userid, 'programid' => $allocation->programid]));
 
-        $DB->insert_record('enrol_programs_usr_snapshots', $data);
+        $DB->insert_record('tool_muprog_usr_snapshot', $data);
 
         return $allocation;
     }
 
     /**
      * Returns list of programs with allocation data that user can see.
+     * @param int|null $userid
      * @return array
      */
-    public static function get_my_allocations($userid = null): array {
+    public static function get_my_allocations(?int $userid = null): array {
         global $USER, $DB;
 
         $params = ['userid' => $userid ?? $USER->id];
 
         $tenantjoin = "";
-        if (\enrol_programs\local\tenant::is_active()) {
+        if (\tool_muprog\local\util::is_mutenancy_active()) {
             // Having program allocations in different tenant is a BAD thing,
             // so let's just do the same as the catalogue for now.
-            $tenantid = \tool_olms_tenant\tenancy::get_tenant_id();
+            $tenantid = \tool_mutenancy\local\tenancy::get_current_tenantid();
             if ($tenantid) {
                 $tenantjoin = "JOIN {context} pc ON pc.id = p.contextid AND (pc.tenantid IS NULL OR pc.tenantid = :tenantid)";
                 $params['tenantid'] = $tenantid;
@@ -1362,8 +1353,8 @@ final class allocation {
         }
 
         $sql = "SELECT pa.*
-                  FROM {enrol_programs_allocations} pa
-                  JOIN {enrol_programs_programs} p ON p.id = pa.programid
+                  FROM {tool_muprog_allocation} pa
+                  JOIN {tool_muprog_program} p ON p.id = pa.programid
                   $tenantjoin
                  WHERE pa.userid = :userid AND p.archived = 0 AND pa.archived = 0
               ORDER BY p.fullname ASC";
@@ -1393,9 +1384,9 @@ final class allocation {
 
         $programid = $user->{$column};
         if (is_number($programid)) {
-            $program = $DB->get_record('enrol_programs_programs', ['id' => $programid]);
+            $program = $DB->get_record('tool_muprog_program', ['id' => $programid]);
         } else {
-            $program = $DB->get_record('enrol_programs_programs', ['idnumber' => $programid]);
+            $program = $DB->get_record('tool_muprog_program', ['idnumber' => $programid]);
         }
         if (!$program) {
             // No need to duplicate errors here,
@@ -1406,11 +1397,11 @@ final class allocation {
 
         $context = \context::instance_by_id($program->contextid, IGNORE_MISSING);
         if (!$context) {
-            $upt->track('enrolments', get_string('userupload_completion_error', 'enrol_programs', $programname), 'error');
+            $upt->track('enrolments', get_string('userupload_completion_error', 'tool_muprog', $programname), 'error');
             return;
         }
-        if (!has_capability('enrol/programs:manageevidence', $context) && !has_capability('enrol/programs:admin', $context)) {
-            $upt->track('enrolments', get_string('userupload_completion_error', 'enrol_programs', $programname), 'error');
+        if (!has_capability('tool/muprog:manageevidence', $context) && !has_capability('tool/muprog:admin', $context)) {
+            $upt->track('enrolments', get_string('userupload_completion_error', 'tool_muprog', $programname), 'error');
             return;
         }
 
@@ -1420,24 +1411,24 @@ final class allocation {
         }
         $timecompleted = strtotime($user->{$completionfield});
         if ($timecompleted === false) {
-            $upt->track('enrolments', get_string('invalidcompletiondate', 'enrol_programs', $programname), 'error');
+            $upt->track('enrolments', get_string('invalidcompletiondate', 'tool_muprog', $programname), 'error');
             return;
         }
         $completionevidence = 'pcompletionevidence'.$number;
         $evidence = $user->{$completionevidence} ?? '';
 
-        $allocation = $DB->get_record('enrol_programs_allocations', ['programid' => $program->id, 'userid' => $user->id]);
+        $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program->id, 'userid' => $user->id]);
         if (!$allocation) {
-            $upt->track('enrolments', get_string('userupload_completion_error', 'enrol_programs', $programname), 'error');
+            $upt->track('enrolments', get_string('userupload_completion_error', 'tool_muprog', $programname), 'error');
             return;
         }
         if ($program->archived || $allocation->archived) {
-            $upt->track('enrolments', get_string('userupload_completion_error', 'enrol_programs', $programname), 'error');
+            $upt->track('enrolments', get_string('userupload_completion_error', 'tool_muprog', $programname), 'error');
             return;
         }
-        $item = $DB->get_record('enrol_programs_items', ['topitem' => 1, 'programid' => $allocation->programid]);
+        $item = $DB->get_record('tool_muprog_item', ['topitem' => 1, 'programid' => $allocation->programid]);
         if (!$item) {
-            $upt->track('enrolments', get_string('userupload_completion_error', 'enrol_programs', $programname), 'error');
+            $upt->track('enrolments', get_string('userupload_completion_error', 'tool_muprog', $programname), 'error');
             return;
         }
 
@@ -1450,10 +1441,10 @@ final class allocation {
         if (trim($evidence) !== '') {
             $data['evidencedetails'] = clean_text($evidence);
         } else {
-            $data['evidencedetails'] = get_string('source_manual_uploadusers', 'enrol_programs');
+            $data['evidencedetails'] = get_string('source_manual_uploadusers', 'tool_muprog');
         }
         self::update_item_evidence((object)$data);
-        $upt->track('enrolments', get_string('userupload_completion_updated', 'enrol_programs', $programname), 'info');
+        $upt->track('enrolments', get_string('userupload_completion_updated', 'tool_muprog', $programname), 'info');
     }
 
     /**
@@ -1482,7 +1473,7 @@ final class allocation {
             'errors' => 0,
         ];
 
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $data->programid], '*', MUST_EXIST);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $data->programid], '*', MUST_EXIST);
 
         if ($data->hasheaders) {
             unset($filedata[0]);
@@ -1518,8 +1509,8 @@ final class allocation {
             }
 
             // Program evidence goes into the top item, program completion is updated via re-calculation option.
-            $item = $DB->get_record('enrol_programs_items', ['topitem' => 1, 'programid' => $program->id]);
-            $allocation = $DB->get_record('enrol_programs_allocations', ['userid' => $user->id, 'programid' => $program->id]);
+            $item = $DB->get_record('tool_muprog_item', ['topitem' => 1, 'programid' => $program->id]);
+            $allocation = $DB->get_record('tool_muprog_allocation', ['userid' => $user->id, 'programid' => $program->id]);
             if (!$allocation) {
                 $result['errors']++;
                 continue;
@@ -1542,9 +1533,9 @@ final class allocation {
                 $completiondata['evidencedetails'] = $data->details;
             } else {
                 // They should have provided meaningful details, so fallback to whatever we call this.
-                $completiondata['evidencedetails'] = get_string('evidenceupload', 'enrol_programs');
+                $completiondata['evidencedetails'] = get_string('evidenceupload', 'tool_muprog');
             }
-            \enrol_programs\local\allocation::update_item_evidence((object)$completiondata);
+            self::update_item_evidence((object)$completiondata);
             $result['updated']++;
         }
 
@@ -1552,7 +1543,7 @@ final class allocation {
             $fs = get_file_storage();
             $context = \context_user::instance($USER->id);
             $fs->delete_area_files($context->id, 'user', 'draft', $data->csvfile);
-            $fs->delete_area_files($context->id, 'enrol_programs', 'upload', $data->csvfile);
+            $fs->delete_area_files($context->id, 'tool_muprog', 'upload', $data->csvfile);
         }
 
         return $result;

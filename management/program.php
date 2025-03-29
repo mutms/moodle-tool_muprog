@@ -1,26 +1,15 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
 /**
- * Program management interface.
+ * Programs management interface.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 /** @var moodle_database $DB */
@@ -29,57 +18,49 @@
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
 
-use enrol_programs\local\management;
-use local_openlms\output\extra_menu\dropdown;
+use tool_muprog\local\management;
+use tool_mulib\output\action_menu\dropdown;
 
-require('../../../config.php');
+require('../../../../config.php');
 require_once($CFG->dirroot . '/lib/formslib.php');
 
 $id = required_param('id', PARAM_INT);
 
 require_login();
 
-$program = $DB->get_record('enrol_programs_programs', ['id' => $id], '*', MUST_EXIST);
+$program = $DB->get_record('tool_muprog_program', ['id' => $id], '*', MUST_EXIST);
 $context = context::instance_by_id($program->contextid);
-require_capability('enrol/programs:view', $context);
+require_capability('tool/muprog:view', $context);
 
-$currenturl = new moodle_url('/enrol/programs/management/program.php', ['id' => $id]);
+$currenturl = new moodle_url('/admin/tool/muprog/management/program.php', ['id' => $id]);
 
-management::setup_program_page($currenturl, $context, $program);
-$PAGE->set_docs_path("$CFG->wwwroot/enrol/programs/documentation.php/program_general.md");
+management::setup_program_page($currenturl, $context, $program, 'program_general');
 
-/** @var \local_openlms\output\dialog_form\renderer $dialogformoutput */
-$dialogformoutput = $PAGE->get_renderer('local_openlms', 'dialog_form');
+/** @var \tool_muprog\output\management\renderer $managementoutput */
+$managementoutput = $PAGE->get_renderer('tool_muprog', 'management');
 
-/** @var \enrol_programs\output\management\renderer $managementoutput */
-$managementoutput = $PAGE->get_renderer('enrol_programs', 'management');
-
-echo $OUTPUT->header();
-
-echo $managementoutput->render_management_program_tabs($program, 'general');
-
-$dropdown = new dropdown(get_string('extra_menu_management_program_general', 'enrol_programs'));
-if ($program->archived && has_capability('enrol/programs:delete', $context)) {
-    $url = new moodle_url('/enrol/programs/management/program_delete.php', ['id' => $program->id]);
-    $link = new local_openlms\output\dialog_form\link($url, get_string('deleteprogram', 'enrol_programs'));
+$dropdown = new dropdown(get_string('extra_menu_management_program_general', 'tool_muprog'));
+if ($program->archived && has_capability('tool/muprog:delete', $context)) {
+    $url = new moodle_url('/admin/tool/muprog/management/program_delete.php', ['id' => $program->id]);
+    $link = new tool_mulib\output\dialog_form\link($url, get_string('deleteprogram', 'tool_muprog'));
     $link->set_after_submit($link::AFTER_SUBMIT_REDIRECT);
     $dropdown->add_dialog_form($link);
 }
-if (has_capability('enrol/programs:export', $context)) {
-    $url = new moodle_url('/enrol/programs/management/export.php', ['id' => $program->id]);
-    $dropdown->add_item(get_string('export', 'enrol_programs'), $url);
+if (has_capability('tool/muprog:export', $context)) {
+    $url = new moodle_url('/admin/tool/muprog/management/export.php', ['id' => $program->id]);
+    $dropdown->add_item(get_string('export', 'tool_muprog'), $url);
 }
 if ($dropdown->has_items()) {
-    echo '<div class="float-end">';
-    echo $OUTPUT->render($dropdown);
-    echo '</div>';
+    $PAGE->add_header_action($OUTPUT->render($dropdown));
 }
 
+echo $OUTPUT->header();
+
 $buttons = [];
-if (has_capability('enrol/programs:edit', $context)) {
-    $url = new moodle_url('/enrol/programs/management/program_update.php', ['id' => $program->id]);
-    $editbutton = new local_openlms\output\dialog_form\button($url, get_string('edit'));
-    $buttons[] = $dialogformoutput->render($editbutton);
+if (has_capability('tool/muprog:edit', $context)) {
+    $url = new moodle_url('/admin/tool/muprog/management/program_update.php', ['id' => $program->id]);
+    $editbutton = new tool_mulib\output\dialog_form\button($url, get_string('edit'));
+    $buttons[] = $OUTPUT->render($editbutton);
 }
 
 echo $managementoutput->render_program_general($program);

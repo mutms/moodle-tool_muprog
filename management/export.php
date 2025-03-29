@@ -1,41 +1,31 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
 /**
  * Programs export.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2024 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use enrol_programs\local\management;
-use enrol_programs\local\export;
+use tool_muprog\local\management;
+use tool_muprog\local\export;
 
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
 /** @var core_renderer $OUTPUT */
 /** @var stdClass $CFG */
 
+// phpcs:ignoreFile moodle.Files.MoodleInternal.MoodleInternalGlobalState
 if (!empty($_POST['format'])) {
     define('NO_DEBUG_DISPLAY', true);
 }
 
-require('../../../config.php');
+require('../../../../config.php');
 
 require_login();
 
@@ -44,9 +34,9 @@ $contextid = optional_param('contextid', 0, PARAM_INT);
 $archived = optional_param('archived', 0, PARAM_BOOL);
 
 if ($id) {
-    $program = $DB->get_record('enrol_programs_programs', ['id' => $id], '*', MUST_EXIST);
+    $program = $DB->get_record('tool_muprog_program', ['id' => $id], '*', MUST_EXIST);
     $context = context::instance_by_id($program->contextid);
-    $returnurl = new moodle_url('/enrol/programs/management/program.php', ['id' => $program->id]);
+    $returnurl = new moodle_url('/admin/tool/muprog/management/program.php', ['id' => $program->id]);
     $contextid = $context->id;
     $archived = $program->archived;
 } else {
@@ -56,21 +46,21 @@ if ($id) {
     } else {
         $context = context_system::instance();
     }
-    $returnurl = new moodle_url('/enrol/programs/management/index.php',
+    $returnurl = new moodle_url('/admin/tool/muprog/management/index.php',
         ['contextid' => $contextid, 'archived' => $archived]);
 }
-$currenturl = new moodle_url('/enrol/programs/management/export.php',
+$currenturl = new moodle_url('/admin/tool/muprog/management/export.php',
     ['id' => $id, 'contextid' => $contextid, 'archived' => $archived]);
 
-require_capability('enrol/programs:export', $context);
+require_capability('tool/muprog:export', $context);
 
 if ($program) {
-    management::setup_program_page($currenturl, $context, $program);
+    management::setup_program_page($currenturl, $context, $program, 'program_general');
 } else {
-    management::setup_index_page($currenturl, $context, $contextid);
+    management::setup_index_page($currenturl, $context);
 }
 
-$form = new \enrol_programs\local\form\export(null,
+$form = new \tool_muprog\local\form\export(null,
     ['program' => $program, 'contextid' => $contextid, 'archived' => $archived]);
 
 if ($form->is_cancelled()) {
@@ -81,7 +71,7 @@ if ($data = $form->get_data()) {
     die;
 }
 
-$PAGE->set_heading(get_string('export', 'enrol_programs'));
+$PAGE->set_heading(get_string('export', 'tool_muprog'));
 echo $OUTPUT->header();
 
 echo $form->render();

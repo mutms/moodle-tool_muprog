@@ -1,28 +1,18 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace enrol_programs\local;
+namespace tool_muprog\local;
 
 use stdClass;
 
 /**
  * Program calendar events helper.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2023 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -30,8 +20,11 @@ final class calendar {
     /** @var null|string */
     private static $oldforceflang = null;
 
+    /** @var string start type */
     public const EVENTTYPE_START = 'programstart';
+    /** @var string due type */
     public const EVENTTYPE_DUE = 'programdue';
+    /** @var string end type */
     public const EVENTTYPE_END = 'programend';
 
     /**
@@ -52,7 +45,7 @@ final class calendar {
         $types = [self::EVENTTYPE_START, self::EVENTTYPE_DUE, self::EVENTTYPE_END];
 
         $user = $DB->get_record('user', ['id' => $allocation->userid, 'deleted' => 0, 'confirmed' => 1]);
-        $records = $DB->get_records('event', ['component' => 'enrol_programs', 'instance' => $allocation->id]);
+        $records = $DB->get_records('event', ['component' => 'tool_muprog', 'instance' => $allocation->id]);
 
         if (!$user || $program->archived || $allocation->archived || $allocation->timecompleted) {
             // Delete all events.
@@ -103,7 +96,7 @@ final class calendar {
                     continue;
                 }
 
-                $name = get_string('calendar' . $type, 'enrol_programs', $program->fullname);
+                $name = get_string('calendar' . $type, 'tool_muprog', $program->fullname);
                 $description = $program->description;
                 $format = $program->descriptionformat;
                 if ($format == FORMAT_HTML || $format == FORMAT_MOODLE) {
@@ -119,14 +112,14 @@ final class calendar {
                         'courseid' => 0,
                         'groupid' => 0,
                         'userid' => $allocation->userid,
-                        'component' => 'enrol_programs',
+                        'component' => 'tool_muprog',
                         'eventtype' => $type,
                         'modulename' => '',
                         'instance' => $allocation->id,
                         'type' => CALENDAR_EVENT_TYPE_ACTION,
                         'timestart' => $time,
                         'timeduration' => 0,
-                        'visible' => 1
+                        'visible' => 1,
                     ];
                     \calendar_event::create($data, false);
                 } else {
@@ -165,7 +158,7 @@ final class calendar {
      * @param \progress_trace|null $trace
      * @return void
      */
-    public static function fix_program_events(?stdClass $program, \progress_trace $trace = null): void {
+    public static function fix_program_events(?stdClass $program, ?\progress_trace $trace = null): void {
         global $DB, $CFG;
         require_once($CFG->dirroot . '/calendar/lib.php');
 
@@ -182,10 +175,10 @@ final class calendar {
         }
         $sql = "SELECT e.*
                   FROM {event} e
-                  JOIN {user} u ON u.id = e.userid AND u.deleted = 0    
-             LEFT JOIN {enrol_programs_allocations} pa ON pa.id = e.instance
-             LEFT JOIN {enrol_programs_programs} p ON p.id = pa.programid
-                 WHERE e.component = 'enrol_programs'
+                  JOIN {user} u ON u.id = e.userid AND u.deleted = 0
+             LEFT JOIN {tool_muprog_allocation} pa ON pa.id = e.instance
+             LEFT JOIN {tool_muprog_program} p ON p.id = pa.programid
+                 WHERE e.component = 'tool_muprog'
                        AND (pa.id IS NULL OR pa.archived = 1 OR p.archived = 1 OR pa.timecompleted IS NOT NULL)
                        $programselect
              ORDER BY e.id ASC";
@@ -216,12 +209,12 @@ final class calendar {
             $programselect = " AND pa.programid = :programid";
         }
         $sql = "SELECT pa.*
-                  FROM {enrol_programs_programs} p
-                  JOIN {enrol_programs_allocations} pa ON pa.programid = p.id
+                  FROM {tool_muprog_program} p
+                  JOIN {tool_muprog_allocation} pa ON pa.programid = p.id
                   JOIN {user} u ON u.id = pa.userid AND u.deleted = 0
-             LEFT JOIN {event} es ON es.instance = pa.id AND es.component = 'enrol_programs' AND es.eventtype = :pstart
-             LEFT JOIN {event} ed ON ed.instance = pa.id AND ed.component = 'enrol_programs' AND ed.eventtype = :pdue
-             LEFT JOIN {event} ee ON ee.instance = pa.id AND ee.component = 'enrol_programs' AND ee.eventtype = :pend
+             LEFT JOIN {event} es ON es.instance = pa.id AND es.component = 'tool_muprog' AND es.eventtype = :pstart
+             LEFT JOIN {event} ed ON ed.instance = pa.id AND ed.component = 'tool_muprog' AND ed.eventtype = :pdue
+             LEFT JOIN {event} ee ON ee.instance = pa.id AND ee.component = 'tool_muprog' AND ee.eventtype = :pend
                  WHERE p.archived = 0 AND pa.archived = 0 AND pa.timecompleted IS NULL
                        AND (
                            (es.visible = 0 OR es.timestart <> pa.timestart OR es.id IS NULL)
@@ -234,8 +227,8 @@ final class calendar {
         $rs = $DB->get_recordset_sql($sql, $params);
         $allocationprogram = $program;
         foreach ($rs as $allocation) {
-            if (!$allocationprogram || $allocationprogram->id != $allocation->programid){
-                $allocationprogram = $DB->get_record('enrol_programs_programs', ['id' => $allocation->programid], '*', MUST_EXIST);
+            if (!$allocationprogram || $allocationprogram->id != $allocation->programid) {
+                $allocationprogram = $DB->get_record('tool_muprog_program', ['id' => $allocation->programid], '*', MUST_EXIST);
             }
             self::fix_allocation_events($allocation, $allocationprogram);
         }
@@ -252,7 +245,7 @@ final class calendar {
         global $DB, $CFG;
         require_once($CFG->dirroot . '/calendar/lib.php');
 
-        $events = $DB->get_records('event', ['component' => 'enrol_programs', 'instance' => $allocationid], 'id ASC');
+        $events = $DB->get_records('event', ['component' => 'tool_muprog', 'instance' => $allocationid], 'id ASC');
         foreach ($events as $event) {
             $calendarevent = \calendar_event::load($event);
             $calendarevent->delete();
@@ -271,7 +264,7 @@ final class calendar {
 
         $sql = "SELECT e.*
                   FROM {event} e
-                  JOIN {enrol_programs_allocations} pa ON pa.id = e.instance AND e.component = 'enrol_programs'
+                  JOIN {tool_muprog_allocation} pa ON pa.id = e.instance AND e.component = 'tool_muprog'
                  WHERE pa.programid = :programid
               ORDER BY e.id ASC";
         $params = ['programid' => $programid];
@@ -295,8 +288,8 @@ final class calendar {
         // Do not use calendar API here for performance reasons, we will run proper event update soon enough.
         $sql = "UPDATE {event}
                    SET visible = 0
-                 WHERE component = 'enrol_programs' AND visible = 1
-                       AND instance IN (SELECT id FROM {enrol_programs_allocations} WHERE programid = :programid)";
+                 WHERE component = 'tool_muprog' AND visible = 1
+                       AND instance IN (SELECT id FROM {tool_muprog_allocation} WHERE programid = :programid)";
         $params = ['programid' => $programid];
         $DB->execute($sql, $params);
     }

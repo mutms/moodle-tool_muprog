@@ -9,7 +9,7 @@
     height: auto;
 }
 
-#page-enrol-programs-management-program .programimage img,
+#page-tool-muprog-management-program .programimage img,
 #page-admin-enrol-programs-management-program .programimage img {
     max-width: 300px;
     max-height: 200px;
@@ -21,7 +21,7 @@
     background-color: rgba(0, 0, 0, 0.03);
 }
 
-#page-enrol-programs-documentation #programs_docs img {
+#page-tool-muprog-documentation #programs_docs img {
     width: 100%;
     height: 100%;
 }

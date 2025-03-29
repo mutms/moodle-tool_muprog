@@ -1,26 +1,14 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
 /**
  * Program allocation import interface.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2023 Open LMS (https://www.openlms.net/)
  * @author     Farhan Karmali
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 /** @var moodle_database $DB */
@@ -29,28 +17,28 @@
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
 
-use enrol_programs\local\management;
-use enrol_programs\local\program;
+use tool_muprog\local\management;
+use tool_muprog\local\program;
 
-if (!empty($_SERVER['HTTP_X_LEGACY_DIALOG_FORM_REQUEST'])) {
+// phpcs:ignoreFile moodle.Files.MoodleInternal.MoodleInternalGlobalState
+if (!empty($_SERVER['HTTP_X_MULIB_DIALOG_FORM_REQUEST'])) {
     define('AJAX_SCRIPT', true);
 }
-
-require('../../../config.php');
+require('../../../../config.php');
 
 $id = required_param('id', PARAM_INT);
 $fromprogram = optional_param('fromprogram', 0, PARAM_INT);
 
 require_login();
 
-$targetprogram = $DB->get_record('enrol_programs_programs', ['id' => $id], '*', MUST_EXIST);
+$targetprogram = $DB->get_record('tool_muprog_program', ['id' => $id], '*', MUST_EXIST);
 $context = context::instance_by_id($targetprogram->contextid);
-require_capability('enrol/programs:edit', $context);
+require_capability('tool/muprog:edit', $context);
 
-$currenturl = new moodle_url('/enrol/programs/management/program_allocation_import.php', ['id' => $targetprogram->id, 'fromprogram' => $fromprogram]);
-management::setup_program_page($currenturl, $context, $targetprogram);
+$currenturl = new moodle_url('/admin/tool/muprog/management/program_allocation_import.php', ['id' => $targetprogram->id, 'fromprogram' => $fromprogram]);
+management::setup_program_page($currenturl, $context, $targetprogram, 'program_content');
 
-$returnurl = new moodle_url('/enrol/programs/management/program_allocation.php', ['id' => $targetprogram->id]);
+$returnurl = new moodle_url('/admin/tool/muprog/management/program_allocation.php', ['id' => $targetprogram->id]);
 
 if ($targetprogram->archived) {
     redirect($returnurl);
@@ -58,7 +46,7 @@ if ($targetprogram->archived) {
 
 $form = null;
 if (!$fromprogram) {
-    $form = new \enrol_programs\local\form\program_allocation_import(null,
+    $form = new \tool_muprog\local\form\program_allocation_import(null,
         ['id' => $targetprogram->id, 'contextid' => $context->id]);
     if ($form->is_cancelled()) {
         redirect($returnurl);
@@ -70,28 +58,23 @@ if (!$fromprogram) {
 }
 
 if (!$form) {
-    $form = new \enrol_programs\local\form\program_allocation_import_confirmation(null,
+    $form = new \tool_muprog\local\form\program_allocation_import_confirmation(null,
         ['context' => $context, 'id' => $targetprogram->id, 'fromprogram' => $fromprogram]);
 
     if ($form->is_cancelled()) {
         redirect($returnurl);
 
     } else if ($data = $form->get_data()) {
-        $from = $DB->get_record('enrol_programs_programs', ['id' => $data->fromprogram], '*', MUST_EXIST);
+        $from = $DB->get_record('tool_muprog_program', ['id' => $data->fromprogram], '*', MUST_EXIST);
         program::import_program_allocation($data);
         $form->redirect_submitted($returnurl);
     }
 }
 
-/** @var \enrol_programs\output\management\renderer $managementoutput */
-$managementoutput = $PAGE->get_renderer('enrol_programs', 'management');
-
 echo $OUTPUT->header();
 echo $OUTPUT->heading(format_string($targetprogram->fullname));
 
-echo $managementoutput->render_management_program_tabs($targetprogram, 'content');
-
-echo $OUTPUT->heading(get_string('importprogramallocation', 'enrol_programs'), 3);
+echo $OUTPUT->heading(get_string('importprogramallocation', 'tool_muprog'), 3);
 
 echo $form->render();
 

@@ -1,4 +1,4 @@
-@enrol @enrol_programs @openlms
+@tool @tool_muprog @muTMS
 Feature: Manual program allocation tests
 
   Background:
@@ -44,16 +44,16 @@ Feature: Manual program allocation tests
       | Program viewer  | pviewer   |
       | Program manager | pmanager  |
     And the following "permission overrides" exist:
-      | capability                      | permission | role     | contextlevel | reference |
-      | enrol/programs:view             | Allow      | pviewer  | System       |           |
-      | enrol/programs:view             | Allow      | pmanager | System       |           |
-      | enrol/programs:edit             | Allow      | pmanager | System       |           |
-      | enrol/programs:delete           | Allow      | pmanager | System       |           |
-      | enrol/programs:addcourse        | Allow      | pmanager | System       |           |
-      | enrol/programs:allocate         | Allow      | pmanager | System       |           |
-      | enrol/programs:manageallocation | Allow      | pmanager | System       |           |
-      | enrol/programs:archive          | Allow      | pmanager | System       |           |
-      | moodle/cohort:view              | Allow      | pmanager | System       |           |
+      | capability                   | permission | role     | contextlevel | reference |
+      | tool/muprog:view             | Allow      | pviewer  | System       |           |
+      | tool/muprog:view             | Allow      | pmanager | System       |           |
+      | tool/muprog:edit             | Allow      | pmanager | System       |           |
+      | tool/muprog:delete           | Allow      | pmanager | System       |           |
+      | tool/muprog:addcourse        | Allow      | pmanager | System       |           |
+      | tool/muprog:allocate         | Allow      | pmanager | System       |           |
+      | tool/muprog:manageallocation | Allow      | pmanager | System       |           |
+      | tool/muprog:archive          | Allow      | pmanager | System       |           |
+      | moodle/cohort:view           | Allow      | pmanager | System       |           |
     And the following "role assigns" exist:
       | user      | role          | contextlevel | reference |
       | manager   | manager       | System       |           |
@@ -61,7 +61,7 @@ Feature: Manual program allocation tests
       | manager2  | pmanager      | Category     | CAT2      |
       | manager2  | pmanager      | Category     | CAT3      |
       | viewer1   | pviewer       | System       |           |
-    And the following "enrol_programs > programs" exist:
+    And the following "tool_muprog > programs" exist:
       | fullname    | idnumber | category |
       | Program 000 | PR0      |          |
       | Program 001 | PR1      | Cat 1    |
@@ -71,199 +71,200 @@ Feature: Manual program allocation tests
   @javascript
   Scenario: Manager may allocate users manually to program
     Given I log in as "manager1"
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
     And I follow "Allocation settings"
     And I click on "Update Manual allocation" "link"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Active | Yes |
     And I press dialog form button "Update"
-    And I should see "Active" in the "Manual allocation:" definition list item
+    And I should see "Active" in the "Manual allocation" definition list item
     And I follow "Users"
 
     When I click on "Users actions" "link"
     And I click on "Allocate users" "link"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Users | Student 1, Student 5 |
     And I press dialog form button "Allocate users"
-    Then "Student 1" row "Source" column of "program_allocations" table should contain "Manual allocation"
-    And "Student 5" row "Source" column of "program_allocations" table should contain "Manual allocation"
+    Then "Student 1" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
+    And "Student 5" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
     And I should not see "Student 2"
     And I should not see "Student 3"
     And I should not see "Student 4"
 
     When I click on "Users actions" "link"
     And I click on "Allocate users" "link"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Cohort | Cohort 2 |
     And I press dialog form button "Allocate users"
-    Then "Student 1" row "Source" column of "program_allocations" table should contain "Manual allocation"
-    And "Student 2" row "Source" column of "program_allocations" table should contain "Manual allocation"
-    And "Student 5" row "Source" column of "program_allocations" table should contain "Manual allocation"
+    Then "Student 1" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
+    And "Student 2" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
+    And "Student 5" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
     And I should not see "Student 3"
     And I should not see "Student 4"
 
-    When I click on "Delete program allocation" "link" in the "Student 2" "table_row"
+    When I click on "Actions" "link" in the "Student 2" "table_row"
+    And I click on "Delete program allocation" "link" in the "Student 2" "table_row"
     And I press dialog form button "Cancel"
-    Then "Student 2" row "Source" column of "program_allocations" table should contain "Manual allocation"
+    Then "Student 2" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
 
-    When I click on "Delete program allocation" "link" in the "Student 2" "table_row"
+    When I click on "Actions" "link" in the "Student 2" "table_row"
+    And I click on "Delete program allocation" "link" in the "Student 2" "table_row"
     And I press dialog form button "Delete program allocation"
     Then I should not see "Student 2"
 
-  @javascript @tool_olms_tenant
+  @javascript @tool_mutenancy
   Scenario: Tenant manager may allocate users manually to program
-    Given tenant support was activated
-    And the following "tool_olms_tenant > tenants" exist:
-      | name     | idnumber | category |
-      | Tenant 1 | TEN1     | CAT1     |
-      | Tenant 2 | TEN2     | CAT2     |
+    Given the following "tool_mutenancy > tenants" exist:
+      | name     | idnumber | category | assoccohort |
+      | Tenant 1 | ten1     | CAT1     | CH1         |
+      | Tenant 2 | ten2     | CAT2     | CH2         |
     And the following "users" exist:
       | username | firstname | lastname | email                | tenant   |
-      | tu1      | Tenant 1  | Student  | tu1@example.com      | TEN1     |
-      | tu2      | Tenant 2  | Student  | tu2@example.com      | TEN2     |
+      | tu1      | Tenant 1  | Student  | tu1@example.com      | ten1     |
+      | tu2      | Tenant 2  | Student  | tu2@example.com      | ten2     |
     And I log in as "manager"
 
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
     And I follow "Allocation settings"
     And I click on "Update Manual allocation" "link"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Active | Yes |
     And I press dialog form button "Update"
-    And I should see "Active" in the "Manual allocation:" definition list item
-    And I click on "Users" "link" in the "#region-main" "css_element"
+    And I should see "Active" in the "Manual allocation" definition list item
+    And I click on "Users" "link" in the ".secondary-navigation" "css_element"
     When I click on "Users actions" "link"
     And I click on "Allocate users" "link"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Users | Student 1 |
     And I press dialog form button "Allocate users"
-    Then "Student 1" row "Source" column of "program_allocations" table should contain "Manual allocation"
+    Then "Student 1" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
 
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 001"
     And I follow "Allocation settings"
     And I click on "Update Manual allocation" "link"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Active | Yes |
     And I press dialog form button "Update"
-    And I should see "Active" in the "Manual allocation:" definition list item
-    And I click on "Users" "link" in the "#region-main" "css_element"
+    And I should see "Active" in the "Manual allocation" definition list item
+    And I click on "Users" "link" in the ".secondary-navigation" "css_element"
 
     When I click on "Users actions" "link"
     And I click on "Allocate users" "link"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Users | Student 1 |
     And I press dialog form button "Allocate users"
-    And "Student 1" row "Source" column of "program_allocations" table should contain "Manual allocation"
+    And "Student 1" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
 
-    And I click on "Select a tenant" "link"
-    And I set the following fields to these values:
+    And I click on "Switch tenant" "link"
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Tenant      | Tenant 1         |
-    And I press dialog form button "Switch"
+    And I press dialog form button "Switch tenant"
 
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
-    And I click on "Users" "link" in the "#region-main" "css_element"
+    And I click on "Users" "link" in the ".secondary-navigation" "css_element"
 
     When I click on "Users actions" "link"
     And I click on "Allocate users" "link"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Users | Tenant 1 Student |
     And I press dialog form button "Allocate users"
-    Then "Tenant 1 Student" row "Source" column of "program_allocations" table should contain "Manual allocation"
+    Then "Tenant 1 Student" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
 
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 001"
-    And I click on "Users" "link" in the "#region-main" "css_element"
+    And I click on "Users" "link" in the ".secondary-navigation" "css_element"
 
     When I click on "Users actions" "link"
     And I click on "Allocate users" "link"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Users | Tenant 1 Student |
     And I press dialog form button "Allocate users"
-    Then "Tenant 1 Student" row "Source" column of "program_allocations" table should contain "Manual allocation"
+    Then "Tenant 1 Student" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
 
   @javascript @_file_upload
   Scenario: Manager may upload CSV file with manual allocations without dates
     Given I log in as "manager1"
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
     And I follow "Allocation settings"
     And I click on "Update Manual allocation" "link"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Active | Yes |
     And I press dialog form button "Update"
-    And I should see "Active" in the "Manual allocation:" definition list item
-    And I click on "Users" "link" in the "#region-main" "css_element"
+    And I should see "Active" in the "Manual allocation" definition list item
+    And I click on "Users" "link" in the ".secondary-navigation" "css_element"
 
     When I click on "Users actions" "link"
     And I click on "Upload allocations" "link"
-    And I upload "enrol/programs/tests/fixtures/upload1.csv" file to "CSV file" filemanager
-    And I set the following fields to these values:
+    And I upload "admin/tool/muprog/tests/fixtures/upload1.csv" file to "CSV file" filemanager
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | CSV separator | ,     |
       | Encoding      | UTF-8 |
     And I press dialog form button "Continue"
-    And the following fields match these values:
+    And the following fields in the ".modal-dialog" "css_element" match these values:
       | User identification column | username |
       | User mapping via           | Username |
       | First line is header       | 1        |
     And I press dialog form button "Upload allocations"
     Then I should see "3 users were assigned to program."
-    And "Student 1" row "Source" column of "program_allocations" table should contain "Manual allocation"
-    And "Student 2" row "Source" column of "program_allocations" table should contain "Manual allocation"
-    And "Student 3" row "Source" column of "program_allocations" table should contain "Manual allocation"
+    And "Student 1" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
+    And "Student 2" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
+    And "Student 3" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
 
     When I click on "Users actions" "link"
     And I click on "Upload allocations" "link"
-    And I upload "enrol/programs/tests/fixtures/upload2.csv" file to "CSV file" filemanager
-    And I set the following fields to these values:
+    And I upload "admin/tool/muprog/tests/fixtures/upload2.csv" file to "CSV file" filemanager
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | CSV separator | ,     |
       | Encoding      | UTF-8 |
     And I press dialog form button "Continue"
-    And the following fields match these values:
+    And the following fields in the ".modal-dialog" "css_element" match these values:
       | User identification column | student1@example.com |
       | User mapping via           | Username             |
       | First line is header       | 0                    |
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | User mapping via           | Email address    |
     And I press dialog form button "Upload allocations"
     Then I should see "1 users were assigned to program."
     And I should see "2 users were already assigned to program."
     And I should see "1 errors detected when assigning programs."
-    And "Student 1" row "Source" column of "program_allocations" table should contain "Manual allocation"
-    And "Student 2" row "Source" column of "program_allocations" table should contain "Manual allocation"
-    And "Student 3" row "Source" column of "program_allocations" table should contain "Manual allocation"
-    And "Student 4" row "Source" column of "program_allocations" table should contain "Manual allocation"
+    And "Student 1" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
+    And "Student 2" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
+    And "Student 3" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
+    And "Student 4" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
 
     When I click on "Users actions" "link"
     And I click on "Upload allocations" "link"
-    And I upload "enrol/programs/tests/fixtures/upload3.csv" file to "CSV file" filemanager
-    And I set the following fields to these values:
+    And I upload "admin/tool/muprog/tests/fixtures/upload3.csv" file to "CSV file" filemanager
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | CSV separator | ;     |
       | Encoding      | UTF-8 |
     And I press dialog form button "Continue"
-    And the following fields match these values:
+    And the following fields in the ".modal-dialog" "css_element" match these values:
       | User identification column | idnumber  |
       | User mapping via           | ID number |
       | First line is header       | 1         |
     And I press dialog form button "Upload allocations"
     Then I should see "1 users were assigned to program."
     And I should see "1 users were already assigned to program."
-    And "Student 1" row "Source" column of "program_allocations" table should contain "Manual allocation"
-    And "Student 2" row "Source" column of "program_allocations" table should contain "Manual allocation"
-    And "Student 3" row "Source" column of "program_allocations" table should contain "Manual allocation"
-    And "Student 4" row "Source" column of "program_allocations" table should contain "Manual allocation"
-    And "Student 5" row "Source" column of "program_allocations" table should contain "Manual allocation"
+    And "Student 1" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
+    And "Student 2" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
+    And "Student 3" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
+    And "Student 4" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
+    And "Student 5" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
 
   @javascript @_file_upload
   Scenario: Manager may upload CSV file with manual allocations including program dates
     Given I log in as "manager1"
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
     And I follow "Allocation settings"
     And I click on "Update scheduling" "link"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Program start              | At a fixed date |
       | programstart_date[year]    | 2022 |
       | programstart_date[day]     | 5    |
@@ -284,20 +285,20 @@ Feature: Manual program allocation tests
       | programend_date[minute]    | 00   |
     And I press dialog form button "Update scheduling"
     And I click on "Update Manual allocation" "link"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Active | Yes |
     And I press dialog form button "Update"
-    And I should see "Active" in the "Manual allocation:" definition list item
-    And I click on "Users" "link" in the "#region-main" "css_element"
+    And I should see "Active" in the "Manual allocation" definition list item
+    And I click on "Users" "link" in the ".secondary-navigation" "css_element"
 
     When I click on "Users actions" "link"
     And I click on "Upload allocations" "link"
-    And I upload "enrol/programs/tests/fixtures/upload4.csv" file to "CSV file" filemanager
+    And I upload "admin/tool/muprog/tests/fixtures/upload4.csv" file to "CSV file" filemanager
     And I set the following fields to these values:
       | CSV separator | ,     |
       | Encoding      | UTF-8 |
     And I press dialog form button "Continue"
-    And the following fields match these values:
+    And the following fields in the ".modal-dialog" "css_element" match these values:
       | User identification column | username           |
       | User mapping via           | Username           |
     And I set the following fields to these values:
@@ -307,7 +308,7 @@ Feature: Manual program allocation tests
     And I press dialog form button "Upload allocations"
     Then I should see "3 users were assigned to program."
     And I should see "3 errors detected when assigning programs."
-    Then the following should exist in the "program_allocations" table:
+    Then the following should exist in the "reportbuilder-table" table:
       | First name          | Program start   | Due date        | Program end     | Source            |
       | Student 1           | 5/11/22, 09:00  | 22/01/23, 09:00 | 31/12/23, 09:00 | Manual allocation |
       | Student 2           | 11/10/22, 00:00 | 31/12/22, 00:00 | 31/01/23, 23:52 | Manual allocation |
@@ -315,11 +316,11 @@ Feature: Manual program allocation tests
 
   @javascript
   Scenario: Program manager cannot alter dates of archived allocation
-    Given the following "enrol_programs > program_allocations" exist:
+    Given the following "tool_muprog > program_allocations" exist:
       | program     | user     |
       | Program 000 | student1 |
     And I log in as "manager1"
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
     And I follow "Users"
     And I follow "Student 1"

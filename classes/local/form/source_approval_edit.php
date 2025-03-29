@@ -1,33 +1,23 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace enrol_programs\local\form;
+namespace tool_muprog\local\form;
 
-use enrol_programs\local\program;
-use enrol_programs\local\allocation;
+use tool_muprog\local\program;
+use tool_muprog\local\allocation;
 
 /**
  * Edit approval source settings.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class source_approval_edit extends \local_openlms\dialog_form {
+final class source_approval_edit extends \tool_mulib\local\dialog_form {
+    #[\Override]
     protected function definition() {
         $mform = $this->_form;
         $context = $this->_customdata['context'];
@@ -40,7 +30,7 @@ final class source_approval_edit extends \local_openlms\dialog_form {
             $mform->hardFreeze('enable');
         }
 
-        $mform->addElement('select', 'approval_allowrequest', get_string('source_approval_allowrequest', 'enrol_programs'),
+        $mform->addElement('select', 'approval_allowrequest', get_string('source_approval_allowrequest', 'tool_muprog'),
             ['1' => get_string('yes'), '0' => get_string('no')]);
         $mform->setDefault('approval_allowrequest', $source->approval_allowrequest);
         $mform->hideIf('approval_allowrequest', 'enable', 'eq', '0');
@@ -56,6 +46,7 @@ final class source_approval_edit extends \local_openlms\dialog_form {
         $this->add_action_buttons(true, get_string('update'));
     }
 
+    #[\Override]
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 

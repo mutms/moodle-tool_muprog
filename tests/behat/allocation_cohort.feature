@@ -1,4 +1,4 @@
-@enrol @enrol_programs @openlms
+@tool @tool_muprog @muTMS
 Feature: Visible cohorts program allocation tests
 
   Background:
@@ -46,22 +46,22 @@ Feature: Visible cohorts program allocation tests
       | Program viewer  | pviewer   |
       | Program manager | pmanager  |
     And the following "permission overrides" exist:
-      | capability                      | permission | role     | contextlevel | reference |
-      | enrol/programs:view             | Allow      | pviewer  | System       |           |
-      | enrol/programs:view             | Allow      | pmanager | System       |           |
-      | enrol/programs:edit             | Allow      | pmanager | System       |           |
-      | enrol/programs:delete           | Allow      | pmanager | System       |           |
-      | enrol/programs:addcourse        | Allow      | pmanager | System       |           |
-      | enrol/programs:allocate         | Allow      | pmanager | System       |           |
-      | enrol/programs:manageallocation | Allow      | pmanager | System       |           |
-      | moodle/cohort:view              | Allow      | pmanager | System       |           |
+      | capability                   | permission | role     | contextlevel | reference |
+      | tool/muprog:view             | Allow      | pviewer  | System       |           |
+      | tool/muprog:view             | Allow      | pmanager | System       |           |
+      | tool/muprog:edit             | Allow      | pmanager | System       |           |
+      | tool/muprog:delete           | Allow      | pmanager | System       |           |
+      | tool/muprog:addcourse        | Allow      | pmanager | System       |           |
+      | tool/muprog:allocate         | Allow      | pmanager | System       |           |
+      | tool/muprog:manageallocation | Allow      | pmanager | System       |           |
+      | moodle/cohort:view           | Allow      | pmanager | System       |           |
     And the following "role assigns" exist:
       | user      | role          | contextlevel | reference |
       | manager1  | pmanager      | System       |           |
       | manager2  | pmanager      | Category     | CAT2      |
       | manager2  | pmanager      | Category     | CAT3      |
       | viewer1   | pviewer       | System       |           |
-    And the following "enrol_programs > programs" exist:
+    And the following "tool_muprog > programs" exist:
       | fullname    | idnumber | category |
       | Program 000 | PR0      |          |
       | Program 001 | PR1      | Cat 1    |
@@ -71,62 +71,66 @@ Feature: Visible cohorts program allocation tests
   @javascript
   Scenario: Manager may enable automatic cohort allocation in programs
     Given I log in as "manager1"
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
-    And I click on "Allocation settings" "link" in the "#region-main" "css_element"
+    And I click on "Allocation settings" "link" in the ".secondary-navigation" "css_element"
     And I click on "Update Automatic cohort allocation" "link"
     And I set the following fields to these values:
       | Active           | Yes                |
       | Allocate cohorts | Cohort 1, Cohort 2 |
     And I press dialog form button "Update"
-    Then I should see "Active (Cohort 1, Cohort 2)" in the "Automatic cohort allocation:" definition list item
-    And I click on "Users" "link" in the "#region-main" "css_element"
-    And "Student 1" row "Source" column of "program_allocations" table should contain "Automatic cohort allocation"
-    And "Student 1" row "Program status" column of "program_allocations" table should contain "Open"
-    And "Student 2" row "Source" column of "program_allocations" table should contain "Automatic cohort allocation"
-    And "Student 2" row "Program status" column of "program_allocations" table should contain "Open"
-    And "Student 3" row "Source" column of "program_allocations" table should contain "Automatic cohort allocation"
-    And "Student 3" row "Program status" column of "program_allocations" table should contain "Open"
-    And "Student 4" row "Source" column of "program_allocations" table should contain "Automatic cohort allocation"
-    And "Student 4" row "Program status" column of "program_allocations" table should contain "Open"
+    Then I should see "Active (Cohort 1, Cohort 2)" in the "Automatic cohort allocation" definition list item
+    And I click on "Users" "link" in the ".secondary-navigation" "css_element"
+    And "Student 1" row "Source" column of "reportbuilder-table" table should contain "Automatic cohort allocation"
+    And "Student 1" row "Program status" column of "reportbuilder-table" table should contain "Open"
+    And "Student 2" row "Source" column of "reportbuilder-table" table should contain "Automatic cohort allocation"
+    And "Student 2" row "Program status" column of "reportbuilder-table" table should contain "Open"
+    And "Student 3" row "Source" column of "reportbuilder-table" table should contain "Automatic cohort allocation"
+    And "Student 3" row "Program status" column of "reportbuilder-table" table should contain "Open"
+    And "Student 4" row "Source" column of "reportbuilder-table" table should contain "Automatic cohort allocation"
+    And "Student 4" row "Program status" column of "reportbuilder-table" table should contain "Open"
     And I should not see "Student 5"
 
-    When I click on "Allocation settings" "link" in the "#region-main" "css_element"
+    When I click on "Allocation settings" "link" in the ".secondary-navigation" "css_element"
     And I click on "Update Automatic cohort allocation" "link"
     And I set the following fields to these values:
       | Allocate cohorts | Cohort 1 |
     And I press dialog form button "Update"
-    Then I should see "Active (Cohort 1)" in the "Automatic cohort allocation:" definition list item
-    And I click on "Users" "link" in the "#region-main" "css_element"
-    And "Student 1" row "Source" column of "program_allocations" table should contain "Automatic cohort allocation"
-    And "Student 1" row "Program status" column of "program_allocations" table should contain "Open"
-    And "Student 2" row "Source" column of "program_allocations" table should contain "Automatic cohort allocation"
-    And "Student 2" row "Program status" column of "program_allocations" table should contain "Open"
-    And "Student 3" row "Source" column of "program_allocations" table should contain "Automatic cohort allocation"
-    And "Student 3" row "Program status" column of "program_allocations" table should contain "Open"
-    And "Student 4" row "Source" column of "program_allocations" table should contain "Automatic cohort allocation"
-    And "Student 4" row "Program status" column of "program_allocations" table should contain "Archived"
+    Then I should see "Active (Cohort 1)" in the "Automatic cohort allocation" definition list item
+    And I click on "Users" "link" in the ".secondary-navigation" "css_element"
+    And "Student 1" row "Source" column of "reportbuilder-table" table should contain "Automatic cohort allocation"
+    And "Student 1" row "Program status" column of "reportbuilder-table" table should contain "Open"
+    And "Student 2" row "Source" column of "reportbuilder-table" table should contain "Automatic cohort allocation"
+    And "Student 2" row "Program status" column of "reportbuilder-table" table should contain "Open"
+    And "Student 3" row "Source" column of "reportbuilder-table" table should contain "Automatic cohort allocation"
+    And "Student 3" row "Program status" column of "reportbuilder-table" table should contain "Open"
+    And "Student 4" row "Source" column of "reportbuilder-table" table should contain "Automatic cohort allocation"
+    And "Student 4" row "Program status" column of "reportbuilder-table" table should contain "Archived"
     And I should not see "Student 5"
 
-    When I click on "Allocation settings" "link" in the "#region-main" "css_element"
+    When I click on "Allocation settings" "link" in the ".secondary-navigation" "css_element"
     And I click on "Update Automatic cohort allocation" "link"
     And I set the following fields to these values:
       | Allocate cohorts | Cohort 4 |
     And I press dialog form button "Update"
-    And I should see "Active (Cohort 4)" in the "Automatic cohort allocation:" definition list item
-    And I click on "Users" "link" in the "#region-main" "css_element"
+    And I should see "Active (Cohort 4)" in the "Automatic cohort allocation" definition list item
+    And I click on "Users" "link" in the ".secondary-navigation" "css_element"
+    And I click on "Actions" "link" in the "Student 1" "table_row"
     And I click on "Delete program allocation" "link" in the "Student 1" "table_row"
     And I press dialog form button "Delete program allocation"
+    And I click on "Actions" "link" in the "Student 2" "table_row"
     And I click on "Delete program allocation" "link" in the "Student 2" "table_row"
     And I press dialog form button "Delete program allocation"
+    And I click on "Actions" "link" in the "Student 3" "table_row"
     And I click on "Delete program allocation" "link" in the "Student 3" "table_row"
     And I press dialog form button "Delete program allocation"
+    And I click on "Actions" "link" in the "Student 4" "table_row"
     And I click on "Delete program allocation" "link" in the "Student 4" "table_row"
     And I press dialog form button "Delete program allocation"
     And I should see "No user allocations found"
-    And I click on "Allocation settings" "link" in the "#region-main" "css_element"
+    And I click on "Allocation settings" "link" in the ".secondary-navigation" "css_element"
     And I click on "Update Automatic cohort allocation" "link"
     And I set the following fields to these values:
       | Active              | No                |
     And I press dialog form button "Update"
-    Then I should see "Inactive" in the "Automatic cohort allocation:" definition list item
+    Then I should see "Inactive" in the "Automatic cohort allocation" definition list item

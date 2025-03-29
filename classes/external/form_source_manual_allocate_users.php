@@ -1,20 +1,8 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace enrol_programs\external;
+namespace tool_muprog\external;
 
 use core_external\external_function_parameters;
 use core_external\external_value;
@@ -22,12 +10,13 @@ use core_external\external_value;
 /**
  * Provides list of candidates for program allocation.
  *
- * @package     enrol_programs
+ * @package     tool_muprog
  * @copyright   2023 Open LMS (https://www.openlms.net/)
+ * @copyright   2025 Petr Skoda
  * @author      Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class form_source_manual_allocate_users extends \local_openlms\external\form_autocomplete_field {
+final class form_source_manual_allocate_users extends \tool_mulib\external\form_autocomplete_field {
     /**
      * True means returned field data is array, false means value is scalar.
      *
@@ -64,12 +53,12 @@ final class form_source_manual_allocate_users extends \local_openlms\external\fo
         $query = $params['query'];
         $programid = $params['programid'];
 
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $programid], '*', MUST_EXIST);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
 
         // Validate context.
         $context = \context::instance_by_id($program->contextid);
         self::validate_context($context);
-        require_capability('enrol/programs:allocate', $context);
+        require_capability('tool/muprog:allocate', $context);
 
         $hasviewfullnames = has_capability('moodle/site:viewfullnames', $context);
 
@@ -81,29 +70,16 @@ final class form_source_manual_allocate_users extends \local_openlms\external\fo
         $params = array_merge($searchparams, $sortparams);
         $params['programid'] = $programid;
 
-        $tenantjoin = "";
         $tenantwhere = "";
-        if (\enrol_programs\local\tenant::is_active()) {
-            $tenantid = \tool_olms_tenant\tenants::get_context_tenant_id($context);
-            if ($tenantid) {
-                $tenantjoin .= " LEFT JOIN {tool_olms_tenant_user} tu ON tu.userid = usr.id";
-                $tenantwhere .= " AND (tu.id IS NULL OR tu.tenantid = :tenantid)";
-                $params['tenantid'] = $tenantid;
-            }
-            $currenttenantid = \tool_olms_tenant\tenancy::get_tenant_id();
-            if ($currenttenantid) {
-                $tenantjoin .= " JOIN {tool_olms_tenant_user} ctu ON ctu.userid = usr.id";
-                $tenantwhere .= " AND ctu.tenantid = :currenttenantid";
-                $params['currenttenantid'] = $currenttenantid;
-            }
+        if (\tool_muprog\local\util::is_mutenancy_active()) {
+            $tenantwhere = \tool_mutenancy\local\tenancy::get_related_users_exists('usr.id', $context);
         }
 
         $additionalfields = $fields->get_sql('usr')->selects;
         $sqlquery = <<<SQL
             SELECT usr.id {$additionalfields}
               FROM {user} usr
-         LEFT JOIN {enrol_programs_allocations} pa ON (pa.userid = usr.id AND pa.programid = :programid)
-         {$tenantjoin}     
+         LEFT JOIN {tool_muprog_allocation} pa ON (pa.userid = usr.id AND pa.programid = :programid)
              WHERE pa.id IS NULL AND {$searchsql} {$tenantwhere}
                    AND usr.deleted = 0 AND usr.confirmed = 1
           ORDER BY {$sortsql}
@@ -131,7 +107,7 @@ SQL;
                 // Sanitize the extra fields to prevent potential XSS exploit.
                 $user->extrafields[] = (object) [
                     'name' => $extrafield,
-                    'value' => s($record->$extrafield)
+                    'value' => s($record->$extrafield),
                 ];
             }
             $list[] = [
@@ -157,7 +133,7 @@ SQL;
         return function($value) use ($arguments): string {
             global $OUTPUT, $DB;
 
-            $program = $DB->get_record('enrol_programs_programs', ['id' => $arguments['programid']], '*', MUST_EXIST);
+            $program = $DB->get_record('tool_muprog_program', ['id' => $arguments['programid']], '*', MUST_EXIST);
             $context = \context::instance_by_id($program->contextid);
 
             $error = ''; // This is not pretty, but luckily there is a low chance this will happen.
@@ -186,8 +162,11 @@ SQL;
     }
 
     /**
+     * Validate values.
+     *
      * @param array $arguments
-     * @param $value
+     * @param mixed $value
+     * @param \context $context
      * @return string|null error message, NULL means value is ok
      */
     public static function validate_form_value(array $arguments, $value, \context $context): ?string {
@@ -202,15 +181,14 @@ SQL;
             return get_string('error');
         }
 
-        if ($DB->record_exists('enrol_programs_allocations', ['programid' => $arguments['programid'], 'userid' => $user->id])) {
+        if ($DB->record_exists('tool_muprog_allocation', ['programid' => $arguments['programid'], 'userid' => $user->id])) {
             return get_string('error');
         }
 
-        if (\enrol_programs\local\tenant::is_active()) {
-            $tenantid = \tool_olms_tenant\tenants::get_context_tenant_id($context);
-            if ($tenantid) {
-                $usertenantid = \tool_olms_tenant\tenant_users::get_user_tenant_id($user->id);
-                if ($usertenantid && $usertenantid != $tenantid) {
+        if (\tool_muprog\local\util::is_mutenancy_active()) {
+            if ($context->tenantid) {
+                $usertenantid = \tool_mutenancy\local\tenancy::get_user_tenantid($user->id);
+                if ($usertenantid && $usertenantid != $context->tenantid) {
                     return get_string('error');
                 }
             }

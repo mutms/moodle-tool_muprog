@@ -1,4 +1,4 @@
-@enrol @enrol_programs @openlms
+@tool @tool_muprog @muTMS
 Feature: Program completion by students tests
 
   Background:
@@ -58,22 +58,22 @@ Feature: Program completion by students tests
       | Program manager | pmanager  |
     And the following "permission overrides" exist:
       | capability                     | permission | role     | contextlevel | reference |
-      | enrol/programs:view            | Allow      | pviewer  | System       |           |
-      | enrol/programs:view            | Allow      | pmanager | System       |           |
-      | enrol/programs:edit            | Allow      | pmanager | System       |           |
-      | enrol/programs:delete          | Allow      | pmanager | System       |           |
-      | enrol/programs:addcourse       | Allow      | pmanager | System       |           |
-      | enrol/programs:allocate        | Allow      | pmanager | System       |           |
+      | tool/muprog:view            | Allow      | pviewer  | System       |           |
+      | tool/muprog:view            | Allow      | pmanager | System       |           |
+      | tool/muprog:edit            | Allow      | pmanager | System       |           |
+      | tool/muprog:delete          | Allow      | pmanager | System       |           |
+      | tool/muprog:addcourse       | Allow      | pmanager | System       |           |
+      | tool/muprog:allocate        | Allow      | pmanager | System       |           |
     And the following "role assigns" exist:
       | user      | role          | contextlevel | reference |
       | manager1  | pmanager      | System       |           |
       | viewer1   | pviewer       | System       |           |
-    And the following "enrol_programs > programs" exist:
+    And the following "tool_muprog > programs" exist:
       | fullname    | idnumber | category | public |
       | Program 000 | PR0      |          | 1      |
       | Program 001 | PR1      | Cat 1    | 1      |
       | Program 002 | PR2      | Cat 2    | 1      |
-    And the following "enrol_programs > program_items" exist:
+    And the following "tool_muprog > program_items" exist:
       | program     | parent     | course   | fullname   | sequencetype     | minprerequisites |
       | Program 000 |            |          | First set  | All in order     |                  |
       | Program 000 | First set  | Course 1 |            |                  |                  |
@@ -81,7 +81,7 @@ Feature: Program completion by students tests
       | Program 000 |            |          | Second set | At least X       | 1                |
       | Program 000 | Second set | Course 3 |            |                  |                  |
       | Program 000 | Second set | Course 4 |            |                  |                  |
-    And the following "enrol_programs > program_allocations" exist:
+    And the following "tool_muprog > program_allocations" exist:
       | program     | user     |
       | Program 000 | student1 |
       | Program 000 | student2 |
@@ -116,7 +116,7 @@ Feature: Program completion by students tests
   @javascript
   Scenario: Student may complete a program
     When I log in as "student1"
-    And I am on My programs page
+    And I am on the "tool_muprog > My programs" page
     And I follow "Program 000"
     And I follow "Course 1"
     And I follow "Sample page"
@@ -125,9 +125,9 @@ Feature: Program completion by students tests
     And I wait "1" seconds
     And I run the "core\task\completion_regular_task" task
 
-    And I am on My programs page
+    And I am on the "tool_muprog > My programs" page
     And I follow "Program 000"
-    And I should see "Open" in the "Program status:" definition list item
+    And I should see "Open" in the "Program status" definition list item
     And I follow "Course 2"
     And I follow "Sample page"
     # The cron job has to be executed twice with a pause.
@@ -135,9 +135,9 @@ Feature: Program completion by students tests
     And I wait "1" seconds
     And I run the "core\task\completion_regular_task" task
 
-    And I am on My programs page
+    And I am on the "tool_muprog > My programs" page
     And I follow "Program 000"
-    And I should see "Open" in the "Program status:" definition list item
+    And I should see "Open" in the "Program status" definition list item
     And I follow "Course 3"
     And I follow "Sample page"
     # The cron job has to be executed twice with a pause.
@@ -145,9 +145,9 @@ Feature: Program completion by students tests
     And I wait "1" seconds
     And I run the "core\task\completion_regular_task" task
 
-    And I am on My programs page
+    And I am on the "tool_muprog > My programs" page
     And I follow "Program 000"
-    Then I should see "Completed" in the "Program status:" definition list item
+    Then I should see "Completed" in the "Program status" definition list item
 
   @javascript
   Scenario: Student may see that course is missing which prevents completion
@@ -160,7 +160,7 @@ Feature: Program completion by students tests
     And I log out
 
     When I log in as "student1"
-    And I am on My programs page
+    And I am on the "tool_muprog > My programs" page
     And I follow "Program 000"
     Then I should see "Course is missing" in the "Course 1" "table_row"
     And I should not see "Course is missing" in the "Course 2" "table_row"

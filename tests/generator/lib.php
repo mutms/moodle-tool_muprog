@@ -1,28 +1,18 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Files.LineLength.TooLong
 
 /**
  * Program generator.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class enrol_programs_generator extends component_generator_base {
+class tool_muprog_generator extends component_generator_base {
     /**
      * @var int keeps track of how many programs have been created.
      */
@@ -41,7 +31,7 @@ class enrol_programs_generator extends component_generator_base {
     /**
      * Create a new program.
      *
-     * @param $record
+     * @param mixed $record
      * @return stdClass program record
      */
     public function create_program($record = null): stdClass {
@@ -95,7 +85,7 @@ class enrol_programs_generator extends component_generator_base {
         $cohorts = empty($record->cohorts) ? [] : $record->cohorts;
         unset($record->cohorts);
 
-        $program = enrol_programs\local\program::add_program($record);
+        $program = tool_muprog\local\program::add_program($record);
 
         if ($cohorts) {
             $cohortids = [];
@@ -112,7 +102,7 @@ class enrol_programs_generator extends component_generator_base {
                 }
 
             }
-            \enrol_programs\local\program::update_program_visibility((object)['id' => $program->id, 'public' => $program->public, 'cohorts' => $cohortids]);
+            \tool_muprog\local\program::update_program_visibility((object)['id' => $program->id, 'public' => $program->public, 'cohorts' => $cohortids]);
         }
 
         foreach ($sources as $source => $data) {
@@ -120,7 +110,7 @@ class enrol_programs_generator extends component_generator_base {
             $data['programid'] = $program->id;
             $data['type'] = $source;
             $data = (object)$data;
-            \enrol_programs\local\source\base::update_source($data);
+            \tool_muprog\local\source\base::update_source($data);
         }
 
         return $program;
@@ -129,22 +119,22 @@ class enrol_programs_generator extends component_generator_base {
     /**
      * Add program item.
      *
-     * @param $record
-     * @return \enrol_programs\local\content\item
+     * @param mixed $record
+     * @return \tool_muprog\local\content\item
      */
-    public function create_program_item($record): \enrol_programs\local\content\item {
+    public function create_program_item($record): \tool_muprog\local\content\item {
         global $DB;
 
         $record = (object)(array)$record;
 
         if (!empty($record->programid)) {
-            $program = $DB->get_record('enrol_programs_programs', ['id' => $record->programid], '*', MUST_EXIST);
+            $program = $DB->get_record('tool_muprog_program', ['id' => $record->programid], '*', MUST_EXIST);
         } else {
-            $program = $DB->get_record('enrol_programs_programs', ['fullname' => $record->program], '*', MUST_EXIST);
+            $program = $DB->get_record('tool_muprog_program', ['fullname' => $record->program], '*', MUST_EXIST);
         }
-        $top = \enrol_programs\local\program::load_content($program->id);
+        $top = \tool_muprog\local\program::load_content($program->id);
         if (!empty($record->parent)) {
-            $parentrecord = $DB->get_record('enrol_programs_items', ['programid' => $program->id, 'fullname' => $record->parent], '*', MUST_EXIST);
+            $parentrecord = $DB->get_record('tool_muprog_item', ['programid' => $program->id, 'fullname' => $record->parent], '*', MUST_EXIST);
             $parent = $top->find_item($parentrecord->id);
         } else {
             $parent = $top;
@@ -159,14 +149,14 @@ class enrol_programs_generator extends component_generator_base {
             return $top->append_course($parent, $course->id);
         } else if (!empty($record->trainingid) || !empty($record->training)) {
             if (!empty($record->trainingid)) {
-                $framework = $DB->get_record('customfield_training_frameworks', ['id' => $record->trainingid], '*', MUST_EXIST);
+                $framework = $DB->get_record('customfield_mutrain_framework', ['id' => $record->trainingid], '*', MUST_EXIST);
             } else {
-                $framework = $DB->get_record('customfield_training_frameworks', ['name' => $record->training], '*', MUST_EXIST);
+                $framework = $DB->get_record('customfield_mutrain_framework', ['name' => $record->training], '*', MUST_EXIST);
             }
             return $top->append_training($parent, $framework->id);
         } else {
             if (!empty($record->sequencetype)) {
-                $types = \enrol_programs\local\content\set::get_sequencetype_types();
+                $types = \tool_muprog\local\content\set::get_sequencetype_types();
                 if (isset($types[$record->sequencetype])) {
                     $sequencetype = $record->sequencetype;
                 } else {
@@ -174,7 +164,7 @@ class enrol_programs_generator extends component_generator_base {
                     $sequencetype = $types[$record->sequencetype];
                 }
             } else {
-                $sequencetype = \enrol_programs\local\content\set::SEQUENCE_TYPE_ALLINANYORDER;
+                $sequencetype = \tool_muprog\local\content\set::SEQUENCE_TYPE_ALLINANYORDER;
             }
             if (!empty($record->minprerequisites)) {
                 $minprerequisites = $record->minprerequisites;
@@ -188,7 +178,7 @@ class enrol_programs_generator extends component_generator_base {
     /**
      * Manually allocate user to program.
      *
-     * @param $record
+     * @param mixed $record
      * @return \stdClass allocation record
      */
     public function create_program_allocation($record): stdClass {
@@ -197,9 +187,9 @@ class enrol_programs_generator extends component_generator_base {
         $record = (object)(array)$record;
 
         if (!empty($record->programid)) {
-            $program = $DB->get_record('enrol_programs_programs', ['id' => $record->programid], '*', MUST_EXIST);
+            $program = $DB->get_record('tool_muprog_program', ['id' => $record->programid], '*', MUST_EXIST);
         } else {
-            $program = $DB->get_record('enrol_programs_programs', ['fullname' => $record->program], '*', MUST_EXIST);
+            $program = $DB->get_record('tool_muprog_program', ['fullname' => $record->program], '*', MUST_EXIST);
         }
 
         if (!empty($record->userid)) {
@@ -208,24 +198,24 @@ class enrol_programs_generator extends component_generator_base {
             $user = $DB->get_record('user', ['username' => $record->user], '*', MUST_EXIST);
         }
 
-        $source = $DB->get_record('enrol_programs_sources', ['type' => 'manual', 'programid' => $program->id]);
+        $source = $DB->get_record('tool_muprog_source', ['type' => 'manual', 'programid' => $program->id]);
         if (!$source) {
             $data = [];
             $data['enable'] = 1;
             $data['programid'] = $program->id;
             $data['type'] = 'manual';
             $data = (object)$data;
-            $source = \enrol_programs\local\source\manual::update_source($data);
+            $source = \tool_muprog\local\source\manual::update_source($data);
         }
-        \enrol_programs\local\source\manual::allocate_users($program->id, $source->id, [$user->id]);
+        \tool_muprog\local\source\manual::allocate_users($program->id, $source->id, [$user->id]);
 
-        return $DB->get_record('enrol_programs_allocations', ['programid' => $program->id, 'userid' => $user->id], '*', MUST_EXIST);
+        return $DB->get_record('tool_muprog_allocation', ['programid' => $program->id, 'userid' => $user->id], '*', MUST_EXIST);
     }
 
     /**
      * Create program notification.
      *
-     * @param $record
+     * @param mixed $record
      * @return \stdClass notification record
      */
     public function create_program_notification($record): stdClass {
@@ -234,18 +224,18 @@ class enrol_programs_generator extends component_generator_base {
         $record = (object)(array)$record;
 
         if (!empty($record->programid)) {
-            $program = $DB->get_record('enrol_programs_programs', ['id' => $record->programid], '*', MUST_EXIST);
+            $program = $DB->get_record('tool_muprog_program', ['id' => $record->programid], '*', MUST_EXIST);
         } else {
-            $program = $DB->get_record('enrol_programs_programs', ['fullname' => $record->program], '*', MUST_EXIST);
+            $program = $DB->get_record('tool_muprog_program', ['fullname' => $record->program], '*', MUST_EXIST);
         }
 
-        $alltypes = \enrol_programs\local\notification_manager::get_all_types();
+        $alltypes = \tool_muprog\local\notification_manager::get_all_types();
         if (!$record->notificationtype || !isset($alltypes[$record->notificationtype])) {
             throw new coding_exception('Invalid notification type');
         }
 
         $data = [
-            'component' => 'enrol_programs',
+            'component' => 'tool_muprog',
             'notificationtype' => $record->notificationtype,
             'instanceid' => $program->id,
             'enabled' => '1',
@@ -255,6 +245,6 @@ class enrol_programs_generator extends component_generator_base {
             $data['body'] = $record->body ?? '';
             $data['subject'] = $record->subject ?? '';
         }
-        return \local_openlms\notification\util::notification_create($data);
+        return \tool_mulib\local\notification\util::notification_create($data);
     }
 }

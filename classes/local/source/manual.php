@@ -1,30 +1,21 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace enrol_programs\local\source;
+namespace tool_muprog\local\source;
 
+use tool_mulib\output\action_menu\dropdown;
 use stdClass;
 
 /**
  * Manual program allocation.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class manual extends base {
     /**
@@ -61,11 +52,11 @@ final class manual extends base {
     public static function is_import_allowed(stdClass $fromprogram, stdClass $targetprogram): bool {
         global $DB;
 
-        if (!$DB->record_exists('enrol_programs_sources', ['type' => static::get_type(), 'programid' => $fromprogram->id])) {
+        if (!$DB->record_exists('tool_muprog_source', ['type' => static::get_type(), 'programid' => $fromprogram->id])) {
             return false;
         }
 
-        if (!$DB->record_exists('enrol_programs_sources', ['type' => static::get_type(), 'programid' => $targetprogram->id])) {
+        if (!$DB->record_exists('tool_muprog_source', ['type' => static::get_type(), 'programid' => $targetprogram->id])) {
             if (!static::is_new_allowed($targetprogram)) {
                 return false;
             }
@@ -132,13 +123,11 @@ final class manual extends base {
     /**
      * Source related extra menu items for program allocation tab.
      *
-     * @param \enrol_programs\hook\extra_menu\management_program_users $menu
-     * @param stdClass $source
+     * @param dropdown $dropdown
+     * @param stdClass $program
+     * @param stdClass $source source record
      */
-    public static function add_management_program_users_extra_actions(
-        \enrol_programs\hook\extra_menu\management_program_users $menu, stdClass $source): void {
-
-        $program = $menu->get_program();
+    public static function add_management_program_users_extra_actions(dropdown $dropdown, stdClass $program, stdClass $source): void {
         if ($program->id != $source->programid || $source->type !== self::get_type()) {
             throw new \coding_exception('Parameter mismatch detected');
         }
@@ -148,14 +137,14 @@ final class manual extends base {
         }
 
         $context = \context::instance_by_id($program->contextid);
-        if (has_capability('enrol/programs:allocate', $context)) {
-            $url = new \moodle_url('/enrol/programs/management/source_manual_allocate.php', ['sourceid' => $source->id]);
-            $link = new \local_openlms\output\dialog_form\link($url, get_string('source_manual_allocateusers', 'enrol_programs'));
-            $menu->add_dialog_form($link);
+        if (has_capability('tool/muprog:allocate', $context)) {
+            $url = new \moodle_url('/admin/tool/muprog/management/source_manual_allocate.php', ['sourceid' => $source->id]);
+            $link = new \tool_mulib\output\dialog_form\link($url, get_string('source_manual_allocateusers', 'tool_muprog'));
+            $dropdown->add_dialog_form($link);
 
-            $url = new \moodle_url('/enrol/programs/management/source_manual_upload.php', ['sourceid' => $source->id]);
-            $link = new \local_openlms\output\dialog_form\link($url, get_string('source_manual_uploadusers', 'enrol_programs'));
-            $menu->add_dialog_form($link);
+            $url = new \moodle_url('/admin/tool/muprog/management/source_manual_upload.php', ['sourceid' => $source->id]);
+            $link = new \tool_mulib\output\dialog_form\link($url, get_string('source_manual_uploadusers', 'tool_muprog'));
+            $dropdown->add_dialog_form($link);
         }
     }
 
@@ -192,8 +181,8 @@ final class manual extends base {
     public static function allocate_users(int $programid, int $sourceid, array $userids, array $dateoverrides = []): void {
         global $DB;
 
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $programid], '*', MUST_EXIST);
-        $source = $DB->get_record('enrol_programs_sources',
+        $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
+        $source = $DB->get_record('tool_muprog_source',
             ['id' => $sourceid, 'type' => static::get_type(), 'programid' => $program->id], '*', MUST_EXIST);
 
         if (count($userids) === 0) {
@@ -202,7 +191,7 @@ final class manual extends base {
 
         foreach ($userids as $userid) {
             $user = $DB->get_record('user', ['id' => $userid, 'deleted' => 0], '*', MUST_EXIST);
-            if ($DB->record_exists('enrol_programs_allocations', ['programid' => $program->id, 'userid' => $user->id])) {
+            if ($DB->record_exists('tool_muprog_allocation', ['programid' => $program->id, 'userid' => $user->id])) {
                 // One allocation per program only.
                 continue;
             }
@@ -214,8 +203,8 @@ final class manual extends base {
         } else {
             $userid = null;
         }
-        \enrol_programs\local\allocation::fix_user_enrolments($programid, $userid);
-        \enrol_programs\local\notification_manager::trigger_notifications($programid, $userid);
+        \tool_muprog\local\allocation::fix_user_enrolments($programid, $userid);
+        \tool_muprog\local\notification_manager::trigger_notifications($programid, $userid);
     }
 
     /**
@@ -244,8 +233,8 @@ final class manual extends base {
             'errors' => 0,
         ];
 
-        $source = $DB->get_record('enrol_programs_sources', ['id' => $data->sourceid, 'type' => 'manual'], '*', MUST_EXIST);
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $source->programid], '*', MUST_EXIST);
+        $source = $DB->get_record('tool_muprog_source', ['id' => $data->sourceid, 'type' => 'manual'], '*', MUST_EXIST);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $source->programid], '*', MUST_EXIST);
 
         if ($data->hasheaders) {
             unset($filedata[0]);
@@ -276,7 +265,7 @@ final class manual extends base {
                 $result['errors']++;
                 continue;
             }
-            if ($DB->record_exists('enrol_programs_allocations', ['programid' => $program->id, 'userid' => $user->id])) {
+            if ($DB->record_exists('tool_muprog_allocation', ['programid' => $program->id, 'userid' => $user->id])) {
                 $result['skipped']++;
                 continue;
             }
@@ -296,8 +285,8 @@ final class manual extends base {
                 continue;
             }
             self::allocate_user($program, $source, $user->id, [], $dateoverrides);
-            \enrol_programs\local\allocation::fix_user_enrolments($program->id, $user->id);
-            \enrol_programs\local\notification_manager::trigger_notifications($program->id, $user->id);
+            \tool_muprog\local\allocation::fix_user_enrolments($program->id, $user->id);
+            \tool_muprog\local\notification_manager::trigger_notifications($program->id, $user->id);
             $userids[] = $user->id;
         }
 
@@ -307,7 +296,7 @@ final class manual extends base {
             $fs = get_file_storage();
             $context = \context_user::instance($USER->id);
             $fs->delete_area_files($context->id, 'user', 'draft', $data->csvfile);
-            $fs->delete_area_files($context->id, 'enrol_programs', 'upload', $data->csvfile);
+            $fs->delete_area_files($context->id, 'tool_muprog', 'upload', $data->csvfile);
         }
 
         return $result;
@@ -341,30 +330,30 @@ final class manual extends base {
         $program = null;
         if ($isidcolumn) {
             if (is_number($programid)) {
-                $program = $DB->get_record('enrol_programs_programs', ['id' => $programid]);
+                $program = $DB->get_record('tool_muprog_program', ['id' => $programid]);
             }
         } else {
-            $program = $DB->get_record('enrol_programs_programs', ['idnumber' => $programid]);
+            $program = $DB->get_record('tool_muprog_program', ['idnumber' => $programid]);
         }
         if (!$program) {
-            $upt->track('enrolments', get_string('source_manual_userupload_invalidprogram', 'enrol_programs', s($programid)), 'error');
+            $upt->track('enrolments', get_string('source_manual_userupload_invalidprogram', 'tool_muprog', s($programid)), 'error');
             return;
         }
         $programname = format_string($program->fullname);
 
         $context = \context::instance_by_id($program->contextid, IGNORE_MISSING);
-        if (!$context || !has_capability('enrol/programs:allocate', $context)) {
-            $upt->track('enrolments', get_string('source_manual_userupload_invalidprogram', 'enrol_programs', $programname), 'error');
+        if (!$context || !has_capability('tool/muprog:allocate', $context)) {
+            $upt->track('enrolments', get_string('source_manual_userupload_invalidprogram', 'tool_muprog', $programname), 'error');
             return;
         }
-        $source = $DB->get_record('enrol_programs_sources', ['type' => 'manual', 'programid' => $program->id]);
+        $source = $DB->get_record('tool_muprog_source', ['type' => 'manual', 'programid' => $program->id]);
         if (!$source || !self::is_allocation_possible($program, $source)) {
-            $upt->track('enrolments', get_string('source_manual_userupload_invalidprogram', 'enrol_programs', $programname), 'error');
+            $upt->track('enrolments', get_string('source_manual_userupload_invalidprogram', 'tool_muprog', $programname), 'error');
             return;
         }
 
-        if ($DB->record_exists('enrol_programs_allocations', ['programid' => $program->id, 'userid' => $user->id])) {
-            $upt->track('enrolments', get_string('source_manual_userupload_alreadyallocated', 'enrol_programs', $programname), 'info');
+        if ($DB->record_exists('tool_muprog_allocation', ['programid' => $program->id, 'userid' => $user->id])) {
+            $upt->track('enrolments', get_string('source_manual_userupload_alreadyallocated', 'tool_muprog', $programname), 'info');
             return;
         }
 
@@ -376,22 +365,22 @@ final class manual extends base {
             if (!empty($user->{$datefield})) {
                 $dateoverrides[$key] = strtotime($user->{$datefield});
                 if ($dateoverrides[$key] === false) {
-                    $upt->track('enrolments', get_string('invalidallocationdates', 'enrol_programs', $programname), 'error');
+                    $upt->track('enrolments', get_string('invalidallocationdates', 'tool_muprog', $programname), 'error');
                     return;
                 }
             }
         }
 
         if (!base::is_valid_dateoverrides($program, $dateoverrides)) {
-            $upt->track('enrolments', get_string('invalidallocationdates', 'enrol_programs', $programname), 'error');
+            $upt->track('enrolments', get_string('invalidallocationdates', 'tool_muprog', $programname), 'error');
             return;
         }
 
         self::allocate_user($program, $source, $user->id, [], $dateoverrides);
-        \enrol_programs\local\allocation::fix_user_enrolments($program->id, $user->id);
-        \enrol_programs\local\notification_manager::trigger_notifications($program->id, $user->id);
+        \tool_muprog\local\allocation::fix_user_enrolments($program->id, $user->id);
+        \tool_muprog\local\notification_manager::trigger_notifications($program->id, $user->id);
 
-        $upt->track('enrolments', get_string('source_manual_userupload_allocated', 'enrol_programs', $programname), 'info');
+        $upt->track('enrolments', get_string('source_manual_userupload_allocated', 'tool_muprog', $programname), 'info');
     }
 }
 

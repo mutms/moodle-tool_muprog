@@ -1,44 +1,40 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace enrol_programs\output\management;
+namespace tool_muprog\output\management;
 
-use enrol_programs\local\notification_manager;
-use enrol_programs\local\allocation;
-use enrol_programs\local\management;
-use enrol_programs\local\program;
-use enrol_programs\local\util;
-use enrol_programs\local\content\item,
-    enrol_programs\local\content\top,
-    enrol_programs\local\content\set,
-    enrol_programs\local\content\course,
-    enrol_programs\local\content\training;
-use stdClass, moodle_url, tabobject, html_writer;
+use tool_muprog\local\notification_manager;
+use tool_muprog\local\allocation;
+use tool_muprog\local\management;
+use tool_muprog\local\program;
+use tool_muprog\local\util;
+use tool_muprog\local\content\item,
+    tool_muprog\local\content\top,
+    tool_muprog\local\content\set,
+    tool_muprog\local\content\course,
+    tool_muprog\local\content\training;
+use stdClass, moodle_url, html_writer;
 
 /**
- * Program management renderer.
+ * Programs management renderer.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class renderer extends \plugin_renderer_base {
+    /**
+     * Render program.
+     *
+     * @param stdClass $program
+     * @return string
+     */
     public function render_program_general(stdClass $program): string {
-        global $CFG, $PAGE;
+        global $CFG;
 
         $context = \context::instance_by_id($program->contextid);
 
@@ -47,61 +43,72 @@ class renderer extends \plugin_renderer_base {
         $presentation = (array)json_decode($program->presentationjson);
         if (!empty($presentation['image'])) {
             $imageurl = moodle_url::make_file_url("$CFG->wwwroot/pluginfile.php",
-                '/' . $context->id . '/enrol_programs/image/' . $program->id . '/'. $presentation['image'], false);
+                '/' . $context->id . '/tool_muprog/image/' . $program->id . '/'. $presentation['image'], false);
             $result .= '<div class="float-end programimage">' . html_writer::img($imageurl, '') . '</div>';
         }
         $result .= '<dl class="row">';
-        $result .= '<dt class="col-3">' . get_string('fullname') . ':</dt><dd class="col-9">'
+        $result .= '<dt class="col-3">' . get_string('fullname') . '</dt><dd class="col-9">'
             . format_string($program->fullname) . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('idnumber') . ':</dt><dd class="col-9">'
+        $result .= '<dt class="col-3">' . get_string('programidnumber', 'tool_muprog') . '</dt><dd class="col-9">'
             . s($program->idnumber) . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('category') . ':</dt><dd class="col-9">'
-            . html_writer::link(new moodle_url('/enrol/programs/management/index.php',
+        $result .= '<dt class="col-3">' . get_string('category') . '</dt><dd class="col-9">'
+            . html_writer::link(new moodle_url('/admin/tool/muprog/management/index.php',
                 ['contextid' => $context->id]), $context->get_context_name(false)) . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('creategroups', 'enrol_programs') . ':</dt><dd class="col-9">'
+        $result .= '<dt class="col-3">' . get_string('creategroups', 'tool_muprog') . '</dt><dd class="col-9">'
             . ($program->creategroups ? get_string('yes') : get_string('no')) . '</dd>';
         if ($CFG->usetags) {
-            $tags = \core_tag_tag::get_item_tags('enrol_programs', 'program', $program->id);
+            $tags = \core_tag_tag::get_item_tags('tool_muprog', 'program', $program->id);
             if ($tags) {
-                $result .= '<dt class="col-3">' . get_string('tags') . ':</dt><dd class="col-9">'
+                $result .= '<dt class="col-3">' . get_string('tags') . '</dt><dd class="col-9">'
                     . $this->output->tag_list($tags, '', 'program-tags') . '</dd>';
             }
         }
-        $description = file_rewrite_pluginfile_urls($program->description, 'pluginfile.php', $context->id, 'enrol_programs', 'description', $program->id);
+        $description = file_rewrite_pluginfile_urls($program->description, 'pluginfile.php', $context->id, 'tool_muprog', 'description', $program->id);
         $description = format_text($description, $program->descriptionformat, ['context' => $context]);
         if (trim($description) === '') {
             $description = '&nbsp;';
         }
-        $result .= '<dt class="col-3">' . get_string('description') . ':</dt><dd class="col-9">' . $description . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('archived', 'enrol_programs') . ':</dt><dd class="col-9">'
+        $result .= '<dt class="col-3">' . get_string('description') . '</dt><dd class="col-9">' . $description . '</dd>';
+        $result .= '<dt class="col-3">' . get_string('archived', 'tool_muprog') . '</dt><dd class="col-9">'
             . ($program->archived ? get_string('yes') : get_string('no')) . '</dd>';
 
-        $customfieldoutput = $PAGE->get_renderer('enrol_programs', 'customfield');
+        $customfieldoutput = $this->page->get_renderer('tool_muprog', 'customfield');
         $result .= $customfieldoutput->render_customfields($program->id);
         $result .= '</dl>';
-
 
         return $result;
     }
 
+    /**
+     * Render program allocation.
+     *
+     * @param stdClass $program
+     * @return string
+     */
     public function render_program_allocation(stdClass $program): string {
         $result = '';
 
         $result .= '<dl class="row">';
-        $result .= '<dt class="col-3">' . get_string('allocationstart', 'enrol_programs') . ':</dt><dd class="col-9">'
-            . ($program->timeallocationstart ? userdate($program->timeallocationstart) : get_string('notset', 'enrol_programs')) . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('allocationend', 'enrol_programs') . ':</dt><dd class="col-9">'
-            . ($program->timeallocationend ? userdate($program->timeallocationend) : get_string('notset', 'enrol_programs')) . '</dd>';
+        $result .= '<dt class="col-3">' . get_string('allocationstart', 'tool_muprog') . '</dt><dd class="col-9">'
+            . ($program->timeallocationstart ? userdate($program->timeallocationstart) : get_string('notset', 'tool_muprog')) . '</dd>';
+        $result .= '<dt class="col-3">' . get_string('allocationend', 'tool_muprog') . '</dt><dd class="col-9">'
+            . ($program->timeallocationend ? userdate($program->timeallocationend) : get_string('notset', 'tool_muprog')) . '</dd>';
         $result .= '</dl>';
 
         return $result;
     }
 
+    /**
+     * Rdener program scheduling.
+     *
+     * @param stdClass $program
+     * @return string
+     */
     public function render_program_scheduling(stdClass $program): string {
         $result = '';
 
         $result .= '<dl class="row">';
-        $result .= '<dt class="col-3">' . get_string('programstart', 'enrol_programs') . ':</dt><dd class="col-9">';
+        $result .= '<dt class="col-3">' . get_string('programstart', 'tool_muprog') . '</dt><dd class="col-9">';
         $start = (object)json_decode($program->startdatejson);
         $types = program::get_program_startdate_types();
 
@@ -114,7 +121,7 @@ class renderer extends \plugin_renderer_base {
         }
         $result .= '</dd>';
 
-        $result .= '<dt class="col-3">' . get_string('programdue', 'enrol_programs') . ':</dt><dd class="col-9">';
+        $result .= '<dt class="col-3">' . get_string('programdue', 'tool_muprog') . '</dt><dd class="col-9">';
         $due = (object)json_decode($program->duedatejson);
         $types = program::get_program_duedate_types();
         if ($due->type === 'date') {
@@ -126,7 +133,7 @@ class renderer extends \plugin_renderer_base {
         }
         $result .= '</dd>';
 
-        $result .= '<dt class="col-3">' . get_string('programend', 'enrol_programs') . ':</dt><dd class="col-9">';
+        $result .= '<dt class="col-3">' . get_string('programend', 'tool_muprog') . '</dt><dd class="col-9">';
         $end = (object)json_decode($program->enddatejson);
         $types = program::get_program_enddate_types();
         if ($end->type === 'date') {
@@ -142,13 +149,19 @@ class renderer extends \plugin_renderer_base {
         return $result;
     }
 
+    /**
+     * Render program visibility.
+     *
+     * @param stdClass $program
+     * @return string
+     */
     public function render_program_visibility(stdClass $program): string {
         $result = '';
 
         $result .= '<dl class="row">';
-        $result .= '<dt class="col-3">' . get_string('public', 'enrol_programs') . ':</dt><dd class="col-9">'
+        $result .= '<dt class="col-3">' . get_string('public', 'tool_muprog') . '</dt><dd class="col-9">'
             . ($program->public ? get_string('yes') : get_string('no')) . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('cohorts', 'enrol_programs') . ':</dt><dd class="col-9">';
+        $result .= '<dt class="col-3">' . get_string('cohorts', 'tool_muprog') . '</dt><dd class="col-9">';
         $cohorts = management::fetch_current_cohorts_menu($program->id);
         if ($cohorts) {
             $result .= implode(', ', array_map('format_string', $cohorts));
@@ -161,60 +174,22 @@ class renderer extends \plugin_renderer_base {
         return $result;
     }
 
-    public function render_management_program_tabs(stdClass $program, string $currenttab): string {
-        $url = new moodle_url('/enrol/programs/management/program.php', ['id' => $program->id]);
-        $tabs[] = new tabobject('general', $url, get_string('tabgeneral', 'enrol_programs'));
-
-        $url = new moodle_url('/enrol/programs/management/program_content.php', ['id' => $program->id]);
-        $tabs[] = new tabobject('content', $url, get_string('tabcontent', 'enrol_programs'));
-
-        $url = new moodle_url('/enrol/programs/management/program_visibility.php', ['id' => $program->id]);
-        $tabs[] = new tabobject('visibility', $url, get_string('tabvisibility', 'enrol_programs'));
-
-        $url = new moodle_url('/enrol/programs/management/program_allocation.php', ['id' => $program->id]);
-        $tabs[] = new tabobject('allocation', $url, get_string('taballocation', 'enrol_programs'));
-
-        $url = new moodle_url('/enrol/programs/management/program_notifications.php', ['id' => $program->id]);
-        $tabs[] = new tabobject('notifications', $url, get_string('notifications', 'local_openlms'));
-
-        /** @var \enrol_programs\local\source\base[] $sourceclasses */ // Class name hack.
-        $sourceclasses = allocation::get_source_classes();
-        foreach ($sourceclasses as $sourceclass) {
-            $extras = $sourceclass::get_extra_management_tabs($program);
-            foreach ($extras as $tab) {
-                $tabs[] = $tab;
-            }
-        }
-
-        if (\enrol_programs\local\certificate::is_available()) {
-            // NOTE: this should be implemented via hooks, then the tab would be stored
-            // in new subplugin in tool_certificate.
-            $url = new moodle_url('/enrol/programs/management/program_certificate.php', ['id' => $program->id]);
-            $tabs[] = new tabobject('certificate', $url, get_string('certificate', 'tool_certificate'));
-        }
-
-        $url = new moodle_url('/enrol/programs/management/program_users.php', ['id' => $program->id]);
-        $tabs[] = new tabobject('users', $url, get_string('tabusers', 'enrol_programs'), '', true);
-
-        if (count($tabs) > 1) {
-            return $this->output->render(new \tabtree($tabs, $currenttab));
-        } else {
-            return '';
-        }
-    }
-
+    /**
+     * Render program content.
+     *
+     * @param int $programid
+     * @param int|null $movetargetsfor
+     * @return string
+     */
     public function render_content(int $programid, ?int $movetargetsfor): string {
         global $DB;
 
-        /** @var \local_openlms\output\dialog_form\renderer $dialogformoutput */
-        $dialogformoutput = $this->page->get_renderer('local_openlms', 'dialog_form');
-
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $programid], '*', MUST_EXIST);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
         $context = \context::instance_by_id($program->contextid);
         if ($program->archived) {
             $canedit = false;
         } else {
-            $canedit = has_capability('enrol/programs:edit', $context);
+            $canedit = has_capability('tool/muprog:edit', $context);
         }
 
         $result = '';
@@ -223,11 +198,11 @@ class renderer extends \plugin_renderer_base {
         $top = program::load_content($program->id);
 
         if ($top->is_problem_detected()) {
-            $result .= $this->output->notification(get_string('errorcontentproblem', 'enrol_programs'), \core\output\notification::NOTIFY_ERROR);
-            if (has_capability('enrol/programs:admin', $context)) {
-                $fixurl = new moodle_url('/enrol/programs/management/program_content.php', ['id' => $program->id, 'autofix' => 1, 'sesskey' => sesskey()]);
+            $result .= $this->output->notification(get_string('errorcontentproblem', 'tool_muprog'), \core\output\notification::NOTIFY_ERROR);
+            if (has_capability('tool/muprog:admin', $context)) {
+                $fixurl = new moodle_url('/admin/tool/muprog/management/program_content.php', ['id' => $program->id, 'autofix' => 1, 'sesskey' => sesskey()]);
                 $result .= '<div class="buttons mb-3">';
-                $result .= $this->output->single_button($fixurl, get_string('programautofix', 'enrol_programs'));
+                $result .= $this->output->single_button($fixurl, get_string('programautofix', 'tool_muprog'));
                 $result .= '</div>';
             }
         }
@@ -237,9 +212,9 @@ class renderer extends \plugin_renderer_base {
         }
         $movetargetsforname = null;
         if ($movetargetsfor) {
-            $movetargetsforname = $DB->get_field('enrol_programs_items', 'fullname', ['id' => $movetargetsfor]);
+            $movetargetsforname = $DB->get_field('tool_muprog_item', 'fullname', ['id' => $movetargetsfor]);
             $movetargetsforname = format_string($movetargetsforname);
-            $cancelmove = get_string('moveitemcancel', 'enrol_programs');
+            $cancelmove = get_string('moveitemcancel', 'tool_muprog');
             $result .= $this->output->single_button($this->page->url, $cancelmove, 'get');
         }
 
@@ -247,7 +222,7 @@ class renderer extends \plugin_renderer_base {
         $hasactions = false;
         $output = $this->output;
         $renderercolumns = function(item $item, int $itemdepth, int $position, ?set $parent, bool $showtargets) use(&$renderercolumns, &$rows, $canedit, &$hasactions,
-            &$output, $dialogformoutput, &$movetargetsfor, $movetargetsforname): void {
+            &$output, &$movetargetsfor, $movetargetsforname): void {
             $fullname = $item->get_fullname();
             $id = $item->get_id();
             $padding = str_repeat('&nbsp;', $itemdepth * 6);
@@ -256,7 +231,7 @@ class renderer extends \plugin_renderer_base {
             if ($item instanceof set) {
                 $completion = $item->get_sequencetype_info();
             } else if ($item instanceof training) {
-                $completion = get_string('trainingcompletion', 'enrol_programs', $item->get_required_training());
+                $completion = get_string('trainingcompletion', 'tool_muprog', $item->get_required_training());
             } else {
                 $completion = '';
             }
@@ -265,7 +240,7 @@ class renderer extends \plugin_renderer_base {
                 if ($completion !== '') {
                     $completion .= '<br />';
                 }
-                $completion .= '<small>' . get_string('completiondelay', 'enrol_programs') . ': ' . util::format_duration($completiondelay) . '</small>';
+                $completion .= '<small>' . get_string('completiondelay', 'tool_muprog') . ': ' . util::format_duration($completiondelay) . '</small>';
             }
 
             if ($movetargetsfor == $item->get_id()) {
@@ -279,29 +254,29 @@ class renderer extends \plugin_renderer_base {
             if ($canedit) {
                 $importurl = null;
                 if ($item instanceof set) {
-                    $appendurl = new moodle_url('/enrol/programs/management/item_append.php', ['parentitemid' => $id]);
-                    $appendaction = new \local_openlms\output\dialog_form\icon($appendurl, 'appenditem', get_string('appenditem', 'enrol_programs'), 'enrol_programs');
-                    $actions[] = $dialogformoutput->render($appendaction);
+                    $appendurl = new moodle_url('/admin/tool/muprog/management/item_append.php', ['parentitemid' => $id]);
+                    $appendaction = new \tool_mulib\output\dialog_form\icon($appendurl, get_string('appenditem', 'tool_muprog'), 'appenditem', 'tool_muprog');
+                    $actions[] = $output->render($appendaction);
                     if ($item instanceof top) {
-                        $importurl = new moodle_url('/enrol/programs/management/program_content_import.php', ['id' => $item->get_programid()]);
-                        $importaction = new \local_openlms\output\dialog_form\icon(
-                            $importurl, 'import', get_string('importprogramcontent', 'enrol_programs'), 'enrol_programs');
-                        $actions[] = $dialogformoutput->render($importaction);
+                        $importurl = new moodle_url('/admin/tool/muprog/management/program_content_import.php', ['id' => $item->get_programid()]);
+                        $importaction = new \tool_mulib\output\dialog_form\icon(
+                            $importurl, get_string('importprogramcontent', 'tool_muprog'), 'import', 'tool_muprog');
+                        $actions[] = $output->render($importaction);
                     }
                 } else {
                     $actions[] = $output->pix_icon('i/navigationitem', '') . ' ';
                 }
                 if ($item->is_deletable()) {
                     if ($item instanceof course) {
-                        $deletestr = get_string('deletecourse', 'enrol_programs');
+                        $deletestr = get_string('deletecourse', 'tool_muprog');
                     } else if ($item instanceof training) {
-                        $deletestr = get_string('deletetraining', 'enrol_programs');
+                        $deletestr = get_string('deletetraining', 'tool_muprog');
                     } else {
-                        $deletestr = get_string('deleteset', 'enrol_programs');
+                        $deletestr = get_string('deleteset', 'tool_muprog');
                     }
-                    $deleteurl = new moodle_url('/enrol/programs/management/item_delete.php', ['id' => $id]);
-                    $deleteaction = new \local_openlms\output\dialog_form\icon($deleteurl, 'deleteitem', $deletestr, 'enrol_programs');
-                    $actions[] = $dialogformoutput->render($deleteaction);
+                    $deleteurl = new moodle_url('/admin/tool/muprog/management/item_delete.php', ['id' => $id]);
+                    $deleteaction = new \tool_mulib\output\dialog_form\icon($deleteurl, $deletestr, 'deleteitem', 'tool_muprog');
+                    $actions[] = $output->render($deleteaction);
                 } else {
                     if (!$importurl) {
                         $actions[] = $output->pix_icon('i/navigationitem', '') . ' ';
@@ -323,24 +298,24 @@ class renderer extends \plugin_renderer_base {
                         }
                     }
                 } else {
-                    $moveurl = new moodle_url('/enrol/programs/management/program_content.php', ['id' => $item->get_programid(), 'movetargetsfor' => $item->get_id()]);
-                    $moveicon = $output->pix_icon('move', get_string('moveitem', 'enrol_programs'), 'enrol_programs');
-                    $actions[] = \html_writer::link($moveurl, $moveicon, array('title' => get_string('moveitem', 'enrol_programs')));
+                    $moveurl = new moodle_url('/admin/tool/muprog/management/program_content.php', ['id' => $item->get_programid(), 'movetargetsfor' => $item->get_id()]);
+                    $moveicon = $output->pix_icon('move', get_string('moveitem', 'tool_muprog'), 'tool_muprog');
+                    $actions[] = \html_writer::link($moveurl, $moveicon, ['title' => get_string('moveitem', 'tool_muprog')]);
                 }
 
                 if ($item instanceof set) {
-                    $editurl = new moodle_url('/enrol/programs/management/item_set_edit.php', ['id' => $id]);
-                    $editaction = new \local_openlms\output\dialog_form\icon($editurl, 'i/settings', get_string('updateset', 'enrol_programs'));
-                    $actions[] = $dialogformoutput->render($editaction);
+                    $editurl = new moodle_url('/admin/tool/muprog/management/item_set_edit.php', ['id' => $id]);
+                    $editaction = new \tool_mulib\output\dialog_form\icon($editurl, get_string('updateset', 'tool_muprog'), 'i/settings');
+                    $actions[] = $output->render($editaction);
                 } else if ($item instanceof course) {
-                    $editurl = new moodle_url('/enrol/programs/management/item_course_edit.php', ['id' => $id]);
-                    $editaction = new \local_openlms\output\dialog_form\icon($editurl, 'i/settings', get_string('updatecourse', 'enrol_programs'));
-                    $actions[] = $dialogformoutput->render($editaction);
+                    $editurl = new moodle_url('/admin/tool/muprog/management/item_course_edit.php', ['id' => $id]);
+                    $editaction = new \tool_mulib\output\dialog_form\icon($editurl, get_string('updatecourse', 'tool_muprog'), 'i/settings');
+                    $actions[] = $output->render($editaction);
                     $actions[] = $output->pix_icon('i/navigationitem', '') . ' ';
                 } else if ($item instanceof training) {
-                    $editurl = new moodle_url('/enrol/programs/management/item_training_edit.php', ['id' => $id]);
-                    $editaction = new \local_openlms\output\dialog_form\icon($editurl, 'i/settings', get_string('updatetraining', 'enrol_programs'));
-                    $actions[] = $dialogformoutput->render($editaction);
+                    $editurl = new moodle_url('/admin/tool/muprog/management/item_training_edit.php', ['id' => $id]);
+                    $editaction = new \tool_mulib\output\dialog_form\icon($editurl, get_string('updatetraining', 'tool_muprog'), 'i/settings');
+                    $actions[] = $output->render($editaction);
                     $actions[] = $output->pix_icon('i/navigationitem', '') . ' ';
                 } else {
                     $actions[] = $output->pix_icon('i/navigationitem', '') . ' ';
@@ -356,28 +331,28 @@ class renderer extends \plugin_renderer_base {
                         $fullname = \html_writer::link($detailurl, $fullname);
                     }
                 } else {
-                    $fullname .= ' <span class="badge badge-danger">' . get_string('errorcoursemissing', 'enrol_programs') . '</span>';
+                    $fullname .= ' <span class="badge badge-danger">' . get_string('errorcoursemissing', 'tool_muprog') . '</span>';
                 }
             }
 
             if ($item instanceof top) {
-                $itemname = $output->pix_icon('itemtop', get_string('program', 'enrol_programs'), 'enrol_programs') . '&nbsp;' . $fullname;
+                $itemname = $output->pix_icon('itemtop', get_string('program', 'tool_muprog'), 'tool_muprog') . '&nbsp;' . $fullname;
             } else if ($item instanceof course) {
-                $itemname = $padding . $output->pix_icon('itemcourse', get_string('course'), 'enrol_programs') . $fullname;
+                $itemname = $padding . $output->pix_icon('itemcourse', get_string('course'), 'tool_muprog') . $fullname;
             } else if ($item instanceof training) {
-                $itemname = $padding . $output->pix_icon('itemtraining', get_string('training', 'enrol_programs'), 'enrol_programs') . $fullname;
+                $itemname = $padding . $output->pix_icon('itemtraining', get_string('training', 'tool_muprog'), 'tool_muprog') . $fullname;
             } else {
-                $itemname = $padding . $output->pix_icon('itemset', get_string('set', 'enrol_programs'), 'enrol_programs') . $fullname;
+                $itemname = $padding . $output->pix_icon('itemset', get_string('set', 'tool_muprog'), 'tool_muprog') . $fullname;
             }
             if ($actions) {
                 $hasactions = true;
             }
 
             if ($canedit && $targetpre) {
-                $turl = new moodle_url('/enrol/programs/management/program_content.php',
+                $turl = new moodle_url('/admin/tool/muprog/management/program_content.php',
                     ['id' => $item->get_programid(), 'moveitem' => $movetargetsfor, 'movetoparent' => $parent->get_id(), 'moveposition' => $position, 'sesskey' => sesskey()]);
                 $a = (object)['item' => $movetargetsforname, 'target' => $item->get_fullname()];
-                $movehere = get_string('movebefore', 'enrol_programs', $a);
+                $movehere = get_string('movebefore', 'tool_muprog', $a);
                 $target = $padding . \html_writer::link($turl, $movehere, ['class' => 'movehere']);
                 $rows[]  = [$target, '', ''];
             }
@@ -398,19 +373,19 @@ class renderer extends \plugin_renderer_base {
                     $i++;
                 }
             } else if ($showtargets && ($item instanceof set)) {
-                $turl = new moodle_url('/enrol/programs/management/program_content.php',
+                $turl = new moodle_url('/admin/tool/muprog/management/program_content.php',
                     ['id' => $item->get_programid(), 'moveitem' => $movetargetsfor, 'movetoparent' => $item->get_id(), 'moveposition' => 0, 'sesskey' => sesskey()]);
                 $a = (object)['item' => $movetargetsforname, 'target' => $item->get_fullname()];
-                $movehere = get_string('moveinto', 'enrol_programs', $a);
+                $movehere = get_string('moveinto', 'tool_muprog', $a);
                 $target = $childpadding . \html_writer::link($turl, $movehere, ['class' => 'movehere']);
                 $rows[]  = [$target, '', ''];
             }
 
             if ($canedit && $targetpost) {
-                $turl = new moodle_url('/enrol/programs/management/program_content.php',
+                $turl = new moodle_url('/admin/tool/muprog/management/program_content.php',
                     ['id' => $item->get_programid(), 'moveitem' => $movetargetsfor, 'movetoparent' => $parent->get_id(), 'moveposition' => $position + 1, 'sesskey' => sesskey()]);
                 $a = (object)['item' => $movetargetsforname, 'target' => $item->get_fullname()];
-                $movehere = get_string('moveafter', 'enrol_programs', $a);
+                $movehere = get_string('moveafter', 'tool_muprog', $a);
                 $target = $padding . \html_writer::link($turl, $movehere, ['class' => 'movehere']);
                 $rows[]  = [$target, '', ''];
             }
@@ -419,9 +394,9 @@ class renderer extends \plugin_renderer_base {
 
         $table = new \html_table();
         $table->head = [
-            get_string('item', 'enrol_programs'),
-            get_string('itempoints', 'enrol_programs'),
-            get_string('sequencetype', 'enrol_programs'),
+            get_string('item', 'tool_muprog'),
+            get_string('itempoints', 'tool_muprog'),
+            get_string('sequencetype', 'tool_muprog'),
             get_string('actions'),
         ];
         $table->id = 'program_content';
@@ -444,16 +419,22 @@ class renderer extends \plugin_renderer_base {
         return $result;
     }
 
+    /**
+     * Render orphaned items.
+     *
+     * @param int $programid
+     * @return string
+     */
     public function render_content_orphans(int $programid): string {
         global $DB;
 
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $programid], '*', MUST_EXIST);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
         $context = \context::instance_by_id($program->contextid);
 
         if ($program->archived) {
             return '';
         }
-        if (!has_capability('enrol/programs:edit', $context)) {
+        if (!has_capability('tool/muprog:edit', $context)) {
             return '';
         }
 
@@ -468,17 +449,17 @@ class renderer extends \plugin_renderer_base {
 
         $rows = [];
 
-        $iconcourse = $this->output->pix_icon('itemcourse', get_string('course'), 'enrol_programs');
-        $iconset = $this->output->pix_icon('itemset', get_string('set', 'enrol_programs'), 'enrol_programs');
+        $iconcourse = $this->output->pix_icon('itemcourse', get_string('course'), 'tool_muprog');
+        $iconset = $this->output->pix_icon('itemset', get_string('set', 'tool_muprog'), 'tool_muprog');
 
         foreach ($orphanedsets as $set) {
             $fullname = $iconset . $set->get_fullname();
 
             $actions = [];
-            $deletestr = get_string('deleteset', 'enrol_programs');
-            $deleteurl = new moodle_url('/enrol/programs/management/item_delete.php', ['id' => $set->get_id()]);
-            $deleteimg = $this->output->pix_icon('deleteitem', $deletestr, 'enrol_programs');
-            $actions[] = \html_writer::link($deleteurl, $deleteimg, array('title' => $deletestr));
+            $deletestr = get_string('deleteset', 'tool_muprog');
+            $deleteurl = new moodle_url('/admin/tool/muprog/management/item_delete.php', ['id' => $set->get_id()]);
+            $deleteimg = $this->output->pix_icon('deleteitem', $deletestr, 'tool_muprog');
+            $actions[] = \html_writer::link($deleteurl, $deleteimg, ['title' => $deletestr]);
 
             $rows[] = [$fullname, implode('', $actions)];
         }
@@ -487,76 +468,92 @@ class renderer extends \plugin_renderer_base {
             $fullname = $iconcourse . $course->get_fullname();
 
             $actions = [];
-            $deletestr = get_string('deletecourse', 'enrol_programs');
-            $deleteurl = new moodle_url('/enrol/programs/management/item_delete.php', ['id' => $course->get_id()]);
-            $deleteimg = $this->output->pix_icon('deleteitem', $deletestr, 'enrol_programs');
-            $actions[] = \html_writer::link($deleteurl, $deleteimg, array('title' => $deletestr));
+            $deletestr = get_string('deletecourse', 'tool_muprog');
+            $deleteurl = new moodle_url('/admin/tool/muprog/management/item_delete.php', ['id' => $course->get_id()]);
+            $deleteimg = $this->output->pix_icon('deleteitem', $deletestr, 'tool_muprog');
+            $actions[] = \html_writer::link($deleteurl, $deleteimg, ['title' => $deletestr]);
 
             $rows[] = [$fullname, implode('', $actions)];
         }
 
         $table = new \html_table();
-        $table->head = [get_string('item', 'enrol_programs'), get_string('actions')];
+        $table->head = [get_string('item', 'tool_muprog'), get_string('actions')];
         $table->id = 'program_content_orphaned_sets';
         $table->attributes['class'] = 'admintable generaltable';
         $table->data = $rows;
 
         $result = '';
-        $result .= $this->output->heading(get_string('unlinkeditems', 'enrol_programs'));
+        $result .= $this->output->heading(get_string('unlinkeditems', 'tool_muprog'));
         $result .= \html_writer::table($table);
 
         return $result;
     }
 
+    /**
+     * Render allocation.
+     *
+     * @param stdClass $program
+     * @param stdClass $source
+     * @param stdClass $allocation
+     * @return string
+     */
     public function render_user_allocation(stdClass $program, stdClass $source, stdClass $allocation): string {
         global $DB;
 
-        $strnotset = get_string('notset', 'enrol_programs');
+        $strnotset = get_string('notset', 'tool_muprog');
         $sourceclasses = allocation::get_source_classes();
         $context = \context::instance_by_id($program->contextid);
-        $source = $DB->get_record('enrol_programs_sources', ['id' => $allocation->sourceid], '*', MUST_EXIST);
-        /** @var \enrol_programs\local\source\base $sourceclass */
+        $source = $DB->get_record('tool_muprog_source', ['id' => $allocation->sourceid], '*', MUST_EXIST);
+        /** @var \tool_muprog\local\source\base $sourceclass */
         $sourceclass = $sourceclasses[$source->type];
 
         $result = '';
 
         $result .= '<dl class="row">';
-        $result .= '<dt class="col-3">' . get_string('programstatus', 'enrol_programs') . ':</dt><dd class="col-9">'
+        $result .= '<dt class="col-3">' . get_string('programstatus', 'tool_muprog') . '</dt><dd class="col-9">'
             . allocation::get_completion_status_html($program, $allocation) . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('source', 'enrol_programs') . ':</dt><dd class="col-9">'
+        $result .= '<dt class="col-3">' . get_string('source', 'tool_muprog') . '</dt><dd class="col-9">'
             . $sourceclass::render_allocation_source($program, $source, $allocation) . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('allocationdate', 'enrol_programs') . ':</dt><dd class="col-9">'
+        $result .= '<dt class="col-3">' . get_string('allocationdate', 'tool_muprog') . '</dt><dd class="col-9">'
             . userdate($allocation->timeallocated) . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('programstart', 'enrol_programs') . ':</dt><dd class="col-9">'
+        $result .= '<dt class="col-3">' . get_string('programstart', 'tool_muprog') . '</dt><dd class="col-9">'
             . userdate($allocation->timestart) . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('programdue', 'enrol_programs') . ':</dt><dd class="col-9">'
+        $result .= '<dt class="col-3">' . get_string('programdue', 'tool_muprog') . '</dt><dd class="col-9">'
             . (isset($allocation->timedue) ? userdate($allocation->timedue) : $strnotset) . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('programend', 'enrol_programs') . ':</dt><dd class="col-9">'
+        $result .= '<dt class="col-3">' . get_string('programend', 'tool_muprog') . '</dt><dd class="col-9">'
             . (isset($allocation->timeend) ? userdate($allocation->timeend) : $strnotset) . '</dd>';
 
-        $result .= '<dt class="col-3">' . get_string('programcompletion', 'enrol_programs') . ':</dt><dd class="col-9">'
+        $result .= '<dt class="col-3">' . get_string('programcompletion', 'tool_muprog') . '</dt><dd class="col-9">'
             . (isset($allocation->timecompleted) ? userdate($allocation->timecompleted) : $strnotset) . '</dd>';
         $result .= '</dl>';
 
         return $result;
     }
 
+    /**
+     * Render notification.
+     *
+     * @param stdClass $program
+     * @param stdClass $allocation
+     * @return string
+     */
     public function render_user_notifications(stdClass $program, stdClass $allocation): string {
-        $strnotset = get_string('notset', 'enrol_programs');
+        $strnotset = get_string('notset', 'tool_muprog');
 
-        $result = $this->output->heading(get_string('notificationdates', 'enrol_programs'), 3, ['h4']);
+        $result = $this->output->heading(get_string('notificationdates', 'tool_muprog'), 3, ['h4']);
 
         $result .= '<dl class="row">';
 
         $types = notification_manager::get_all_types();
-        /** @var class-string<\enrol_programs\local\notification\base> $classname */
+        // phpcs:ignore moodle.Commenting.InlineComment.TypeHintingForeach
+        /** @var class-string<\tool_muprog\local\notification\base> $classname */
         foreach ($types as $notificationtype => $classname) {
             if ($notificationtype === 'deallocation') {
                 continue;
             }
             $result .= '<dt class="col-3">';
             $result .= $classname::get_name();
-            $result .= ':</dt><dd class="col-9">';
+            $result .= '</dt><dd class="col-9">';
             $timenotified = notification_manager::get_timenotified($allocation->userid, $program->id, $notificationtype);
             $result .= ($timenotified ? userdate($timenotified) : $strnotset);
             $result .= '</dd>';
@@ -565,23 +562,27 @@ class renderer extends \plugin_renderer_base {
         return $result;
     }
 
+    /**
+     * Render progress.
+     *
+     * @param stdClass $program
+     * @param stdClass $allocation
+     * @return string
+     */
     public function render_user_progress(stdClass $program, stdClass $allocation): string {
         global $DB;
 
         $context = \context::instance_by_id($program->contextid);
-        $canevidence = has_capability('enrol/programs:manageevidence', $context);
-        $canadmin = has_capability('enrol/programs:admin', $context);
+        $canevidence = has_capability('tool/muprog:manageevidence', $context);
+        $canadmin = has_capability('tool/muprog:admin', $context);
         $dateformat = get_string('strftimedatetimeshort');
-
-        /** @var \local_openlms\output\dialog_form\renderer $dialogformoutput */
-        $dialogformoutput = $this->page->get_renderer('local_openlms', 'dialog_form');
 
         $top = program::load_content($program->id);
 
         $output = $this->output;
         $rows = [];
         $renderercolumns = function(item $item, $itemdepth) use(&$renderercolumns, &$rows, $program,
-            $allocation, &$output, &$dialogformoutput, &$DB, &$context, $dateformat,
+            $allocation, &$output, &$DB, &$context, $dateformat,
             $canevidence, $canadmin): void {
 
             $fullname = $item->get_fullname();
@@ -614,18 +615,18 @@ class renderer extends \plugin_renderer_base {
                         $fullname = \html_writer::link($detailurl, $fullname);
                     }
                 } else {
-                    $fullname .= ' <span class="badge badge-danger">' . get_string('errorcoursemissing', 'enrol_programs') . '</span>';
+                    $fullname .= ' <span class="badge badge-danger">' . get_string('errorcoursemissing', 'tool_muprog') . '</span>';
                 }
             }
 
             if ($item instanceof top) {
-                $itemname = $output->pix_icon('itemtop', get_string('program', 'enrol_programs'), 'enrol_programs') . '&nbsp;' . $fullname;
+                $itemname = $output->pix_icon('itemtop', get_string('program', 'tool_muprog'), 'tool_muprog') . '&nbsp;' . $fullname;
             } else if ($item instanceof course) {
-                $itemname = $padding . $output->pix_icon('itemcourse', get_string('course'), 'enrol_programs') . $fullname;
+                $itemname = $padding . $output->pix_icon('itemcourse', get_string('course'), 'tool_muprog') . $fullname;
             } else if ($item instanceof training) {
-                $itemname = $padding . $output->pix_icon('itemtraining', get_string('training', 'enrol_programs'), 'enrol_programs') . $fullname;
+                $itemname = $padding . $output->pix_icon('itemtraining', get_string('training', 'tool_muprog'), 'tool_muprog') . $fullname;
             } else {
-                $itemname = $padding . $output->pix_icon('itemset', get_string('set', 'enrol_programs'), 'enrol_programs') . $fullname;
+                $itemname = $padding . $output->pix_icon('itemset', get_string('set', 'tool_muprog'), 'tool_muprog') . $fullname;
             }
 
             if ($item instanceof top) {
@@ -636,30 +637,30 @@ class renderer extends \plugin_renderer_base {
 
             // Completion stuff.
             $completioninfo = '';
-            $completion = $DB->get_record('enrol_programs_completions', ['itemid' => $item->get_id(), 'allocationid' => $allocation->id]);
+            $completion = $DB->get_record('tool_muprog_completion', ['itemid' => $item->get_id(), 'allocationid' => $allocation->id]);
             if ($completion) {
                 $completioninfo = userdate($completion->timecompleted, $dateformat);
             }
             if ($canadmin) {
-                $editurl = new moodle_url('/enrol/programs/management/item_completion_override.php', ['allocationid' => $allocation->id, 'itemid' => $item->get_id()]);
-                $editaction = new \local_openlms\output\dialog_form\icon($editurl, 'i/settings', get_string('completionoverride', 'enrol_programs'));
-                $completioninfo .= ' ' . $dialogformoutput->render($editaction);
+                $editurl = new moodle_url('/admin/tool/muprog/management/item_completion_override.php', ['allocationid' => $allocation->id, 'itemid' => $item->get_id()]);
+                $editaction = new \tool_mulib\output\dialog_form\icon($editurl, get_string('completionoverride', 'tool_muprog'), 'i/settings');
+                $completioninfo .= ' ' . $output->render($editaction);
             }
 
             $evidenceinfo = '';
-            $evidence = $DB->get_record('enrol_programs_evidences', ['itemid' => $item->get_id(), 'userid' => $allocation->userid]);
+            $evidence = $DB->get_record('tool_muprog_evidence', ['itemid' => $item->get_id(), 'userid' => $allocation->userid]);
             if ($evidence) {
                 $jsondata = (object)json_decode($evidence->evidencejson);
                 $evidenceinfo .= format_text($jsondata->details, FORMAT_PLAIN, ['para' => false]);
             }
             if ($canevidence && !$program->archived && !$allocation->archived) {
-                $editurl = new moodle_url('/enrol/programs/management/item_evidence_edit.php', ['allocationid' => $allocation->id, 'itemid' => $item->get_id()]);
+                $editurl = new moodle_url('/admin/tool/muprog/management/item_evidence_edit.php', ['allocationid' => $allocation->id, 'itemid' => $item->get_id()]);
                 if ($evidence) {
-                    $editaction = new \local_openlms\output\dialog_form\icon($editurl, 'i/edit', get_string('evidenceupdate', 'enrol_programs'));
+                    $editaction = new \tool_mulib\output\dialog_form\icon($editurl, get_string('evidenceupdate', 'tool_muprog'), 'i/edit');
                 } else {
-                    $editaction = new \local_openlms\output\dialog_form\icon($editurl, 't/add', get_string('evidenceupdate', 'enrol_programs'));
+                    $editaction = new \tool_mulib\output\dialog_form\icon($editurl, get_string('evidenceupdate', 'tool_muprog'), 't/add');
                 }
-                $evidenceinfo .= ' ' . $dialogformoutput->render($editaction);
+                $evidenceinfo .= ' ' . $output->render($editaction);
             }
 
             $rows[] = [$itemname, $points, $completiontype, $completioninfo, $evidenceinfo];
@@ -672,11 +673,11 @@ class renderer extends \plugin_renderer_base {
 
         $table = new \html_table();
         $table->head = [
-            get_string('item', 'enrol_programs'),
-            get_string('itempoints', 'enrol_programs'),
-            get_string('sequencetype', 'enrol_programs'),
-            get_string('completiondate', 'enrol_programs'),
-            get_string('evidence', 'enrol_programs'),
+            get_string('item', 'tool_muprog'),
+            get_string('itempoints', 'tool_muprog'),
+            get_string('sequencetype', 'tool_muprog'),
+            get_string('completiondate', 'tool_muprog'),
+            get_string('evidence', 'tool_muprog'),
         ];
         $table->id = 'program_content';
         $table->attributes['class'] = 'admintable generaltable';
@@ -688,16 +689,22 @@ class renderer extends \plugin_renderer_base {
         return $result;
     }
 
+    /**
+     * Render sources.
+     *
+     * @param stdClass $program
+     * @return string
+     */
     public function render_program_sources(\stdClass $program): string {
         global $DB;
 
         $result = '';
 
         $sources = [];
-        /** @var \enrol_programs\local\source\base[] $sourceclasses */
-        $sourceclasses = \enrol_programs\local\allocation::get_source_classes();
+        /** @var \tool_muprog\local\source\base[] $sourceclasses */
+        $sourceclasses = \tool_muprog\local\allocation::get_source_classes();
         foreach ($sourceclasses as $sourcetype => $sourceclass) {
-            $sourcerecord = $DB->get_record('enrol_programs_sources', ['type' => $sourcetype, 'programid' => $program->id]);
+            $sourcerecord = $DB->get_record('tool_muprog_source', ['type' => $sourcetype, 'programid' => $program->id]);
             if (!$sourcerecord && !$sourceclass::is_new_allowed($program)) {
                 continue;
             }
@@ -711,7 +718,7 @@ class renderer extends \plugin_renderer_base {
             $result .= '<dl class="row">';
             foreach ($sources as $sourcetype => $status) {
                 $name = $sourceclasses[$sourcetype]::get_name();
-                $result .= '<dt class="col-3">' . $name . ':</dt><dd class="col-9">' . $status . '</dd>';
+                $result .= '<dt class="col-3">' . $name . '</dt><dd class="col-9">' . $status . '</dd>';
             }
             $result .= '</dl>';
         } else {

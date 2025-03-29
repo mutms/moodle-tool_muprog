@@ -1,0 +1,65 @@
+<?php
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+
+namespace tool_muprog\phpunit\event;
+
+/**
+ * Program completed event test.
+ *
+ * @group      muTMS
+ * @package    tool_muprog
+ * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
+ * @author     Petr Skoda
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ *
+ * @covers \tool_muprog\event\program_completed
+ */
+final class program_completed_test extends \advanced_testcase {
+    public function setUp(): void {
+        parent::setUp();
+        $this->resetAfterTest();
+    }
+
+    public function test_event(): void {
+        global $DB;
+
+        $syscontext = \context_system::instance();
+        $data = (object)[
+            'fullname' => 'Some program',
+            'idnumber' => 'SP1',
+            'contextid' => $syscontext->id,
+            'sources' => ['manual' => []],
+        ];
+        $admin = get_admin();
+        $user = $this->getDataGenerator()->create_user();
+        /** @var \tool_muprog_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
+
+        $this->setAdminUser();
+        $program = $generator->create_program($data);
+        $program->duedatejson = '{"type":"date","date":' . time() . '}';
+        $DB->update_record('tool_muprog_program', $program);
+        $source = $DB->get_record('tool_muprog_source', ['programid' => $program->id, 'type' => 'manual']);
+        \tool_muprog\local\source\manual::allocate_users($program->id, $source->id, [$user->id]);
+
+        $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program->id, 'userid' => $user->id]);
+        $allocation->timecompleted = (string)time();
+        $DB->update_record('tool_muprog_allocation', $allocation);
+
+        $event = \tool_muprog\event\program_completed::create_from_allocation($allocation, $program);
+        $event->trigger();
+        $this->assertEquals($syscontext->id, $event->contextid);
+        $this->assertSame($allocation->id, $event->objectid);
+        $this->assertSame($admin->id, $event->userid);
+        $this->assertSame($user->id, $event->relateduserid);
+        $this->assertSame('c', $event->crud);
+        $this->assertSame($event::LEVEL_PARTICIPATING, $event->edulevel);
+        $this->assertSame('tool_muprog_allocation', $event->objecttable);
+        $this->assertSame('Program completed', $event::get_name());
+        $description = $event->get_description();
+        $programurl = new \moodle_url('/admin/tool/muprog/management/user_allocation.php', ['id' => $allocation->id]);
+        $this->assertSame($programurl->out(false), $event->get_url()->out(false));
+    }
+}

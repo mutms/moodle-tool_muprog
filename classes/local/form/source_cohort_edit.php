@@ -1,34 +1,24 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace enrol_programs\local\form;
+namespace tool_muprog\local\form;
 
-use enrol_programs\local\program;
-use enrol_programs\local\allocation;
-use enrol_programs\local\source\cohort;
+use tool_muprog\local\program;
+use tool_muprog\local\allocation;
+use tool_muprog\local\source\cohort;
 
 /**
  * Edit cohort allocation settings.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class source_cohort_edit extends \local_openlms\dialog_form {
+final class source_cohort_edit extends \tool_mulib\local\dialog_form {
+    #[\Override]
     protected function definition() {
         global $DB;
         $mform = $this->_form;
@@ -45,7 +35,7 @@ final class source_cohort_edit extends \local_openlms\dialog_form {
         $options = ['contextid' => $context->id, 'multiple' => true];
         /** @var \MoodleQuickForm_cohort $cohortsel */
         $cohortsel = $mform->addElement('cohort', 'cohorts', get_string('source_cohort_cohortstoallocate',
-            'enrol_programs'), $options);
+            'tool_muprog'), $options);
         // WARNING: The cohort element is not great at all, work around the current value problems here in a very hacky way.
         if (!empty($source->id)) {
             $cohorts = cohort::fetch_allocation_cohorts_menu($source->id);
@@ -68,6 +58,7 @@ final class source_cohort_edit extends \local_openlms\dialog_form {
         $this->add_action_buttons(true, get_string('update'));
     }
 
+    #[\Override]
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 

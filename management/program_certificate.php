@@ -1,26 +1,15 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
 /**
- * Program management interface - certificate awarding.
+ * Programs management interface - certificate awarding.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 /** @var moodle_database $DB */
@@ -29,59 +18,55 @@
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
 
-use enrol_programs\local\management;
-use enrol_programs\local\program;
+use tool_muprog\local\management;
+use tool_muprog\local\program;
 
-require('../../../config.php');
+require('../../../../config.php');
 require_once($CFG->dirroot . '/lib/formslib.php');
 
 $id = required_param('id', PARAM_INT);
 
 require_login();
 
-$program = $DB->get_record('enrol_programs_programs', ['id' => $id], '*', MUST_EXIST);
+$program = $DB->get_record('tool_muprog_program', ['id' => $id], '*', MUST_EXIST);
 $context = context::instance_by_id($program->contextid);
-require_capability('enrol/programs:view', $context);
+require_capability('tool/muprog:view', $context);
 
-if (!\enrol_programs\local\certificate::is_available()) {
-    redirect(new moodle_url('/enrol/programs/program.php', ['id' => $program->id]));
+if (!\tool_muprog\local\certificate::is_available()) {
+    redirect(new moodle_url('/admin/tool/muprog/program.php', ['id' => $program->id]));
 }
 
-$currenturl = new moodle_url('/enrol/programs/management/program_certificate.php', ['id' => $id]);
+$currenturl = new moodle_url('/admin/tool/muprog/management/program_certificate.php', ['id' => $id]);
 
-management::setup_program_page($currenturl, $context, $program);
+management::setup_program_page($currenturl, $context, $program, 'program_certificate');
 
-/** @var \local_openlms\output\dialog_form\renderer $dialogformoutput */
-$dialogformoutput = $PAGE->get_renderer('local_openlms', 'dialog_form');
-/** @var \enrol_programs\output\management\renderer $managementoutput */
-$managementoutput = $PAGE->get_renderer('enrol_programs', 'management');
+/** @var \tool_muprog\output\management\renderer $managementoutput */
+$managementoutput = $PAGE->get_renderer('tool_muprog', 'management');
 
-$cert = $DB->get_record('enrol_programs_certs', ['programid' => $program->id]);
+$cert = $DB->get_record('tool_muprog_cert', ['programid' => $program->id]);
 
 echo $OUTPUT->header();
 
-echo $managementoutput->render_management_program_tabs($program, 'certificate');
-
 $buttons = [];
-if (has_capability('enrol/programs:edit', $context)) {
-    $editurl = new moodle_url('/enrol/programs/management/program_certificate_edit.php', ['id' => $program->id]);
-    $editbutton = new local_openlms\output\dialog_form\button($editurl, get_string('edit'));
+if (has_capability('tool/muprog:edit', $context)) {
+    $editurl = new moodle_url('/admin/tool/muprog/management/program_certificate_edit.php', ['id' => $program->id]);
+    $editbutton = new tool_mulib\output\dialog_form\button($editurl, get_string('edit'));
     $editbutton->set_dialog_name(get_string('certificate', 'tool_certificate'));
-    $buttons[] = $dialogformoutput->render($editbutton);
+    $buttons[] = $OUTPUT->render($editbutton);
 
     if ($cert) {
-        $deleteurl = new moodle_url('/enrol/programs/management/program_certificate_delete.php', ['id' => $program->id]);
-        $deletebutton = new local_openlms\output\dialog_form\button($deleteurl, get_string('delete'));
+        $deleteurl = new moodle_url('/admin/tool/muprog/management/program_certificate_delete.php', ['id' => $program->id]);
+        $deletebutton = new tool_mulib\output\dialog_form\button($deleteurl, get_string('delete'));
         $deletebutton->set_dialog_name(get_string('certificate', 'tool_certificate'));
-        $buttons[] = $dialogformoutput->render($deletebutton);
+        $buttons[] = $OUTPUT->render($deletebutton);
     }
 }
 
-$cert = $DB->get_record('enrol_programs_certs', ['programid' => $program->id]);
+$cert = $DB->get_record('tool_muprog_cert', ['programid' => $program->id]);
 
 if ($cert) {
     echo '<dl class="row">';
-    echo '<dt class="col-3">' . get_string('certificatetemplate', 'tool_certificate') . ':</dt><dd class="col-9">';
+    echo '<dt class="col-3">' . get_string('certificatetemplate', 'tool_certificate') . '</dt><dd class="col-9">';
     $template = $DB->get_record('tool_certificate_templates', ['id' => $cert->templateid]);
     if (!$template) {
         echo get_string('error');
@@ -91,7 +76,7 @@ if ($cert) {
         echo format_string($template->name);
         echo '</dd>';
 
-        echo '<dt class="col-3">' . get_string('expirydate', 'tool_certificate') . ':</dt><dd class="col-9">';
+        echo '<dt class="col-3">' . get_string('expirydate', 'tool_certificate') . '</dt><dd class="col-9">';
         if ($cert->expirydatetype == 1) {
             echo userdate($cert->expirydateoffset);
         } else if ($cert->expirydatetype == 2) {
@@ -105,8 +90,8 @@ if ($cert) {
     }
 } else {
     echo '<dl class="row">';
-    echo '<dt class="col-3">' . get_string('certificatetemplate', 'tool_certificate') . ':</dt><dd class="col-9">';
-    echo get_string('notset', 'enrol_programs');
+    echo '<dt class="col-3">' . get_string('certificatetemplate', 'tool_certificate') . '</dt><dd class="col-9">';
+    echo get_string('notset', 'tool_muprog');
     echo '</dd>';
     echo '</dl>';
 }

@@ -1,35 +1,53 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace enrol_programs\local;
+namespace tool_muprog\local;
 
 /**
  * Utility class for programs.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class util {
+    /**
+     * Is multi-tenancy available?
+     *
+     * @return bool
+     */
+    public static function is_mutenancy_available(): bool {
+        return class_exists(\tool_mutenancy\local\tenancy::class);
+    }
+
+    /**
+     * Is multi-tenancy active?
+     *
+     * @return bool
+     */
+    public static function is_mutenancy_active(): bool {
+        if (!self::is_mutenancy_available()) {
+            return false;
+        }
+        return \tool_mutenancy\local\tenancy::is_active();
+    }
+
+    /**
+     * Is training available?
+     *
+     * @return bool
+     */
+    public static function is_mutrain_available(): bool {
+        return class_exists(\customfield_mutrain\local\framework::class);
+    }
 
     /**
      * Encode JSON date in a consistent way.
      *
-     * @param $data
+     * @param mixed $data
      * @return string
      */
     public static function json_encode($data): string {
@@ -137,7 +155,7 @@ final class util {
             return get_string('error');
         }
         if (!$duration) {
-            return get_string('notset', 'enrol_programs');
+            return get_string('notset', 'tool_muprog');
         }
         $days = intval($duration / DAYSECS);
         $duration = $duration - $days * DAYSECS;
@@ -199,12 +217,12 @@ final class util {
         $fs = get_file_storage();
         $context = \context_user::instance($USER->id);
 
-        $fs->delete_area_files($context->id, 'enrol_programs', 'upload', $draftid);
+        $fs->delete_area_files($context->id, 'tool_muprog', 'upload', $draftid);
 
         $content = json_encode($filedata, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         $record = [
             'contextid' => $context->id,
-            'component' => 'enrol_programs',
+            'component' => 'tool_muprog',
             'filearea' => 'upload',
             'itemid' => $draftid,
             'filepath' => '/',
@@ -231,7 +249,7 @@ final class util {
         $fs = get_file_storage();
         $context = \context_user::instance($USER->id);
 
-        $file = $fs->get_file($context->id, 'enrol_programs', 'upload', $draftid, '/', 'data.json');
+        $file = $fs->get_file($context->id, 'tool_muprog', 'upload', $draftid, '/', 'data.json');
         if (!$file) {
             return null;
         }
@@ -254,11 +272,11 @@ final class util {
         $fs = get_file_storage();
         $sql = "SELECT contextid, itemid
                   FROM {files}
-                 WHERE component = 'enrol_programs' AND filearea = 'upload' AND filepath = '/' AND filename = '.'
+                 WHERE component = 'tool_muprog' AND filearea = 'upload' AND filepath = '/' AND filename = '.'
                        AND timecreated < :old";
-        $rs = $DB->get_recordset_sql($sql, ['old' => time() - 60*60*24*2]);
+        $rs = $DB->get_recordset_sql($sql, ['old' => time() - 60 * 60 * 24 * 2]);
         foreach ($rs as $dir) {
-            $fs->delete_area_files($dir->contextid, 'enrol_programs', 'upload', $dir->itemid);
+            $fs->delete_area_files($dir->contextid, 'tool_muprog', 'upload', $dir->itemid);
         }
         $rs->close();
     }

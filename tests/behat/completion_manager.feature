@@ -1,4 +1,4 @@
-@enrol @enrol_programs @openlms
+@tool @tool_muprog @muTMS
 Feature: Program completion by managers tests
 
   Background:
@@ -29,28 +29,28 @@ Feature: Program completion by managers tests
       | Program admin   | padmin    |
     And the following "permission overrides" exist:
       | capability                       | permission | role     | contextlevel | reference |
-      | enrol/programs:view              | Allow      | pviewer  | System       |           |
-      | enrol/programs:view              | Allow      | pmanager | System       |           |
-      | enrol/programs:edit              | Allow      | pmanager | System       |           |
-      | enrol/programs:delete            | Allow      | pmanager | System       |           |
-      | enrol/programs:manageevidence    | Allow      | pmanager | System       |           |
-      | enrol/programs:view              | Allow      | padmin   | System       |           |
-      | enrol/programs:edit              | Allow      | padmin   | System       |           |
-      | enrol/programs:delete            | Allow      | padmin   | System       |           |
-      | enrol/programs:manageevidence    | Allow      | padmin   | System       |           |
-      | enrol/programs:manageallocation  | Allow      | pmanager | System       |           |
-      | enrol/programs:archive           | Allow      | pmanager | System       |           |
-      | enrol/programs:admin             | Allow      | padmin   | System       |           |
+      | tool/muprog:view              | Allow      | pviewer  | System       |           |
+      | tool/muprog:view              | Allow      | pmanager | System       |           |
+      | tool/muprog:edit              | Allow      | pmanager | System       |           |
+      | tool/muprog:delete            | Allow      | pmanager | System       |           |
+      | tool/muprog:manageevidence    | Allow      | pmanager | System       |           |
+      | tool/muprog:view              | Allow      | padmin   | System       |           |
+      | tool/muprog:edit              | Allow      | padmin   | System       |           |
+      | tool/muprog:delete            | Allow      | padmin   | System       |           |
+      | tool/muprog:manageevidence    | Allow      | padmin   | System       |           |
+      | tool/muprog:manageallocation  | Allow      | pmanager | System       |           |
+      | tool/muprog:archive           | Allow      | pmanager | System       |           |
+      | tool/muprog:admin             | Allow      | padmin   | System       |           |
     And the following "role assigns" exist:
       | user      | role          | contextlevel | reference |
       | admin1    | padmin        | System       |           |
       | manager1  | pmanager      | System       |           |
       | viewer1   | pviewer       | System       |           |
-    And the following "enrol_programs > programs" exist:
+    And the following "tool_muprog > programs" exist:
       | fullname    | idnumber | category | public |
       | Program 000 | PR0      |          | 1      |
       | Program 001 | PR1      | Cat 1    | 1      |
-    And the following "enrol_programs > program_items" exist:
+    And the following "tool_muprog > program_items" exist:
       | program     | parent     | course   | fullname   | sequencetype     | minprerequisites |
       | Program 000 |            |          | First set  | All in order     |                  |
       | Program 000 | First set  | Course 1 |            |                  |                  |
@@ -58,7 +58,7 @@ Feature: Program completion by managers tests
       | Program 000 |            |          | Second set | At least X       | 1                |
       | Program 000 | Second set | Course 3 |            |                  |                  |
       | Program 000 | Second set | Course 4 |            |                  |                  |
-    And the following "enrol_programs > program_allocations" exist:
+    And the following "tool_muprog > program_allocations" exist:
       | program     | user     |
       | Program 000 | student1 |
       | Program 000 | student2 |
@@ -68,97 +68,97 @@ Feature: Program completion by managers tests
   Scenario: Program manager may alter completion with evidence
     Given I log in as "manager1"
 
-    When I am on all programs management page
+    When I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
     And I follow "Users"
     And I follow "Student 1"
     And I click on "Update other evidence" "link" in the "Program 000" "table_row"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | evidencetimecompleted[enabled] | 1        |
       | Details                        | no need! |
     And I press dialog form button "Update"
-    Then I should see "Completed" in the "Program status:" definition list item
+    Then I should see "Completed" in the "Program status" definition list item
     And I should see "no need!"
 
     When I click on "Update other evidence" "link" in the "Program 000" "table_row"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | evidencetimecompleted[enabled] | 0        |
     And I press dialog form button "Update"
-    Then I should see "Completed" in the "Program status:" definition list item
+    Then I should see "Completed" in the "Program status" definition list item
     And I should not see "no need!"
 
     When I click on "Update other evidence" "link" in the "Program 000" "table_row"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | evidencetimecompleted[enabled] | 0        |
       | itemrecalculate                | 1        |
     And I press dialog form button "Update"
-    Then I should see "Open" in the "Program status:" definition list item
+    Then I should see "Open" in the "Program status" definition list item
 
-    When I am on all programs management page
+    When I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
     And I follow "Users"
     And I follow "Student 2"
     And I click on "Update other evidence" "link" in the "Course 1" "table_row"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | evidencetimecompleted[enabled] | 1        |
       | Details                        | no need! |
     And I press dialog form button "Update"
-    And I should see "Open" in the "Program status:" definition list item
+    And I should see "Open" in the "Program status" definition list item
     And I click on "Update other evidence" "link" in the "Course 3" "table_row"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | evidencetimecompleted[enabled] | 1        |
       | Details                        | no need! |
     And I press dialog form button "Update"
-    And I should see "Open" in the "Program status:" definition list item
+    And I should see "Open" in the "Program status" definition list item
     And I click on "Update other evidence" "link" in the "Course 2" "table_row"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | evidencetimecompleted[enabled] | 1        |
       | Details                        | no need! |
     And I press dialog form button "Update"
-    Then I should see "Completed" in the "Program status:" definition list item
+    Then I should see "Completed" in the "Program status" definition list item
     And I should see "no need!"
 
   @javascript
   Scenario: Program admin may mark override completion
     Given I log in as "admin1"
 
-    When I am on all programs management page
+    When I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
     And I follow "Users"
     And I follow "Student 1"
     And I click on "Allocation actions" "link"
     And I click on "Override program completion" "link"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | timecompleted[enabled] | 1    |
     And I press dialog form button "Update"
-    Then I should see "Completed" in the "Program status:" definition list item
+    Then I should see "Completed" in the "Program status" definition list item
 
-    When I am on all programs management page
+    When I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
     And I follow "Users"
     And I follow "Student 2"
     And I click on "Override completion" "link" in the "Program 000" "table_row"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | timecompleted[enabled] | 1    |
     And I press dialog form button "Update"
-    Then I should see "Completed" in the "Program status:" definition list item
+    Then I should see "Completed" in the "Program status" definition list item
 
-    When I am on all programs management page
+    When I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
     And I follow "Users"
     And I follow "Student 3"
     And I click on "Override completion" "link" in the "Course 1" "table_row"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | timecompleted[enabled] | 1    |
     And I press dialog form button "Update"
-    And I should see "Open" in the "Program status:" definition list item
+    And I should see "Open" in the "Program status" definition list item
     And I click on "Override completion" "link" in the "Course 3" "table_row"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | timecompleted[enabled] | 1    |
     And I press dialog form button "Update"
-    And I should see "Open" in the "Program status:" definition list item
+    And I should see "Open" in the "Program status" definition list item
     And I click on "Override completion" "link" in the "Course 2" "table_row"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | timecompleted[enabled] | 1    |
     And I press dialog form button "Update"
-    Then I should see "Completed" in the "Program status:" definition list item
+    Then I should see "Completed" in the "Program status" definition list item

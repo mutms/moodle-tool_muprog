@@ -1,4 +1,4 @@
-@enrol @enrol_programs @openlms
+@tool @tool_muprog @muTMS
 Feature: Programs navigation behat steps test
 
   Background:
@@ -27,9 +27,9 @@ Feature: Programs navigation behat steps test
       | Program admin  | padmin        |
     And the following "permission overrides" exist:
       | capability                     | permission | role         | contextlevel | reference |
-      | enrol/programs:view            | Allow      | pviewer      | System       |           |
+      | tool/muprog:view               | Allow      | pviewer      | System       |           |
       | moodle/site:configview         | Allow      | pviewer      | System       |           |
-      | enrol/programs:admin           | Allow      | padmin       | System       |           |
+      | tool/muprog:admin              | Allow      | padmin       | System       |           |
       | moodle/site:configview         | Allow      | padmin       | System       |           |
     And the following "role assigns" exist:
       | user     | role          | contextlevel | reference |
@@ -38,151 +38,112 @@ Feature: Programs navigation behat steps test
       | admin1   | padmin        | System       |           |
       | viewer1  | pviewer       | System       |           |
       | viewer2  | pviewer       | Category     | CAT1      |
-    And the following "enrol_programs > programs" exist:
+    And the following "tool_muprog > programs" exist:
       | fullname    | idnumber | category | public | archived |
       | Program 000 | PR0      |          | 0      | 0        |
       | Program 001 | PR1      | Cat 1    | 1      | 0        |
       | Program 002 | PR2      | Cat 2    | 0      | 0        |
       | Program 003 | PR3      |          | 1      | 1        |
 
+  @javascript
   Scenario: Admin navigates to programs via behat step
     Given I log in as "admin"
 
-    When I am on all programs management page
-    Then I should see "Program management"
+    When I am on the "tool_muprog > All programs management" page
+    Then I should see "Programs"
     And I should see "Program 000"
     And I should see "Program 001"
     And I should see "Program 002"
-    And I should not see "Program 003"
+    And I should see "Program 003"
 
-    When I am on programs management page in "system"
-    Then I should see "Program management"
+    When I click on "Filters" "button"
+    And I set the following fields in the "Exclude sub-categories" "core_reportbuilder > Filter" to these values:
+      | Exclude sub-categories operator | Yes |
+    And I click on "Apply" "button" in the "[data-region='report-filters']" "css_element"
+    And I click on "Filters" "button"
+    Then I should see "Programs"
     And I should see "Program 000"
     And I should not see "Program 001"
     And I should not see "Program 002"
-    And I should not see "Program 003"
+    And I should see "Program 003"
 
-    When I am on programs management page in "Cat 1"
-    Then I should see "Program management"
+    When I am on the "System" "tool_muprog > Programs management" page
+    Then I should see "Programs"
+    And I should see "Program 000"
+    And I should not see "Program 001"
+    And I should not see "Program 002"
+    And I should see "Program 003"
+
+    When I am on the "Cat 1" "tool_muprog > Programs management" page
+    Then I should see "Programs"
     And I should not see "Program 000"
     And I should see "Program 001"
     And I should not see "Program 002"
     And I should not see "Program 003"
 
-  @javascript
   Scenario: Admin navigates to programs the normal way
     Given I log in as "admin"
 
-    When I navigate to "Programs > Program management" in site administration
-    Then I should see "Program management"
+    When I navigate to "Programs > Programs management" in site administration
+    Then I should see "Programs"
     And I should see "Program 000"
     And I should see "Program 001"
     And I should see "Program 002"
-    And I should not see "Program 003"
+    And I should see "Program 003"
 
-    When I select "System (2)" from the "Select category" singleselect
-    Then I should see "Program management"
-    And I should see "Program 000"
-    And I should not see "Program 001"
-    And I should not see "Program 002"
-    And I should not see "Program 003"
-
-    When I select "Cat 1 (1)" from the "Select category" singleselect
-    Then I should see "Program management"
+    When I follow "Cat 1"
+    Then I should see "Programs"
     And I should not see "Program 000"
     And I should see "Program 001"
     And I should not see "Program 002"
-    And I should not see "Program 003"
-
-    When I select "All programs (4)" from the "Select category" singleselect
-    Then I should see "Program management"
-    And I should see "Program 000"
-    And I should see "Program 001"
-    And I should see "Program 002"
     And I should not see "Program 003"
 
   Scenario: Full manager navigates to programs via behat step
     Given I log in as "manager1"
 
-    When I am on all programs management page
-    Then I should see "Program management"
+    When I am on the "tool_muprog > All programs management" page
+    Then I should see "Programs"
     And I should see "Program 000"
     And I should see "Program 001"
     And I should see "Program 002"
-    And I should not see "Program 003"
+    And I should see "Program 003"
 
-    When I am on programs management page in "system"
-    Then I should see "Program management"
+    When I am on the "system" "tool_muprog > Programs management" page
+    Then I should see "Programs"
     And I should see "Program 000"
-    And I should not see "Program 001"
-    And I should not see "Program 002"
-    And I should not see "Program 003"
+    And I should see "Program 001"
+    And I should see "Program 002"
+    And I should see "Program 003"
 
-    When I am on programs management page in "Cat 1"
-    Then I should see "Program management"
+    When I am on the "Cat 1" "tool_muprog > Programs management" page
+    Then I should see "Programs"
     And I should not see "Program 000"
     And I should see "Program 001"
     And I should not see "Program 002"
     And I should not see "Program 003"
 
-  @javascript
   Scenario: Full manager navigates to programs the normal way
     Given I log in as "manager1"
 
-    When I navigate to "Programs > Program management" in site administration
-    Then I should see "Program management"
+    When I navigate to "Programs > Programs management" in site administration
+    Then I should see "Programs"
     And I should see "Program 000"
     And I should see "Program 001"
     And I should see "Program 002"
-    And I should not see "Program 003"
-    And I should not see "Program 003"
+    And I should see "Program 003"
 
-    When I select "System (2)" from the "Select category" singleselect
-    Then I should see "Program management"
-    And I should see "Program 000"
-    And I should not see "Program 001"
-    And I should not see "Program 002"
-    And I should not see "Program 003"
-    And I should not see "Program 003"
-
-    When I select "Cat 1 (1)" from the "Select category" singleselect
-    Then I should see "Program management"
+    When I follow "Cat 1"
+    Then I should see "Programs"
     And I should not see "Program 000"
     And I should see "Program 001"
     And I should not see "Program 002"
-    And I should not see "Program 003"
-    And I should not see "Program 003"
-
-    When I select "All programs (4)" from the "Select category" singleselect
-    Then I should see "Program management"
-    And I should see "Program 000"
-    And I should see "Program 001"
-    And I should see "Program 002"
-    And I should not see "Program 003"
     And I should not see "Program 003"
 
   Scenario: Category manager navigates to programs via behat step
     Given I log in as "manager2"
 
-    When I am on programs management page in "Cat 1"
-    Then I should see "Program management"
-    And I should not see "Program 000"
-    And I should see "Program 001"
-    And I should not see "Program 002"
-    And I should not see "Program 003"
-
-  @javascript
-  Scenario: Category manager navigates to programs via navmenu
-    Given I skip tests if "local_navmenu" is not installed
-    And the following "local_navmenu > items" exist:
-      | itemtype                  |
-      | enrol_programs_catalogue  |
-      | enrol_programs_myprograms |
-    And I log in as "manager2"
-
-    When I select "Program catalogue" from primary navigation
-    And I follow "Program management"
-    Then I should see "Program management"
+    When I am on the "Cat 1" "tool_muprog > Programs management" page
+    Then I should see "Programs"
     And I should not see "Program 000"
     And I should see "Program 001"
     And I should not see "Program 002"
@@ -194,127 +155,59 @@ Feature: Programs navigation behat steps test
       | moodle/site:configview         | Prohibit   | pviewer      | System       |           |
     And I log in as "viewer1"
 
-    When I am on all programs management page
-    Then I should see "Program management"
+    When I am on the "tool_muprog > All programs management" page
+    Then I should see "Programs"
     And I should see "Program 000"
     And I should see "Program 001"
     And I should see "Program 002"
-    And I should not see "Program 003"
+    And I should see "Program 003"
 
-    When I am on programs management page in "system"
-    Then I should see "Program management"
+    When I am on the "system" "tool_muprog > Programs management" page
+    Then I should see "Programs"
     And I should see "Program 000"
-    And I should not see "Program 001"
-    And I should not see "Program 002"
-    And I should not see "Program 003"
+    And I should see "Program 001"
+    And I should see "Program 002"
+    And I should see "Program 003"
 
-    When I am on programs management page in "Cat 1"
-    Then I should see "Program management"
+    When I am on the "Cat 1" "tool_muprog > Programs management" page
+    Then I should see "Programs"
     And I should not see "Program 000"
     And I should see "Program 001"
     And I should not see "Program 002"
     And I should not see "Program 003"
 
-  @javascript
   Scenario: Full viewer navigates to programs the normal way
     Given I log in as "viewer1"
 
-    When I navigate to "Programs > Program management" in site administration
-    Then I should see "Program management"
+    When I navigate to "Programs > Programs management" in site administration
+    Then I should see "Programs"
     And I should see "Program 000"
     And I should see "Program 001"
     And I should see "Program 002"
-    And I should not see "Program 003"
-    And I should not see "Program 003"
+    And I should see "Program 003"
+    And I should see "Program 003"
 
-    When I select "System (2)" from the "Select category" singleselect
-    Then I should see "Program management"
-    And I should see "Program 000"
-    And I should not see "Program 001"
-    And I should not see "Program 002"
-    And I should not see "Program 003"
-    And I should not see "Program 003"
-
-    When I select "Cat 1 (1)" from the "Select category" singleselect
-    Then I should see "Program management"
+    When I follow "Cat 1"
+    Then I should see "Programs"
     And I should not see "Program 000"
     And I should see "Program 001"
     And I should not see "Program 002"
     And I should not see "Program 003"
     And I should not see "Program 003"
 
-    When I select "All programs (4)" from the "Select category" singleselect
-    Then I should see "Program management"
+    When I follow "System"
+    Then I should see "Programs"
     And I should see "Program 000"
     And I should see "Program 001"
     And I should see "Program 002"
-    And I should not see "Program 003"
-    And I should not see "Program 003"
-
-  @javascript
-  Scenario: Full viewer navigates to programs via navmenu
-    Given I skip tests if "local_navmenu" is not installed
-    And the following "local_navmenu > items" exist:
-      | itemtype                  |
-      | enrol_programs_catalogue  |
-      | enrol_programs_myprograms |
-    And the following "permission overrides" exist:
-      | capability                     | permission | role         | contextlevel | reference |
-      | moodle/site:configview         | Prohibit   | pviewer      | System       |           |
-    And I log in as "viewer1"
-
-    When I select "Program catalogue" from primary navigation
-    And I follow "Program management"
-    Then I should see "Program management"
-    And I should see "Program 000"
-    And I should see "Program 001"
-    And I should see "Program 002"
-    And I should not see "Program 003"
-
-    When I select "System (2)" from the "Select category" singleselect
-    Then I should see "Program management"
-    And I should see "Program 000"
-    And I should not see "Program 001"
-    And I should not see "Program 002"
-    And I should not see "Program 003"
-
-    When I select "Cat 1 (1)" from the "Select category" singleselect
-    Then I should see "Program management"
-    And I should not see "Program 000"
-    And I should see "Program 001"
-    And I should not see "Program 002"
-    And I should not see "Program 003"
-
-    When I select "All programs (4)" from the "Select category" singleselect
-    Then I should see "Program management"
-    And I should see "Program 000"
-    And I should see "Program 001"
-    And I should see "Program 002"
-    And I should not see "Program 003"
-    And I should not see "Program 003"
+    And I should see "Program 003"
+    And I should see "Program 003"
 
   Scenario: Category viewer navigates to programs via behat step
     Given I log in as "viewer2"
 
-    When I am on programs management page in "Cat 1"
-    Then I should see "Program management"
-    And I should not see "Program 000"
-    And I should see "Program 001"
-    And I should not see "Program 002"
-    And I should not see "Program 003"
-
-  @javascript
-  Scenario: Category viewer navigates to programs via navmenu
-    Given I skip tests if "local_navmenu" is not installed
-    And the following "local_navmenu > items" exist:
-      | itemtype                  |
-      | enrol_programs_catalogue  |
-      | enrol_programs_myprograms |
-    And I log in as "manager2"
-
-    When I select "Program catalogue" from primary navigation
-    And I follow "Program management"
-    Then I should see "Program management"
+    When I am on the "Cat 1" "tool_muprog > Programs management" page
+    Then I should see "Programs"
     And I should not see "Program 000"
     And I should see "Program 001"
     And I should not see "Program 002"
@@ -323,23 +216,7 @@ Feature: Programs navigation behat steps test
   Scenario: Student navigates to Program catalogue via behat step
     Given I log in as "student1"
 
-    When I am on Program catalogue page
-    Then I should see "Program catalogue"
-    And I should see "Program 001"
-    And I should not see "Program 000"
-    And I should not see "Program 002"
-    And I should not see "Program 003"
-
-  @javascript
-  Scenario: Student navigates to Program catalogue via navmenu
-    Given I skip tests if "local_navmenu" is not installed
-    And the following "local_navmenu > items" exist:
-      | itemtype                  |
-      | enrol_programs_catalogue  |
-      | enrol_programs_myprograms |
-    And I log in as "student1"
-
-    When I select "Program catalogue" from primary navigation
+    When I am on the "tool_muprog > Program catalogue" page
     Then I should see "Program catalogue"
     And I should see "Program 001"
     And I should not see "Program 000"
@@ -349,20 +226,7 @@ Feature: Programs navigation behat steps test
   Scenario: Student navigates to My programs via behat step
     Given I log in as "student1"
 
-    When I am on My programs page
-    Then I should see "My programs"
-    And I should see "You are not allocated to any programs."
-
-  @javascript
-  Scenario: Student navigates to My programs via navmenu
-    Given I skip tests if "local_navmenu" is not installed
-    And the following "local_navmenu > items" exist:
-      | itemtype                  |
-      | enrol_programs_catalogue  |
-      | enrol_programs_myprograms |
-    And I log in as "student1"
-
-    When I select "My programs" from primary navigation
+    When I am on the "tool_muprog > My programs" page
     Then I should see "My programs"
     And I should see "You are not allocated to any programs."
 
@@ -377,11 +241,6 @@ Feature: Programs navigation behat steps test
     And I log out
 
     When I log in as "manager1"
-    And I navigate to "Programs > Program settings" in site administration
-    Then I should see "Allow cohort allocation"
-    And I log out
-
-    When I log in as "admin1"
     And I navigate to "Programs > Program settings" in site administration
     Then I should see "Allow cohort allocation"
     And I log out

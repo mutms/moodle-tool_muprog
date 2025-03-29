@@ -1,4 +1,4 @@
-@enrol @enrol_programs @openlms
+@tool @tool_muprog @muTMS
 Feature: Program allocation calendar events tests
 
   Background:
@@ -14,20 +14,20 @@ Feature: Program allocation calendar events tests
       | Program viewer  | pviewer   |
       | Program manager | pmanager  |
     And the following "permission overrides" exist:
-      | capability                     | permission | role     | contextlevel | reference |
-      | enrol/programs:view            | Allow      | pviewer  | System       |           |
-      | enrol/programs:view            | Allow      | pmanager | System       |           |
-      | enrol/programs:edit            | Allow      | pmanager | System       |           |
-      | enrol/programs:delete          | Allow      | pmanager | System       |           |
-      | enrol/programs:admin           | Allow      | pmanager | System       |           |
+      | capability                  | permission | role     | contextlevel | reference |
+      | tool/muprog:view            | Allow      | pviewer  | System       |           |
+      | tool/muprog:view            | Allow      | pmanager | System       |           |
+      | tool/muprog:edit            | Allow      | pmanager | System       |           |
+      | tool/muprog:delete          | Allow      | pmanager | System       |           |
+      | tool/muprog:admin           | Allow      | pmanager | System       |           |
     And the following "role assigns" exist:
       | user      | role          | contextlevel | reference |
       | manager1  | pmanager      | System       |           |
       | viewer1   | pviewer       | System       |           |
-    And the following "enrol_programs > programs" exist:
+    And the following "tool_muprog > programs" exist:
       | fullname    | idnumber | category | public | description               |
       | Program 000 | PR0      |          | 1      | Fancy program description |
-    And the following "enrol_programs > program_allocations" exist:
+    And the following "tool_muprog > program_allocations" exist:
       | program     | user     |
       | Program 000 | student1 |
 
@@ -41,4 +41,4 @@ Feature: Program allocation calendar events tests
     When I click on "View" "link" in the ".modal-footer" "css_element"
     Then I should see "Program 000"
     And I should see "Fancy program description"
-    And I should see "Manual allocation" in the "Source:" definition list item
+    And I should see "Manual allocation" in the "Source" definition list item

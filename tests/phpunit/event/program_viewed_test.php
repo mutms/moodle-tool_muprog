@@ -1,0 +1,53 @@
+<?php
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+
+namespace tool_muprog\phpunit\event;
+
+use tool_muprog\local\program;
+
+/**
+ * Program viewed event test.
+ *
+ * @group      muTMS
+ * @package    tool_muprog
+ * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
+ * @author     Petr Skoda
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ *
+ * @covers \tool_muprog\event\program_viewed
+ */
+final class program_viewed_test extends \advanced_testcase {
+    public function setUp(): void {
+        parent::setUp();
+        $this->resetAfterTest();
+    }
+
+    public function test_event_trigget(): void {
+        $syscontext = \context_system::instance();
+        $data = (object)[
+            'fullname' => 'Some program',
+            'idnumber' => 'SP1',
+            'contextid' => $syscontext->id,
+        ];
+        $this->setAdminUser();
+        $program = program::add_program($data);
+
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+        $event = \tool_muprog\event\program_viewed::create_from_program($program);
+        $event->trigger();
+
+        $this->assertInstanceOf('tool_muprog\event\program_viewed', $event);
+        $this->assertEquals($syscontext->id, $event->contextid);
+        $this->assertSame($program->id, $event->objectid);
+        $this->assertSame('r', $event->crud);
+        $this->assertSame($event::LEVEL_OTHER, $event->edulevel);
+        $this->assertSame('tool_muprog_program', $event->objecttable);
+        $this->assertSame('Program viewed', $event::get_name());
+        $description = $event->get_description();
+        $programurl = new \moodle_url('/admin/tool/muprog/catalogue/program.php', ['id' => $program->id]);
+        $this->assertSame($programurl->out(false), $event->get_url()->out(false));
+    }
+}

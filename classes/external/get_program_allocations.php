@@ -1,22 +1,10 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace enrol_programs\external;
+namespace tool_muprog\external;
 
-use enrol_programs\local\allocation;
+use tool_muprog\local\allocation;
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_value;
@@ -26,8 +14,9 @@ use core_external\external_single_structure;
 /**
  * Provides list of program allocations for given program and optional list of users.
  *
- * @package     enrol_programs
+ * @package     tool_muprog
  * @copyright   2023 Open LMS (https://www.openlms.net/)
+ * @copyright   2025 Petr Skoda
  * @author      Farhan Karmali
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -37,7 +26,7 @@ final class get_program_allocations extends external_api {
      * Describes the external function arguments.
      *
      * @return external_function_parameters
-     * TODO For now Moodle does not allow multiple_structure to be null , so have left it as value default and empty array.
+     * NOTE For now Moodle does not allow multiple_structure to be null , so have left it as value default and empty array.
      * see MDL-78192 for details, when possible convert empty array to null.
      */
     public static function execute_parameters(): external_function_parameters {
@@ -46,7 +35,7 @@ final class get_program_allocations extends external_api {
             'userids' => new external_multiple_structure(
                 new external_value(PARAM_INT, 'User id'),
                 'List of user ids for whom the program allocation must be fetched',
-                VALUE_DEFAULT, [])
+                VALUE_DEFAULT, []),
         ]);
     }
 
@@ -60,12 +49,12 @@ final class get_program_allocations extends external_api {
     public static function execute(int $programid, array $userids = []): array {
         global $DB;
 
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $programid], '*', MUST_EXIST);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
 
         // Validate context.
         $context = \context::instance_by_id($program->contextid);
         self::validate_context($context);
-        require_capability('enrol/programs:view', $context);
+        require_capability('tool/muprog:view', $context);
 
         $params = self::validate_parameters(self::execute_parameters(),
             ['programid' => $programid, 'userids' => $userids]);
@@ -76,11 +65,11 @@ final class get_program_allocations extends external_api {
         $results = [];
         if (empty($userids)) {
             // TODO: for now treat empty array as all allocations until MDL-78192 adds support for NULLs.
-            $allocations = $DB->get_records('enrol_programs_allocations', ['programid' => $programid], 'id');
+            $allocations = $DB->get_records('tool_muprog_allocation', ['programid' => $programid], 'id');
         } else {
             $allocations = [];
             foreach ($userids as $userid) {
-                $allocationrecord = $DB->get_record('enrol_programs_allocations', ['programid' => $programid, 'userid' => $userid]);
+                $allocationrecord = $DB->get_record('tool_muprog_allocation', ['programid' => $programid, 'userid' => $userid]);
                 if ($allocationrecord) {
                     $allocations[$allocationrecord->id] = $allocationrecord;
                 }
@@ -89,14 +78,14 @@ final class get_program_allocations extends external_api {
         }
 
         $sourceclasses = allocation::get_source_classes();
-        $sources = $DB->get_records('enrol_programs_sources', ['programid' => $program->id]);
+        $sources = $DB->get_records('tool_muprog_source', ['programid' => $program->id]);
         foreach ($allocations as $allocation) {
             if (!isset($sources[$allocation->sourceid]) || !isset($sourceclasses[$sources[$allocation->sourceid]->type])) {
                 // Ignore invalid data.
                 continue;
             }
             $source = $sources[$allocation->sourceid];
-            /** @var class-string<\enrol_programs\local\source\base> $sourceclass */
+            /** @var class-string<\tool_muprog\local\source\base> $sourceclass */
             $sourceclass = $sourceclasses[$source->type];
             $allocation->sourcetype = $source->type;
             $allocation->deletesupported = $sourceclass::allocation_delete_supported($program, $source, $allocation);

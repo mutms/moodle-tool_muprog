@@ -1,4 +1,4 @@
-@enrol @enrol_programs @openlms
+@tool @tool_muprog @muTMS
 Feature: Program selfallocation tests
 
   Background:
@@ -45,12 +45,12 @@ Feature: Program selfallocation tests
       | Program manager | pmanager  |
     And the following "permission overrides" exist:
       | capability                     | permission | role     | contextlevel | reference |
-      | enrol/programs:view            | Allow      | pviewer  | System       |           |
-      | enrol/programs:view            | Allow      | pmanager | System       |           |
-      | enrol/programs:edit            | Allow      | pmanager | System       |           |
-      | enrol/programs:delete          | Allow      | pmanager | System       |           |
-      | enrol/programs:addcourse       | Allow      | pmanager | System       |           |
-      | enrol/programs:allocate        | Allow      | pmanager | System       |           |
+      | tool/muprog:view            | Allow      | pviewer  | System       |           |
+      | tool/muprog:view            | Allow      | pmanager | System       |           |
+      | tool/muprog:edit            | Allow      | pmanager | System       |           |
+      | tool/muprog:delete          | Allow      | pmanager | System       |           |
+      | tool/muprog:addcourse       | Allow      | pmanager | System       |           |
+      | tool/muprog:allocate        | Allow      | pmanager | System       |           |
       | moodle/cohort:view             | Allow      | pmanager | System       |           |
     And the following "role assigns" exist:
       | user      | role          | contextlevel | reference |
@@ -58,13 +58,13 @@ Feature: Program selfallocation tests
       | manager2  | pmanager      | Category     | CAT2      |
       | manager2  | pmanager      | Category     | CAT3      |
       | viewer1   | pviewer       | System       |           |
-    And the following "enrol_programs > programs" exist:
+    And the following "tool_muprog > programs" exist:
       | fullname    | idnumber | category | cohorts  | public |
       | Program 000 | PR0      |          | Cohort 2 |        |
       | Program 001 | PR1      | Cat 1    |          | 1      |
       | Program 002 | PR2      | Cat 2    |          |        |
       | Program 003 | PR3      | Cat 3    |          |        |
-    And the following "enrol_programs > program_items" exist:
+    And the following "tool_muprog > program_items" exist:
       | program     | parent     | course   | fullname   | sequencetype     | minprerequisites |
       | Program 001 |            | Course 1 |            |                  |                  |
       | Program 001 |            | Course 2 |            |                  |                  |
@@ -73,19 +73,19 @@ Feature: Program selfallocation tests
   @javascript
   Scenario: Student may self allocate without a key
     When I log in as "manager1"
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
     And I follow "Allocation settings"
     And I click on "Update Self allocation" "link"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Active             | Yes |
       | Allow new sign ups | No  |
     And I press dialog form button "Update"
-    Then I should see "Active; Sign ups are not allowed" in the "Self allocation:" definition list item
+    Then I should see "Active; Sign ups are not allowed" in the "Self allocation" definition list item
     And I log out
 
     When I log in as "student2"
-    And I am on Program catalogue page
+    And I am on the "tool_muprog > Program catalogue" page
     And I should see "Program 000"
     And I should see "Program 001"
     And I follow "Program 000"
@@ -93,18 +93,18 @@ Feature: Program selfallocation tests
     And I log out
 
     When I log in as "manager1"
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
     And I follow "Allocation settings"
     And I click on "Update Self allocation" "link"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Allow new sign ups | Yes |
     And I press dialog form button "Update"
-    Then I should see "Active; Sign ups are allowed" in the "Self allocation:" definition list item
+    Then I should see "Active; Sign ups are allowed" in the "Self allocation" definition list item
     And I log out
 
     When I log in as "student2"
-    And I am on Program catalogue page
+    And I am on the "tool_muprog > Program catalogue" page
     And I should see "Program 000"
     And I should see "Program 001"
     And I follow "Program 000"
@@ -112,71 +112,71 @@ Feature: Program selfallocation tests
     And I press dialog form button "Cancel"
     And I press "Sign up"
     And I press dialog form button "Sign up"
-    Then I should see "Open" in the "Program status:" definition list item
+    Then I should see "Open" in the "Program status" definition list item
     And I should see "All in any order" in the "Program 000" "table_row"
 
   @javascript
   Scenario: Student may self allocate with a key
     Given I log in as "manager1"
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
     And I follow "Allocation settings"
 
     When I click on "Update Self allocation" "link"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Active      | Yes   |
       | Sign up key | heslo |
     And I press dialog form button "Update"
-    Then I should see "Active; Sign up key is required; Sign ups are allowed" in the "Self allocation:" definition list item
+    Then I should see "Active; Sign up key is required; Sign ups are allowed" in the "Self allocation" definition list item
     And I log out
 
     When I log in as "student2"
-    And I am on Program catalogue page
+    And I am on the "tool_muprog > Program catalogue" page
     And I follow "Program 000"
     And I press "Sign up"
     And I press dialog form button "Sign up"
     And I should see "Required"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Sign up key | hEslo |
     And I press dialog form button "Sign up"
     And I should see "Error"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Sign up key | heslo |
     And I press dialog form button "Sign up"
-    Then I should see "Open" in the "Program status:" definition list item
+    Then I should see "Open" in the "Program status" definition list item
     And I should see "All in any order" in the "Program 000" "table_row"
 
   @javascript
   Scenario: Student may self allocate with max users limit
     Given I log in as "manager1"
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 001"
     And I follow "Allocation settings"
 
     When I click on "Update Self allocation" "link"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Active    | Yes |
       | Max users | 2   |
     And I press dialog form button "Update"
-    Then I should see "Active; Users 0/2; Sign ups are allowed" in the "Self allocation:" definition list item
+    Then I should see "Active; Users 0/2; Sign ups are allowed" in the "Self allocation" definition list item
     And I log out
 
     And I log in as "student1"
-    And I am on Program catalogue page
+    And I am on the "tool_muprog > Program catalogue" page
     And I follow "Program 001"
     And I press "Sign up"
     And I press dialog form button "Sign up"
-    And I should see "Open" in the "Program status:" definition list item
+    And I should see "Open" in the "Program status" definition list item
     And I log out
     And I log in as "student2"
-    And I am on Program catalogue page
+    And I am on the "tool_muprog > Program catalogue" page
     And I follow "Program 001"
     And I press "Sign up"
     And I press dialog form button "Sign up"
     And I log out
 
     When I log in as "student3"
-    And I am on Program catalogue page
+    And I am on the "tool_muprog > Program catalogue" page
     And I follow "Program 001"
     Then I should see "Maximum number of users self-allocated already"
 
@@ -191,7 +191,7 @@ Feature: Program selfallocation tests
     And I log out
 
     When I log in as "student1"
-    And I am on Program catalogue page
+    And I am on the "tool_muprog > Program catalogue" page
     And I follow "Program 001"
     Then I should see "Course is missing" in the "Course 1" "table_row"
     And I should not see "Course is missing" in the "Course 2" "table_row"

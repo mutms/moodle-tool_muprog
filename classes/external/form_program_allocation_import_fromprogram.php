@@ -1,20 +1,8 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace enrol_programs\external;
+namespace tool_muprog\external;
 
 use core_external\external_function_parameters;
 use core_external\external_value;
@@ -22,12 +10,14 @@ use core_external\external_value;
 /**
  * Provides list of programs from which the user can import content.
  *
- * @package     enrol_programs
+ * @package     tool_muprog
  * @copyright   2023 Open LMS (https://www.openlms.net/)
+ * @copyright   2025 Petr Skoda
  * @author      Farhan Karmali
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class form_program_allocation_import_fromprogram extends \local_openlms\external\form_autocomplete_field {
+final class form_program_allocation_import_fromprogram extends \tool_mulib\external\form_autocomplete_field {
+    /** @var int max results */
     const MAX_RESULTS = 20;
 
     /**
@@ -66,17 +56,17 @@ final class form_program_allocation_import_fromprogram extends \local_openlms\ex
         $query = $params['query'];
         $programid = $params['programid'];
 
-        $targetprogram = $DB->get_record('enrol_programs_programs', ['id' => $programid], '*', MUST_EXIST);
+        $targetprogram = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
         $context = \context::instance_by_id($targetprogram->contextid);
 
         self::validate_context($context);
-        require_capability('enrol/programs:edit', $context);
+        require_capability('tool/muprog:edit', $context);
 
-        list($searchsql, $params) = \enrol_programs\local\management::get_program_search_query(null, $query, 'p');
+        list($searchsql, $params) = \tool_muprog\local\management::get_program_search_query(null, $query, 'p');
         $params['programid'] = $programid;
 
         $tenantselect = '';
-        if (\enrol_programs\local\tenant::is_available()) {
+        if (\tool_muprog\local\util::is_mutenancy_active()) {
             $targetprogramtenantid = $DB->get_field('context', 'tenantid', ['id' => $context->id]);
             if ($targetprogramtenantid) {
                 $tenantselect = "AND (c.tenantid = :tenantid OR c.tenantid IS NULL)";
@@ -85,7 +75,7 @@ final class form_program_allocation_import_fromprogram extends \local_openlms\ex
         }
 
         $sql = "SELECT p.id, p.fullname, p.contextid
-                  FROM {enrol_programs_programs} p
+                  FROM {tool_muprog_program} p
                   JOIN {context} c ON c.id = p.contextid
                  WHERE p.id <> :programid AND $searchsql
                        $tenantselect
@@ -97,12 +87,12 @@ final class form_program_allocation_import_fromprogram extends \local_openlms\ex
         $count = 0;
         foreach ($rs as $program) {
             $context = \context::instance_by_id($program->contextid);
-            if (!has_capability('enrol/programs:clone', $context)) {
+            if (!has_capability('tool/muprog:clone', $context)) {
                 continue;
             }
             $count++;
             if ($count > self::MAX_RESULTS) {
-                $notice = get_string('toomanyrecords', 'local_openlms', self::MAX_RESULTS);
+                $notice = get_string('toomanyrecords', 'tool_mulib', self::MAX_RESULTS);
                 break;
             }
             $list[] = ['value' => $program->id, 'label' => format_string($program->fullname)];

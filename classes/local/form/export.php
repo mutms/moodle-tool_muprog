@@ -1,20 +1,10 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace enrol_programs\local\form;
+namespace tool_muprog\local\form;
+
+defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 require_once($CFG->dirroot . '/lib/formslib.php');
@@ -23,16 +13,14 @@ require_once($CFG->dirroot . '/lib/csvlib.class.php');
 /**
  * Export programs.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2024 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class export extends \moodleform {
-    /**
-     * Export form definition.
-     * @return void
-     */
+    #[\Override]
     protected function definition() {
         $mform = $this->_form;
         $program = $this->_customdata['program'];
@@ -41,8 +29,8 @@ final class export extends \moodleform {
 
         if ($program) {
             // Export was started from a program details page, let them add other programs.
-            \enrol_programs\external\form_export_programids::add_form_element(
-                $mform, ['query' => ''], 'programids', get_string('programs', 'enrol_programs'));
+            \tool_muprog\external\form_export_programids::add_form_element(
+                $mform, ['query' => ''], 'programids', get_string('programs', 'tool_muprog'));
             $mform->addRule('programids', null, 'required', null, 'client');
             $mform->setDefault('programids', [$program->id]);
 
@@ -55,15 +43,15 @@ final class export extends \moodleform {
             $mform->addElement('select', 'contextid', get_string('context'), self::get_contextid_options());
             $mform->setDefault('contextid', $contextid);
 
-            $mform->addElement('advcheckbox', 'archived', get_string('archived', 'enrol_programs'), '&nbsp;');
+            $mform->addElement('advcheckbox', 'archived', get_string('archived', 'tool_muprog'), '&nbsp;');
             $mform->setDefault('archived', $archived);
         }
 
         $choices = [
-            'json' => get_string('exportformat_json', 'enrol_programs'),
-            'csv' => get_string('exportformat_csv', 'enrol_programs'),
+            'json' => get_string('exportformat_json', 'tool_muprog'),
+            'csv' => get_string('exportformat_csv', 'tool_muprog'),
         ];
-        $mform->addElement('select', 'format', get_string('exportformat', 'enrol_programs'), $choices);
+        $mform->addElement('select', 'format', get_string('exportformat', 'tool_muprog'), $choices);
 
         $choices = \csv_import_reader::get_delimiter_list();
         unset($choices['colon']); // This collides with formatted dates, better not use it at all.
@@ -84,7 +72,7 @@ final class export extends \moodleform {
 
         // We cannot redirect after file is downloaded, so let them click "Back" button instead.
         $buttonarray = [
-            $mform->createElement('submit', 'exportbutton', get_string('export', 'enrol_programs')),
+            $mform->createElement('submit', 'exportbutton', get_string('export', 'tool_muprog')),
             $mform->createElement('cancel', 'cancel', get_string('back')),
         ];
         $grp = $mform->addGroup($buttonarray, 'buttonar', get_string('formactions', 'core_form'), [' '], false);
@@ -92,13 +80,7 @@ final class export extends \moodleform {
         $mform->closeHeaderBefore('buttonar');
     }
 
-    /**
-     * Validate export options.
-     *
-     * @param array $data
-     * @param array $files
-     * @return array
-     */
+    #[\Override]
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
         $program = $this->_customdata['program'];
@@ -107,7 +89,7 @@ final class export extends \moodleform {
             if (!$data['programids']) {
                 $errors['programids'] = get_string('required');
             } else {
-                $error = \enrol_programs\external\form_export_programids::validate_programids($data['programids']);
+                $error = \tool_muprog\external\form_export_programids::validate_programids($data['programids']);
                 if ($error !== null) {
                     $errors['programids'] = $error;
                 }
@@ -125,11 +107,11 @@ final class export extends \moodleform {
     public function get_contextid_options(): array {
         $options = [];
         $syscontext = \context_system::instance();
-        if (has_capability('enrol/programs:export', $syscontext)) {
-            $options[0] = get_string('allprograms', 'enrol_programs');
+        if (has_capability('tool/muprog:export', $syscontext)) {
+            $options[0] = get_string('allprograms', 'tool_muprog');
             $options[$syscontext->id] = $syscontext->get_context_name();
         }
-        $categories = \core_course_category::make_categories_list('enrol/programs:export');
+        $categories = \core_course_category::make_categories_list('tool/muprog:export');
         foreach ($categories as $catid => $categoryname) {
             $catcontext = \context_coursecat::instance($catid);
             $options[$catcontext->id] = $categoryname;

@@ -1,4 +1,4 @@
-@enrol @enrol_programs @openlms
+@tool @tool_muprog @muTMS
 Feature: Upload program completion evidence using csv
 
   Background:
@@ -45,12 +45,12 @@ Feature: Upload program completion evidence using csv
       | Program manager | pmanager  |
     And the following "permission overrides" exist:
       | capability                     | permission | role     | contextlevel | reference |
-      | enrol/programs:view            | Allow      | pviewer  | System       |           |
-      | enrol/programs:view            | Allow      | pmanager | System       |           |
-      | enrol/programs:manageevidence  | Allow      | pmanager | System       |           |
-      | enrol/programs:edit            | Allow      | pmanager | System       |           |
-      | enrol/programs:allocate        | Allow      | pmanager | System       |           |
-      | enrol/programs:archive         | Allow      | pmanager | System       |           |
+      | tool/muprog:view            | Allow      | pviewer  | System       |           |
+      | tool/muprog:view            | Allow      | pmanager | System       |           |
+      | tool/muprog:manageevidence  | Allow      | pmanager | System       |           |
+      | tool/muprog:edit            | Allow      | pmanager | System       |           |
+      | tool/muprog:allocate        | Allow      | pmanager | System       |           |
+      | tool/muprog:archive         | Allow      | pmanager | System       |           |
     And the following "role assigns" exist:
       | user      | role          | contextlevel | reference |
       | manager   | manager       | System       |           |
@@ -58,7 +58,7 @@ Feature: Upload program completion evidence using csv
       | manager2  | pmanager      | Category     | CAT2      |
       | manager2  | pmanager      | Category     | CAT3      |
       | viewer1   | pviewer       | System       |           |
-    And the following "enrol_programs > programs" exist:
+    And the following "tool_muprog > programs" exist:
       | fullname    | idnumber | category |
       | Program 000 | PR0      |          |
       | Program 001 | PR1      | Cat 1    |
@@ -68,25 +68,25 @@ Feature: Upload program completion evidence using csv
   @javascript @_file_upload
   Scenario: Manager may upload CSV file for other evidence completion
     Given I log in as "manager1"
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 001"
     And I follow "Allocation settings"
     And I click on "Update Manual allocation" "link"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Active | Yes |
     And I press dialog form button "Update"
-    And I should see "Active" in the "Manual allocation:" definition list item
-    And I click on "Users" "link" in the "#region-main" "css_element"
+    And I should see "Active" in the "Manual allocation" definition list item
+    And I click on "Users" "link" in the ".secondary-navigation" "css_element"
     And I click on "Users actions" "link"
     And I should not see "Upload completion evidences"
 
     And I click on "Upload allocations" "link"
-    And I upload "enrol/programs/tests/fixtures/evidence1.csv" file to "CSV file" filemanager
-    And I set the following fields to these values:
+    And I upload "admin/tool/muprog/tests/fixtures/evidence1.csv" file to "CSV file" filemanager
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | CSV separator | ,     |
       | Encoding      | UTF-8 |
     And I press dialog form button "Continue"
-    And the following fields match these values:
+    And the following fields in the ".modal-dialog" "css_element" match these values:
       | User identification column | username |
       | User mapping via           | Username |
       | First line is header       | 1        |
@@ -99,16 +99,16 @@ Feature: Upload program completion evidence using csv
     And I click on "Allocation actions" "link"
     And I click on "Archive" "link"
     And I press dialog form button "Archive"
-    And I click on "Users" "link" in the "#region-main" "css_element"
+    And I click on "Users" "link" in the ".secondary-navigation" "css_element"
     And I click on "Users actions" "link"
 
     When I click on "Upload completion evidences" "link"
-    And I upload "enrol/programs/tests/fixtures/evidence1.csv" file to "CSV file" filemanager
-    And I set the following fields to these values:
+    And I upload "admin/tool/muprog/tests/fixtures/evidence1.csv" file to "CSV file" filemanager
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | CSV separator | ,     |
       | Encoding      | UTF-8 |
     And I press dialog form button "Continue"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | User identification column | username      |
       | User mapping via           | Username      |
       | First line is header       | 1             |
@@ -119,8 +119,8 @@ Feature: Upload program completion evidence using csv
     Then I should see "Completion evidence updated for 2 users"
     And I should see "2 rows skipped"
     And I should see "2 invalid rows detected"
-    And the following should exist in the "program_allocations" table:
-      | First name / Last name | Program status |
+    And the following should exist in the "reportbuilder-table" table:
+      | First name             | Program status |
       | Student 1              | Completed      |
       | Student 2              | Completed      |
       | Student 3              | Archived       |
@@ -128,22 +128,22 @@ Feature: Upload program completion evidence using csv
       | Student 5              | Open           |
 
     And I follow "Student 1"
-    And I should see "12 February 2023, 12:00" in the "Program completion date:" definition list item
+    And I should see "12 February 2023, 12:00" in the "Program completion date" definition list item
     And the following should exist in the "program_content" table:
       | Completion date | Other evidence |
       | 12/02/23, 00:00 | Evidence1      |
-    And I click on "Users" "link" in the "#region-main" "css_element"
+    And I click on "Users" "link" in the ".secondary-navigation" "css_element"
 
     And I follow "Student 2"
-    And I should see "12 March 2023, 12:00" in the "Program completion date:" definition list item
+    And I should see "12 March 2023, 12:00" in the "Program completion date" definition list item
     And the following should exist in the "program_content" table:
       | Completion date | Other evidence |
       | 12/03/23, 00:00 | EvidenceX      |
-    And I click on "Users" "link" in the "#region-main" "css_element"
+    And I click on "Users" "link" in the ".secondary-navigation" "css_element"
     And I click on "Users actions" "link"
 
     When I click on "Upload completion evidences" "link"
-    And I upload "enrol/programs/tests/fixtures/evidence2.csv" file to "CSV file" filemanager
+    And I upload "admin/tool/muprog/tests/fixtures/evidence2.csv" file to "CSV file" filemanager
     And I set the following fields to these values:
       | CSV separator | ,     |
       | Encoding      | UTF-8 |
@@ -165,22 +165,22 @@ Feature: Upload program completion evidence using csv
     And I should see "1 rows skipped"
 
     And I follow "Student 1"
-    And I should see "12 July 2023, 12:00" in the "Program completion date:" definition list item
+    And I should see "12 July 2023, 12:00" in the "Program completion date" definition list item
     And the following should exist in the "program_content" table:
       | Completion date | Other evidence |
       | 12/07/23, 00:00 | EvidenceY      |
-    And I click on "Users" "link" in the "#region-main" "css_element"
+    And I click on "Users" "link" in the ".secondary-navigation" "css_element"
 
     And I follow "Student 2"
-    And I should see "12 March 2023, 12:00" in the "Program completion date:" definition list item
+    And I should see "12 March 2023, 12:00" in the "Program completion date" definition list item
     And the following should exist in the "program_content" table:
       | Completion date | Other evidence |
       | 12/03/23, 00:00 | EvidenceX      |
-    And I click on "Users" "link" in the "#region-main" "css_element"
+    And I click on "Users" "link" in the ".secondary-navigation" "css_element"
 
     And I follow "Student 4"
-    And I should see "Not set" in the "Program completion date:" definition list item
+    And I should see "Not set" in the "Program completion date" definition list item
     And the following should exist in the "program_content" table:
       | Completion date | Other evidence |
       | 11/04/35, 00:00 | EvidenceY      |
-    And I click on "Users" "link" in the "#region-main" "css_element"
+    And I click on "Users" "link" in the ".secondary-navigation" "css_element"

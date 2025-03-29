@@ -1,41 +1,36 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace enrol_programs\local\content;
+namespace tool_muprog\local\content;
 
-use enrol_programs\local\util;
+use tool_muprog\local\util;
 use stdClass;
 
 /**
  * Program training item.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class training extends item {
     /** @var int */
-    protected $frameworkid;
+    protected $trainingid;
 
     /** @var ?item Previous item is not actually used because there is no concept of start of training */
     protected $previous;
 
-    public function get_frameworkid(): int {
-        return $this->frameworkid;
+    /**
+     * ReturnGet training id.
+     *
+     * @return int
+     */
+    public function get_trainingid(): int {
+        return $this->trainingid;
     }
 
     /**
@@ -45,7 +40,7 @@ final class training extends item {
      */
     public function get_required_training(): ?int {
         global $DB;
-        $framework = $DB->get_record('customfield_training_frameworks', ['id' => $this->frameworkid]);
+        $framework = $DB->get_record('customfield_mutrain_framework', ['id' => $this->trainingid]);
         if (!$framework) {
             return null;
         }
@@ -60,15 +55,15 @@ final class training extends item {
     public function get_completed_training(stdClass $allocation): int {
         global $DB;
         $sql = "SELECT SUM(cd.intvalue) AS completed
-                  FROM {customfield_training_completions} ctc
+                  FROM {customfield_mutrain_completion} ctc
                   JOIN {customfield_field} cf ON cf.id = ctc.fieldid
                   JOIN {customfield_data} cd ON cd.fieldid = cf.id AND cd.instanceid = ctc.instanceid
-                  JOIN {customfield_training_fields} tf ON tf.fieldid = cf.id
-                  JOIN {customfield_training_frameworks} tfr ON tfr.id = tf.frameworkid
-                 WHERE tfr.id = :frameworkid AND ctc.userid = :userid AND cd.intvalue IS NOT NULL
+                  JOIN {customfield_mutrain_field} tf ON tf.fieldid = cf.id
+                  JOIN {customfield_mutrain_framework} tfr ON tfr.id = tf.frameworkid
+                 WHERE tfr.id = :trainingid AND ctc.userid = :userid AND cd.intvalue IS NOT NULL
                        AND (tfr.restrictedcompletion = 0 OR ctc.timecompleted >= :timestart)";
         $params = [
-            'frameworkid' => $this->frameworkid,
+            'trainingid' => $this->trainingid,
             'userid' => $allocation->userid,
             'timestart' => $allocation->timestart,
         ];
@@ -87,7 +82,7 @@ final class training extends item {
 
         $now = time();
 
-        $framework = $DB->get_record('customfield_training_frameworks', ['id' => $this->frameworkid]);
+        $framework = $DB->get_record('customfield_mutrain_framework', ['id' => $this->trainingid]);
         if (!$framework) {
             return get_string('error');
         }
@@ -95,7 +90,7 @@ final class training extends item {
         if ($framework->archived || $allocation->archived
             || $allocation->timestart > $now || ($allocation->timeend && $allocation->timeend <= $now)) {
 
-            return get_string('trainingcompletion', 'enrol_programs', $framework->requiredtraining);
+            return get_string('trainingcompletion', 'tool_muprog', $framework->requiredtraining);
         }
 
         $data = [
@@ -103,7 +98,7 @@ final class training extends item {
             'total' => $framework->requiredtraining,
         ];
 
-        return get_string('trainingprogress', 'enrol_programs', $data);
+        return get_string('trainingprogress', 'tool_muprog', $data);
     }
 
     /**
@@ -147,13 +142,13 @@ final class training extends item {
      * @return training
      */
     protected static function init_from_record(\stdClass $record, ?item $previous, array &$unusedrecords, array &$prerequisites): item {
-        if ($record->topitem || $record->courseid !== null || $record->frameworkid === null) {
+        if ($record->topitem || $record->courseid !== null || $record->trainingid === null) {
             throw new \coding_exception('Invalid training item');
         }
         $item = new training();
         $item->id = $record->id;
         $item->programid = $record->programid;
-        $item->frameworkid = $record->frameworkid;
+        $item->trainingid = $record->trainingid;
         $item->previous = $previous;
         if ($previous) {
             if ($previous->id == $record->id) {
@@ -202,7 +197,7 @@ final class training extends item {
     protected function get_record(): array {
         global $DB;
 
-        $fullname = $DB->get_field('customfield_training_frameworks', 'name', ['id' => $this->frameworkid]);
+        $fullname = $DB->get_field('customfield_mutrain_framework', 'name', ['id' => $this->trainingid]);
         if ($fullname === false) {
             $fullname = $this->fullname;
         }
@@ -212,7 +207,7 @@ final class training extends item {
             'programid' => (string)$this->programid,
             'topitem' => null,
             'courseid' => null,
-            'frameworkid' => (string)$this->frameworkid,
+            'trainingid' => (string)$this->trainingid,
             'previtemid' => (isset($this->previous) ? (string)$this->previous->id : null),
             'fullname' => $fullname,
             'sequencejson' => util::json_encode([]),

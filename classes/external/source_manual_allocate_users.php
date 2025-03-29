@@ -1,22 +1,10 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace enrol_programs\external;
+namespace tool_muprog\external;
 
-use enrol_programs\local\source\manual;
+use tool_muprog\local\source\manual;
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_value;
@@ -26,7 +14,7 @@ use core_external\external_single_structure;
 /**
  * Allocates the given users to the program.
  *
- * @package     enrol_programs
+ * @package     tool_muprog
  * @copyright   2023 Open LMS (https://www.openlms.net/)
  * @author      Farhan Karmali
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -49,8 +37,8 @@ final class source_manual_allocate_users extends external_api {
             'dateoverrides' => new external_single_structure([
                 'timestart' => new external_value(PARAM_INT, 'time start', VALUE_OPTIONAL),
                 'timedue' => new external_value(PARAM_INT, 'time due', VALUE_OPTIONAL),
-                'timeend' => new external_value(PARAM_INT, 'time start', VALUE_OPTIONAL)
-            ], 'Array of date overrides, timestart timedue timeend can be passed as unix timestamps', VALUE_DEFAULT, [])
+                'timeend' => new external_value(PARAM_INT, 'time start', VALUE_OPTIONAL),
+            ], 'Array of date overrides, timestart timedue timeend can be passed as unix timestamps', VALUE_DEFAULT, []),
         ]);
     }
 
@@ -72,14 +60,14 @@ final class source_manual_allocate_users extends external_api {
         $cohortids = $params['cohortids'];
         $dateoverrides = $params['dateoverrides'];
 
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $programid], '*', MUST_EXIST);
-        $source = $DB->get_record('enrol_programs_sources',
+        $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
+        $source = $DB->get_record('tool_muprog_source',
             ['type' => 'manual', 'programid' => $program->id], '*', MUST_EXIST);
 
         // Validate context.
         $context = \context::instance_by_id($program->contextid);
         self::validate_context($context);
-        require_capability('enrol/programs:allocate', $context);
+        require_capability('tool/muprog:allocate', $context);
 
         if ($program->archived) {
             throw new \invalid_parameter_exception('Program is archived');
@@ -91,7 +79,7 @@ final class source_manual_allocate_users extends external_api {
 
         $useridstoallocate = [];
         foreach ($userids as $userid) {
-            if ($DB->record_exists('enrol_programs_allocations', ['userid' => $userid, 'programid' => $program->id])) {
+            if ($DB->record_exists('tool_muprog_allocation', ['userid' => $userid, 'programid' => $program->id])) {
                 continue;
             }
             $useridstoallocate[$userid] = $userid;
@@ -102,18 +90,18 @@ final class source_manual_allocate_users extends external_api {
             require_capability('moodle/cohort:view', $cohortcontext);
             $cohrotuserids = $DB->get_fieldset_select('cohort_members', 'userid',  "cohortid = ?", [$cohort->id]);
             foreach ($cohrotuserids as $userid) {
-                if ($DB->record_exists('enrol_programs_allocations', ['userid' => $userid, 'programid' => $program->id])) {
+                if ($DB->record_exists('tool_muprog_allocation', ['userid' => $userid, 'programid' => $program->id])) {
                     continue;
                 }
                 $useridstoallocate[$userid] = $userid;
             }
         }
 
-        if (\enrol_programs\local\tenant::is_active()) {
+        if (\tool_muprog\local\util::is_mutenancy_active()) {
             $programtenantid = $DB->get_field('context', 'tenantid', ['id' => $program->contextid]);
             if ($programtenantid) {
                 foreach ($useridstoallocate as $userid) {
-                    $usertenantid = \tool_olms_tenant\tenant_users::get_user_tenant_id($userid);
+                    $usertenantid = \tool_mutenancy\local\tenancy::get_user_tenantid($userid);
                     if ($usertenantid && $usertenantid != $programtenantid) {
                         throw new \invalid_parameter_exception('Tenant mismatch');
                     }

@@ -1,35 +1,29 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace enrol_programs\local\content;
+namespace tool_muprog\local\content;
 
-use enrol_programs\local\util;
+use tool_muprog\local\util;
 
 /**
  * Program set item.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class set extends item {
+    /** @var string All in any order. */
     public const SEQUENCE_TYPE_ALLINANYORDER = 'allinanyorder';
+    /** @var string All in order */
     public const SEQUENCE_TYPE_ALLINORDER = 'allinorder';
+    /** @var string At least items */
     public const SEQUENCE_TYPE_ATLEAST = 'atleast';
+    /** @var string at least points */
     public const SEQUENCE_TYPE_MINPOINTS = 'minpoints';
 
     /** @var item[] list of children */
@@ -61,7 +55,7 @@ class set extends item {
         $a->minpoints = 'X';
         $a->total = 'Y';
         foreach ($types as $type) {
-            $result[$type] = get_string('sequencetype_' . $type, 'enrol_programs', $a);
+            $result[$type] = get_string('sequencetype_' . $type, 'tool_muprog', $a);
         }
 
         return $result;
@@ -104,7 +98,7 @@ class set extends item {
         $a->min = $this->minprerequisites;
         $a->minpoints = $this->minpoints;
         $a->total = count($this->children);
-        return get_string('sequencetype_' . $this->sequencetype, 'enrol_programs', $a);
+        return get_string('sequencetype_' . $this->sequencetype, 'tool_muprog', $a);
     }
 
     /**
@@ -117,7 +111,7 @@ class set extends item {
      * @return set
      */
     protected static function init_from_record(\stdClass $record, ?item $previous, array &$unusedrecords, array &$prerequisites): item {
-        if ($record->courseid !== null || $record->frameworkid !== null) {
+        if ($record->courseid !== null || $record->trainingid !== null) {
             throw new \coding_exception('Invalid set item');
         }
         if ($record->topitem) {
@@ -149,7 +143,7 @@ class set extends item {
                 unset($unusedrecords[$childitemid]);
                 if ($childrecord->courseid !== null) {
                     $child = course::init_from_record($childrecord, $previous, $unusedrecords, $prerequisites);
-                } else if ($childrecord->frameworkid !== null) {
+                } else if ($childrecord->trainingid !== null) {
                     $child = training::init_from_record($childrecord, $previous, $unusedrecords, $prerequisites);
                 } else {
                     $child = self::init_from_record($childrecord, $previous, $unusedrecords, $prerequisites);
@@ -259,7 +253,7 @@ class set extends item {
                 }
             }
             $p = ['itemid' => $this->id, 'prerequisiteitemid' => $child->id];
-            $DB->insert_record('enrol_programs_prerequisites', (object)$p);
+            $DB->insert_record('tool_muprog_prerequisite', (object)$p);
             $updated = true;
         }
 
@@ -316,7 +310,7 @@ class set extends item {
             'programid' => (string)$this->programid,
             'topitem' => null,
             'courseid' => null,
-            'frameworkid' => null,
+            'trainingid' => null,
             'previtemid' => null,
             'fullname' => $this->fullname,
             'sequencejson' => util::json_encode($sequence),

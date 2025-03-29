@@ -1,41 +1,30 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace enrol_programs\local\form;
+namespace tool_muprog\local\form;
 
-use enrol_programs\local\program;
-use enrol_programs\local\util;
+use tool_muprog\local\program;
+use tool_muprog\local\util;
 
 /**
  * Import program allocation - confirmation step.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2023 Open LMS (https://www.openlms.net/)
  * @author     Farhan Karmali
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class program_allocation_import_confirmation extends \local_openlms\dialog_form {
+final class program_allocation_import_confirmation extends \tool_mulib\local\dialog_form {
+    #[\Override]
     protected function definition() {
-        global $DB, $PAGE, $OUTPUT;
+        global $DB, $PAGE;
         $mform = $this->_form;
 
         $renderer = $PAGE->get_renderer('core', null, RENDERER_TARGET_GENERAL);
 
-        $targetprogram = $DB->get_record('enrol_programs_programs', ['id' => $this->_customdata['id']], '*', MUST_EXIST);
-        $fromprogram = $DB->get_record('enrol_programs_programs', ['id' => $this->_customdata['fromprogram']], '*', MUST_EXIST);
+        $targetprogram = $DB->get_record('tool_muprog_program', ['id' => $this->_customdata['id']], '*', MUST_EXIST);
+        $fromprogram = $DB->get_record('tool_muprog_program', ['id' => $this->_customdata['fromprogram']], '*', MUST_EXIST);
 
         $fromcontext = \context::instance_by_id($fromprogram->contextid);
 
@@ -43,19 +32,19 @@ final class program_allocation_import_confirmation extends \local_openlms\dialog
         $a->fullname = format_string($fromprogram->fullname);
         $a->idnumber = s($fromprogram->idnumber);
         $a->category = $fromcontext->get_context_name(false);
-        $message = get_string('importprogramallocationconfirmation', 'enrol_programs', $a);
+        $message = get_string('importprogramallocationconfirmation', 'tool_muprog', $a);
         $message = markdown_to_html($message);
         $message = $renderer->notification($message, \core\notification::INFO);
         $mform->addElement('html', $message);
 
-        $mform->addElement('header', 'allocationheading', get_string('allocations', 'enrol_programs'));
+        $mform->addElement('header', 'allocationheading', get_string('allocations', 'tool_muprog'));
         $mform->setExpanded('allocationheading', true, true);
-        $a = $fromprogram->timeallocationstart ? userdate($fromprogram->timeallocationstart) : get_string('notset', 'enrol_programs');
-        $mform->addElement('advcheckbox', 'importallocationstart', get_string('importallocationstart', 'enrol_programs', $a));
-        $a = $fromprogram->timeallocationend ? userdate($fromprogram->timeallocationend) : get_string('notset', 'enrol_programs');
-        $mform->addElement('advcheckbox', 'importallocationend', get_string('importallocationend', 'enrol_programs', $a));
+        $a = $fromprogram->timeallocationstart ? userdate($fromprogram->timeallocationstart) : get_string('notset', 'tool_muprog');
+        $mform->addElement('advcheckbox', 'importallocationstart', get_string('importallocationstart', 'tool_muprog', $a));
+        $a = $fromprogram->timeallocationend ? userdate($fromprogram->timeallocationend) : get_string('notset', 'tool_muprog');
+        $mform->addElement('advcheckbox', 'importallocationend', get_string('importallocationend', 'tool_muprog', $a));
 
-        $mform->addElement('header', 'schedulingheading', get_string('scheduling', 'enrol_programs'));
+        $mform->addElement('header', 'schedulingheading', get_string('scheduling', 'tool_muprog'));
         $mform->setExpanded('schedulingheading', true, true);
 
         $start = (object)json_decode($fromprogram->startdatejson);
@@ -68,7 +57,7 @@ final class program_allocation_import_confirmation extends \local_openlms\dialog
         } else {
             $startdate = $types[$start->type];
         }
-        $mform->addElement('advcheckbox', 'importprogramstart', get_string('importprogramstart', 'enrol_programs', $startdate));
+        $mform->addElement('advcheckbox', 'importprogramstart', get_string('importprogramstart', 'tool_muprog', $startdate));
 
         $due = (object)json_decode($fromprogram->duedatejson);
         $types = program::get_program_duedate_types();
@@ -80,7 +69,7 @@ final class program_allocation_import_confirmation extends \local_openlms\dialog
         } else {
             $duedate = $types[$due->type];
         }
-        $mform->addElement('advcheckbox', 'importprogramdue', get_string('importprogramdue', 'enrol_programs', $duedate));
+        $mform->addElement('advcheckbox', 'importprogramdue', get_string('importprogramdue', 'tool_muprog', $duedate));
 
         $end = (object)json_decode($fromprogram->enddatejson);
         $types = program::get_program_enddate_types();
@@ -92,19 +81,19 @@ final class program_allocation_import_confirmation extends \local_openlms\dialog
         } else {
             $enddate = $types[$end->type];
         }
-        $mform->addElement('advcheckbox', 'importprogramend', get_string('importprogramend', 'enrol_programs', $enddate));
+        $mform->addElement('advcheckbox', 'importprogramend', get_string('importprogramend', 'tool_muprog', $enddate));
 
-        $mform->addElement('header', 'sourcesheading', get_string('allocationsources', 'enrol_programs'));
+        $mform->addElement('header', 'sourcesheading', get_string('allocationsources', 'tool_muprog'));
         $mform->setExpanded('sourcesheading', true, true);
 
-        /** @var \enrol_programs\local\source\base[] $sourceclasses */
-        $sourceclasses = \enrol_programs\local\allocation::get_source_classes();
+        /** @var \tool_muprog\local\source\base[] $sourceclasses */
+        $sourceclasses = \tool_muprog\local\allocation::get_source_classes();
         foreach ($sourceclasses as $sourcetype => $sourceclass) {
             if (!$sourceclass::is_import_allowed($fromprogram, $targetprogram)) {
                 continue;
             }
 
-            $source = $DB->get_record('enrol_programs_sources', ['type' => $sourcetype, 'programid' => $fromprogram->id]);
+            $source = $DB->get_record('tool_muprog_source', ['type' => $sourcetype, 'programid' => $fromprogram->id]);
             if (!$source) {
                 $source = null;
             }
@@ -121,19 +110,20 @@ final class program_allocation_import_confirmation extends \local_openlms\dialog
         $mform->setType('id', PARAM_INT);
         $mform->setDefault('id', $targetprogram->id);
 
-        $this->add_action_buttons(true, get_string('importprogramallocation', 'enrol_programs'));
+        $this->add_action_buttons(true, get_string('importprogramallocation', 'tool_muprog'));
     }
 
+    #[\Override]
     public function validation($data, $files) {
         global $DB;
         $errors = parent::validation($data, $files);
 
-        $targetprogram = $DB->get_record('enrol_programs_programs', ['id' => $this->_customdata['id']], '*', MUST_EXIST);
-        $fromprogram = $DB->get_record('enrol_programs_programs', ['id' => $this->_customdata['fromprogram']], '*', MUST_EXIST);
+        $targetprogram = $DB->get_record('tool_muprog_program', ['id' => $this->_customdata['id']], '*', MUST_EXIST);
+        $fromprogram = $DB->get_record('tool_muprog_program', ['id' => $this->_customdata['fromprogram']], '*', MUST_EXIST);
 
         // Check if the user has capability to copy the selected program.
         $context = \context::instance_by_id($fromprogram->contextid);
-        if (!has_capability('enrol/programs:clone', $context )) {
+        if (!has_capability('tool/muprog:clone', $context )) {
             $errors['fromprogram'] = get_string('error');
         }
 

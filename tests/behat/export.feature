@@ -1,4 +1,4 @@
-@enrol @enrol_programs @openlms @javascript
+@tool @tool_muprog @muTMS @javascript
 Feature: Program export tests
 
   Background:
@@ -25,14 +25,14 @@ Feature: Program export tests
       | Program manager | pmanager  |
     And the following "permission overrides" exist:
       | capability                     | permission | role     | contextlevel | reference |
-      | enrol/programs:view            | Allow      | pmanager | System       |           |
-      | enrol/programs:export          | Allow      | pmanager | System       |           |
+      | tool/muprog:view            | Allow      | pmanager | System       |           |
+      | tool/muprog:export          | Allow      | pmanager | System       |           |
     And the following "role assigns" exist:
       | user      | role          | contextlevel | reference |
       | manager1  | pmanager      | System       |           |
       | manager2  | pmanager      | Category     | CAT2      |
       | manager2  | pmanager      | Category     | CAT3      |
-    When the following "enrol_programs > programs" exist:
+    When the following "tool_muprog > programs" exist:
       | fullname    | idnumber | category   | public |
       | Program 000 | PR0      |            | 0      |
       | Program 001 | PR1      | Category 1 | 1      |
@@ -43,7 +43,7 @@ Feature: Program export tests
 
   Scenario: Site program manager max export programs
     Given I log in as "manager1"
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
 
     When I click on "Programs actions" "link"
     And I click on "Export programs" "link"
@@ -75,7 +75,7 @@ Feature: Program export tests
 
   Scenario: Category program manager max export programs
     Given I log in as "manager1"
-    And I am on programs management page in "Category 2"
+    And I am on the "Category 2" "tool_muprog > Programs management" page
 
     When I click on "Programs actions" "link"
     And I click on "Export programs" "link"
@@ -93,7 +93,7 @@ Feature: Program export tests
     And I wait "1" seconds
 
     When I press "Back"
-    And I am on programs management page in "Category 2"
+    And I am on the "Category 2" "tool_muprog > Programs management" page
     And I should see "Program 002"
     And I follow "Program 002"
     And I click on "Program actions" "link"

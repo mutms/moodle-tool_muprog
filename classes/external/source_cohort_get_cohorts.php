@@ -1,20 +1,8 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace enrol_programs\external;
+namespace tool_muprog\external;
 
 use core_external\external_function_parameters;
 use core_external\external_value;
@@ -25,7 +13,7 @@ use core_external\external_single_structure;
 /**
  * Provides list of cohorts that are synchronized with a program.
  *
- * @package     enrol_programs
+ * @package     tool_muprog
  * @copyright   2023 Open LMS (https://www.openlms.net/)
  * @author      Farhan Karmali
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -39,7 +27,7 @@ final class source_cohort_get_cohorts extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'programid' => new external_value(PARAM_INT, 'Program id')
+            'programid' => new external_value(PARAM_INT, 'Program id'),
         ]);
     }
 
@@ -54,12 +42,12 @@ final class source_cohort_get_cohorts extends external_api {
         $params = self::validate_parameters(self::execute_parameters(), ['programid' => $programid]);
         $programid = $params['programid'];
 
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $programid], '*', MUST_EXIST);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
 
         // Validate context.
         $context = \context::instance_by_id($program->contextid);
         self::validate_context($context);
-        require_capability('enrol/programs:view', $context);
+        require_capability('tool/muprog:view', $context);
 
         return self::get_cohorts($program->id);
     }
@@ -99,9 +87,9 @@ final class source_cohort_get_cohorts extends external_api {
         global $DB;
 
         $sql = "SELECT c.id, c.contextid, c.name, c.idnumber
-                  FROM {enrol_programs_src_cohorts} sc
+                  FROM {tool_muprog_src_cohort} sc
                   JOIN {cohort} c ON c.id = sc.cohortid
-                  JOIN {enrol_programs_sources} ps ON ps.id = sc.sourceid
+                  JOIN {tool_muprog_source} ps ON ps.id = sc.sourceid
                  WHERE ps.programid = :programid and ps.type = 'cohort'
               ORDER BY id ASC";
 

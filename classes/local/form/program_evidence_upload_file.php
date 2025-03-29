@@ -1,32 +1,21 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace enrol_programs\local\form;
+namespace tool_muprog\local\form;
 
-use enrol_programs\local\source\manual;
+use tool_muprog\local\source\manual;
 
 /**
  * Upload user program completions.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2024 Open LMS (https://www.openlms.net/)
  * @author     Farhan Karmali
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class program_evidence_upload_file extends \local_openlms\dialog_form {
+final class program_evidence_upload_file extends \tool_mulib\local\dialog_form {
+    #[\Override]
     protected function definition() {
         global $CFG;
         require_once($CFG->dirroot . '/lib/csvlib.class.php');
@@ -35,7 +24,7 @@ final class program_evidence_upload_file extends \local_openlms\dialog_form {
         $program = $this->_customdata['program'];
         $context = $this->_customdata['context'];
 
-        $mform->addElement('filepicker', 'csvfile', get_string('evidenceupload_csvfile', 'enrol_programs'));
+        $mform->addElement('filepicker', 'csvfile', get_string('evidenceupload_csvfile', 'tool_muprog'));
         $mform->addRule('csvfile', null, 'required');
 
         $choices = \csv_import_reader::get_delimiter_list();
@@ -59,6 +48,7 @@ final class program_evidence_upload_file extends \local_openlms\dialog_form {
         $this->add_action_buttons(true, get_string('continue'));
     }
 
+    #[\Override]
     public function validation($data, $files) {
         global $USER;
         $errors = parent::validation($data, $files);
@@ -120,7 +110,7 @@ final class program_evidence_upload_file extends \local_openlms\dialog_form {
 
         $cir->cleanup(true);
 
-        \enrol_programs\local\util::store_uploaded_data($data['csvfile'], $filedata);
+        \tool_muprog\local\util::store_uploaded_data($data['csvfile'], $filedata);
 
         return $errors;
     }

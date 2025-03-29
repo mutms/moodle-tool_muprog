@@ -1,22 +1,10 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace enrol_programs\external;
+namespace tool_muprog\external;
 
-use enrol_programs\local\allocation;
+use tool_muprog\local\allocation;
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_value;
@@ -25,7 +13,7 @@ use core_external\external_multiple_structure;
 /**
  * Deallocates the given users from the program.
  *
- * @package     enrol_programs
+ * @package     tool_muprog
  * @copyright   2023 Open LMS (https://www.openlms.net/)
  * @author      Farhan Karmali
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -40,8 +28,8 @@ final class delete_program_allocations extends external_api {
         return new external_function_parameters([
             'programid' => new external_value(PARAM_INT, 'Program id'),
             'userids' => new external_multiple_structure(
-                new external_value(PARAM_INT, 'User id')
-                , 'User ids to be deallocated from program')
+                new external_value(PARAM_INT, 'User id'),
+                'User ids to be deallocated from program'),
         ]);
     }
 
@@ -59,20 +47,20 @@ final class delete_program_allocations extends external_api {
         $programid = $params['programid'];
         $userids = $params['userids'];
 
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $programid], '*', MUST_EXIST);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
 
         // Validate context.
         $context = \context::instance_by_id($program->contextid);
         self::validate_context($context);
-        require_capability('enrol/programs:allocate', $context);
+        require_capability('tool/muprog:allocate', $context);
 
         $sourceclasses = allocation::get_source_classes();
-        $sources = $DB->get_records('enrol_programs_sources', ['programid' => $program->id]);
+        $sources = $DB->get_records('tool_muprog_source', ['programid' => $program->id]);
 
         // Check all data is valid first.
         $deallocate = [];
         foreach ($userids as $userid) {
-            $allocationrecord = $DB->get_record('enrol_programs_allocations',
+            $allocationrecord = $DB->get_record('tool_muprog_allocation',
                 ['programid' => $programid, 'userid' => $userid]);
             if (!$allocationrecord) {
                 // Not allocated - ignore.
@@ -84,7 +72,7 @@ final class delete_program_allocations extends external_api {
                 throw new \invalid_parameter_exception('Invalid user allocation');
             }
             $source = $sources[$allocationrecord->sourceid];
-            /** @var class-string<\enrol_programs\local\source\base> $sourceclass */
+            /** @var class-string<\tool_muprog\local\source\base> $sourceclass */
             $sourceclass = $sourceclasses[$source->type];
 
             if (!$sourceclass::allocation_delete_supported($program, $source, $allocationrecord)) {
@@ -97,7 +85,7 @@ final class delete_program_allocations extends external_api {
 
         // Deallocate after validation of all data.
         foreach ($deallocate as $v) {
-            /** @var class-string<\enrol_programs\local\source\base> $sourceclass */
+            /** @var class-string<\tool_muprog\local\source\base> $sourceclass */
             list($sourceclass, $source, $allocationrecord) = $v;
             $sourceclass::deallocate_user($program, $source, $allocationrecord);
         }

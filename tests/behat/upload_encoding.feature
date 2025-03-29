@@ -1,4 +1,4 @@
-@enrol @enrol_programs @openlms @javascript
+@tool @tool_muprog @muTMS @javascript
 Feature: Program encoding upload tests
 
   Background:
@@ -25,26 +25,22 @@ Feature: Program encoding upload tests
       | Program manager | pmanager  |
     And the following "permission overrides" exist:
       | capability                     | permission | role     | contextlevel | reference |
-      | enrol/programs:view            | Allow      | pmanager | System       |           |
-      | enrol/programs:upload          | Allow      | pmanager | System       |           |
+      | tool/muprog:view            | Allow      | pmanager | System       |           |
+      | tool/muprog:upload          | Allow      | pmanager | System       |           |
     And the following "role assigns" exist:
       | user      | role          | contextlevel | reference |
       | manager1  | pmanager      | System       |           |
       | manager2  | pmanager      | Category     | CAT2      |
       | manager2  | pmanager      | Category     | CAT3      |
-    And the following "customfield_training > frameworks" exist:
-      | name         | idnumber | public | requiredtraining |
-      | Training FW1 | TFW1     | 1      | 10               |
-      | Training FW2 |          | 1      | 20               |
 
   @_file_upload
   Scenario: Program manager can upload CSV with custom encoding
     Given I log in as "manager2"
-    And I am on programs management page in "Category 2"
+    And I am on the "Category 2" "tool_muprog > Programs management" page
 
     When I click on "Programs actions" "link"
     And I click on "Upload programs" "link"
-    And I upload "enrol/programs/tests/fixtures/upload/czech.zip" file to "Files" filemanager
+    And I upload "admin/tool/muprog/tests/fixtures/upload/czech.zip" file to "Files" filemanager
     And I set the following fields to these values:
       | Encoding    | ISO-8859-2 |
     And I press "Continue"
@@ -57,8 +53,8 @@ Feature: Program encoding upload tests
       | PČ1      | OK     | Programíček 01 | -          |
       | PČ2      | OK     | Programíček 02 | -          |
     And I press "Upload programs"
-    Then the following should exist in the "management_programs" table:
-      | Program name     | ID number | Description  | Courses | Allocations | Public |
-      | Programíček 00   | PČ0       |              | 0       | 0           | No     |
-      | Programíček 01   | PČ1       |              | 0       | 0           | No     |
-      | Programíček 02   | PČ2       |              | 0       | 0           | No     |
+    Then the following should exist in the "reportbuilder-table" table:
+      | Program name     | Program ID | Allocations | Public |
+      | Programíček 00   | PČ0        | 0           | No     |
+      | Programíček 01   | PČ1        | 0           | No     |
+      | Programíček 02   | PČ2        | 0           | No     |

@@ -1,30 +1,19 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace enrol_programs\local;
+namespace tool_muprog\local;
 
 use stdClass;
 
 /**
  * Program export helper.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2024 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class export {
     /**
@@ -56,7 +45,7 @@ final class export {
         global $DB;
 
         $result = [];
-        $rs = $DB->get_recordset_select('enrol_programs_programs', $select, $params, 'fullname ASC, id ASC');
+        $rs = $DB->get_recordset_select('tool_muprog_program', $select, $params, 'fullname ASC, id ASC');
         foreach ($rs as $record) {
             $context = \context::instance_by_id($record->contextid);
             if ($context instanceof \context_system) {
@@ -101,17 +90,17 @@ final class export {
             }
             $program['enddate'] = $enddate;
 
-            $cfhandler = \enrol_programs\customfield\fields_handler::create();
+            $cfhandler = \tool_muprog\customfield\fields_handler::create();
             $cfdatas = $cfhandler->get_instance_data($record->id);
             foreach ($cfdatas as $cfdata) {
                 // We need to use raw internal value here to allow imports.
                 $program['customfield_' . $cfdata->get_field()->get('shortname')] = $cfdata->get_value();
             }
 
-            $top = \enrol_programs\local\content\top::load($record->id);
-            $iterator = function(\enrol_programs\local\content\item $item) use (&$iterator): array {
+            $top = \tool_muprog\local\content\top::load($record->id);
+            $iterator = function(\tool_muprog\local\content\item $item) use (&$iterator): array {
                 global $DB;
-                if ($item instanceof \enrol_programs\local\content\set) {
+                if ($item instanceof \tool_muprog\local\content\set) {
                     $result = [
                         'itemtype' => 'set',
                         'points' => $item->get_points(),
@@ -131,7 +120,7 @@ final class export {
                     return $result;
                 }
 
-                if ($item instanceof \enrol_programs\local\content\course) {
+                if ($item instanceof \tool_muprog\local\content\course) {
                     $course = $DB->get_record('course', ['id' => $item->get_courseid()]);
                     if ($course) {
                         $reference = $course->shortname;
@@ -147,10 +136,14 @@ final class export {
                     return $result;
                 }
 
-                if ($item instanceof \enrol_programs\local\content\training) {
-                    $framework = $DB->get_record('customfield_training_frameworks', ['id' => $item->get_frameworkid()]);
-                    if ($framework) {
-                        $reference = $framework->idnumber ?? $framework->name;
+                if ($item instanceof \tool_muprog\local\content\training) {
+                    if (util::is_mutrain_available()) {
+                        $framework = $DB->get_record('customfield_mutrain_framework', ['id' => $item->get_trainingid()]);
+                        if ($framework) {
+                            $reference = $framework->idnumber ?? $framework->name;
+                        } else {
+                            $reference = null; // Error - this will fail during validation.
+                        }
                     } else {
                         $reference = null; // Error - this will fail during validation.
                     }
@@ -171,9 +164,9 @@ final class export {
             unset($program['contents']['points']);
 
             $program['sources'] = [];
-            $sources = $DB->get_records('enrol_programs_sources', ['programid' => $record->id], 'type ASC');
+            $sources = $DB->get_records('tool_muprog_source', ['programid' => $record->id], 'type ASC');
             foreach ($sources as $source) {
-                if (!in_array($source->type, ['manual', 'selfallocation', 'approval', 'certify'])) {
+                if (!in_array($source->type, ['manual', 'selfallocation', 'approval', 'mucertify'])) {
                     // Cohort references are problematic in exports, skip it for now.
                     continue;
                 }
@@ -192,7 +185,7 @@ final class export {
         $rs->close();
 
         // Fix objects and arrays to be JSON compatible.
-        $result = \local_openlms\json_schema::normalise_data($result);
+        $result = \tool_mulib\local\json_schema::normalise_data($result);
 
         if (debugging('', DEBUG_DEVELOPER)) {
             $json = (object)[
@@ -200,7 +193,7 @@ final class export {
             ];
 
             $schema = file_get_contents(__DIR__ . '/../../db/programs_schema.json');
-            list($valid, $errors) = \local_openlms\json_schema::validate($json, $schema);
+            list($valid, $errors) = \tool_mulib\local\json_schema::validate($json, $schema);
             if (!$valid) {
                 $debug = [];
                 foreach ($errors as $i => $lines) {
@@ -439,10 +432,10 @@ final class export {
     public static function process(stdClass $data): void {
         if ($data->format === 'json') {
             $file = self::export_json($data);
-            $filename = get_string('exportfile_programs', 'enrol_programs') . '_json-' . gmdate('Ymd_Hi') . '.zip';
+            $filename = get_string('exportfile_programs', 'tool_muprog') . '_json-' . gmdate('Ymd_Hi') . '.zip';
         } else if ($data->format === 'csv') {
             $file = self::export_csv($data);
-            $filename = get_string('exportfile_programs', 'enrol_programs') . '_csv-' . gmdate('Ymd_Hi') . '.zip';
+            $filename = get_string('exportfile_programs', 'tool_muprog') . '_csv-' . gmdate('Ymd_Hi') . '.zip';
         } else {
             throw new \invalid_parameter_exception('invalid program export format');
         }

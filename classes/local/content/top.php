@@ -1,32 +1,22 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace enrol_programs\local\content;
+namespace tool_muprog\local\content;
 
-use enrol_programs\local\program;
-use enrol_programs\local\util;
-use enrol_programs\local\allocation;
+use tool_muprog\local\program;
+use tool_muprog\local\util;
+use tool_muprog\local\allocation;
 
 /**
  * Program top item.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class top extends set {
     /** @var course[] list of orphaned courses in program */
@@ -55,7 +45,7 @@ final class top extends set {
     protected function get_record(): array {
         global $DB;
 
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $this->programid], '*', MUST_EXIST);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $this->programid], '*', MUST_EXIST);
 
         $record = parent::get_record();
         $record['topitem'] = '1';
@@ -73,7 +63,7 @@ final class top extends set {
     public static function load(int $programid): top {
         global $DB;
 
-        $records = $DB->get_records('enrol_programs_items', ['programid' => $programid], 'id ASC');
+        $records = $DB->get_records('tool_muprog_item', ['programid' => $programid], 'id ASC');
         if (!$records) {
             throw new \coding_exception('No program items found');
         }
@@ -108,7 +98,7 @@ final class top extends set {
                         $top->problemdetected = true;
                     }
                     $top->orphanedcourses[$orphan->id] = $orphan;
-                } else if ($record->frameworkid !== null) {
+                } else if ($record->trainingid !== null) {
                     $fakerecords = [];
                     $orphan = training::init_from_record($record, $top, $fakerecords, $prerequisites);
                     if ($orphan->problemdetected) {
@@ -191,9 +181,9 @@ final class top extends set {
         global $DB;
 
         $sql = "SELECT p.*
-                  FROM {enrol_programs_prerequisites} p
-                  JOIN {enrol_programs_items} i ON i.id = p.itemid AND i.programid = :programid
-                  JOIN {enrol_programs_items} pi ON pi.id = p.prerequisiteitemid AND pi.programid = i.programid
+                  FROM {tool_muprog_prerequisite} p
+                  JOIN {tool_muprog_item} i ON i.id = p.itemid AND i.programid = :programid
+                  JOIN {tool_muprog_item} pi ON pi.id = p.prerequisiteitemid AND pi.programid = i.programid
               ORDER BY p.id ASC";
         return $DB->get_records_sql($sql, ['programid' => $programid]);
     }
@@ -237,7 +227,7 @@ final class top extends set {
             'programid' => (string)$this->programid,
             'topitem' => null,
             'courseid' => (string)$course->id,
-            'frameworkid' => null,
+            'trainingid' => null,
             'previtemid' => null,
             'fullname' => $course->fullname,
             'sequencejson' => util::json_encode([]),
@@ -252,9 +242,9 @@ final class top extends set {
         $item = course::init_from_record((object)$record, null, $fakerecords, $fakeprerequisites);
 
         $trans = $DB->start_delegated_transaction();
-        $item->id = (string)$DB->insert_record('enrol_programs_items', (object)$item->get_record());
+        $item->id = (string)$DB->insert_record('tool_muprog_item', (object)$item->get_record());
         $parent->add_child($item);
-        $DB->update_record('enrol_programs_items', (object)$parent->get_record());
+        $DB->update_record('tool_muprog_item', (object)$parent->get_record());
 
         $this->fix_content();
 
@@ -272,11 +262,11 @@ final class top extends set {
      * Add new training item to given parent set.
      *
      * @param set $parent
-     * @param int $frameworkid
+     * @param int $trainingid
      * @param array $data
      * @return training
      */
-    public function append_training(set $parent, int $frameworkid, array $data = []): training {
+    public function append_training(set $parent, int $trainingid, array $data = []): training {
         global $DB;
 
         if ($parent->programid != $this->programid) {
@@ -300,14 +290,18 @@ final class top extends set {
             throw new \invalid_parameter_exception('Completion delay cannot be negative');
         }
 
-        $framework = $DB->get_record('customfield_training_frameworks', ['id' => $frameworkid], '*', MUST_EXIST);
+        if (!util::is_mutrain_available()) {
+            throw new \core\exception\coding_exception('mutrain is not avialable');
+        }
+
+        $framework = $DB->get_record('customfield_mutrain_framework', ['id' => $trainingid], '*', MUST_EXIST);
 
         $record = [
             'id' => null,
             'programid' => (string)$this->programid,
             'topitem' => null,
             'courseid' => null,
-            'frameworkid' => (string)$framework->id,
+            'trainingid' => (string)$framework->id,
             'previtemid' => null,
             'fullname' => $framework->name,
             'sequencejson' => util::json_encode([]),
@@ -322,9 +316,9 @@ final class top extends set {
         $item = training::init_from_record((object)$record, null, $fakerecords, $fakeprerequisites);
 
         $trans = $DB->start_delegated_transaction();
-        $item->id = (string)$DB->insert_record('enrol_programs_items', (object)$item->get_record());
+        $item->id = (string)$DB->insert_record('tool_muprog_item', (object)$item->get_record());
         $parent->add_child($item);
-        $DB->update_record('enrol_programs_items', (object)$parent->get_record());
+        $DB->update_record('tool_muprog_item', (object)$parent->get_record());
 
         $this->fix_content();
 
@@ -407,7 +401,7 @@ final class top extends set {
             'programid' => (string)$this->programid,
             'topitem' => null,
             'courseid' => null,
-            'frameworkid' => null,
+            'trainingid' => null,
             'previtemid' => null,
             'fullname' => $fullname,
             'sequencejson' => util::json_encode($sequence),
@@ -423,9 +417,9 @@ final class top extends set {
         $item = set::init_from_record((object)$record, null, $fakerecords, $fakeprerequisites);
 
         $trans = $DB->start_delegated_transaction();
-        $item->id = (string)$DB->insert_record('enrol_programs_items', (object)$item->get_record());
+        $item->id = (string)$DB->insert_record('tool_muprog_item', (object)$item->get_record());
         $parent->add_child($item);
-        $DB->update_record('enrol_programs_items', (object)$parent->get_record());
+        $DB->update_record('tool_muprog_item', (object)$parent->get_record());
 
         $this->fix_content();
 
@@ -505,7 +499,7 @@ final class top extends set {
         }
 
         $trans = $DB->start_delegated_transaction();
-        $DB->update_record('enrol_programs_items', (object)$set->get_record());
+        $DB->update_record('tool_muprog_item', (object)$set->get_record());
 
         $this->fix_content();
 
@@ -551,7 +545,7 @@ final class top extends set {
         }
 
         $trans = $DB->start_delegated_transaction();
-        $DB->update_record('enrol_programs_items', (object)$course->get_record());
+        $DB->update_record('tool_muprog_item', (object)$course->get_record());
 
         $this->fix_content();
 
@@ -597,7 +591,7 @@ final class top extends set {
         }
 
         $trans = $DB->start_delegated_transaction();
-        $DB->update_record('enrol_programs_items', (object)$training->get_record());
+        $DB->update_record('tool_muprog_item', (object)$training->get_record());
 
         $this->fix_content();
 
@@ -670,7 +664,7 @@ final class top extends set {
                     $oldparent->minprerequisites = 1;
                 }
             }
-            $DB->update_record('enrol_programs_items', (object)$oldparent->get_record());
+            $DB->update_record('tool_muprog_item', (object)$oldparent->get_record());
         }
 
         $newchildren = [];
@@ -698,7 +692,7 @@ final class top extends set {
                 $newparent->minprerequisites = 1;
             }
         }
-        $DB->update_record('enrol_programs_items', (object)$newparent->get_record());
+        $DB->update_record('tool_muprog_item', (object)$newparent->get_record());
 
         $this->fix_content();
 
@@ -763,22 +757,22 @@ final class top extends set {
 
         $trans = $DB->start_delegated_transaction();
 
-        $record = $DB->get_record('enrol_programs_items', ['id' => $itemid], '*', MUST_EXIST);
+        $record = $DB->get_record('tool_muprog_item', ['id' => $itemid], '*', MUST_EXIST);
         if ($record->courseid !== null) {
-            $groups = $DB->get_records('enrol_programs_groups', ['programid' => $record->programid, 'courseid' => $record->courseid]);
+            $groups = $DB->get_records('tool_muprog_group', ['programid' => $record->programid, 'courseid' => $record->courseid]);
             foreach ($groups as $g) {
                 groups_delete_group($g->groupid);
             }
         }
-        $DB->delete_records('enrol_programs_prerequisites', ['itemid' => $itemid]);
-        $DB->delete_records('enrol_programs_prerequisites', ['prerequisiteitemid' => $itemid]);
+        $DB->delete_records('tool_muprog_prerequisite', ['itemid' => $itemid]);
+        $DB->delete_records('tool_muprog_prerequisite', ['prerequisiteitemid' => $itemid]);
         if ($parent) {
             $parent->remove_chid($itemid);
-            $DB->update_record('enrol_programs_items', (object)$parent->get_record());
+            $DB->update_record('tool_muprog_item', (object)$parent->get_record());
         }
-        $DB->delete_records('enrol_programs_evidences', ['itemid' => $itemid]);
-        $DB->delete_records('enrol_programs_completions', ['itemid' => $itemid]);
-        $DB->delete_records('enrol_programs_items', ['id' => $itemid]);
+        $DB->delete_records('tool_muprog_evidence', ['itemid' => $itemid]);
+        $DB->delete_records('tool_muprog_completion', ['itemid' => $itemid]);
+        $DB->delete_records('tool_muprog_item', ['id' => $itemid]);
 
         $this->fix_content();
 
@@ -796,7 +790,7 @@ final class top extends set {
     /**
      * Import content from another program.
      *
-     * @param \stdClass $data from \enrol_programs\local\form\program_content_import_confirmation
+     * @param \stdClass $data from \tool_muprog\local\form\program_content_import_confirmation
      * @return void
      */
     public function content_import(\stdClass $data) {
@@ -806,7 +800,7 @@ final class top extends set {
         if ($data->id != $this->programid) {
             throw new \coding_exception('invalid parameters');
         }
-        $topfrom = top::load($data->fromprogram);
+        $topfrom = self::load($data->fromprogram);
         if (!$this->get_children()) {
             $this->update_set($this, [
                 'fullname' => $this->get_fullname(),
@@ -838,7 +832,7 @@ final class top extends set {
                     'completiondelay' => $item->get_completiondelay(),
                 ]);
             } else if ($item instanceof training) {
-                $top->append_training($newparent, $item->get_frameworkid(), [
+                $top->append_training($newparent, $item->get_trainingid(), [
                     'points' => $item->get_points(),
                     'completiondelay' => $item->get_completiondelay(),
                 ]);
@@ -874,11 +868,11 @@ final class top extends set {
         $saveclosure = function(item $item) use (&$saveclosure, &$DB): void {
             $record = $item->get_record();
             if ($record['id']) {
-                $oldrecord = $DB->get_record('enrol_programs_items', ['id' => $record['id']]);
+                $oldrecord = $DB->get_record('tool_muprog_item', ['id' => $record['id']]);
                 if ($oldrecord) {
                     foreach ((array)$oldrecord as $k => $v) {
                         if ($record[$k] !== $v) {
-                            $DB->update_record('enrol_programs_items', (object)$record);
+                            $DB->update_record('tool_muprog_item', (object)$record);
                             break;
                         }
                     }
@@ -886,7 +880,7 @@ final class top extends set {
                     debugging('Ignoring update of missing item', DEBUG_DEVELOPER);
                 }
             } else {
-                $item->id = (string)$DB->insert_record('enrol_programs_items', $record);
+                $item->id = (string)$DB->insert_record('tool_muprog_item', $record);
             }
 
             foreach ($item->get_children() as $child) {
@@ -910,7 +904,7 @@ final class top extends set {
         $prerequisites = self::get_prerequisites($this->programid);
         $this->fix_prerequisites($prerequisites);
         foreach ($prerequisites as $prerequisite) {
-            $DB->delete_records('enrol_programs_prerequisites', ['id' => $prerequisite->id]);
+            $DB->delete_records('tool_muprog_prerequisite', ['id' => $prerequisite->id]);
         }
     }
 

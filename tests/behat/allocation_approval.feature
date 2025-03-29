@@ -1,4 +1,4 @@
-@enrol @enrol_programs @openlms
+@tool @tool_muprog @muTMS
 Feature: Program approval allocations tests
 
   Background:
@@ -47,17 +47,17 @@ Feature: Program approval allocations tests
       | Program allocator | allocator |
     And the following "permission overrides" exist:
       | capability                      | permission | role      | contextlevel | reference |
-      | enrol/programs:view             | Allow      | pviewer   | System       |           |
-      | enrol/programs:view             | Allow      | pmanager  | System       |           |
-      | enrol/programs:edit             | Allow      | pmanager  | System       |           |
-      | enrol/programs:delete           | Allow      | pmanager  | System       |           |
-      | enrol/programs:addcourse        | Allow      | pmanager  | System       |           |
-      | enrol/programs:allocate         | Allow      | pmanager  | System       |           |
-      | enrol/programs:manageallocation | Allow      | pmanager  | System       |           |
-      | moodle/cohort:view              | Allow      | pmanager  | System       |           |
-      | enrol/programs:view             | Allow      | allocator | System       |           |
-      | enrol/programs:allocate         | Allow      | allocator | System       |           |
-      | enrol/programs:manageallocation | Allow      | allocator | System       |           |
+      | tool/muprog:view             | Allow      | pviewer   | System       |           |
+      | tool/muprog:view             | Allow      | pmanager  | System       |           |
+      | tool/muprog:edit             | Allow      | pmanager  | System       |           |
+      | tool/muprog:delete           | Allow      | pmanager  | System       |           |
+      | tool/muprog:addcourse        | Allow      | pmanager  | System       |           |
+      | tool/muprog:allocate         | Allow      | pmanager  | System       |           |
+      | tool/muprog:manageallocation | Allow      | pmanager  | System       |           |
+      | moodle/cohort:view           | Allow      | pmanager  | System       |           |
+      | tool/muprog:view             | Allow      | allocator | System       |           |
+      | tool/muprog:allocate         | Allow      | allocator | System       |           |
+      | tool/muprog:manageallocation | Allow      | allocator | System       |           |
     And the following "role assigns" exist:
       | user      | role          | contextlevel | reference |
       | manager1  | pmanager      | System       |           |
@@ -65,7 +65,7 @@ Feature: Program approval allocations tests
       | manager2  | pmanager      | Category     | CAT3      |
       | viewer1   | pviewer       | System       |           |
       | allocator | allocator     | Category     | CAT1      |
-    And the following "enrol_programs > programs" exist:
+    And the following "tool_muprog > programs" exist:
       | fullname    | idnumber | category | cohorts  | public |
       | Program 000 | PR0      |          | Cohort 2 |        |
       | Program 001 | PR1      | Cat 1    |          | 1      |
@@ -75,36 +75,36 @@ Feature: Program approval allocations tests
   @javascript
   Scenario: Allocator approves student allocation request for a program
     When I log in as "manager1"
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 001"
     And I follow "Allocation settings"
     And I click on "Update Requests with approval" "link"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Active             | Yes |
       | Allow new requests | No  |
     And I press dialog form button "Update"
-    Then I should see "Active; Requests are not allowed" in the "Requests with approval:" definition list item
+    Then I should see "Active; Requests are not allowed" in the "Requests with approval" definition list item
     And I log out
 
     When I log in as "student2"
-    And I am on Program catalogue page
+    And I am on the "tool_muprog > Program catalogue" page
     And I follow "Program 001"
     And I should not see "Request access"
     And I log out
 
     When I log in as "manager1"
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 001"
     And I follow "Allocation settings"
     And I click on "Update Requests with approval" "link"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Allow new requests | Yes |
     And I press dialog form button "Update"
-    Then I should see "Active; Requests are allowed" in the "Requests with approval:" definition list item
+    Then I should see "Active; Requests are allowed" in the "Requests with approval" definition list item
     And I log out
 
     When I log in as "student2"
-    And I am on Program catalogue page
+    And I am on the "tool_muprog > Program catalogue" page
     And I follow "Program 001"
     And I press "Request access"
     And I press dialog form button "Cancel"
@@ -114,51 +114,53 @@ Feature: Program approval allocations tests
     And I log out
 
     When I log in as "allocator"
-    And I am on programs management page in "Cat 1"
+    And I am on the "Cat 1" "tool_muprog > Programs management" page
     And I follow "Program 001"
     And I follow "Requests"
+    And I click on "Actions" "link" in the "Student 2" "table_row"
     And I click on "Approve request" "link" in the "Student 2" "table_row"
     And I press dialog form button "Approve request"
     Then I should not see "Student 2"
     And I follow "Users"
-    And "Student 2" row "Source" column of "program_allocations" table should contain "Requests with approval"
+    And "Student 2" row "Source" column of "reportbuilder-table" table should contain "Requests with approval"
     And I log out
 
     When I log in as "student2"
-    And I am on My programs page
+    And I am on the "tool_muprog > My programs" page
     And "Program 001" row "Program status" column of "my_programs" table should contain "Open"
     And I log out
 
     When I log in as "allocator"
-    And I am on programs management page in "Cat 1"
+    And I am on the "Cat 1" "tool_muprog > Programs management" page
     And I follow "Program 001"
     And I follow "Users"
+    And I click on "Actions" "link" in the "Student 2" "table_row"
     And I click on "Delete program allocation" "link" in the "Student 2" "table_row"
     And I press dialog form button "Delete program allocation"
     Then I should not see "Student 2"
     And I log out
 
     When I log in as "student2"
-    And I am on My programs page
+    And I am on the "tool_muprog > My programs" page
     And I should not see "Program 001"
     And I log out
 
   @javascript
   Scenario: Allocator rejects student allocation request for a program
     Given I log in as "manager1"
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 001"
     And I follow "Allocation settings"
 
     When I click on "Update Requests with approval" "link"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Active | Yes |
     And I press dialog form button "Update"
-    Then I should see "Active" in the "Requests with approval:" definition list item
+    Then I should see "Active" in the "Requests with approval" definition list item
     And I log out
 
     When I log in as "student2"
-    And I am on Program catalogue page
+    And I am on the "tool_muprog > Program catalogue" page
     And I follow "Program 001"
     And I press "Request access"
     And I press dialog form button "Request access"
@@ -166,11 +168,12 @@ Feature: Program approval allocations tests
     And I log out
 
     When I log in as "allocator"
-    And I am on programs management page in "Cat 1"
+    And I am on the "Cat 1" "tool_muprog > Programs management" page
     And I follow "Program 001"
     And I follow "Requests"
+    And I click on "Actions" "link" in the "Student 2" "table_row"
     And I click on "Reject request" "link" in the "Student 2" "table_row"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Rejection reason | Sorry mate! |
     And I press dialog form button "Reject request"
     Then I should see "Student 2"
@@ -179,22 +182,23 @@ Feature: Program approval allocations tests
     And I log out
 
     When I log in as "student2"
-    And I am on Program catalogue page
+    And I am on the "tool_muprog > Program catalogue" page
     And I follow "Program 001"
     Then I should see "Access request was rejected"
     And I log out
 
     When I log in as "allocator"
-    And I am on programs management page in "Cat 1"
+    And I am on the "Cat 1" "tool_muprog > Programs management" page
     And I follow "Program 001"
     And I follow "Requests"
+    And I click on "Actions" "link" in the "Student 2" "table_row"
     And I click on "Delete request" "link" in the "Student 2" "table_row"
     And I press dialog form button "Delete request"
     Then I should not see "Student 2"
     And I log out
 
     When I log in as "student2"
-    And I am on Program catalogue page
+    And I am on the "tool_muprog > Program catalogue" page
     And I follow "Program 001"
     And I press "Request access"
     And I press dialog form button "Request access"

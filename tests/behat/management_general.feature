@@ -1,5 +1,5 @@
-@enrol @enrol_programs @openlms
-Feature: General program management tests
+@tool @tool_muprog @muTMS
+Feature: General programs management tests
 
   Background:
     Given unnecessary Admin bookmarks block gets deleted
@@ -33,17 +33,17 @@ Feature: General program management tests
 
     And the following "permission overrides" exist:
       | capability                     | permission | role     | contextlevel | reference |
-      | enrol/programs:view            | Allow      | pviewer  | System       |           |
-      | enrol/programs:view            | Allow      | pmanager | System       |           |
-      | enrol/programs:edit            | Allow      | pmanager | System       |           |
-      | enrol/programs:delete          | Allow      | pmanager | System       |           |
-      | enrol/programs:addcourse       | Allow      | pmanager | System       |           |
-      | enrol/programs:allocate        | Allow      | pmanager | System       |           |
-      | enrol/programs:edit            | Allow      | peditor  | System       |           |
-      | enrol/programs:view            | Allow      | peditor  | System       |           |
-      | enrol/programs:admin          | Allow      | peditor  | System       |           |
+      | tool/muprog:view            | Allow      | pviewer  | System       |           |
+      | tool/muprog:view            | Allow      | pmanager | System       |           |
+      | tool/muprog:edit            | Allow      | pmanager | System       |           |
+      | tool/muprog:delete          | Allow      | pmanager | System       |           |
+      | tool/muprog:addcourse       | Allow      | pmanager | System       |           |
+      | tool/muprog:allocate        | Allow      | pmanager | System       |           |
+      | tool/muprog:edit            | Allow      | peditor  | System       |           |
+      | tool/muprog:view            | Allow      | peditor  | System       |           |
+      | tool/muprog:admin          | Allow      | peditor  | System       |           |
       | moodle/site:configview         | Allow      | cfmanager| System       |           |
-      | enrol/programs:configurecustomfields   | Allow      | cfmanager| System       |           |
+      | tool/muprog:configurecustomfields   | Allow      | cfmanager| System       |           |
 
     And the following "role assigns" exist:
       | user      | role          | contextlevel | reference |
@@ -57,103 +57,96 @@ Feature: General program management tests
   @javascript
   Scenario: Manager may create a new program with required settings
     Given I log in as "manager1"
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
 
-    When I click on "Programs actions" "link"
-    And I click on "Add program" "link"
-    And the following fields match these values:
+    When I click on "Add program" "button"
+    And the following fields in the ".modal-dialog" "css_element" match these values:
       | Program name  |             |
-      | ID number     |             |
+      | Program ID    |             |
       | Course groups | No          |
       | Description   |             |
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Program name  | Program 001 |
-      | ID number     | PR01        |
+      | Program ID    | PR01        |
     And I press dialog form button "Add program"
-    Then I should see "Program 001" in the "Full name:" definition list item
-    And I should see "PR01" in the "ID number:" definition list item
-    And I should see "System" in the "Category:" definition list item
-    And I should see "No" in the "Course groups:" definition list item
-    And I should see "No" in the "Archived:" definition list item
-    And I am on all programs management page
-    And "Program 001" row "Category" column of "management_programs" table should contain "System"
-    And "Program 001" row "ID number" column of "management_programs" table should contain "PR01"
-    And "Program 001" row "Public" column of "management_programs" table should contain "No"
+    Then I should see "Program 001" in the "Full name" definition list item
+    And I should see "PR01" in the "Program ID" definition list item
+    And I should see "System" in the "Category" definition list item
+    And I should see "No" in the "Course groups" definition list item
+    And I should see "No" in the "Archived" definition list item
+    And I am on the "tool_muprog > All programs management" page
+    And "Program 001" row "Category" column of "reportbuilder-table" table should contain "System"
+    And "Program 001" row "Program ID" column of "reportbuilder-table" table should contain "PR01"
+    And "Program 001" row "Public" column of "reportbuilder-table" table should contain "No"
 
   @javascript @_file_upload
   Scenario: Manager may create a new programs with all settings
     Given I log in as "manager1"
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
 
-    When I click on "Programs actions" "link"
-    And I click on "Add program" "link"
-    And the following fields match these values:
+    When I click on "Add program" "button"
+    And the following fields in the ".modal-dialog" "css_element" match these values:
       | Program name  |             |
-      | ID number     |             |
+      | Program ID    |             |
       | Course groups | No          |
       | Description   |             |
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Program name  | Program 001 |
-      | ID number     | PR01        |
+      | Program ID    | PR01        |
       | Course groups | Yes         |
       | Description   | Nice desc   |
-    And I upload "enrol/programs/tests/fixtures/badge.png" file to "Program image" filemanager
+    And I upload "admin/tool/muprog/tests/fixtures/badge.png" file to "Program image" filemanager
     And I set the field "Context" to "Cat 2"
     And I set the field "Tags" to "Mathematics, Algebra"
     And I press dialog form button "Add program"
-    Then I should see "Program 001" in the "Full name:" definition list item
-    And I should see "PR01" in the "ID number:" definition list item
-    And I should see "Cat 2" in the "Category:" definition list item
-    And I should see "Yes" in the "Course groups:" definition list item
-    And I should see "No" in the "Archived:" definition list item
-    And I should see "Mathematics" in the "Tags:" definition list item
-    And I should see "Algebra" in the "Tags:" definition list item
-    And I am on programs management page in "Cat 2"
-    And "PR01" row "Program name" column of "management_programs" table should contain "Program 001"
-    And "PR01" row "Program name" column of "management_programs" table should contain "Mathematics"
-    And "PR01" row "Program name" column of "management_programs" table should contain "Algebra"
-    And "PR01" row "Description" column of "management_programs" table should contain "Nice desc"
-    And "PR01" row "Public" column of "management_programs" table should contain "No"
-    And "PR01" row "Courses" column of "management_programs" table should contain "0"
-    And "PR01" row "Allocations" column of "management_programs" table should contain "0"
+    Then I should see "Program 001" in the "Full name" definition list item
+    And I should see "PR01" in the "Program ID" definition list item
+    And I should see "Cat 2" in the "Category" definition list item
+    And I should see "Yes" in the "Course groups" definition list item
+    And I should see "No" in the "Archived" definition list item
+    And I should see "Mathematics" in the "Tags" definition list item
+    And I should see "Algebra" in the "Tags" definition list item
+    And I am on the "Cat 2" "tool_muprog > Programs management" page
+    And "PR01" row "Program name" column of "reportbuilder-table" table should contain "Program 001"
+    And "PR01" row "Public" column of "reportbuilder-table" table should contain "No"
+    And "PR01" row "Courses" column of "reportbuilder-table" table should contain "0"
+    And "PR01" row "Allocations" column of "reportbuilder-table" table should contain "0"
 
   @javascript
   Scenario: Manager may update basic general settings of an existing program
     Given I log in as "manager1"
-    And I am on all programs management page
-    And I click on "Programs actions" "link"
-    And I click on "Add program" "link"
-    And I set the following fields to these values:
+    And I am on the "tool_muprog > All programs management" page
+    And I click on "Add program" "button"
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Program name  | Program 001 |
-      | ID number     | PR01        |
+      | Program ID    | PR01        |
     And I press dialog form button "Add program"
 
     When I press "Edit"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Program name  | Program 002 |
-      | ID number     | PR02        |
+      | Program ID    | PR02        |
     And I press dialog form button "Update program"
-    Then I should see "Program 002" in the "Full name:" definition list item
-    And I should see "PR02" in the "ID number:" definition list item
-    And I should see "System" in the "Category:" definition list item
-    And I should see "No" in the "Course groups:" definition list item
-    And I should see "No" in the "Archived:" definition list item
+    Then I should see "Program 002" in the "Full name" definition list item
+    And I should see "PR02" in the "Program ID" definition list item
+    And I should see "System" in the "Category" definition list item
+    And I should see "No" in the "Course groups" definition list item
+    And I should see "No" in the "Archived" definition list item
 
   @javascript
   Scenario: Manager may delete program
     Given I log in as "manager1"
-    And I am on all programs management page
-    And I click on "Programs actions" "link"
-    And I click on "Add program" "link"
-    And I set the following fields to these values:
+    And I am on the "tool_muprog > All programs management" page
+    And I click on "Add program" "button"
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Program name  | Program 001 |
-      | ID number     | PR01        |
+      | Program ID    | PR01        |
     And I press dialog form button "Add program"
     And I press "Edit"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Archived  | 1 |
     And I press dialog form button "Update program"
-    And I should see "Yes" in the "Archived:" definition list item
+    And I should see "Yes" in the "Archived" definition list item
 
     When I click on "Program actions" "link"
     And I click on "Delete program" "link"
@@ -163,33 +156,32 @@ Feature: General program management tests
   @javascript @_file_upload
   Scenario: Manager may update all general settings of an existing program
     Given I log in as "manager1"
-    And I am on all programs management page
-    And I click on "Programs actions" "link"
-    And I click on "Add program" "link"
-    And I set the following fields to these values:
+    And I am on the "tool_muprog > All programs management" page
+    And I click on "Add program" "button"
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Program name  | Program 002 |
-      | ID number     | PR02        |
+      | Program ID    | PR02        |
     And I set the field "Context" to "Cat 1"
     And I set the field "Tags" to "Logic"
     And I press dialog form button "Add program"
 
     When I press "Edit"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Program name  | Program 001 |
-      | ID number     | PR01        |
+      | Program ID    | PR01        |
       | Course groups | Yes         |
       | Description   | Nice desc   |
-    And I upload "enrol/programs/tests/fixtures/badge.png" file to "Program image" filemanager
+    And I upload "admin/tool/muprog/tests/fixtures/badge.png" file to "Program image" filemanager
     And I set the field "Context" to "Cat 2"
     And I set the field "Tags" to "Mathematics, Algebra"
     And I press dialog form button "Update program"
-    Then I should see "Program 001" in the "Full name:" definition list item
-    And I should see "PR01" in the "ID number:" definition list item
-    And I should see "Cat 2" in the "Category:" definition list item
-    And I should see "Yes" in the "Course groups:" definition list item
-    And I should see "No" in the "Archived:" definition list item
-    And I should see "Mathematics" in the "Tags:" definition list item
-    And I should see "Algebra" in the "Tags:" definition list item
+    Then I should see "Program 001" in the "Full name" definition list item
+    And I should see "PR01" in the "Program ID" definition list item
+    And I should see "Cat 2" in the "Category" definition list item
+    And I should see "Yes" in the "Course groups" definition list item
+    And I should see "No" in the "Archived" definition list item
+    And I should see "Mathematics" in the "Tags" definition list item
+    And I should see "Algebra" in the "Tags" definition list item
 
   @javascript
   Scenario: Set up and edit custom fields of programs
@@ -207,24 +199,23 @@ Feature: General program management tests
       | Custom field | Short name | Type       |
       | Test field   | testfield  | Short text |
     When I log in as "editor1"
-    And I am on all programs management page
-    And I click on "Programs actions" "link"
-    And I click on "Add program" "link"
+    And I am on the "tool_muprog > All programs management" page
+    And I click on "Add program" "button"
     And I expand all fieldsets
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Program name       | Program 007       |
-      | ID number          | P007              |
+      | Program ID         | P007              |
       | Test field         | Test value        |
     And I press dialog form button "Add program"
 
   @javascript
   Scenario: Manager may see there are deleted courses in program in list of programs
-    Given the following "enrol_programs > programs" exist:
+    Given the following "tool_muprog > programs" exist:
       | fullname    | idnumber |
       | Program 001 | PR01      |
       | Program 002 | PR02      |
       | Program 003 | PR03      |
-    And the following "enrol_programs > program_items" exist:
+    And the following "tool_muprog > program_items" exist:
       | program     | parent     | course   | fullname   | sequencetype     | minprerequisites |
       | Program 001 |            | Course 1 |            |                  |                  |
       | Program 001 |            | Course 2 |            |                  |                  |
@@ -247,7 +238,7 @@ Feature: General program management tests
     And I log out
 
     When I log in as "manager1"
-    And I am on all programs management page
-    Then "PR01" row "Courses" column of "management_programs" table should contain "Missing courses: 2"
-    And "PR02" row "Courses" column of "management_programs" table should contain "Missing courses: 1"
-    And "PR03" row "Courses" column of "management_programs" table should not contain "Missing courses"
+    And I am on the "tool_muprog > All programs management" page
+    Then "PR01" row "Courses" column of "reportbuilder-table" table should contain "Missing courses: 2"
+    And "PR02" row "Courses" column of "reportbuilder-table" table should contain "Missing courses: 1"
+    And "PR03" row "Courses" column of "reportbuilder-table" table should not contain "Missing courses"

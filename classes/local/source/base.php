@@ -1,32 +1,23 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace enrol_programs\local\source;
+namespace tool_muprog\local\source;
 
-use enrol_programs\local\allocation;
+use tool_muprog\local\allocation;
+use tool_mulib\output\action_menu\dropdown;
 
 use stdClass;
 
 /**
  * Program source abstraction.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class base {
     /**
@@ -47,7 +38,7 @@ abstract class base {
      */
     public static function get_name(): string {
         $type = static::get_type();
-        return get_string('source_' . $type, 'enrol_programs');
+        return get_string('source_' . $type, 'tool_muprog');
     }
 
     /**
@@ -61,7 +52,7 @@ abstract class base {
      */
     public static function is_new_allowed(\stdClass $program): bool {
         $type = static::get_type();
-        return (bool)get_config('enrol_programs', 'source_' . $type . '_allownew');
+        return (bool)get_config('tool_muprog', 'source_' . $type . '_allownew');
     }
 
     /**
@@ -94,11 +85,10 @@ abstract class base {
     /**
      * Return extra tab for managing the source data in program.
      *
+     * @param \tool_muprog\navigation\views\program_secondary $secondary
      * @param stdClass $program
-     * @return array
      */
-    public static function get_extra_management_tabs(stdClass $program): array {
-        return [];
+    public static function add_program_secondary_tabs(\tool_muprog\navigation\views\program_secondary $secondary, stdClass $program): void {
     }
 
     /**
@@ -138,26 +128,13 @@ abstract class base {
     }
 
     /**
-     * Allocation related buttons for program management page.
-     *
-     * @deprecated
-     *
-     * @param stdClass $program
-     * @param stdClass $source
-     * @return array
-     */
-    public static function get_management_program_users_buttons(\stdClass $program, \stdClass $source): array {
-        return [];
-    }
-
-    /**
      * Source related extra menu items for program allocation tab.
      *
-     * @param \enrol_programs\hook\extra_menu\management_program_users $menu
+     * @param dropdown $dropdown
+     * @param stdClass $program
      * @param stdClass $source source record
      */
-    public static function add_management_program_users_extra_actions(
-        \enrol_programs\hook\extra_menu\management_program_users $menu, stdClass $source): void {
+    public static function add_management_program_users_extra_actions(dropdown $dropdown, stdClass $program, stdClass $source): void {
     }
 
     /**
@@ -207,7 +184,8 @@ abstract class base {
      * @param int|null $sourceinstanceid
      * @return stdClass user allocation record
      */
-    final protected static function allocate_user(\stdClass $program, \stdClass $source, int $userid, array $sourcedata, array $dateoverrides = [], ?int $sourceinstanceid = null): \stdClass {
+    final protected static function allocate_user(\stdClass $program, \stdClass $source, int $userid,
+                                                  array $sourcedata, array $dateoverrides = [], ?int $sourceinstanceid = null): \stdClass {
         global $DB;
 
         if ($userid <= 0 || isguestuser($userid)) {
@@ -223,7 +201,7 @@ abstract class base {
         $record->userid = $userid;
         $record->sourceid = $source->id;
         $record->archived = 0;
-        $record->sourcedatajson = \enrol_programs\local\util::json_encode($sourcedata);
+        $record->sourcedatajson = \tool_muprog\local\util::json_encode($sourcedata);
         $record->sourceinstanceid = $sourceinstanceid;
         $record->timeallocated = empty($dateoverrides['timeallocated']) ? $now : $dateoverrides['timeallocated'];
         $record->timecreated = $now;
@@ -246,17 +224,17 @@ abstract class base {
             $record->timedue = $record->timeend;
         }
 
-        $record->id = $DB->insert_record('enrol_programs_allocations', $record);
-        $allocation = $DB->get_record('enrol_programs_allocations', ['id' => $record->id], '*', MUST_EXIST);
+        $record->id = $DB->insert_record('tool_muprog_allocation', $record);
+        $allocation = $DB->get_record('tool_muprog_allocation', ['id' => $record->id], '*', MUST_EXIST);
 
-        \enrol_programs\local\allocation::make_snapshot($allocation->id, 'allocation');
+        \tool_muprog\local\allocation::make_snapshot($allocation->id, 'allocation');
 
-        $event = \enrol_programs\event\user_allocated::create_from_allocation($allocation, $program);
+        $event = \tool_muprog\event\user_allocated::create_from_allocation($allocation, $program);
         $event->trigger();
 
-        \enrol_programs\local\notification\allocation::notify_now($user, $program, $source, $allocation);
+        \tool_muprog\local\notification\allocation::notify_now($user, $program, $source, $allocation);
 
-        \enrol_programs\local\calendar::fix_allocation_events($allocation, $program);
+        \tool_muprog\local\calendar::fix_allocation_events($allocation, $program);
 
         return $allocation;
     }
@@ -279,7 +257,7 @@ abstract class base {
      */
     public static function encode_datajson(stdClass $formdata): string {
         // Override if necessary.
-        return \enrol_programs\local\util::json_encode([]);
+        return \tool_muprog\local\util::json_encode([]);
     }
 
     /**
@@ -301,7 +279,7 @@ abstract class base {
      */
     public static function get_edit_form_class(): string {
         $type = static::get_type();
-        $class = "enrol_programs\\local\\form\source_{$type}_edit";
+        $class = "tool_muprog\\local\\form\source_{$type}_edit";
         if (!class_exists($class)) {
             throw new \coding_exception('source edit class not found, either override get_edit_form_class or add class: ' . $class);
         }
@@ -329,27 +307,27 @@ abstract class base {
     public static function import_source_data(int $fromprogramid, int $targetprogramid): stdClass {
         global $DB;
 
-        $fromsource = $DB->get_record('enrol_programs_sources',
+        $fromsource = $DB->get_record('tool_muprog_source',
             ['programid' => $fromprogramid, 'type' => static::get_type()], '*', MUST_EXIST);
-        $targetsource = $DB->get_record('enrol_programs_sources',
+        $targetsource = $DB->get_record('tool_muprog_source',
             ['programid' => $targetprogramid, 'type' => static::get_type()]);
 
         if ($targetsource) {
             $fromsource->id = $targetsource->id;
             $fromsource->programid = $targetprogramid;
-            $DB->update_record('enrol_programs_sources', $fromsource);
+            $DB->update_record('tool_muprog_source', $fromsource);
         } else {
             unset($fromsource->id);
             $fromsource->programid = $targetprogramid;
-            $DB->insert_record('enrol_programs_sources', $fromsource);
+            $DB->insert_record('tool_muprog_source', $fromsource);
         }
 
-        return $DB->get_record('enrol_programs_sources',
+        return $DB->get_record('tool_muprog_source',
             ['programid' => $targetprogramid, 'type' => static::get_type()], '*', MUST_EXIST);
     }
 
     /**
-     * Render details about this enabled source in a program management ui.
+     * Render details about this enabled source in a programs management ui.
      *
      * @param stdClass $program
      * @param stdClass|null $source
@@ -367,7 +345,7 @@ abstract class base {
      * @return string
      */
     public static function render_status(stdClass $program, ?stdClass $source): string {
-        global $PAGE;
+        global $OUTPUT;
 
         $type = static::get_type();
 
@@ -375,18 +353,15 @@ abstract class base {
             throw new \coding_exception('Invalid source type');
         }
 
-        /** @var \local_openlms\output\dialog_form\renderer $dialogformoutput */
-        $dialogformoutput = $PAGE->get_renderer('local_openlms', 'dialog_form');
-
         $result = static::render_status_details($program, $source);
 
         $context = \context::instance_by_id($program->contextid);
-        if (has_capability('enrol/programs:edit', $context) && static::is_update_allowed($program)) {
-            $label = get_string('updatesource', 'enrol_programs', static::get_name());
-            $editurl = new \moodle_url('/enrol/programs/management/program_source_edit.php', ['programid' => $program->id, 'type' => $type]);
-            $editbutton = new \local_openlms\output\dialog_form\icon($editurl, 'i/settings', $label);
+        if (has_capability('tool/muprog:edit', $context) && static::is_update_allowed($program)) {
+            $label = get_string('updatesource', 'tool_muprog', static::get_name());
+            $editurl = new \moodle_url('/admin/tool/muprog/management/program_source_edit.php', ['programid' => $program->id, 'type' => $type]);
+            $editbutton = new \tool_mulib\output\dialog_form\icon($editurl, $label, 'i/settings');
             $editbutton->set_dialog_name(static::get_name());
-            $result .= ' ' . $dialogformoutput->render($editbutton);
+            $result .= ' ' . $OUTPUT->render($editbutton);
         }
 
         return $result;
@@ -420,15 +395,15 @@ abstract class base {
         global $DB;
 
         /** @var base[] $sourceclasses */
-        $sourceclasses = \enrol_programs\local\allocation::get_source_classes();
+        $sourceclasses = \tool_muprog\local\allocation::get_source_classes();
         if (!isset($sourceclasses[$data->type])) {
             throw new \coding_exception('Invalid source type');
         }
         $sourcetype = $data->type;
         $sourceclass = $sourceclasses[$sourcetype];
 
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $data->programid], '*', MUST_EXIST);
-        $source = $DB->get_record('enrol_programs_sources', ['type' => $sourcetype, 'programid' => $program->id]);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $data->programid], '*', MUST_EXIST);
+        $source = $DB->get_record('tool_muprog_source', ['type' => $sourcetype, 'programid' => $program->id]);
         if ($source) {
             $oldsource = clone($source);
         } else {
@@ -445,7 +420,7 @@ abstract class base {
                 $source->auxint1 = $data->auxint1 ?? null;
                 $source->auxint2 = $data->auxint2 ?? null;
                 $source->auxint3 = $data->auxint3 ?? null;
-                $DB->update_record('enrol_programs_sources', $source);
+                $DB->update_record('tool_muprog_source', $source);
             } else {
                 $source = new \stdClass();
                 $source->programid = $data->programid;
@@ -454,27 +429,27 @@ abstract class base {
                 $source->auxint1 = $data->auxint1 ?? null;
                 $source->auxint2 = $data->auxint2 ?? null;
                 $source->auxint3 = $data->auxint3 ?? null;
-                $source->id = $DB->insert_record('enrol_programs_sources', $source);
+                $source->id = $DB->insert_record('tool_muprog_source', $source);
             }
-            $source = $DB->get_record('enrol_programs_sources', ['id' => $source->id], '*', MUST_EXIST);
+            $source = $DB->get_record('tool_muprog_source', ['id' => $source->id], '*', MUST_EXIST);
         } else {
             if ($source) {
-                if ($DB->record_exists('enrol_programs_allocations', ['sourceid' => $source->id])) {
+                if ($DB->record_exists('tool_muprog_allocation', ['sourceid' => $source->id])) {
                     throw new \coding_exception('Cannot delete source with allocations');
                 }
-                $DB->delete_records('enrol_programs_requests', ['sourceid' => $source->id]);
-                $DB->delete_records('enrol_programs_src_cohorts', ['sourceid' => $source->id]);
-                $DB->delete_records('enrol_programs_sources', ['id' => $source->id]);
+                $DB->delete_records('tool_muprog_request', ['sourceid' => $source->id]);
+                $DB->delete_records('tool_muprog_src_cohort', ['sourceid' => $source->id]);
+                $DB->delete_records('tool_muprog_source', ['id' => $source->id]);
                 $source = null;
             }
         }
         $sourceclass::after_update($oldsource, $data, $source);
 
-        \enrol_programs\local\program::make_snapshot($data->programid, 'update_source');
+        \tool_muprog\local\program::make_snapshot($data->programid, 'update_source');
 
-        \enrol_programs\local\allocation::fix_allocation_sources($program->id, null);
-        \enrol_programs\local\allocation::fix_enrol_instances($program->id);
-        \enrol_programs\local\allocation::fix_user_enrolments($program->id, null);
+        \tool_muprog\local\allocation::fix_allocation_sources($program->id, null);
+        \tool_muprog\local\allocation::fix_enrol_instances($program->id);
+        \tool_muprog\local\allocation::fix_user_enrolments($program->id, null);
 
         return $source;
     }
@@ -513,39 +488,39 @@ abstract class base {
 
         $trans = $DB->start_delegated_transaction();
 
-        \enrol_programs\local\allocation::make_snapshot($allocation->id, 'deallocation');
+        \tool_muprog\local\allocation::make_snapshot($allocation->id, 'deallocation');
 
         if ($user && !$skipnotify) {
-            \enrol_programs\local\notification\deallocation::notify_now($user, $program, $source, $allocation);
+            \tool_muprog\local\notification\deallocation::notify_now($user, $program, $source, $allocation);
         }
-        \enrol_programs\local\notification_manager::delete_allocation_notifications($allocation);
+        \tool_muprog\local\notification_manager::delete_allocation_notifications($allocation);
 
-        $issues = $DB->get_records('enrol_programs_certs_issues', ['allocationid' => $allocation->id]);
+        $issues = $DB->get_records('tool_muprog_cert_issue', ['allocationid' => $allocation->id]);
         foreach ($issues as $issue) {
-            $DB->set_field('enrol_programs_certs_issues', 'allocationid', null, ['id' => $issue->id]);
+            $DB->set_field('tool_muprog_cert_issue', 'allocationid', null, ['id' => $issue->id]);
         }
-        if (\enrol_programs\local\certificate::is_available()) {
+        if (\tool_muprog\local\certificate::is_available()) {
             foreach ($issues as $issue) {
                 $DB->set_field('tool_certificate_issues', 'archived', 1, ['id' => $issue->issueid]);
             }
         }
         unset($issues);
 
-        $items = $DB->get_records('enrol_programs_items', ['programid' => $allocation->programid]);
+        $items = $DB->get_records('tool_muprog_item', ['programid' => $allocation->programid]);
         foreach ($items as $item) {
-            $DB->delete_records('enrol_programs_evidences', ['itemid' => $item->id, 'userid' => $allocation->userid]);
-            $DB->delete_records('enrol_programs_completions', ['itemid' => $item->id, 'allocationid' => $allocation->id]);
+            $DB->delete_records('tool_muprog_evidence', ['itemid' => $item->id, 'userid' => $allocation->userid]);
+            $DB->delete_records('tool_muprog_completion', ['itemid' => $item->id, 'allocationid' => $allocation->id]);
         }
         unset($items);
-        $DB->delete_records('enrol_programs_allocations', ['id' => $allocation->id]);
+        $DB->delete_records('tool_muprog_allocation', ['id' => $allocation->id]);
 
         $trans->allow_commit();
 
-        \enrol_programs\local\allocation::fix_allocation_sources($program->id, $allocation->userid);
-        \enrol_programs\local\allocation::fix_user_enrolments($program->id, $allocation->userid);
-        \enrol_programs\local\calendar::delete_allocation_events($allocation->id);
+        \tool_muprog\local\allocation::fix_allocation_sources($program->id, $allocation->userid);
+        \tool_muprog\local\allocation::fix_user_enrolments($program->id, $allocation->userid);
+        \tool_muprog\local\calendar::delete_allocation_events($allocation->id);
 
-        $event = \enrol_programs\event\user_deallocated::create_from_allocation($allocation, $program);
+        $event = \tool_muprog\event\user_deallocated::create_from_allocation($allocation, $program);
         $event->trigger();
     }
 }

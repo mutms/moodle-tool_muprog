@@ -1,30 +1,20 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace enrol_programs\local\source;
+namespace tool_muprog\local\source;
 
 use stdClass;
 
 /**
  * Program self allocation source.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class selfallocation extends base {
     /**
@@ -75,11 +65,11 @@ final class selfallocation extends base {
     public static function is_import_allowed(stdClass $fromprogram, stdClass $targetprogram): bool {
         global $DB;
 
-        if (!$DB->record_exists('enrol_programs_sources', ['type' => static::get_type(), 'programid' => $fromprogram->id])) {
+        if (!$DB->record_exists('tool_muprog_source', ['type' => static::get_type(), 'programid' => $fromprogram->id])) {
             return false;
         }
 
-        if (!$DB->record_exists('enrol_programs_sources', ['type' => static::get_type(), 'programid' => $targetprogram->id])) {
+        if (!$DB->record_exists('tool_muprog_source', ['type' => static::get_type(), 'programid' => $targetprogram->id])) {
             if (!static::is_new_allowed($targetprogram)) {
                 return false;
             }
@@ -132,20 +122,20 @@ final class selfallocation extends base {
             return false;
         }
 
-        if (!\enrol_programs\local\catalogue::is_program_visible($program, $userid)) {
+        if (!\tool_muprog\local\catalogue::is_program_visible($program, $userid)) {
             return false;
         }
 
-        if ($DB->record_exists('enrol_programs_allocations', ['programid' => $program->id, 'userid' => $userid])) {
+        if ($DB->record_exists('tool_muprog_allocation', ['programid' => $program->id, 'userid' => $userid])) {
             return false;
         }
 
         $data = (object)json_decode($source->datajson);
         if (isset($data->maxusers)) {
             // Any type of allocations.
-            $count = $DB->count_records('enrol_programs_allocations', ['programid' => $program->id]);
+            $count = $DB->count_records('tool_muprog_allocation', ['programid' => $program->id]);
             if ($count >= $data->maxusers) {
-                $failurereason = get_string('source_selfallocation_maxusersreached', 'enrol_programs');
+                $failurereason = get_string('source_selfallocation_maxusersreached', 'tool_muprog');
                 $failurereason = '<em><strong>' . $failurereason . '</strong></em>';
                 return false;
             }
@@ -167,7 +157,7 @@ final class selfallocation extends base {
      * @return string[]
      */
     public static function get_catalogue_actions(\stdClass $program, \stdClass $source): array {
-        global $USER, $DB, $PAGE;
+        global $USER, $OUTPUT;
 
         $failurereason = null;
         if (!self::can_user_request($program, $source, (int)$USER->id, $failurereason)) {
@@ -178,12 +168,10 @@ final class selfallocation extends base {
             }
         }
 
-        $url = new \moodle_url('/enrol/programs/catalogue/source_selfallocation.php', ['sourceid' => $source->id]);
-        $button = new \local_openlms\output\dialog_form\button($url, get_string('source_selfallocation_allocate', 'enrol_programs'));
+        $url = new \moodle_url('/admin/tool/muprog/catalogue/source_selfallocation.php', ['sourceid' => $source->id]);
+        $button = new \tool_mulib\output\dialog_form\button($url, get_string('source_selfallocation_allocate', 'tool_muprog'));
 
-        /** @var \local_openlms\output\dialog_form\renderer $dialogformoutput */
-        $dialogformoutput = $PAGE->get_renderer('local_openlms', 'dialog_form');
-        $button = $dialogformoutput->render($button);
+        $button = $OUTPUT->render($button);
 
         return [$button];
     }
@@ -198,12 +186,12 @@ final class selfallocation extends base {
     public static function signup(int $programid, int $sourceid): stdClass {
         global $DB, $USER;
 
-        $program = $DB->get_record('enrol_programs_programs', ['id' => $programid], '*', MUST_EXIST);
-        $source = $DB->get_record('enrol_programs_sources',
+        $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
+        $source = $DB->get_record('tool_muprog_source',
             ['id' => $sourceid, 'type' => static::get_type(), 'programid' => $program->id], '*', MUST_EXIST);
 
         $user = $DB->get_record('user', ['id' => $USER->id, 'deleted' => 0], '*', MUST_EXIST);
-        $allocation = $DB->get_record('enrol_programs_allocations', ['programid' => $program->id, 'userid' => $user->id]);
+        $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program->id, 'userid' => $user->id]);
         if ($allocation) {
             // One allocation per program only.
             return $allocation;
@@ -211,8 +199,8 @@ final class selfallocation extends base {
 
         $allocation = self::allocate_user($program, $source, $user->id, []);
 
-        \enrol_programs\local\allocation::fix_user_enrolments($program->id, $user->id);
-        \enrol_programs\local\notification_manager::trigger_notifications($program->id, $user->id);
+        \tool_muprog\local\allocation::fix_user_enrolments($program->id, $user->id);
+        \tool_muprog\local\notification_manager::trigger_notifications($program->id, $user->id);
 
         return $allocation;
     }
@@ -266,11 +254,11 @@ final class selfallocation extends base {
         if (isset($formdata->selfallocation_allowsignup)) {
             $data['allowsignup'] = (int)(bool)$formdata->selfallocation_allowsignup;
         }
-        return \enrol_programs\local\util::json_encode($data);
+        return \tool_muprog\local\util::json_encode($data);
     }
 
     /**
-     * Render details about this enabled source in a program management ui.
+     * Render details about this enabled source in a programs management ui.
      *
      * @param stdClass $program
      * @param stdClass|null $source
@@ -284,17 +272,17 @@ final class selfallocation extends base {
         if ($source) {
             $data = (object)json_decode($source->datajson);
             if (isset($data->key)) {
-                $result .= '; ' . get_string('source_selfallocation_keyrequired', 'enrol_programs');
+                $result .= '; ' . get_string('source_selfallocation_keyrequired', 'tool_muprog');
             }
             if (isset($data->maxusers)) {
-                $count = $DB->count_records('enrol_programs_allocations', ['programid' => $program->id, 'sourceid' => $source->id]);
+                $count = $DB->count_records('tool_muprog_allocation', ['programid' => $program->id, 'sourceid' => $source->id]);
                 $a = (object)['count' => $count, 'max' => $data->maxusers];
-                $result .= '; ' . get_string('source_selfallocation_maxusers_status', 'enrol_programs', $a);
+                $result .= '; ' . get_string('source_selfallocation_maxusers_status', 'tool_muprog', $a);
             }
             if (!isset($data->allowsignup) || $data->allowsignup) {
-                $result .= '; ' . get_string('source_selfallocation_signupallowed', 'enrol_programs');
+                $result .= '; ' . get_string('source_selfallocation_signupallowed', 'tool_muprog');
             } else {
-                $result .= '; ' . get_string('source_selfallocation_signupnotallowed', 'enrol_programs');
+                $result .= '; ' . get_string('source_selfallocation_signupnotallowed', 'tool_muprog');
             }
         }
 

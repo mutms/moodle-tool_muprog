@@ -1,28 +1,18 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// This file is part of Programs for Moodle™.
+// phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace enrol_programs\local;
+namespace tool_muprog\local;
 
 /**
  * Program catalogue for learners.
  *
- * @package    enrol_programs
+ * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class catalogue {
     /** @var int page number */
@@ -76,7 +66,7 @@ final class catalogue {
         if ($this->searchtext !== null) {
             $pageparams['searchtext'] = $this->searchtext;
         }
-        return new \moodle_url('/enrol/programs/catalogue/index.php', $pageparams);
+        return new \moodle_url('/admin/tool/muprog/catalogue/index.php', $pageparams);
     }
 
     /**
@@ -142,32 +132,32 @@ final class catalogue {
     public function render_programs(): string {
         global $OUTPUT, $CFG, $DB, $USER, $PAGE;
 
-        $catalogueoutput = $PAGE->get_renderer('enrol_programs', 'catalogue');
+        $catalogueoutput = $PAGE->get_renderer('tool_muprog', 'catalogue');
 
         $totalcount = $this->count_programs();
         $programs = $this->get_programs();
 
         if (!$totalcount && !$this->is_filtering()) {
-            return get_string('errornoprograms', 'enrol_programs');
+            return get_string('errornoprograms', 'tool_muprog');
         }
 
-        $programicon = $OUTPUT->pix_icon('program', '', 'enrol_programs');
+        $programicon = $OUTPUT->pix_icon('program', '', 'tool_muprog');
         $currenturl = $this->get_current_url();
 
         $result = '';
 
         $data = [
-            'action' => new \moodle_url('/enrol/programs/catalogue/index.php'),
+            'action' => new \moodle_url('/admin/tool/muprog/catalogue/index.php'),
             'inputname' => 'searchtext',
             'searchstring' => get_string('search', 'cohort'),
             'query' => $this->searchtext,
             'hiddenfields' => $this->get_hidden_search_fields(),
-            'extraclasses' => 'mb-3'
+            'extraclasses' => 'mb-3',
         ];
         $result .= $OUTPUT->render_from_template('core/search_input', $data);
 
         if (!$totalcount) {
-            $result .= get_string('errornoprograms', 'enrol_programs');
+            $result .= get_string('errornoprograms', 'tool_muprog');
             return $result;
         }
 
@@ -176,7 +166,7 @@ final class catalogue {
         $i = 0;
         $count = count($programs);
         foreach ($programs as $program) {
-            $allocation = $DB->get_record('enrol_programs_allocations', ['programid' => $program->id, 'userid' => $USER->id, 'archived' => 0]);
+            $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program->id, 'userid' => $USER->id, 'archived' => 0]);
             $context = \context::instance_by_id($program->contextid);
             $classes = ['programbox', 'clearfix'];
             if ($i % 2 === 0) {
@@ -193,18 +183,18 @@ final class catalogue {
             $classes = implode(' ', $classes);
             $fullname = format_string($program->fullname);
             if ($allocation) {
-                $url = new \moodle_url('/enrol/programs/my/program.php', ['id' => $program->id]);
+                $url = new \moodle_url('/admin/tool/muprog/my/program.php', ['id' => $program->id]);
             } else {
-                $url = new \moodle_url('/enrol/programs/catalogue/program.php', ['id' => $program->id]);
+                $url = new \moodle_url('/admin/tool/muprog/catalogue/program.php', ['id' => $program->id]);
             }
             $url = $url->out(true);
 
-            $description = file_rewrite_pluginfile_urls($program->description, 'pluginfile.php', $context->id, 'enrol_programs', 'description', $program->id);
+            $description = file_rewrite_pluginfile_urls($program->description, 'pluginfile.php', $context->id, 'tool_muprog', 'description', $program->id);
             $description = format_text($description, $program->descriptionformat, ['context' => $context]);
 
             $tagsdiv = '';
             if ($CFG->usetags) {
-                $tags = \core_tag_tag::get_item_tags('enrol_programs', 'program', $program->id);
+                $tags = \core_tag_tag::get_item_tags('tool_muprog', 'program', $program->id);
                 if ($tags) {
                     $tagsdiv = $OUTPUT->tag_list($tags, '', 'program-tags');
                 }
@@ -219,7 +209,7 @@ final class catalogue {
             $presentation = (array)json_decode($program->presentationjson);
             if (!empty($presentation['image'])) {
                 $imageurl = \moodle_url::make_file_url("$CFG->wwwroot/pluginfile.php",
-                    '/' . $context->id . '/enrol_programs/image/' . $program->id . '/'. $presentation['image'], false);
+                    '/' . $context->id . '/tool_muprog/image/' . $program->id . '/'. $presentation['image'], false);
                 $programimage = '<div class="float-end programimage">' . \html_writer::img($imageurl, '') . '</div>';
             }
 
@@ -290,8 +280,8 @@ EOT;
         }
 
         $tenantjoin = "";
-        if (tenant::is_active()) {
-            $tenantid = \tool_olms_tenant\tenancy::get_tenant_id();
+        if (util::is_mutenancy_active()) {
+            $tenantid = \tool_mutenancy\local\tenancy::get_current_tenantid();
             if ($tenantid) {
                 $tenantjoin = "JOIN {context} pc ON pc.id = p.contextid AND (pc.tenantid IS NULL OR pc.tenantid = :tenantid)";
                 $params['tenantid'] = $tenantid;
@@ -299,14 +289,14 @@ EOT;
         }
 
         $sql = "SELECT p.*
-                  FROM {enrol_programs_programs} p
-             LEFT JOIN {enrol_programs_allocations} pa ON pa.programid = p.id AND pa.userid = :userid1 AND pa.archived = 0
+                  FROM {tool_muprog_program} p
+             LEFT JOIN {tool_muprog_allocation} pa ON pa.programid = p.id AND pa.userid = :userid1 AND pa.archived = 0
                   $tenantjoin
                  WHERE p.archived = 0 $searchwhere
                        AND (p.public = 1 OR pa.id IS NOT NULL OR EXISTS (
                             SELECT cm.id
                               FROM {cohort_members} cm
-                              JOIN {enrol_programs_cohorts} pc ON pc.cohortid = cm.cohortid
+                              JOIN {tool_muprog_cohort} pc ON pc.cohortid = cm.cohortid
                              WHERE cm.userid = :userid2 AND pc.programid = p.id))
               ORDER BY p.fullname ASC";
 
@@ -322,7 +312,7 @@ EOT;
     public static function is_program_visible(\stdClass $program, ?int $userid = null): bool {
         global $DB, $USER;
 
-        if (!enrol_is_enabled('programs')) {
+        if (!enrol_is_enabled('muprog')) {
             return false;
         }
 
@@ -334,16 +324,15 @@ EOT;
             return false;
         }
 
-        if (\enrol_programs\local\tenant::is_active()) {
+        if (\tool_muprog\local\util::is_mutenancy_active()) {
             if ($userid == $USER->id) {
-                $tenantid = \tool_olms_tenant\tenancy::get_tenant_id();
+                $tenantid = \tool_mutenancy\local\tenancy::get_current_tenantid();
             } else {
-                $tenantid = \tool_olms_tenant\tenant_users::get_user_tenant_id($userid);
+                $tenantid = \tool_mutenancy\local\tenancy::get_user_tenantid($userid);
             }
             if ($tenantid) {
                 $programcontext = \context::instance_by_id($program->contextid);
-                $programtenantid = \tool_olms_tenant\tenants::get_context_tenant_id($programcontext);
-                if ($programtenantid && $programtenantid != $tenantid) {
+                if ($programcontext->tenantid && $programcontext->tenantid != $tenantid) {
                     return false;
                 }
             }
@@ -352,11 +341,11 @@ EOT;
         if ($program->public) {
             return true;
         }
-        if ($DB->record_exists('enrol_programs_allocations', ['programid' => $program->id, 'userid' => $userid, 'archived' => 0])) {
+        if ($DB->record_exists('tool_muprog_allocation', ['programid' => $program->id, 'userid' => $userid, 'archived' => 0])) {
             return true;
         }
         $sql = "SELECT 1
-                  FROM {enrol_programs_cohorts} c
+                  FROM {tool_muprog_cohort} c
                   JOIN {cohort_members} cm ON cm.cohortid = c.cohortid AND cm.userid = :userid
                  WHERE c.programid = :programid";
         $params = ['programid' => $program->id, 'userid' => $userid];
@@ -372,16 +361,16 @@ EOT;
      * @return ?\moodle_url null of programs disabled or user cannot access catalogue
      */
     public static function get_catalogue_url(): ?\moodle_url {
-        if (!enrol_is_enabled('programs')) {
+        if (!enrol_is_enabled('muprog')) {
             return null;
         }
         if (!isloggedin()) {
             return null;
         }
-        if (!has_capability('enrol/programs:viewcatalogue', \context_system::instance())) {
+        if (!has_capability('tool/muprog:viewcatalogue', \context_system::instance())) {
             return null;
         }
-        return new \moodle_url('/enrol/programs/catalogue/index.php');
+        return new \moodle_url('/admin/tool/muprog/catalogue/index.php');
     }
 
     /**
@@ -405,14 +394,14 @@ EOT;
 
         $sql = "SELECT DISTINCT t.id, t.name
                   FROM {tag} t
-                  JOIN {tag_instance} tt ON tt.itemtype = 'program' AND tt.tagid = t.id AND tt.component = 'enrol_programs'
-                  JOIN {enrol_programs_programs} p ON p.id = tt.itemid
-             LEFT JOIN {enrol_programs_allocations} pa ON pa.programid = p.id AND pa.userid = :userid1 AND pa.archived = 0
+                  JOIN {tag_instance} tt ON tt.itemtype = 'program' AND tt.tagid = t.id AND tt.component = 'tool_muprog'
+                  JOIN {tool_muprog_program} p ON p.id = tt.itemid
+             LEFT JOIN {tool_muprog_allocation} pa ON pa.programid = p.id AND pa.userid = :userid1 AND pa.archived = 0
                  WHERE p.archived = 0
                        AND (p.public = 1 OR pa.id IS NOT NULL OR EXISTS (
                             SELECT cm.id
                               FROM {cohort_members} cm
-                              JOIN {enrol_programs_cohorts} pc ON pc.cohortid = cm.cohortid
+                              JOIN {tool_muprog_cohort} pc ON pc.cohortid = cm.cohortid
                              WHERE cm.userid = :userid2 AND pc.programid = p.id))
               ORDER BY t.name ASC";
         $params = ['userid1' => $userid, 'userid2' => $userid];
@@ -439,14 +428,14 @@ EOT;
         // then only complication here may be multi-tenancy.
 
         $sql = "SELECT p.*
-                  FROM {enrol_programs_programs} p
-                  JOIN {tag_instance} tt ON tt.itemid = p.id AND tt.itemtype = 'program' AND tt.tagid = :tagid AND tt.component = 'enrol_programs'
-             LEFT JOIN {enrol_programs_allocations} pa ON pa.programid = p.id AND pa.userid = :userid1 AND pa.archived = 0
+                  FROM {tool_muprog_program} p
+                  JOIN {tag_instance} tt ON tt.itemid = p.id AND tt.itemtype = 'program' AND tt.tagid = :tagid AND tt.component = 'tool_muprog'
+             LEFT JOIN {tool_muprog_allocation} pa ON pa.programid = p.id AND pa.userid = :userid1 AND pa.archived = 0
                  WHERE p.archived = 0
                        AND (p.public = 1 OR pa.id IS NOT NULL OR EXISTS (
                              SELECT cm.id
                                FROM {cohort_members} cm
-                               JOIN {enrol_programs_cohorts} pc ON pc.cohortid = cm.cohortid
+                               JOIN {tool_muprog_cohort} pc ON pc.cohortid = cm.cohortid
                               WHERE cm.userid = :userid2 AND pc.programid = p.id))
               ORDER BY p.fullname";
         $countsql = util::convert_to_count_sql($sql);
@@ -458,8 +447,8 @@ EOT;
         $result = [];
         foreach ($programs as $program) {
             $fullname = format_string($program->fullname);
-            $url = new \moodle_url('/enrol/programs/catalogue/program.php', ['id' => $program->id]);
-            $icon = $OUTPUT->pix_icon('program', '', 'enrol_programs');
+            $url = new \moodle_url('/admin/tool/muprog/catalogue/program.php', ['id' => $program->id]);
+            $icon = $OUTPUT->pix_icon('program', '', 'tool_muprog');
             $result[] = '<div class="program-link">' . $icon . \html_writer::link($url, $fullname) . '</div>';
         }
 

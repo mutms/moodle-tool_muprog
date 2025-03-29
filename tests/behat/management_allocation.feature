@@ -1,4 +1,4 @@
-@enrol @enrol_programs @openlms
+@tool @tool_muprog @muTMS
 Feature: Program allocation management tests
 
   Background:
@@ -28,9 +28,9 @@ Feature: Program allocation management tests
       | Program manager | pmanager  |
     And the following "permission overrides" exist:
       | capability                     | permission | role     | contextlevel | reference |
-      | enrol/programs:view            | Allow      | pviewer  | System       |           |
-      | enrol/programs:view            | Allow      | pmanager | System       |           |
-      | enrol/programs:edit            | Allow      | pmanager | System       |           |
+      | tool/muprog:view            | Allow      | pviewer  | System       |           |
+      | tool/muprog:view            | Allow      | pmanager | System       |           |
+      | tool/muprog:edit            | Allow      | pmanager | System       |           |
     And the following "role assigns" exist:
       | user      | role          | contextlevel | reference |
       | manager1  | pmanager      | System       |           |
@@ -41,38 +41,37 @@ Feature: Program allocation management tests
   @javascript
   Scenario: Manager creates programs with expected default allocation settings
     Given I log in as "manager1"
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
 
-    And I click on "Programs actions" "link"
-    And I click on "Add program" "link"
-    And I set the following fields to these values:
+    And I click on "Add program" "button"
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Program name  | Program 001 |
-      | ID number     | PR01        |
+      | Program ID    | PR01        |
     And I press dialog form button "Add program"
     And I follow "Allocation settings"
-    And I should see "Not set" in the "Allocation start:" definition list item
-    And I should see "Not set" in the "Allocation end:" definition list item
-    And I should see "Start immediately after allocation" in the "Program start:" definition list item
-    And I should see "Not set" in the "Program due:" definition list item
-    And I should see "Not set" in the "Program end:" definition list item
-    And I should see "Inactive" in the "Manual allocation:" definition list item
-    And I should see "Inactive" in the "Self allocation:" definition list item
-    And I should see "Inactive" in the "Requests with approval:" definition list item
-    And I should see "Inactive" in the "Automatic cohort allocation:" definition list item
+    And I should see "Not set" in the "Allocation start" definition list item
+    And I should see "Not set" in the "Allocation end" definition list item
+    And I should see "Start immediately after allocation" in the "Program start" definition list item
+    And I should see "Not set" in the "Program due" definition list item
+    And I should see "Not set" in the "Program end" definition list item
+    And I should see "Inactive" in the "Manual allocation" definition list item
+    And I should see "Inactive" in the "Self allocation" definition list item
+    And I should see "Inactive" in the "Requests with approval" definition list item
+    And I should see "Inactive" in the "Automatic cohort allocation" definition list item
 
   @javascript
   Scenario: Manager updates allocation start and end dates
-    Given the following "enrol_programs > programs" exist:
+    Given the following "tool_muprog > programs" exist:
       | fullname    | idnumber |
       | Program 000 | PR0      |
       | Program 001 | PR1      |
     And I log in as "manager1"
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
     And I follow "Allocation settings"
 
     When I click on "Update allocations" "link"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | timeallocationstart[enabled] | 1    |
       | timeallocationstart[day]     | 5    |
       | timeallocationstart[month]   | 11   |
@@ -80,11 +79,11 @@ Feature: Program allocation management tests
       | timeallocationstart[hour]    | 09   |
       | timeallocationstart[minute]  | 00   |
     And I press dialog form button "Update allocations"
-    Then I should see "Thursday, 5 November 2020, 9:00" in the "Allocation start:" definition list item
-    And I should see "Not set" in the "Allocation end:" definition list item
+    Then I should see "Thursday, 5 November 2020, 9:00" in the "Allocation start" definition list item
+    And I should see "Not set" in the "Allocation end" definition list item
 
     When I click on "Update allocations" "link"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | timeallocationend[enabled]   | 1    |
       | timeallocationend[day]       | 4   |
       | timeallocationend[month]     | 11   |
@@ -93,7 +92,7 @@ Feature: Program allocation management tests
       | timeallocationend[minute]    | 00   |
     And I press dialog form button "Update allocations"
     Then I should see "Error"
-    When I set the following fields to these values:
+    When  I set the following fields in the ".modal-dialog" "css_element" to these values:
       | timeallocationend[enabled]   | 1    |
       | timeallocationend[day]       | 10   |
       | timeallocationend[month]     | 11   |
@@ -101,44 +100,44 @@ Feature: Program allocation management tests
       | timeallocationend[hour]      | 20   |
       | timeallocationend[minute]    | 00   |
     And I press dialog form button "Update allocations"
-    Then I should see "Thursday, 5 November 2020, 9:00" in the "Allocation start:" definition list item
-    And I should see "Tuesday, 10 November 2020, 8:00" in the "Allocation end:" definition list item
+    Then I should see "Thursday, 5 November 2020, 9:00" in the "Allocation start" definition list item
+    And I should see "Tuesday, 10 November 2020, 8:00" in the "Allocation end" definition list item
 
     When I click on "Update allocations" "link"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | timeallocationstart[enabled] | 0    |
       | timeallocationend[enabled]   | 0    |
     And I press dialog form button "Cancel"
-    Then I should see "Thursday, 5 November 2020, 9:00" in the "Allocation start:" definition list item
-    And I should see "Tuesday, 10 November 2020, 8:00" in the "Allocation end:" definition list item
+    Then I should see "Thursday, 5 November 2020, 9:00" in the "Allocation start" definition list item
+    And I should see "Tuesday, 10 November 2020, 8:00" in the "Allocation end" definition list item
 
     When I click on "Update allocations" "link"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | timeallocationstart[enabled] | 0    |
     And I press dialog form button "Update allocations"
-    And I should see "Not set" in the "Allocation start:" definition list item
-    And I should see "Tuesday, 10 November 2020, 8:00" in the "Allocation end:" definition list item
+    And I should see "Not set" in the "Allocation start" definition list item
+    And I should see "Tuesday, 10 November 2020, 8:00" in the "Allocation end" definition list item
 
     When I click on "Update allocations" "link"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | timeallocationend[enabled]   | 0    |
     And I press dialog form button "Update allocations"
-    And I should see "Not set" in the "Allocation start:" definition list item
-    And I should see "Not set" in the "Allocation end:" definition list item
+    And I should see "Not set" in the "Allocation start" definition list item
+    And I should see "Not set" in the "Allocation end" definition list item
 
   @javascript
   Scenario: Manager updates allocation scheduling
-    Given the following "enrol_programs > programs" exist:
+    Given the following "tool_muprog > programs" exist:
       | fullname    | idnumber |
       | Program 000 | PR0      |
       | Program 001 | PR1      |
     And I log in as "manager1"
-    And I am on all programs management page
+    And I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
     And I follow "Allocation settings"
 
     When I click on "Update scheduling" "link"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Program start              | At a fixed date |
       | programstart_date[day]     | 5    |
       | programstart_date[month]   | 11   |
@@ -146,7 +145,7 @@ Feature: Program allocation management tests
       | programstart_date[hour]    | 09   |
       | programstart_date[minute]  | 00   |
     And I press dialog form button "Update scheduling"
-    Then I should see "Friday, 5 November 2032, 9:00" in the "Program start:" definition list item
+    Then I should see "Friday, 5 November 2032, 9:00" in the "Program start" definition list item
 
     When I click on "Update scheduling" "link"
     And I set the following fields to these values:
@@ -154,7 +153,7 @@ Feature: Program allocation management tests
       | programstart_delay[value] | 5      |
       | programstart_delay[type]  | months |
     And I press dialog form button "Update scheduling"
-    Then I should see "Delay start after allocation - 5 months" in the "Program start:" definition list item
+    Then I should see "Delay start after allocation - 5 months" in the "Program start" definition list item
 
     When I click on "Update scheduling" "link"
     And I set the following fields to these values:
@@ -162,7 +161,7 @@ Feature: Program allocation management tests
       | programstart_delay[value] | 3      |
       | programstart_delay[type]  | days   |
     And I press dialog form button "Update scheduling"
-    Then I should see "Delay start after allocation - 3 days" in the "Program start:" definition list item
+    Then I should see "Delay start after allocation - 3 days" in the "Program start" definition list item
 
     When I click on "Update scheduling" "link"
     And I set the following fields to these values:
@@ -170,13 +169,13 @@ Feature: Program allocation management tests
       | programstart_delay[value] | 7      |
       | programstart_delay[type]  | hours  |
     And I press dialog form button "Update scheduling"
-    Then I should see "Delay start after allocation - 7 hours" in the "Program start:" definition list item
+    Then I should see "Delay start after allocation - 7 hours" in the "Program start" definition list item
 
     When I click on "Update scheduling" "link"
     And I set the following fields to these values:
       | Program start             | Start immediately after allocation |
     And I press dialog form button "Update scheduling"
-    Then I should see "Start immediately after allocation" in the "Program start:" definition list item
+    Then I should see "Start immediately after allocation" in the "Program start" definition list item
 
     When I click on "Update scheduling" "link"
     And I set the following fields to these values:
@@ -187,7 +186,7 @@ Feature: Program allocation management tests
       | programdue_date[hour]    | 09   |
       | programdue_date[minute]  | 00   |
     And I press dialog form button "Update scheduling"
-    Then I should see "Friday, 5 November 2032, 9:00" in the "Program due:" definition list item
+    Then I should see "Friday, 5 November 2032, 9:00" in the "Program due" definition list item
 
     When I click on "Update scheduling" "link"
     And I set the following fields to these values:
@@ -195,7 +194,7 @@ Feature: Program allocation management tests
       | programdue_delay[value] | 5      |
       | programdue_delay[type]  | months |
     And I press dialog form button "Update scheduling"
-    Then I should see "Due after start - 5 months" in the "Program due:" definition list item
+    Then I should see "Due after start - 5 months" in the "Program due" definition list item
 
     When I click on "Update scheduling" "link"
     And I set the following fields to these values:
@@ -203,7 +202,7 @@ Feature: Program allocation management tests
       | programdue_delay[value] | 3      |
       | programdue_delay[type]  | days   |
     And I press dialog form button "Update scheduling"
-    Then I should see "Due after start - 3 days" in the "Program due:" definition list item
+    Then I should see "Due after start - 3 days" in the "Program due" definition list item
 
     When I click on "Update scheduling" "link"
     And I set the following fields to these values:
@@ -211,13 +210,13 @@ Feature: Program allocation management tests
       | programdue_delay[value] | 7      |
       | programdue_delay[type]  | hours  |
     And I press dialog form button "Update scheduling"
-    Then I should see "Due after start - 7 hours" in the "Program due:" definition list item
+    Then I should see "Due after start - 7 hours" in the "Program due" definition list item
 
     When I click on "Update scheduling" "link"
     And I set the following fields to these values:
       | Program due             | Not set |
     And I press dialog form button "Update scheduling"
-    Then I should see "Not set" in the "Program due:" definition list item
+    Then I should see "Not set" in the "Program due" definition list item
 
     When I click on "Update scheduling" "link"
     And I set the following fields to these values:
@@ -228,7 +227,7 @@ Feature: Program allocation management tests
       | programend_date[hour]    | 09   |
       | programend_date[minute]  | 00   |
     And I press dialog form button "Update scheduling"
-    Then I should see "Friday, 5 November 2032, 9:00" in the "Program end:" definition list item
+    Then I should see "Friday, 5 November 2032, 9:00" in the "Program end" definition list item
 
     When I click on "Update scheduling" "link"
     And I set the following fields to these values:
@@ -236,7 +235,7 @@ Feature: Program allocation management tests
       | programend_delay[value] | 5      |
       | programend_delay[type]  | months |
     And I press dialog form button "Update scheduling"
-    Then I should see "End after start - 5 months" in the "Program end:" definition list item
+    Then I should see "End after start - 5 months" in the "Program end" definition list item
 
     When I click on "Update scheduling" "link"
     And I set the following fields to these values:
@@ -244,7 +243,7 @@ Feature: Program allocation management tests
       | programend_delay[value] | 3      |
       | programend_delay[type]  | days   |
     And I press dialog form button "Update scheduling"
-    Then I should see "End after start - 3 days" in the "Program end:" definition list item
+    Then I should see "End after start - 3 days" in the "Program end" definition list item
 
     When I click on "Update scheduling" "link"
     And I set the following fields to these values:
@@ -252,13 +251,13 @@ Feature: Program allocation management tests
       | programend_delay[value] | 7      |
       | programend_delay[type]  | hours  |
     And I press dialog form button "Update scheduling"
-    Then I should see "End after start - 7 hours" in the "Program end:" definition list item
+    Then I should see "End after start - 7 hours" in the "Program end" definition list item
 
     When I click on "Update scheduling" "link"
     And I set the following fields to these values:
       | Program end             | Not set |
     And I press dialog form button "Update scheduling"
-    Then I should see "Not set" in the "Program end:" definition list item
+    Then I should see "Not set" in the "Program end" definition list item
 
     When I click on "Update scheduling" "link"
     And I set the following fields to these values:
@@ -310,6 +309,6 @@ Feature: Program allocation management tests
       | programdue_date[hour]    | 09   |
       | programdue_date[minute]  | 00   |
     And I press dialog form button "Update scheduling"
-    Then I should see "Friday, 5 November 2032, 9:00" in the "Program start:" definition list item
-    And I should see "Monday, 15 November 2032, 9:00" in the "Program due:" definition list item
-    And I should see "Saturday, 20 November 2032, 9:00" in the "Program end:" definition list item
+    Then I should see "Friday, 5 November 2032, 9:00" in the "Program start" definition list item
+    And I should see "Monday, 15 November 2032, 9:00" in the "Program due" definition list item
+    And I should see "Saturday, 20 November 2032, 9:00" in the "Program end" definition list item

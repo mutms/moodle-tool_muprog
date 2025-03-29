@@ -1,4 +1,4 @@
-@enrol @enrol_programs @openlms
+@tool @tool_muprog @muTMS
 Feature: Program visibility management tests
 
   Background:
@@ -44,12 +44,12 @@ Feature: Program visibility management tests
       | Program manager | pmanager  |
     And the following "permission overrides" exist:
       | capability                     | permission | role     | contextlevel | reference |
-      | enrol/programs:view            | Allow      | pviewer  | System       |           |
-      | enrol/programs:view            | Allow      | pmanager | System       |           |
-      | enrol/programs:edit            | Allow      | pmanager | System       |           |
-      | enrol/programs:delete          | Allow      | pmanager | System       |           |
-      | enrol/programs:addcourse       | Allow      | pmanager | System       |           |
-      | enrol/programs:allocate        | Allow      | pmanager | System       |           |
+      | tool/muprog:view            | Allow      | pviewer  | System       |           |
+      | tool/muprog:view            | Allow      | pmanager | System       |           |
+      | tool/muprog:edit            | Allow      | pmanager | System       |           |
+      | tool/muprog:delete          | Allow      | pmanager | System       |           |
+      | tool/muprog:addcourse       | Allow      | pmanager | System       |           |
+      | tool/muprog:allocate        | Allow      | pmanager | System       |           |
       | moodle/cohort:view             | Allow      | pmanager | System       |           |
     And the following "role assigns" exist:
       | user      | role          | contextlevel | reference |
@@ -60,59 +60,59 @@ Feature: Program visibility management tests
 
   @javascript
   Scenario: Manager may update program visibility settings
-    Given the following "enrol_programs > programs" exist:
+    Given the following "tool_muprog > programs" exist:
       | fullname    | idnumber | category |
       | Program 000 | PR0      |          |
       | Program 001 | PR1      | Cat 1    |
       | Program 002 | PR2      | Cat 2    |
       | Program 003 | PR3      | Cat 3    |
     And I log in as "manager1"
-    And I am on all programs management page
-    And "Program 000" row "Public" column of "management_programs" table should contain "No"
-    And "Program 001" row "Public" column of "management_programs" table should contain "No"
-    And "Program 002" row "Public" column of "management_programs" table should contain "No"
-    And "Program 003" row "Public" column of "management_programs" table should contain "No"
+    And I am on the "tool_muprog > All programs management" page
+    And "Program 000" row "Public" column of "reportbuilder-table" table should contain "No"
+    And "Program 001" row "Public" column of "reportbuilder-table" table should contain "No"
+    And "Program 002" row "Public" column of "reportbuilder-table" table should contain "No"
+    And "Program 003" row "Public" column of "reportbuilder-table" table should contain "No"
 
     When I follow "Program 000"
     And I follow "Visibility settings"
     And I press "Edit"
-    And the following fields match these values:
+    And the following fields in the ".modal-dialog" "css_element" match these values:
       | Public             | No             |
       | Visible to cohorts |                |
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Public             | Yes            |
     And I press dialog form button "Update program"
     Then I press "Edit"
-    And the following fields match these values:
+    And the following fields in the ".modal-dialog" "css_element" match these values:
       | Public             | Yes            |
     And I press dialog form button "Cancel"
-    And I am on all programs management page
-    And "Program 000" row "Public" column of "management_programs" table should contain "Yes"
+    And I am on the "tool_muprog > All programs management" page
+    And "Program 000" row "Public" column of "reportbuilder-table" table should contain "Yes"
 
     When I click on "No" "link" in the "Program 001" "table_row"
     And I press "Edit"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Visible to cohorts | Cohort 1 |
     And I press dialog form button "Update program"
     Then I should see "Cohort 1"
     And I press "Edit"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Visible to cohorts | Cohort 2 |
     And I press dialog form button "Update program"
     And I should see "Cohort 2"
-    And I am on all programs management page
-    And "Program 001" row "Public" column of "management_programs" table should contain "No"
+    And I am on the "tool_muprog > All programs management" page
+    And "Program 001" row "Public" column of "reportbuilder-table" table should contain "No"
 
     When I follow "Program 002"
     And I follow "Visibility settings"
     And I press "Edit"
-    And I set the following fields to these values:
+    And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Visible to cohorts | Cohort 2, Cohort 1 |
     And I press dialog form button "Update program"
     Then I should see "Cohort 1"
     And I should see "Cohort 2"
 
-    When I am on Program catalogue page
+    When I am on the "tool_muprog > Program catalogue" page
     Then I should see "Program 000"
     And I should not see "Program 001"
     And I should not see "Program 002"
@@ -120,7 +120,7 @@ Feature: Program visibility management tests
     And I log out
 
     When I log in as "student1"
-    And I am on Program catalogue page
+    And I am on the "tool_muprog > Program catalogue" page
     Then I should see "Program 000"
     And I should not see "Program 001"
     And I should see "Program 002"
@@ -128,7 +128,7 @@ Feature: Program visibility management tests
     And I log out
 
     When I log in as "student2"
-    And I am on Program catalogue page
+    And I am on the "tool_muprog > Program catalogue" page
     Then I should see "Program 000"
     And I should see "Program 001"
     And I should see "Program 002"
@@ -136,7 +136,7 @@ Feature: Program visibility management tests
     And I log out
 
     When I log in as "student3"
-    And I am on Program catalogue page
+    And I am on the "tool_muprog > Program catalogue" page
     Then I should see "Program 000"
     And I should not see "Program 001"
     And I should see "Program 002"
@@ -144,7 +144,7 @@ Feature: Program visibility management tests
     And I log out
 
     When I log in as "student4"
-    And I am on Program catalogue page
+    And I am on the "tool_muprog > Program catalogue" page
     Then I should see "Program 000"
     And I should not see "Program 001"
     And I should not see "Program 002"
