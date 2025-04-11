@@ -70,6 +70,7 @@ jobs:
 
       - name: Install moodle-plugin-ci
         run: |
+          moodle-plugin-ci add-plugin --branch $MOODLE_BRANCH mutms/mutms-tool_mulib
           moodle-plugin-ci add-plugin --branch $MOODLE_BRANCH mutms/mutms-enrol_muprog
           moodle-plugin-ci add-plugin --branch MOODLE_400_STABLE moodleworkplace/moodle-tool_certificate
           moodle-plugin-ci add-plugin --branch $MOODLE_BRANCH mutms/mutms-certificateelement_muprog
