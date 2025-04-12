@@ -113,7 +113,7 @@ final class allocation extends base {
         ))
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_INTEGER)
-            ->add_fields("{$allocationalias}.id, {$allocationalias}.programid, {$allocationalias}.timestart,{$allocationalias}.timedue, "
+            ->add_fields("{$allocationalias}.id, {$allocationalias}.programid, {$allocationalias}.timestart, {$allocationalias}.timedue, "
                 . "{$allocationalias}.timeend, {$allocationalias}.timecompleted, {$allocationalias}.archived")
             ->add_field('(' . "SELECT p.archived FROM {tool_muprog_program} p WHERE p.id = {$allocationalias}.programid" . ')', 'programarchived')
             ->set_is_sortable(false)

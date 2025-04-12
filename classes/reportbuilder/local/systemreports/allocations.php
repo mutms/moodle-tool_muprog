@@ -11,8 +11,6 @@ use tool_muprog\reportbuilder\local\entities\source;
 use core_reportbuilder\local\entities\user;
 use core_reportbuilder\system_report;
 use core_reportbuilder\local\helpers\database;
-use core_reportbuilder\local\report\filter;
-use core_reportbuilder\local\filters\boolean_select;
 use core_reportbuilder\local\helpers\user_profile_fields;
 use lang_string;
 use moodle_url;

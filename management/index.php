@@ -48,6 +48,7 @@ management::setup_index_page($currenturl, $context);
 
 $buttons = [];
 $dropdown = new dropdown(get_string('extra_menu_management_index', 'tool_muprog'));
+
 if (has_capability('tool/muprog:edit', $context)) {
     $url = new moodle_url('/admin/tool/muprog/management/program_add.php', ['contextid' => $context->id]);
     $button = new tool_mulib\output\dialog_form\button($url, get_string('addprogram', 'tool_muprog'));

@@ -47,7 +47,7 @@ class renderer extends \plugin_renderer_base {
             $result .= '<div class="float-end programimage">' . html_writer::img($imageurl, '') . '</div>';
         }
         $result .= '<dl class="row">';
-        $result .= '<dt class="col-3">' . get_string('fullname') . '</dt><dd class="col-9">'
+        $result .= '<dt class="col-3">' . get_string('programname', 'tool_muprog') . '</dt><dd class="col-9">'
             . format_string($program->fullname) . '</dd>';
         $result .= '<dt class="col-3">' . get_string('programidnumber', 'tool_muprog') . '</dt><dd class="col-9">'
             . s($program->idnumber) . '</dd>';

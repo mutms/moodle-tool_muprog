@@ -9,12 +9,10 @@ use lang_string;
 use core_reportbuilder\local\entities\base;
 use core_reportbuilder\local\report\{column, filter};
 use core_reportbuilder\local\helpers\format;
-use core_reportbuilder\local\filters\boolean_select;
 use core_reportbuilder\local\filters\select;
-use core_reportbuilder\local\filters\date;
 
 /**
- * Program request entity.
+ * Program allocation request entity.
  *
  * @package     tool_muprog
  * @copyright   2025 Petr Skoda

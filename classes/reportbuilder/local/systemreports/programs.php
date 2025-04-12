@@ -65,8 +65,8 @@ final class programs extends system_report {
             'program:context',
             'program:coursecount',
             'program:allocationcount',
-            'program:archived',
             'program:public',
+            'program:archived',
         ];
         $this->add_columns_from_entities($columns);
 

@@ -225,7 +225,7 @@ final class management {
         foreach ($contexts as $context) {
             $url = null;
             if (has_capability('tool/muprog:view', $context)) {
-                $url = new moodle_url('/admin/tool/muprog/management/index.php', ['id' => $context->id]);
+                $url = new moodle_url('/admin/tool/muprog/management/index.php', ['contextid' => $context->id]);
             }
             $PAGE->navbar->add($context->get_context_name(false), $url);
         }
@@ -270,7 +270,7 @@ final class management {
         foreach ($contexts as $context) {
             $url = null;
             if (has_capability('tool/muprog:view', $context)) {
-                $url = new moodle_url('/admin/tool/muprog/management/index.php', ['id' => $context->id]);
+                $url = new moodle_url('/admin/tool/muprog/management/index.php', ['contextid' => $context->id]);
             }
             $PAGE->navbar->add($context->get_context_name(false), $url);
         }
