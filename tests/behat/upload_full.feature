@@ -56,7 +56,7 @@ Feature: Program upload full tests
       | Program 01   | Category 1 | P01        | 3       | 0           | No     |
       | Program 02   | Category 2 | P02        | 0       | 0           | No     |
     And I follow "Program 00"
-    And I should see "Program 00" in the "Full name" definition list item
+    And I should see "Program 00" in the "Program name" definition list item
     And I should see "No" in the "Archived" definition list item
     And I follow "Content"
     And the following should exist in the "program_content" table:
@@ -139,7 +139,7 @@ Feature: Program upload full tests
       | Program 01   | Category 1 | P01        | 3       | 0           | No     |
       | Program 02   | Category 2 | P02        | 0       | 0           | No     |
     And I follow "Program 00"
-    And I should see "Program 00" in the "Full name" definition list item
+    And I should see "Program 00" in the "Program name" definition list item
     And I should see "No" in the "Archived" definition list item
     And I follow "Content"
     And the following should exist in the "program_content" table:
@@ -228,7 +228,7 @@ Feature: Program upload full tests
       | Program 01   | Category 1 | P01        | 3       | 0           | No     |
       | Program 02   | Category 2 | P02        | 0       | 0           | No     |
     And I follow "Program 00"
-    And I should see "Program 00" in the "Full name" definition list item
+    And I should see "Program 00" in the "Program name" definition list item
     And I should see "No" in the "Archived" definition list item
     And I follow "Content"
     And the following should exist in the "program_content" table:
@@ -315,7 +315,7 @@ Feature: Program upload full tests
       | Program 01   | Category 1 | P01        | 3       | 0           | No     |
       | Program 02   | Category 2 | P02        | 0       | 0           | No     |
     And I follow "Program 00"
-    And I should see "Program 00" in the "Full name" definition list item
+    And I should see "Program 00" in the "Program name" definition list item
     And I should see "No" in the "Archived" definition list item
     And I follow "Content"
     And the following should exist in the "program_content" table:
@@ -399,7 +399,7 @@ Feature: Program upload full tests
       | Program 01   | Category 1 | P01        | 3       | 0           | No     |
       | Program 02   | Category 2 | P02        | 0       | 0           | No     |
     And I follow "Program 00"
-    And I should see "Program 00" in the "Full name" definition list item
+    And I should see "Program 00" in the "Program name" definition list item
     And I should see "No" in the "Archived" definition list item
     And I follow "Content"
     And the following should exist in the "program_content" table:
@@ -483,7 +483,7 @@ Feature: Program upload full tests
       | Program 01   | Category 1 | P01        | 3       | 0           | No     |
       | Program 02   | Category 2 | P02        | 0       | 0           | No     |
     And I follow "Program 00"
-    And I should see "Program 00" in the "Full name" definition list item
+    And I should see "Program 00" in the "Program name" definition list item
     And I should see "No" in the "Archived" definition list item
     And I follow "Content"
     And the following should exist in the "program_content" table:
@@ -569,7 +569,7 @@ Feature: Program upload full tests
       | Program 01   | Category 1 | P01        | 3       | 0           | No     |
       | Program 02   | Category 2 | P02        | 0       | 0           | No     |
     And I follow "Program 00"
-    And I should see "Program 00" in the "Full name" definition list item
+    And I should see "Program 00" in the "Program name" definition list item
     And I should see "No" in the "Archived" definition list item
     And I follow "Content"
     And the following should exist in the "program_content" table:
@@ -660,7 +660,7 @@ Feature: Program upload full tests
       | Program 01   | Category 1 | P01        | 3       | 0           | No     |
       | Program 02   | Category 2 | P02        | 0       | 0           | No     |
     And I follow "Program 00"
-    And I should see "Program 00" in the "Full name" definition list item
+    And I should see "Program 00" in the "Program name" definition list item
     And I should see "No" in the "Archived" definition list item
     And I follow "Content"
     And the following should exist in the "program_content" table:

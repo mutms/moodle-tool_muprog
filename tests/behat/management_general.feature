@@ -69,7 +69,7 @@ Feature: General programs management tests
       | Program name  | Program 001 |
       | Program ID    | PR01        |
     And I press dialog form button "Add program"
-    Then I should see "Program 001" in the "Full name" definition list item
+    Then I should see "Program 001" in the "Program name" definition list item
     And I should see "PR01" in the "Program ID" definition list item
     And I should see "System" in the "Category" definition list item
     And I should see "No" in the "Course groups" definition list item
@@ -99,7 +99,7 @@ Feature: General programs management tests
     And I set the field "Context" to "Cat 2"
     And I set the field "Tags" to "Mathematics, Algebra"
     And I press dialog form button "Add program"
-    Then I should see "Program 001" in the "Full name" definition list item
+    Then I should see "Program 001" in the "Program name" definition list item
     And I should see "PR01" in the "Program ID" definition list item
     And I should see "Cat 2" in the "Category" definition list item
     And I should see "Yes" in the "Course groups" definition list item
@@ -127,7 +127,7 @@ Feature: General programs management tests
       | Program name  | Program 002 |
       | Program ID    | PR02        |
     And I press dialog form button "Update program"
-    Then I should see "Program 002" in the "Full name" definition list item
+    Then I should see "Program 002" in the "Program name" definition list item
     And I should see "PR02" in the "Program ID" definition list item
     And I should see "System" in the "Category" definition list item
     And I should see "No" in the "Course groups" definition list item
@@ -175,7 +175,7 @@ Feature: General programs management tests
     And I set the field "Context" to "Cat 2"
     And I set the field "Tags" to "Mathematics, Algebra"
     And I press dialog form button "Update program"
-    Then I should see "Program 001" in the "Full name" definition list item
+    Then I should see "Program 001" in the "Program name" definition list item
     And I should see "PR01" in the "Program ID" definition list item
     And I should see "Cat 2" in the "Category" definition list item
     And I should see "Yes" in the "Course groups" definition list item
