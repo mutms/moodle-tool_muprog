@@ -17,7 +17,7 @@
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
 /**
- * Programs management interface.
+ * Restore program.
  *
  * @package    tool_muprog
  * @copyright  2025 Petr Skoda

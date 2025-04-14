@@ -38,7 +38,7 @@ final class program_updated_test extends \advanced_testcase {
         $this->resetAfterTest();
     }
 
-    public function test_update_program_general(): void {
+    public function test_update_general(): void {
         $syscontext = \context_system::instance();
         $data = (object)[
             'fullname' => 'Some program',
@@ -46,11 +46,11 @@ final class program_updated_test extends \advanced_testcase {
             'contextid' => $syscontext->id,
         ];
         $this->setAdminUser();
-        $program = program::add_program($data);
+        $program = program::create($data);
 
         $sink = $this->redirectEvents();
         $program->fullname = 'Another program';
-        $program = program::update_program_general($program);
+        $program = program::update_general($program);
         $events = $sink->get_events();
         $sink->close();
 
@@ -68,7 +68,7 @@ final class program_updated_test extends \advanced_testcase {
         $this->assertSame($programurl->out(false), $event->get_url()->out(false));
     }
 
-    public function test_update_program_visibility(): void {
+    public function test_update_visibility(): void {
         $syscontext = \context_system::instance();
         $data = (object)[
             'fullname' => 'Some program',
@@ -76,11 +76,11 @@ final class program_updated_test extends \advanced_testcase {
             'contextid' => $syscontext->id,
         ];
         $this->setAdminUser();
-        $program = program::add_program($data);
+        $program = program::create($data);
 
         $data = (object)['id' => $program->id, 'public' => 1];
         $sink = $this->redirectEvents();
-        $program = program::update_program_visibility($data);
+        $program = program::update_visibility($data);
         $events = $sink->get_events();
         $sink->close();
 

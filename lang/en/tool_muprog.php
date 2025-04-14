@@ -28,7 +28,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['addprogram'] = 'Add program';
 $string['addset'] = 'Add new set';
 $string['allocation'] = 'Allocation';
 $string['allocationdate'] = 'Allocation date';
@@ -72,7 +71,6 @@ $string['customfieldvisible:viewcapability'] = 'Users with view programs capabil
 $string['customfieldvisibleto'] = 'Field content is visible to';
 $string['deleteallocation'] = 'Delete program allocation';
 $string['deletecourse'] = 'Remove course';
-$string['deleteprogram'] = 'Delete program';
 $string['deleteset'] = 'Delete set';
 $string['deletetraining'] = 'Remove training';
 $string['duedate'] = 'Due date';
@@ -282,7 +280,10 @@ $string['privacy:metadata:table:tool_muprog_request'] = 'Information about alloc
 $string['privacy:metadata:table:tool_muprog_usr_snapshot'] = 'Program allocation snapshots';
 $string['program'] = 'Program';
 $string['program_archive'] = 'Archive program';
+$string['program_create'] = 'Add program';
+$string['program_delete'] = 'Delete program';
 $string['program_restore'] = 'Restore program';
+$string['program_update'] = 'Update program';
 $string['programallocations'] = 'Program allocations';
 $string['programautofix'] = 'Auto repair program';
 $string['programcompletion'] = 'Program completion date';
@@ -420,7 +421,6 @@ $string['unlinkeditems'] = 'Unlinked items';
 $string['updateallocation'] = 'Update allocation';
 $string['updateallocations'] = 'Update allocations';
 $string['updatecourse'] = 'Update course';
-$string['updateprogram'] = 'Update program';
 $string['updatescheduling'] = 'Update scheduling';
 $string['updateset'] = 'Update set';
 $string['updatesource'] = 'Update {$a}';

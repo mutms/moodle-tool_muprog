@@ -250,17 +250,17 @@ final class catalogue_test extends \advanced_testcase {
         $this->assertSame(4, $catalogue->count_programs());
 
         $program1->contextid = $catcontext1->id;
-        $program1 = \tool_muprog\local\program::update_program_general($program1);
+        $program1 = \tool_muprog\local\program::update_general($program1);
         $program2->contextid = $catcontext1->id;
-        $program2 = \tool_muprog\local\program::update_program_general($program2);
+        $program2 = \tool_muprog\local\program::update_general($program2);
         $program3->contextid = $catcontext1->id;
-        $program3 = \tool_muprog\local\program::update_program_general($program3);
+        $program3 = \tool_muprog\local\program::update_general($program3);
         $program4->contextid = $catcontext1->id;
-        $program4 = \tool_muprog\local\program::update_program_general($program4);
+        $program4 = \tool_muprog\local\program::update_general($program4);
         $program5->contextid = $catcontext1->id;
-        $program5 = \tool_muprog\local\program::update_program_general($program5);
+        $program5 = \tool_muprog\local\program::update_general($program5);
         $program6->contextid = $catcontext1->id;
-        $program6 = \tool_muprog\local\program::update_program_general($program6);
+        $program6 = \tool_muprog\local\program::update_general($program6);
 
         $this->setUser($user1);
         $catalogue = new \tool_muprog\local\catalogue([]);
@@ -297,17 +297,17 @@ final class catalogue_test extends \advanced_testcase {
         $this->assertSame(4, $catalogue->count_programs());
 
         $program1->contextid = $catcontext2->id;
-        $program1 = \tool_muprog\local\program::update_program_general($program1);
+        $program1 = \tool_muprog\local\program::update_general($program1);
         $program2->contextid = $catcontext2->id;
-        $program2 = \tool_muprog\local\program::update_program_general($program2);
+        $program2 = \tool_muprog\local\program::update_general($program2);
         $program3->contextid = $catcontext2->id;
-        $program3 = \tool_muprog\local\program::update_program_general($program3);
+        $program3 = \tool_muprog\local\program::update_general($program3);
         $program4->contextid = $catcontext2->id;
-        $program4 = \tool_muprog\local\program::update_program_general($program4);
+        $program4 = \tool_muprog\local\program::update_general($program4);
         $program5->contextid = $catcontext2->id;
-        $program5 = \tool_muprog\local\program::update_program_general($program5);
+        $program5 = \tool_muprog\local\program::update_general($program5);
         $program6->contextid = $catcontext2->id;
-        $program6 = \tool_muprog\local\program::update_program_general($program6);
+        $program6 = \tool_muprog\local\program::update_general($program6);
 
         $this->setUser($user1);
         $catalogue = new \tool_muprog\local\catalogue([]);
@@ -492,17 +492,17 @@ final class catalogue_test extends \advanced_testcase {
         $this->assertTrue(\tool_muprog\local\catalogue::is_program_visible($program6, $user3->id));
 
         $program1->contextid = $catcontext1->id;
-        $program1 = \tool_muprog\local\program::update_program_general($program1);
+        $program1 = \tool_muprog\local\program::update_general($program1);
         $program2->contextid = $catcontext1->id;
-        $program2 = \tool_muprog\local\program::update_program_general($program2);
+        $program2 = \tool_muprog\local\program::update_general($program2);
         $program3->contextid = $catcontext1->id;
-        $program3 = \tool_muprog\local\program::update_program_general($program3);
+        $program3 = \tool_muprog\local\program::update_general($program3);
         $program4->contextid = $catcontext1->id;
-        $program4 = \tool_muprog\local\program::update_program_general($program4);
+        $program4 = \tool_muprog\local\program::update_general($program4);
         $program5->contextid = $catcontext1->id;
-        $program5 = \tool_muprog\local\program::update_program_general($program5);
+        $program5 = \tool_muprog\local\program::update_general($program5);
         $program6->contextid = $catcontext1->id;
-        $program6 = \tool_muprog\local\program::update_program_general($program6);
+        $program6 = \tool_muprog\local\program::update_general($program6);
 
         $this->setUser($user1);
         $this->assertTrue(\tool_muprog\local\catalogue::is_program_visible($program1, $user1->id));
@@ -547,17 +547,17 @@ final class catalogue_test extends \advanced_testcase {
         $this->assertTrue(\tool_muprog\local\catalogue::is_program_visible($program6, $user3->id));
 
         $program1->contextid = $catcontext2->id;
-        $program1 = \tool_muprog\local\program::update_program_general($program1);
+        $program1 = \tool_muprog\local\program::update_general($program1);
         $program2->contextid = $catcontext2->id;
-        $program2 = \tool_muprog\local\program::update_program_general($program2);
+        $program2 = \tool_muprog\local\program::update_general($program2);
         $program3->contextid = $catcontext2->id;
-        $program3 = \tool_muprog\local\program::update_program_general($program3);
+        $program3 = \tool_muprog\local\program::update_general($program3);
         $program4->contextid = $catcontext2->id;
-        $program4 = \tool_muprog\local\program::update_program_general($program4);
+        $program4 = \tool_muprog\local\program::update_general($program4);
         $program5->contextid = $catcontext2->id;
-        $program5 = \tool_muprog\local\program::update_program_general($program5);
+        $program5 = \tool_muprog\local\program::update_general($program5);
         $program6->contextid = $catcontext2->id;
-        $program6 = \tool_muprog\local\program::update_program_general($program6);
+        $program6 = \tool_muprog\local\program::update_general($program6);
 
         $this->setUser($user1);
         $this->assertFalse(\tool_muprog\local\catalogue::is_program_visible($program1, $user1->id));

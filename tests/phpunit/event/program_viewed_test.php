@@ -46,7 +46,7 @@ final class program_viewed_test extends \advanced_testcase {
             'contextid' => $syscontext->id,
         ];
         $this->setAdminUser();
-        $program = program::add_program($data);
+        $program = program::create($data);
 
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);

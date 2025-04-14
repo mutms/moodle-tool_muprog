@@ -17,7 +17,7 @@
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
 /**
- * Programs management interface.
+ * Add program.
  *
  * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
@@ -52,7 +52,7 @@ if ($context->contextlevel != CONTEXT_SYSTEM && $context->contextlevel != CONTEX
     throw new moodle_exception('invalidcontext');
 }
 
-$currenturl = new moodle_url('/admin/tool/muprog/management/program_add.php', ['contextid' => $context->id]);
+$currenturl = new moodle_url('/admin/tool/muprog/management/program_create.php', ['contextid' => $context->id]);
 management::setup_index_page($currenturl, $context);
 
 $program = new stdClass();
@@ -65,20 +65,20 @@ $program->descriptionformat = FORMAT_HTML;
 
 $editoroptions = program::get_description_editor_options($context->id);
 
-$form = new \tool_muprog\local\form\program_add(null, ['data' => $program, 'editoroptions' => $editoroptions]);
+$form = new \tool_muprog\local\form\program_create(null, ['data' => $program, 'editoroptions' => $editoroptions]);
 
 if ($form->is_cancelled()) {
     redirect(new moodle_url('/admin/tool/muprog/management/index.php', ['contextid' => $context->id]));
 }
 
 if ($data = $form->get_data()) {
-    $program = program::add_program($data);
+    $program = program::create($data);
     $returlurl = new moodle_url('/admin/tool/muprog/management/program.php', ['id' => $program->id]);
     $form->redirect_submitted($returlurl);
 }
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('addprogram', 'tool_muprog'));
+echo $OUTPUT->heading(get_string('program_create', 'tool_muprog'));
 
 echo $form->render();
 

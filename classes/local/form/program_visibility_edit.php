@@ -57,7 +57,7 @@ final class program_visibility_edit extends \tool_mulib\local\dialog_form {
         $mform->setType('id', PARAM_INT);
         $mform->setDefault('id', $data->id);
 
-        $this->add_action_buttons(true, get_string('updateprogram', 'tool_muprog'));
+        $this->add_action_buttons(true, get_string('program_update', 'tool_muprog'));
     }
 
     #[\Override]

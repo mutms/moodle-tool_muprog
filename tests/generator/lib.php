@@ -99,7 +99,7 @@ class tool_muprog_generator extends component_generator_base {
         $cohorts = empty($record->cohorts) ? [] : $record->cohorts;
         unset($record->cohorts);
 
-        $program = tool_muprog\local\program::add_program($record);
+        $program = tool_muprog\local\program::create($record);
 
         if ($cohorts) {
             $cohortids = [];
@@ -116,7 +116,7 @@ class tool_muprog_generator extends component_generator_base {
                 }
 
             }
-            \tool_muprog\local\program::update_program_visibility((object)['id' => $program->id, 'public' => $program->public, 'cohorts' => $cohortids]);
+            \tool_muprog\local\program::update_visibility((object)['id' => $program->id, 'public' => $program->public, 'cohorts' => $cohortids]);
         }
 
         foreach ($sources as $source => $data) {
@@ -227,7 +227,7 @@ class tool_muprog_generator extends component_generator_base {
     }
 
     /**
-     * Create program notification.
+     * Add program notification.
      *
      * @param mixed $record
      * @return \stdClass notification record

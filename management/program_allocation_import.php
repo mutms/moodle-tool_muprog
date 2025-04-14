@@ -80,7 +80,7 @@ if (!$form) {
 
     } else if ($data = $form->get_data()) {
         $from = $DB->get_record('tool_muprog_program', ['id' => $data->fromprogram], '*', MUST_EXIST);
-        program::import_program_allocation($data);
+        program::import_allocation($data);
         $form->redirect_submitted($returnurl);
     }
 }

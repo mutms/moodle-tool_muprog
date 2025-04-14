@@ -81,7 +81,7 @@ final class allocation_test extends \advanced_testcase {
             'idnumber' => 'SP1',
             'contextid' => $syscontext->id,
         ];
-        $program = \tool_muprog\local\program::add_program($data);
+        $program = \tool_muprog\local\program::create($data);
         $timeallocation = time();
 
         $data = (object)[
@@ -121,7 +121,7 @@ final class allocation_test extends \advanced_testcase {
             'idnumber' => 'SP1',
             'contextid' => $syscontext->id,
         ];
-        $program = \tool_muprog\local\program::add_program($data);
+        $program = \tool_muprog\local\program::create($data);
         $timeallocation = time();
         $timestart = $timeallocation + (60 * 60);
 
@@ -165,7 +165,7 @@ final class allocation_test extends \advanced_testcase {
             'idnumber' => 'SP1',
             'contextid' => $syscontext->id,
         ];
-        $program = \tool_muprog\local\program::add_program($data);
+        $program = \tool_muprog\local\program::create($data);
         $timeallocation = time();
         $timestart = $timeallocation + (60 * 60);
 
@@ -2275,7 +2275,7 @@ final class allocation_test extends \advanced_testcase {
         $groups = $DB->get_records('groups', [], 'id ASC');
         $this->assertCount(0, $groups);
 
-        $program1 = program::update_program_general((object)[
+        $program1 = program::update_general((object)[
             'id' => $program1->id,
             'creategroups' => 1,
         ]);
@@ -2298,7 +2298,7 @@ final class allocation_test extends \advanced_testcase {
         $this->assertSame($user2->id, $members[3]->userid);
         $this->assertSame($groups[1]->id, $members[3]->groupid);
 
-        $program2 = program::update_program_general((object)[
+        $program2 = program::update_general((object)[
             'id' => $program2->id,
             'creategroups' => 1,
         ]);
@@ -2316,7 +2316,7 @@ final class allocation_test extends \advanced_testcase {
         $members = $DB->get_records('groups_members', [], 'userid ASC, groupid ASC');
         $this->assertCount(6, $members);
 
-        $program2 = program::update_program_general((object)[
+        $program2 = program::update_general((object)[
             'id' => $program2->id,
             'creategroups' => 0,
         ]);
@@ -2330,7 +2330,7 @@ final class allocation_test extends \advanced_testcase {
         $members = $DB->get_records('groups_members', [], 'userid ASC, groupid ASC');
         $this->assertCount(4, $members);
 
-        $program2 = program::update_program_general((object)[
+        $program2 = program::update_general((object)[
             'id' => $program2->id,
             'creategroups' => 1,
         ]);
@@ -2386,7 +2386,7 @@ final class allocation_test extends \advanced_testcase {
         $this->assertSame('xxx', $groups[0]->name);
         $this->assertSame($course2->id, $groups[0]->courseid);
 
-        $program1 = program::update_program_general((object)[
+        $program1 = program::update_general((object)[
             'id' => $program1->id,
             'fullname' => 'yy',
         ]);
@@ -2396,10 +2396,10 @@ final class allocation_test extends \advanced_testcase {
         $this->assertSame($program1->fullname, $groups[0]->name);
         $this->assertSame($course2->id, $groups[0]->courseid);
 
-        $program3 = program::update_program_general((object)['id' => $program3->id, 'creategroups' => 0]);
+        $program3 = program::update_general((object)['id' => $program3->id, 'creategroups' => 0]);
         $this->assertCount(0, $DB->get_records('groups', ['name' => $program3->fullname, 'courseid' => $course1->id]));
         delete_course($course1, false);
-        $program3 = program::update_program_general((object)['id' => $program3->id, 'creategroups' => 1]);
+        $program3 = program::update_general((object)['id' => $program3->id, 'creategroups' => 1]);
         program::delete_program($program3->id);
     }
 }

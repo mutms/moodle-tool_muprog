@@ -40,7 +40,7 @@ final class program_test extends \advanced_testcase {
         $this->resetAfterTest();
     }
 
-    public function test_add_program(): void {
+    public function test_create(): void {
         $syscontext = \context_system::instance();
         $data = (object)[
             'fullname' => 'Some program',
@@ -49,7 +49,7 @@ final class program_test extends \advanced_testcase {
         ];
 
         $this->setCurrentTimeStart();
-        $program = program::add_program($data);
+        $program = program::create($data);
         $this->assertInstanceOf('stdClass', $program);
         $this->assertSame((string)$syscontext->id, $program->contextid);
         $this->assertSame($data->fullname, $program->fullname);
@@ -84,7 +84,7 @@ final class program_test extends \advanced_testcase {
         ];
 
         $this->setCurrentTimeStart();
-        $program = program::add_program($data);
+        $program = program::create($data);
         $this->assertInstanceOf('stdClass', $program);
         $this->assertSame((string)$catcontext->id, $program->contextid);
         $this->assertSame($data->fullname, $program->fullname);
@@ -114,7 +114,7 @@ final class program_test extends \advanced_testcase {
         ];
 
         $this->setCurrentTimeStart();
-        $program = program::add_program($data);
+        $program = program::create($data);
         $this->assertInstanceOf('stdClass', $program);
         $this->assertSame((string)$catcontext->id, $program->contextid);
         $this->assertSame($data->fullname, $program->fullname);
@@ -125,7 +125,7 @@ final class program_test extends \advanced_testcase {
         $this->assertTimeCurrent($program->timecreated);
     }
 
-    public function test_update_program_general(): void {
+    public function test_update_general(): void {
         global $DB;
 
         $syscontext = \context_system::instance();
@@ -136,7 +136,7 @@ final class program_test extends \advanced_testcase {
         ];
 
         $this->setCurrentTimeStart();
-        $oldprogram = program::add_program($data);
+        $oldprogram = program::create($data);
 
         $category = $this->getDataGenerator()->create_category([]);
         $cohort1 = $this->getDataGenerator()->create_cohort();
@@ -157,7 +157,7 @@ final class program_test extends \advanced_testcase {
             'timeallocationend' => (string)(time() + 60 * 60 * 24),
         ];
 
-        $program = program::update_program_general($data);
+        $program = program::update_general($data);
         $this->assertInstanceOf('stdClass', $program);
         $this->assertSame((string)$catcontext->id, $program->contextid);
         $this->assertSame($data->fullname, $program->fullname);
@@ -183,7 +183,7 @@ final class program_test extends \advanced_testcase {
             'id' => $oldprogram->id,
             'archived' => 1,
         ];
-        $program = program::update_program_general($data);
+        $program = program::update_general($data);
         $this->assertDebuggingCalled('Use program::archive() and program::restore() to change archived flag');
         $this->assertSame('0', $program->archived);
     }
@@ -197,7 +197,7 @@ final class program_test extends \advanced_testcase {
             'archived' => 0,
         ];
 
-        $program = program::add_program($data);
+        $program = program::create($data);
         $this->assertSame('0', $program->archived);
 
         $program = program::archive($program->id);
@@ -216,7 +216,7 @@ final class program_test extends \advanced_testcase {
             'archived' => 1,
         ];
 
-        $program = program::add_program($data);
+        $program = program::create($data);
         $this->assertSame('1', $program->archived);
 
         $program = program::restore($program->id);
@@ -226,7 +226,7 @@ final class program_test extends \advanced_testcase {
         $this->assertSame('0', $program->archived);
     }
 
-    public function test_update_program_visibility(): void {
+    public function test_update_visibility(): void {
         global $DB;
 
         $syscontext = \context_system::instance();
@@ -237,7 +237,7 @@ final class program_test extends \advanced_testcase {
         ];
 
         $this->setCurrentTimeStart();
-        $oldprogram = program::add_program($data);
+        $oldprogram = program::create($data);
 
         $category = $this->getDataGenerator()->create_category([]);
         $cohort1 = $this->getDataGenerator()->create_cohort();
@@ -259,7 +259,7 @@ final class program_test extends \advanced_testcase {
             'timeallocationend' => (string)(time() + 60 * 60 * 24),
         ];
 
-        $program = program::update_program_visibility($data);
+        $program = program::update_visibility($data);
         $this->assertInstanceOf('stdClass', $program);
         $this->assertSame($oldprogram->contextid, $program->contextid);
         $this->assertSame($oldprogram->fullname, $program->fullname);
@@ -281,7 +281,7 @@ final class program_test extends \advanced_testcase {
         $this->assertSame($data->cohorts, array_values($cohorts));
     }
 
-    public function test_update_program_allocation(): void {
+    public function test_update_allocation(): void {
         global $DB;
 
         $syscontext = \context_system::instance();
@@ -292,7 +292,7 @@ final class program_test extends \advanced_testcase {
         ];
 
         $this->setCurrentTimeStart();
-        $oldprogram = program::add_program($data);
+        $oldprogram = program::create($data);
 
         $category = $this->getDataGenerator()->create_category([]);
         $cohort1 = $this->getDataGenerator()->create_cohort();
@@ -314,7 +314,7 @@ final class program_test extends \advanced_testcase {
             'timeallocationend' => (string)(time() + 60 * 60 * 24),
         ];
 
-        $program = program::update_program_allocation($data);
+        $program = program::update_allocation($data);
         $this->assertInstanceOf('stdClass', $program);
         $this->assertSame($oldprogram->contextid, $program->contextid);
         $this->assertSame($oldprogram->fullname, $program->fullname);
@@ -336,7 +336,7 @@ final class program_test extends \advanced_testcase {
         $this->assertSame([], array_values($cohorts));
     }
 
-    public function test_import_program_allocation(): void {
+    public function test_import_allocation(): void {
         global $DB;
 
         /** @var \tool_muprog_generator $generator */
@@ -392,7 +392,7 @@ final class program_test extends \advanced_testcase {
             'id' => $program1->id,
             'fromprogram' => $program2->id,
         ];
-        $program1x = program::import_program_allocation($data);
+        $program1x = program::import_allocation($data);
         $this->assertSame((array)$program1, (array)$program1x);
 
         $data = (object)[
@@ -401,7 +401,7 @@ final class program_test extends \advanced_testcase {
             'importallocationstart' => 1,
             'importallocationend' => 1,
         ];
-        $program1x = program::import_program_allocation($data);
+        $program1x = program::import_allocation($data);
         $program1->timeallocationstart = $program2->timeallocationstart;
         $program1->timeallocationend = $program2->timeallocationend;
         $this->assertSame((array)$program1, (array)$program1x);
@@ -413,7 +413,7 @@ final class program_test extends \advanced_testcase {
             'importprogramdue' => 1,
             'importprogramend' => 1,
         ];
-        $program1x = program::import_program_allocation($data);
+        $program1x = program::import_allocation($data);
         $program1->startdatejson = $program2->startdatejson;
         $program1->duedatejson = $program2->duedatejson;
         $program1->enddatejson = $program2->enddatejson;
@@ -430,7 +430,7 @@ final class program_test extends \advanced_testcase {
             'fromprogram' => $program2->id,
             'importsourcemanual' => 1,
         ];
-        $program1x = program::import_program_allocation($data);
+        $program1x = program::import_allocation($data);
         $sources1 = $DB->get_records('tool_muprog_source', ['programid' => $program1->id]);
         $this->assertCount(1, $sources1);
         $smanual1 = $DB->get_record('tool_muprog_source', ['programid' => $program1->id, 'type' => 'manual'], '*', MUST_EXIST);
@@ -443,7 +443,7 @@ final class program_test extends \advanced_testcase {
             'importsourceapproval' => 1,
             'importsourceselfallocation' => 1,
         ];
-        $program1x = program::import_program_allocation($data);
+        $program1x = program::import_allocation($data);
         $sources1 = $DB->get_records('tool_muprog_source', ['programid' => $program1->id]);
         $this->assertCount(4, $sources1);
         $smanual1 = $DB->get_record('tool_muprog_source', ['programid' => $program1->id, 'type' => 'manual'], '*', MUST_EXIST);
@@ -464,7 +464,7 @@ final class program_test extends \advanced_testcase {
             'fromprogram' => $program2->id,
             'importsourcecohort' => 1,
         ];
-        $program1x = program::import_program_allocation($data);
+        $program1x = program::import_allocation($data);
         $cohorts = $DB->get_records('tool_muprog_src_cohort', ['sourceid' => $scohort1->id]);
         $this->assertCount(3, $cohorts);
     }
@@ -501,7 +501,7 @@ final class program_test extends \advanced_testcase {
             'contextid' => $syscontext->id,
         ];
 
-        $oldprogram = program::add_program($data);
+        $oldprogram = program::create($data);
 
         $data = (object)[
             'id' => $oldprogram->id,
@@ -555,7 +555,7 @@ final class program_test extends \advanced_testcase {
             'idnumber' => 'SP1',
             'contextid' => $syscontext->id,
         ];
-        $program = program::add_program($data);
+        $program = program::create($data);
 
         program::delete_program($program->id);
         $this->assertFalse($DB->record_exists('tool_muprog_program', ['id' => $program->id]));
@@ -570,7 +570,7 @@ final class program_test extends \advanced_testcase {
             'idnumber' => 'SP1',
             'contextid' => $syscontext->id,
         ];
-        $program = program::add_program($data);
+        $program = program::create($data);
         $this->setAdminUser();
         $admin = get_admin();
 
@@ -611,7 +611,7 @@ final class program_test extends \advanced_testcase {
             'idnumber' => 'SP1',
             'contextid' => $syscontext->id,
         ];
-        $program = program::add_program($data);
+        $program = program::create($data);
 
         $top = program::load_content($program->id);
         $this->assertInstanceOf(\tool_muprog\local\content\top::class, $top);
@@ -689,7 +689,7 @@ final class program_test extends \advanced_testcase {
         $this->assertEquals('pocus', $customfieldsdata->testfield2);
 
         $program2->customfield_testfield1 = 'hocus-pocus';
-        program::update_program_general($program2);
+        program::update_general($program2);
 
         $customfieldsdata = $handler->export_instance_data_object($program2->id);
         $this->assertEquals('hocus-pocus', $customfieldsdata->testfield1);

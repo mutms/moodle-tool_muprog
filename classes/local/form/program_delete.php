@@ -46,6 +46,6 @@ final class program_delete extends \tool_mulib\local\dialog_form {
         $mform->setType('id', PARAM_INT);
         $mform->setDefault('id', $program->id);
 
-        $this->add_action_buttons(true, get_string('deleteprogram', 'tool_muprog'));
+        $this->add_action_buttons(true, get_string('program_delete', 'tool_muprog'));
     }
 }

@@ -285,7 +285,7 @@ final class event_observer_test extends \advanced_testcase {
         $item1x1 = $top1->append_course($top1, $course1->id);
         $item1x2 = $top1->append_course($top1, $course2->id);
 
-        $program1 = \tool_muprog\local\program::update_program_general((object)[
+        $program1 = \tool_muprog\local\program::update_general((object)[
             'id' => $program1->id,
             'creategroups' => 1,
         ]);

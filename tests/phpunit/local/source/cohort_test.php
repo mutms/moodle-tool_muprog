@@ -76,12 +76,12 @@ final class cohort_test extends \advanced_testcase {
         \cohort_add_member($cohort1->id, $user1->id);
         \cohort_add_member($cohort2->id, $user1->id);
         \cohort_add_member($cohort2->id, $user2->id);
-        $program1 = program::update_program_visibility(
+        $program1 = program::update_visibility(
             (object)['id' => $program1->id, 'public' => 1, 'cohorts' => [$cohort1->id, $cohort2->id]]);
         $allocations = $DB->get_records('tool_muprog_allocation', ['programid' => $program1->id], 'userid ASC');
         $this->assertCount(1, $allocations);
 
-        $program1 = program::update_program_visibility(
+        $program1 = program::update_visibility(
             (object)['id' => $program1->id, 'public' => 1, 'cohorts' => []]);
         $allocations = $DB->get_records('tool_muprog_allocation', ['programid' => $program1->id], 'userid ASC');
         $this->assertCount(1, $allocations);

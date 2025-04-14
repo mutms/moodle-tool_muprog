@@ -28,7 +28,7 @@ namespace tool_muprog\local\form;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class program_add extends \tool_mulib\local\dialog_form {
+final class program_create extends \tool_mulib\local\dialog_form {
     #[\Override]
     protected function definition() {
         global $CFG;
@@ -65,7 +65,7 @@ final class program_add extends \tool_mulib\local\dialog_form {
         $handler = \tool_muprog\customfield\fields_handler::create();
         $handler->instance_form_definition($mform);
 
-        $this->add_action_buttons(true, get_string('addprogram', 'tool_muprog'));
+        $this->add_action_buttons(true, get_string('program_create', 'tool_muprog'));
         // Prepare custom fields data.
         $handler->instance_form_before_set_data($data);
 

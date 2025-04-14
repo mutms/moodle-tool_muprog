@@ -17,7 +17,7 @@
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
 /**
- * Programs management interface.
+ * Delete program.
  *
  * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
@@ -71,7 +71,7 @@ if ($data = $form->get_data()) {
 }
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('deleteprogram', 'tool_muprog'));
+echo $OUTPUT->heading(get_string('program_delete', 'tool_muprog'));
 
 echo $form->render();
 

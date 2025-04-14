@@ -87,7 +87,7 @@ final class upload {
                 }
             }
 
-            $program = program::add_program($record);
+            $program = program::create($record);
 
             if (isset($rawprogram->contents) && $rawprogram->contents->itemtype === 'set') {
                 $top = program::load_content($program->id);

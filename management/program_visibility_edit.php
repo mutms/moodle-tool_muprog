@@ -68,7 +68,7 @@ if ($form->is_cancelled()) {
 }
 
 if ($data = $form->get_data()) {
-    program::update_program_visibility($data);
+    program::update_visibility($data);
     $form->redirect_submitted($returnurl);
 }
 

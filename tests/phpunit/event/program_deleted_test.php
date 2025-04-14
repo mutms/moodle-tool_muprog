@@ -46,7 +46,7 @@ final class program_deleted_test extends \advanced_testcase {
             'contextid' => $syscontext->id,
         ];
         $this->setAdminUser();
-        $program = program::add_program($data);
+        $program = program::create($data);
 
         $sink = $this->redirectEvents();
         program::delete_program($program->id);

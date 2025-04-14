@@ -82,7 +82,7 @@ if ($data = $form->get_data()) {
 echo $OUTPUT->header();
 
 if ($set instanceof top) {
-    echo $OUTPUT->heading(get_string('updateprogram', 'tool_muprog'), 3);
+    echo $OUTPUT->heading(get_string('program_update', 'tool_muprog'), 3);
 } else {
     echo $OUTPUT->heading(get_string('updateset', 'tool_muprog'), 3);
 }

@@ -70,7 +70,7 @@ final class program {
                 'id' => $program->id,
                 'contextid' => $parentcontext->id,
             ];
-            self::update_program_general($data);
+            self::update_general($data);
         }
     }
 
@@ -82,7 +82,7 @@ final class program {
      * @param stdClass $data
      * @return stdClass program record
      */
-    public static function add_program(stdClass $data): stdClass {
+    public static function create(stdClass $data): stdClass {
         global $DB, $CFG;
         $data = clone($data);
 
@@ -199,7 +199,7 @@ final class program {
         $data->timecreated = time();
         $data->id = $DB->insert_record('tool_muprog_program', $data);
 
-        $program = self::update_program_image($data);
+        $program = self::update_image($data);
 
         if ($CFG->usetags && isset($data->tags)) {
             \core_tag_tag::set_item_tags('tool_muprog', 'program', $data->id, $context, $data->tags);
@@ -255,7 +255,7 @@ final class program {
      * @param stdClass $data
      * @return stdClass program record
      */
-    public static function update_program_general(stdClass $data): stdClass {
+    public static function update_general(stdClass $data): stdClass {
         global $DB, $CFG;
         require_once($CFG->dirroot . '/group/lib.php');
 
@@ -338,7 +338,7 @@ final class program {
             \core_tag_tag::set_item_tags('tool_muprog', 'program', $data->id, $context, $data->tags);
         }
 
-        $program = self::update_program_image($data);
+        $program = self::update_image($data);
 
         // Save custom fields if there are any of them in the form.
         $handler = \tool_muprog\customfield\fields_handler::create();
@@ -392,7 +392,7 @@ final class program {
      * @param stdClass $data
      * @return stdClass
      */
-    private static function update_program_image(stdClass $data): stdClass {
+    private static function update_image(stdClass $data): stdClass {
         global $DB;
 
         $program = $DB->get_record('tool_muprog_program', ['id' => $data->id], '*', MUST_EXIST);
@@ -487,7 +487,7 @@ final class program {
      * @param stdClass $data
      * @return stdClass
      */
-    public static function update_program_visibility(stdClass $data): stdClass {
+    public static function update_visibility(stdClass $data): stdClass {
         global $DB;
 
         if ((isset($data->cohorts) && !is_array($data->cohorts))
@@ -541,7 +541,7 @@ final class program {
      * @param stdClass $data
      * @return stdClass
      */
-    public static function update_program_allocation(stdClass $data): stdClass {
+    public static function update_allocation(stdClass $data): stdClass {
         global $DB;
 
         if (!isset($data->id)) {
@@ -612,7 +612,7 @@ final class program {
      * @param stdClass $data data from \tool_muprog\local\form\program_allocation_import_confirmation
      * @return stdClass updated program record
      */
-    public static function import_program_allocation(stdClass $data): stdClass {
+    public static function import_allocation(stdClass $data): stdClass {
         global $DB;
 
         $targetprogram = $DB->get_record('tool_muprog_program', ['id' => $data->id], '*', MUST_EXIST);

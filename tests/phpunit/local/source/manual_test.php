@@ -67,27 +67,27 @@ final class manual_test extends \advanced_testcase {
         $program2 = $generator->create_program(['sources' => ['manual' => []]]);
         $source2 = $DB->get_record('tool_muprog_source', ['programid' => $program2->id, 'type' => 'manual'], '*', MUST_EXIST);
 
-        $program1 = program::update_program_allocation(
+        $program1 = program::update_allocation(
             (object)['id' => $program1->id, 'timeallocationstart' => null, 'timeallocationend' => null]
         );
         $this->assertTrue(\tool_muprog\local\source\manual::is_allocation_possible($program1, $source1));
 
-        $program1 = program::update_program_allocation(
+        $program1 = program::update_allocation(
             (object)['id' => $program1->id, 'timeallocationstart' => time() - 100, 'timeallocationend' => time() + 100]
         );
         $this->assertTrue(\tool_muprog\local\source\manual::is_allocation_possible($program1, $source1));
 
-        $program1 = program::update_program_allocation(
+        $program1 = program::update_allocation(
             (object)['id' => $program1->id, 'timeallocationstart' => time() + 100, 'timeallocationend' => time() + 200]
         );
         $this->assertFalse(\tool_muprog\local\source\manual::is_allocation_possible($program1, $source1));
 
-        $program1 = program::update_program_allocation(
+        $program1 = program::update_allocation(
             (object)['id' => $program1->id, 'timeallocationstart' => time() - 200, 'timeallocationend' => time() - 100]
         );
         $this->assertFalse(\tool_muprog\local\source\manual::is_allocation_possible($program1, $source1));
 
-        $program1 = program::update_program_allocation(
+        $program1 = program::update_allocation(
             (object)['id' => $program1->id, 'timeallocationstart' => null, 'timeallocationend' => null]
         );
         $program1 = program::archive($program1->id);

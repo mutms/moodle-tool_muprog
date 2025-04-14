@@ -17,7 +17,7 @@
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
 /**
- * Programs management interface.
+ * Update program.
  *
  * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
@@ -70,12 +70,12 @@ if ($form->is_cancelled()) {
 }
 
 if ($data = $form->get_data()) {
-    $program = program::update_program_general($data);
+    $program = program::update_general($data);
     $form->redirect_submitted($returnurl);
 }
 
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('updateprogram', 'tool_muprog'));
+echo $OUTPUT->heading(get_string('program_update', 'tool_muprog'));
 
 echo $form->render();
 

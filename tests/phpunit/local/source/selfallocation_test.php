@@ -102,36 +102,36 @@ final class selfallocation_test extends \advanced_testcase {
         $this->setUser($user1);
         $this->assertTrue(\tool_muprog\local\source\selfallocation::can_user_request($program1, $source1a, $user1->id));
 
-        $program1 = program::update_program_allocation((object)['id' => $program1->id,
+        $program1 = program::update_allocation((object)['id' => $program1->id,
             'timeallocationstart' => time() + 100, 'timeallocationend' => null]);
         $this->assertFalse(\tool_muprog\local\source\selfallocation::can_user_request($program1, $source1a, $user1->id));
 
-        $program1 = program::update_program_allocation((object)['id' => $program1->id,
+        $program1 = program::update_allocation((object)['id' => $program1->id,
             'timeallocationstart' => null, 'timeallocationend' => time() - 100]);
         $this->assertFalse(\tool_muprog\local\source\selfallocation::can_user_request($program1, $source1a, $user1->id));
 
-        $program1 = program::update_program_allocation((object)['id' => $program1->id,
+        $program1 = program::update_allocation((object)['id' => $program1->id,
             'timeallocationstart' => time() - 100, 'timeallocationend' => time() + 100]);
         $this->assertTrue(\tool_muprog\local\source\selfallocation::can_user_request($program1, $source1a, $user1->id));
 
-        $program1 = program::update_program_allocation((object)['id' => $program1->id,
+        $program1 = program::update_allocation((object)['id' => $program1->id,
             'timeallocationstart' => null, 'timeallocationend' => null]);
 
         // Must be visible.
 
-        $program1 = program::update_program_visibility((object)['id' => $program1->id,
+        $program1 = program::update_visibility((object)['id' => $program1->id,
             'public' => 1]);
         $this->assertTrue(\tool_muprog\local\source\selfallocation::can_user_request($program1, $source1a, $user1->id));
 
-        $program1 = program::update_program_visibility((object)['id' => $program1->id,
+        $program1 = program::update_visibility((object)['id' => $program1->id,
             'public' => 0, 'cohorts' => [$cohort1->id]]);
         $this->assertTrue(\tool_muprog\local\source\selfallocation::can_user_request($program1, $source1a, $user1->id));
 
-        $program1 = program::update_program_visibility((object)['id' => $program1->id,
+        $program1 = program::update_visibility((object)['id' => $program1->id,
             'public' => 0, 'cohorts' => []]);
         $this->assertFalse(\tool_muprog\local\source\selfallocation::can_user_request($program1, $source1a, $user1->id));
 
-        $program1 = program::update_program_visibility((object)['id' => $program1->id,
+        $program1 = program::update_visibility((object)['id' => $program1->id,
             'public' => 1, 'cohorts' => [$cohort1->id]]);
         $this->assertTrue(\tool_muprog\local\source\selfallocation::can_user_request($program1, $source1a, $user1->id));
 

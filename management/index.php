@@ -64,8 +64,8 @@ $buttons = [];
 $dropdown = new dropdown(get_string('extra_menu_management_index', 'tool_muprog'));
 
 if (has_capability('tool/muprog:edit', $context)) {
-    $url = new moodle_url('/admin/tool/muprog/management/program_add.php', ['contextid' => $context->id]);
-    $button = new tool_mulib\output\dialog_form\button($url, get_string('addprogram', 'tool_muprog'));
+    $url = new moodle_url('/admin/tool/muprog/management/program_create.php', ['contextid' => $context->id]);
+    $button = new tool_mulib\output\dialog_form\button($url, get_string('program_create', 'tool_muprog'));
     $button->set_after_submit($button::AFTER_SUBMIT_REDIRECT);
     $buttons[] = $OUTPUT->render($button);
 }

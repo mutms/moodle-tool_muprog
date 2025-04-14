@@ -62,7 +62,7 @@ final class program_certificate_edit extends \tool_mulib\local\dialog_form {
         $mform->addElement('hidden', 'id', $data->id);
         $mform->setType('id', PARAM_INT);
 
-        $this->add_action_buttons(true, get_string('updateprogram', 'tool_muprog'));
+        $this->add_action_buttons(true, get_string('program_update', 'tool_muprog'));
 
         $this->set_data($data);
     }

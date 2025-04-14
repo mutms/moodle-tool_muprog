@@ -65,7 +65,7 @@ if ($form->is_cancelled()) {
 }
 
 if ($data = $form->get_data()) {
-    program::update_program_allocation($data);
+    program::update_allocation($data);
     $form->redirect_submitted($returnurl);
 }
 

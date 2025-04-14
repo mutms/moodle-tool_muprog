@@ -73,7 +73,7 @@ final class program_update extends \tool_mulib\local\dialog_form {
         $handler = \tool_muprog\customfield\fields_handler::create();
         $handler->instance_form_definition($mform, $data->id);
 
-        $this->add_action_buttons(true, get_string('updateprogram', 'tool_muprog'));
+        $this->add_action_buttons(true, get_string('program_update', 'tool_muprog'));
 
         // Prepare custom fields data.
         $handler->instance_form_before_set_data($data);

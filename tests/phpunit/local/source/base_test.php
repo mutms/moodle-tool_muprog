@@ -47,7 +47,7 @@ final class base_test extends \advanced_testcase {
             'idnumber' => 'SP1',
             'contextid' => $syscontext->id,
         ];
-        $program = program::add_program($data);
+        $program = program::create($data);
         $now = time();
 
         $data = (object)[

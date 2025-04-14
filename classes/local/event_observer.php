@@ -83,7 +83,7 @@ class event_observer {
                 'id' => $program->id,
                 'contextid' => $syscontext->id,
             ];
-            program::update_program_general($data);
+            program::update_general($data);
         }
     }
 

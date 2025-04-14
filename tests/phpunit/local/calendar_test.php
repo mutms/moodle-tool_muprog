@@ -669,7 +669,7 @@ final class calendar_test extends \advanced_testcase {
         $this->assertCount(1, $DB->get_records('event', ['component' => 'tool_muprog', 'instance' => $allocation2x2->id, 'visible' => 0]));
     }
 
-    public function test_update_program_general(): void {
+    public function test_update_general(): void {
         global $DB;
 
         /** @var \tool_muprog_generator $generator */
@@ -709,7 +709,7 @@ final class calendar_test extends \advanced_testcase {
             'id' => $program1->id,
             'fullname' => 'XYZ',
         ];
-        $program1 = \tool_muprog\local\program::update_program_general((object)$data);
+        $program1 = \tool_muprog\local\program::update_general((object)$data);
         $this->assertCount(5, $DB->get_records('event', ['component' => 'tool_muprog']));
         $this->assertCount(5, $DB->get_records('event', ['component' => 'tool_muprog', 'visible' => 1]));
         $event = $DB->get_record('event',
@@ -727,7 +727,7 @@ final class calendar_test extends \advanced_testcase {
             'id' => $program1->id,
             'description' => 'blah blah',
         ];
-        $program1 = \tool_muprog\local\program::update_program_general((object)$data);
+        $program1 = \tool_muprog\local\program::update_general((object)$data);
         $this->assertCount(5, $DB->get_records('event', ['component' => 'tool_muprog']));
         $this->assertCount(5, $DB->get_records('event', ['component' => 'tool_muprog', 'visible' => 1]));
         $event = $DB->get_record('event',

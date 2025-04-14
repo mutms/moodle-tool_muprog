@@ -49,7 +49,7 @@ final class program_created_test extends \advanced_testcase {
 
         $this->setAdminUser();
         $sink = $this->redirectEvents();
-        $program = program::add_program($data);
+        $program = program::create($data);
         $events = $sink->get_events();
         $sink->close();
 
