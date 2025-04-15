@@ -280,9 +280,20 @@ $string['privacy:metadata:table:tool_muprog_request'] = 'Information about alloc
 $string['privacy:metadata:table:tool_muprog_usr_snapshot'] = 'Program allocation snapshots';
 $string['program'] = 'Program';
 $string['program_archive'] = 'Archive program';
+$string['program_archive_info'] = 'Archiving program:
+
+* suspends enrolments in program courses,
+* deletes program events from calendar,
+* prevents updates of program,
+* and in general it hides program from regular users.
+
+Archiving is a required step before program can be deleted.';
 $string['program_create'] = 'Add program';
 $string['program_delete'] = 'Delete program';
 $string['program_restore'] = 'Restore program';
+$string['program_restore_info'] = 'Restoring of program reverts changes done during program archiving.
+
+It is however recommended to verify all program settings and allocated users afterwards.';
 $string['program_update'] = 'Update program';
 $string['programallocations'] = 'Program allocations';
 $string['programautofix'] = 'Auto repair program';

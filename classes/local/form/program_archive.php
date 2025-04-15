@@ -31,6 +31,9 @@ final class program_archive extends \tool_mulib\local\dialog_form {
         $mform = $this->_form;
         $program = $this->_customdata['program'];
 
+        $info = '<div class="alert alert-warning">' . markdown_to_html(get_string('program_archive_info', 'tool_muprog')) . '</div>';
+        $mform->addElement('html', $info);
+
         $mform->addElement('static', 'fullname', get_string('programname', 'tool_muprog'), format_string($program->fullname));
 
         $mform->addElement('static', 'idnumber', get_string('idnumber'), format_string($program->idnumber));
