@@ -295,6 +295,20 @@ final class notification_manager extends \tool_mulib\local\notification\manager 
     }
 
     /**
+     * Adds the frominstance autocomplete element to import form.
+     *
+     * @param int $instanceid
+     * @param \MoodleQuickForm $mform
+     * @return void
+     */
+    public static function add_import_frominstance_element(int $instanceid, \MoodleQuickForm $mform): void {
+        $arguments = ['id' => $instanceid];
+        \tool_muprog\external\form_notification_import_frominstance::add_form_element(
+            $mform, $arguments, 'frominstance', get_string('notification_import_from', 'tool_mulib'));
+        $mform->addRule('frominstance', null, 'required', null, 'client');
+    }
+
+    /**
      * Validates if the user can import from the specified instanceid.
      *
      * @param int $instanceid
