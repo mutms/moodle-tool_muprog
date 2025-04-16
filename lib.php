@@ -198,9 +198,10 @@ function tool_muprog_extend_navigation_category_settings($navigation, $coursecat
         return;
     }
 
+    // NOTE: catnav is added to unbreak breadcrums on management pages.
     $settingsnode = navigation_node::create(
         get_string('programs', 'tool_muprog'),
-        new moodle_url('/admin/tool/muprog/management/index.php', ['contextid' => $coursecategorycontext->id]),
+        new moodle_url('/admin/tool/muprog/management/index.php', ['contextid' => $coursecategorycontext->id, 'catnav' => 1]),
         navigation_node::TYPE_CUSTOM,
         null,
         'tool_muprog_programs'

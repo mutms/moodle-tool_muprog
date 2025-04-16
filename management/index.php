@@ -56,7 +56,7 @@ if ($context->contextlevel == CONTEXT_SYSTEM) {
     throw new moodle_exception('invalidcontext');
 }
 
-$currenturl = new moodle_url('/admin/tool/muprog/management/index.php', ['contextid' => $contextid]);
+$currenturl = new moodle_url('/admin/tool/muprog/management/index.php', ['contextid' => $context->id]);
 
 management::setup_index_page($currenturl, $context);
 
