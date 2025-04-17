@@ -509,6 +509,32 @@ abstract class base {
         }
         \tool_muprog\local\notification_manager::delete_allocation_notifications($allocation);
 
+        self::purge_allocation($allocation->id);
+
+        $trans->allow_commit();
+
+        \tool_muprog\local\allocation::fix_allocation_sources($program->id, $allocation->userid);
+        \tool_muprog\local\allocation::fix_user_enrolments($program->id, $allocation->userid);
+        \tool_muprog\local\calendar::delete_allocation_events($allocation->id);
+
+        $event = \tool_muprog\event\user_deallocated::create_from_allocation($allocation, $program);
+        $event->trigger();
+    }
+
+    /**
+     * Purge all user allocation data.
+     *
+     * @param int $allocationid
+     * @return void
+     */
+    protected static function purge_allocation(int $allocationid): void {
+        global $DB;
+
+        $allocation = $DB->get_record('tool_muprog_allocation', ['id' => $allocationid]);
+        if (!$allocation) {
+            return;
+        }
+
         $issues = $DB->get_records('tool_muprog_cert_issue', ['allocationid' => $allocation->id]);
         foreach ($issues as $issue) {
             $DB->set_field('tool_muprog_cert_issue', 'allocationid', null, ['id' => $issue->id]);
@@ -527,15 +553,5 @@ abstract class base {
         }
         unset($items);
         $DB->delete_records('tool_muprog_allocation', ['id' => $allocation->id]);
-
-        $trans->allow_commit();
-
-        \tool_muprog\local\allocation::fix_allocation_sources($program->id, $allocation->userid);
-        \tool_muprog\local\allocation::fix_user_enrolments($program->id, $allocation->userid);
-        \tool_muprog\local\calendar::delete_allocation_events($allocation->id);
-
-        $event = \tool_muprog\event\user_deallocated::create_from_allocation($allocation, $program);
-        $event->trigger();
     }
 }
-

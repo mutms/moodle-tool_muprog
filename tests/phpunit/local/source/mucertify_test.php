@@ -1058,4 +1058,54 @@ final class mucertify_test extends \advanced_testcase {
         $this->assertTrue($ccompletion->is_complete());
         $this->assertTrue($DB->record_exists('course_modules_completion', ['coursemoduleid' => $cm2->id, 'userid' => $user3->id]));
     }
+
+    public function test_certificate_delete(): void {
+        global $DB;
+        /** @var \tool_mucertify_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_mucertify');
+        /** @var \tool_muprog_generator $programgenerator */
+        $programgenerator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
+
+        $program1 = $programgenerator->create_program(['sources' => 'mucertify', 'archived' => 0]);
+        $program1source = $DB->get_record('tool_muprog_source', ['programid' => $program1->id, 'type' => 'mucertify']);
+        $top1 = program::load_content($program1->id);
+        $program2 = $programgenerator->create_program(['sources' => 'mucertify', 'archived' => 0]);
+        $program2source = $DB->get_record('tool_muprog_source', ['programid' => $program2->id, 'type' => 'mucertify']);
+        $top2 = program::load_content($program2->id);
+
+        $data = [
+            'sources' => ['manual' => []],
+            'programid1' => $program1->id,
+        ];
+        $certification1 = $generator->create_certification($data);
+        $source1 = $DB->get_record('tool_mucertify_source',
+            ['type' => 'manual', 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $data = [
+            'sources' => ['manual' => []],
+            'programid1' => $program2->id,
+        ];
+        $certification2 = $generator->create_certification($data);
+        $source2 = $DB->get_record('tool_mucertify_source',
+            ['type' => 'manual', 'certificationid' => $certification2->id], '*', MUST_EXIST);
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $user3 = $this->getDataGenerator()->create_user();
+
+        $now = time();
+        manual::assign_users($certification1->id, $source1->id, [$user1->id], [
+            'timewindowstart' => $now - DAYSECS,
+        ]);
+        manual::assign_users($certification1->id, $source1->id, [$user2->id], [
+            'timewindowstart' => $now - WEEKSECS,
+        ]);
+        manual::assign_users($certification2->id, $source2->id, [$user3->id], [
+            'timewindowstart' => $now - WEEKSECS,
+        ]);
+        $this->assertCount(3, $DB->get_records('tool_muprog_allocation', []));
+
+        \tool_mucertify\local\certification::delete($certification1->id);
+        $this->assertCount(1, $DB->get_records('tool_muprog_allocation', []));
+        $this->assertCount(1, $DB->get_records('tool_muprog_allocation', ['userid' => $user3->id]));
+    }
 }
