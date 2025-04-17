@@ -20,7 +20,7 @@
 namespace tool_muprog\local\source;
 
 use tool_muprog\local\allocation;
-use tool_mulib\output\action_menu\dropdown;
+use tool_mulib\output\header_actions;
 
 use stdClass;
 
@@ -144,11 +144,11 @@ abstract class base {
     /**
      * Source related extra menu items for program allocation tab.
      *
-     * @param dropdown $dropdown
+     * @param header_actions $actions
      * @param stdClass $program
      * @param stdClass $source source record
      */
-    public static function add_management_program_users_extra_actions(dropdown $dropdown, stdClass $program, stdClass $source): void {
+    public static function add_management_program_users_actions(header_actions $actions, stdClass $program, stdClass $source): void {
     }
 
     /**

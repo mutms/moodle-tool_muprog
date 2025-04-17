@@ -81,8 +81,7 @@ Feature: Manual program allocation tests
     And I should see "Active" in the "Manual allocation" definition list item
     And I follow "Users"
 
-    When I click on "Users actions" "link"
-    And I click on "Allocate users" "link"
+    When I press "Allocate users"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Users | Student 1, Student 5 |
     And I press dialog form button "Allocate users"
@@ -92,8 +91,7 @@ Feature: Manual program allocation tests
     And I should not see "Student 3"
     And I should not see "Student 4"
 
-    When I click on "Users actions" "link"
-    And I click on "Allocate users" "link"
+    When I press "Allocate users"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Cohort | Cohort 2 |
     And I press dialog form button "Allocate users"
@@ -135,8 +133,7 @@ Feature: Manual program allocation tests
     And I press dialog form button "Update"
     And I should see "Active" in the "Manual allocation" definition list item
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
-    When I click on "Users actions" "link"
-    And I click on "Allocate users" "link"
+    When I press "Allocate users"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Users | Student 1 |
     And I press dialog form button "Allocate users"
@@ -152,8 +149,7 @@ Feature: Manual program allocation tests
     And I should see "Active" in the "Manual allocation" definition list item
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
 
-    When I click on "Users actions" "link"
-    And I click on "Allocate users" "link"
+    When I press "Allocate users"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Users | Student 1 |
     And I press dialog form button "Allocate users"
@@ -168,8 +164,7 @@ Feature: Manual program allocation tests
     And I follow "Program 000"
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
 
-    When I click on "Users actions" "link"
-    And I click on "Allocate users" "link"
+    When I press "Allocate users"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Users | Tenant 1 Student |
     And I press dialog form button "Allocate users"
@@ -179,8 +174,7 @@ Feature: Manual program allocation tests
     And I follow "Program 001"
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
 
-    When I click on "Users actions" "link"
-    And I click on "Allocate users" "link"
+    When I press "Allocate users"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Users | Tenant 1 Student |
     And I press dialog form button "Allocate users"

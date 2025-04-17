@@ -123,8 +123,7 @@ Feature: Issuing of certificates for program completion
     And I press dialog form button "Update"
     And I should see "Active" in the "Manual allocation" definition list item
     And I follow "Users"
-    And I click on "Users actions" "link"
-    And I click on "Allocate users" "link"
+    And I press "Allocate users"
     And I set the following fields to these values:
       | Users | Student 1 |
     And I press dialog form button "Allocate users"

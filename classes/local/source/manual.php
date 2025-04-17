@@ -19,7 +19,7 @@
 
 namespace tool_muprog\local\source;
 
-use tool_mulib\output\action_menu\dropdown;
+use tool_mulib\output\header_actions;
 use stdClass;
 
 /**
@@ -134,14 +134,8 @@ final class manual extends base {
         return true;
     }
 
-    /**
-     * Source related extra menu items for program allocation tab.
-     *
-     * @param dropdown $dropdown
-     * @param stdClass $program
-     * @param stdClass $source source record
-     */
-    public static function add_management_program_users_extra_actions(dropdown $dropdown, stdClass $program, stdClass $source): void {
+    #[\Override]
+    public static function add_management_program_users_actions(header_actions $actions, stdClass $program, stdClass $source): void {
         if ($program->id != $source->programid || $source->type !== self::get_type()) {
             throw new \coding_exception('Parameter mismatch detected');
         }
@@ -153,12 +147,12 @@ final class manual extends base {
         $context = \context::instance_by_id($program->contextid);
         if (has_capability('tool/muprog:allocate', $context)) {
             $url = new \moodle_url('/admin/tool/muprog/management/source_manual_allocate.php', ['sourceid' => $source->id]);
-            $link = new \tool_mulib\output\dialog_form\link($url, get_string('source_manual_allocateusers', 'tool_muprog'));
-            $dropdown->add_dialog_form($link);
+            $button = new \tool_mulib\output\dialog_form\button($url, get_string('source_manual_allocateusers', 'tool_muprog'));
+            $actions->add_button($button);
 
             $url = new \moodle_url('/admin/tool/muprog/management/source_manual_upload.php', ['sourceid' => $source->id]);
             $link = new \tool_mulib\output\dialog_form\link($url, get_string('source_manual_uploadusers', 'tool_muprog'));
-            $dropdown->add_dialog_form($link);
+            $actions->get_dropdown()->add_dialog_form($link);
         }
     }
 

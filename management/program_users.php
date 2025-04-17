@@ -56,24 +56,24 @@ $sources = $DB->get_records('tool_muprog_source', ['programid' => $program->id])
 /** @var \tool_muprog\local\source\base[] $sourceclasses */ // Type hack.
 $sourceclasses = \tool_muprog\local\allocation::get_source_classes();
 
-$dropdown = new \tool_mulib\output\action_menu\dropdown(get_string('extra_menu_management_program_users', 'tool_muprog'));
+$actions = new \tool_mulib\output\header_actions(get_string('extra_menu_management_program_users', 'tool_muprog'));
 foreach ($sourceclasses as $sourceclass) {
     $sourcetype = $sourceclass::get_type();
     $sourcerecord = $DB->get_record('tool_muprog_source', ['programid' => $program->id, 'type' => $sourcetype]);
     if (!$sourcerecord) {
         continue;
     }
-    $sourceclass::add_management_program_users_extra_actions($dropdown, $program, $sourcerecord);
+    $sourceclass::add_management_program_users_actions($actions, $program, $sourcerecord);
 }
 $canmanageevidence = has_capability('tool/muprog:manageevidence', $context);
 $totalcount = $DB->count_records('tool_muprog_allocation', ['programid' => $program->id]);
 if ($totalcount && !$program->archived && $canmanageevidence) {
     $url = new \moodle_url('/admin/tool/muprog/management/program_evidence_upload.php', ['programid' => $id]);
     $link = new \tool_mulib\output\dialog_form\link($url, get_string('evidenceupload', 'tool_muprog'));
-    $dropdown->add_dialog_form($link);
+    $actions->get_dropdown()->add_dialog_form($link);
 }
-if ($dropdown->has_items()) {
-    $PAGE->add_header_action($OUTPUT->render($dropdown));
+if ($actions->has_items()) {
+    $PAGE->add_header_action($OUTPUT->render($actions));
 }
 
 echo $OUTPUT->header();
