@@ -86,16 +86,20 @@ class renderer extends \plugin_renderer_base {
 </div>
 EOT;
 
-        $result .= '<dl class="row">';
-        $result .= '<dt class="col-3">' . get_string('programstatus', 'tool_muprog') . '</dt><dd class="col-9">'
-            . get_string('errornoallocation', 'tool_muprog') . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('allocationstart', 'tool_muprog') . '</dt><dd class="col-9">'
-            . (isset($program->timeallocationstart) ? userdate($program->timeallocationstart) : $strnotset) . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('allocationend', 'tool_muprog') . '</dt><dd class="col-9">'
-            . (isset($program->timeallocationend) ? userdate($program->timeallocationend) : $strnotset) . '</dd>';
-        $customfieldoutput = $this->page->get_renderer('tool_muprog', 'customfield');
-        $result .= $customfieldoutput->render_customfields($program->id);
-        $result .= '</dl>';
+        $details = [];
+
+        $details[] = ['property' => get_string('programstatus', 'tool_muprog'),
+            'value' => get_string('errornoallocation', 'tool_muprog')];
+        $details[] = ['property' => get_string('allocationstart', 'tool_muprog'),
+            'value' => (isset($program->timeallocationstart) ? userdate($program->timeallocationstart) : $strnotset)];
+        $details[] = ['property' => get_string('allocationend', 'tool_muprog'),
+            'value' => (isset($program->timeallocationend) ? userdate($program->timeallocationend) : $strnotset)];
+        $handler = \tool_muprog\customfield\fields_handler::create();
+        foreach ($handler->get_instance_data($program->id) as $data) {
+            $details[] = ['property' => $data->get_field()->get('name'), 'value' => $data->export_value()];
+        }
+
+        $result .= $this->output->render_from_template('tool_mulib/entity_details', ['details' => $details]);
 
         $actions = [];
         /** @var \tool_muprog\local\source\base[] $sourceclasses */ // Type hack.

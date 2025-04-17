@@ -98,33 +98,30 @@ EOT;
      */
     public function render_user_allocation(stdClass $program, stdClass $source, stdClass $allocation): string {
         $strnotset = get_string('notset', 'tool_muprog');
+        $sourceclass = allocation::get_source_classname($source->type);
 
-        $sourceclasses = allocation::get_source_classes();
-        /** @var \tool_muprog\local\source\base $sourceclass */
-        $sourceclass = $sourceclasses[$source->type];
+        $details = [];
 
-        $result = '';
+        $details[] = ['property' => get_string('programstatus', 'tool_muprog'),
+            'value' => allocation::get_completion_status_html($program, $allocation)];
+        $details[] = ['property' => get_string('source', 'tool_muprog'),
+            'value' => $sourceclass::render_allocation_source($program, $source, $allocation)];
+        $details[] = ['property' => get_string('allocationdate', 'tool_muprog'),
+            'value' => userdate($allocation->timeallocated)];
+        $details[] = ['property' => get_string('programstart', 'tool_muprog'),
+            'value' => userdate($allocation->timestart)];
+        $details[] = ['property' => get_string('programdue', 'tool_muprog'),
+            'value' => (isset($allocation->timedue) ? userdate($allocation->timedue) : $strnotset)];
+        $details[] = ['property' => get_string('programend', 'tool_muprog'),
+            'value' => (isset($allocation->timeend) ? userdate($allocation->timeend) : $strnotset)];
+        $details[] = ['property' => get_string('completiondate', 'tool_muprog'),
+            'value' => (isset($allocation->timecompleted) ? userdate($allocation->timecompleted) : $strnotset)];
+        $handler = \tool_muprog\customfield\fields_handler::create();
+        foreach ($handler->get_instance_data($program->id) as $data) {
+            $details[] = ['property' => $data->get_field()->get('name'), 'value' => $data->export_value()];
+        }
 
-        $result .= '<dl class="row">';
-        $result .= '<dt class="col-3">' . get_string('programstatus', 'tool_muprog') . '</dt><dd class="col-9">'
-            . allocation::get_completion_status_html($program, $allocation) . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('source', 'tool_muprog') . '</dt><dd class="col-9">'
-            . $sourceclass::render_allocation_source($program, $source, $allocation) . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('allocationdate', 'tool_muprog') . '</dt><dd class="col-9">'
-            . userdate($allocation->timeallocated) . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('programstart', 'tool_muprog') . '</dt><dd class="col-9">'
-            . userdate($allocation->timestart) . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('programdue', 'tool_muprog') . '</dt><dd class="col-9">'
-            . (isset($allocation->timedue) ? userdate($allocation->timedue) : $strnotset) . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('programend', 'tool_muprog') . '</dt><dd class="col-9">'
-            . (isset($allocation->timeend) ? userdate($allocation->timeend) : $strnotset) . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('completiondate', 'tool_muprog') . '</dt><dd class="col-9">'
-            . (isset($allocation->timecompleted) ? userdate($allocation->timecompleted) : $strnotset) . '</dd>';
-
-        $customfieldoutput = $this->page->get_renderer('tool_muprog', 'customfield');
-        $result .= $customfieldoutput->render_customfields($program->id);
-        $result .= '</dl>';
-        return $result;
+        return $this->output->render_from_template('tool_mulib/entity_details', ['details' => $details]);
     }
 
     /**

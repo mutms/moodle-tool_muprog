@@ -33,7 +33,6 @@
 /** @var stdClass $COURSE */
 
 use tool_muprog\local\management;
-use tool_muprog\local\program;
 
 require('../../../../config.php');
 require_once($CFG->dirroot . '/lib/formslib.php');
@@ -78,37 +77,31 @@ if (has_capability('tool/muprog:edit', $context)) {
 
 $cert = $DB->get_record('tool_muprog_cert', ['programid' => $program->id]);
 
+$details = [];
+
 if ($cert) {
-    echo '<dl class="row">';
-    echo '<dt class="col-3">' . get_string('certificatetemplate', 'tool_certificate') . '</dt><dd class="col-9">';
     $template = $DB->get_record('tool_certificate_templates', ['id' => $cert->templateid]);
     if (!$template) {
-        echo get_string('error');
-        echo '</dd>';
-        echo '</dl>';
+        $details[] = ['property' => get_string('certificatetemplate', 'tool_certificate'),
+            'value' => get_string('error')];
     } else {
-        echo format_string($template->name);
-        echo '</dd>';
-
-        echo '<dt class="col-3">' . get_string('expirydate', 'tool_certificate') . '</dt><dd class="col-9">';
+        $details[] = ['property' => get_string('certificatetemplate', 'tool_certificate'),
+            'value' => format_string($template->name)];
         if ($cert->expirydatetype == 1) {
-            echo userdate($cert->expirydateoffset);
+            $expiry = userdate($cert->expirydateoffset);
         } else if ($cert->expirydatetype == 2) {
-            echo format_time($cert->expirydateoffset);
+            $expiry = format_time($cert->expirydateoffset);
         } else {
-            echo get_string('never', 'tool_certificate');
+            $expiry = get_string('never', 'tool_certificate');
         }
-        echo '</dd>';
-
-        echo '</dl>';
+        $details[] = ['property' => get_string('expirydate', 'tool_certificate'), 'value' => $expiry];
     }
 } else {
-    echo '<dl class="row">';
-    echo '<dt class="col-3">' . get_string('certificatetemplate', 'tool_certificate') . '</dt><dd class="col-9">';
-    echo get_string('notset', 'tool_muprog');
-    echo '</dd>';
-    echo '</dl>';
+    $details[] = ['property' => get_string('certificatetemplate', 'tool_certificate'),
+        'value' => get_string('notset', 'tool_muprog')];
 }
+
+echo $OUTPUT->render_from_template('tool_mulib/entity_details', ['details' => $details]);
 
 if ($buttons) {
     $buttons = implode(' ', $buttons);

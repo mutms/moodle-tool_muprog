@@ -52,29 +52,25 @@ class renderer extends \plugin_renderer_base {
 
         $context = \context::instance_by_id($program->contextid);
 
-        $result = '';
-
+        $programimage = '';
         $presentation = (array)json_decode($program->presentationjson);
         if (!empty($presentation['image'])) {
             $imageurl = moodle_url::make_file_url("$CFG->wwwroot/pluginfile.php",
                 '/' . $context->id . '/tool_muprog/image/' . $program->id . '/'. $presentation['image'], false);
-            $result .= '<div class="float-end programimage">' . html_writer::img($imageurl, '') . '</div>';
+            $programimage = '<div class="float-end programimage">' . html_writer::img($imageurl, '') . '</div>';
         }
-        $result .= '<dl class="row">';
-        $result .= '<dt class="col-3">' . get_string('programname', 'tool_muprog') . '</dt><dd class="col-9">'
-            . format_string($program->fullname) . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('programidnumber', 'tool_muprog') . '</dt><dd class="col-9">'
-            . s($program->idnumber) . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('category') . '</dt><dd class="col-9">'
-            . html_writer::link(new moodle_url('/admin/tool/muprog/management/index.php',
-                ['contextid' => $context->id]), $context->get_context_name(false)) . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('creategroups', 'tool_muprog') . '</dt><dd class="col-9">'
-            . ($program->creategroups ? get_string('yes') : get_string('no')) . '</dd>';
+
+        $details = [];
+
+        $details[] = ['property' => get_string('programname', 'tool_muprog'), 'value' => format_string($program->fullname)];
+        $details[] = ['property' => get_string('programidnumber', 'tool_muprog'), 'value' => s($program->idnumber)];
+        $url = new moodle_url('/admin/tool/muprog/management/index.php', ['contextid' => $context->id]);
+        $details[] = ['property' => get_string('category'), 'value' => html_writer::link($url, $context->get_context_name(false))];
+        $details[] = ['property' => get_string('creategroups', 'tool_muprog'), 'value' => ($program->creategroups ? get_string('yes') : get_string('no'))];
         if ($CFG->usetags) {
             $tags = \core_tag_tag::get_item_tags('tool_muprog', 'program', $program->id);
             if ($tags) {
-                $result .= '<dt class="col-3">' . get_string('tags') . '</dt><dd class="col-9">'
-                    . $this->output->tag_list($tags, '', 'program-tags') . '</dd>';
+                $details[] = ['property' => get_string('tags'), 'value' => $this->output->tag_list($tags, '', 'program-tags')];
             }
         }
         $description = file_rewrite_pluginfile_urls($program->description, 'pluginfile.php', $context->id, 'tool_muprog', 'description', $program->id);
@@ -82,8 +78,7 @@ class renderer extends \plugin_renderer_base {
         if (trim($description) === '') {
             $description = '&nbsp;';
         }
-        $result .= '<dt class="col-3">' . get_string('description') . '</dt><dd class="col-9">' . $description . '</dd>';
-
+        $details[] = ['property' => get_string('description'), 'value' => $description];
         $archived = $program->archived ? get_string('yes') : get_string('no');
         if (has_capability('tool/muprog:edit', $context)) {
             if ($program->archived) {
@@ -96,14 +91,14 @@ class renderer extends \plugin_renderer_base {
             $action->set_dialog_size('');
             $archived .= $this->output->render($action);
         }
-        $result .= '<dt class="col-3">' . get_string('archived', 'tool_muprog') . '</dt><dd class="col-9">' . $archived . '</dd>';
+        $details[] = ['property' => get_string('archived', 'tool_muprog'), 'value' => $archived];
 
-        /** @var \tool_muprog\output\customfield\renderer $customfieldoutput */
-        $customfieldoutput = $this->page->get_renderer('tool_muprog', 'customfield');
-        $result .= $customfieldoutput->render_customfields($program->id);
-        $result .= '</dl>';
+        $handler = \tool_muprog\customfield\fields_handler::create();
+        foreach ($handler->get_instance_data($program->id) as $data) {
+            $details[] = ['property' => $data->get_field()->get('name'), 'value' => $data->export_value()];
+        }
 
-        return $result;
+        return $programimage . $this->output->render_from_template('tool_mulib/entity_details', ['details' => $details]);
     }
 
     /**
@@ -113,16 +108,14 @@ class renderer extends \plugin_renderer_base {
      * @return string
      */
     public function render_program_allocation(stdClass $program): string {
-        $result = '';
+        $details = [];
 
-        $result .= '<dl class="row">';
-        $result .= '<dt class="col-3">' . get_string('allocationstart', 'tool_muprog') . '</dt><dd class="col-9">'
-            . ($program->timeallocationstart ? userdate($program->timeallocationstart) : get_string('notset', 'tool_muprog')) . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('allocationend', 'tool_muprog') . '</dt><dd class="col-9">'
-            . ($program->timeallocationend ? userdate($program->timeallocationend) : get_string('notset', 'tool_muprog')) . '</dd>';
-        $result .= '</dl>';
+        $details[] = ['property' => get_string('allocationstart', 'tool_muprog'),
+            'value' => $program->timeallocationstart ? userdate($program->timeallocationstart) : get_string('notset', 'tool_muprog')];
+        $details[] = ['property' => get_string('allocationend', 'tool_muprog'),
+            'value' => $program->timeallocationend ? userdate($program->timeallocationend) : get_string('notset', 'tool_muprog')];
 
-        return $result;
+        return $this->output->render_from_template('tool_mulib/entity_details', ['details' => $details]);
     }
 
     /**
@@ -132,48 +125,42 @@ class renderer extends \plugin_renderer_base {
      * @return string
      */
     public function render_program_scheduling(stdClass $program): string {
-        $result = '';
+        $details = [];
 
-        $result .= '<dl class="row">';
-        $result .= '<dt class="col-3">' . get_string('programstart', 'tool_muprog') . '</dt><dd class="col-9">';
         $start = (object)json_decode($program->startdatejson);
         $types = program::get_program_startdate_types();
-
         if ($start->type === 'date') {
-            $result .= userdate($start->date);
+            $startstr = userdate($start->date);
         } else if ($start->type === 'delay') {
-            $result .= $types[$start->type] . ' - ' . util::format_delay($start->delay);
+            $startstr = $types[$start->type] . ' - ' . util::format_delay($start->delay);
         } else {
-            $result .= $types[$start->type];
+            $startstr = $types[$start->type];
         }
-        $result .= '</dd>';
+        $details[] = ['property' => get_string('programstart', 'tool_muprog'), 'value' => $startstr];
 
-        $result .= '<dt class="col-3">' . get_string('programdue', 'tool_muprog') . '</dt><dd class="col-9">';
         $due = (object)json_decode($program->duedatejson);
         $types = program::get_program_duedate_types();
         if ($due->type === 'date') {
-            $result .= userdate($due->date);
+            $duestr = userdate($due->date);
         } else if ($due->type === 'delay') {
-            $result .= $types[$due->type] . ' - ' . util::format_delay($due->delay);
+            $duestr = $types[$due->type] . ' - ' . util::format_delay($due->delay);
         } else {
-            $result .= $types[$due->type];
+            $duestr = $types[$due->type];
         }
-        $result .= '</dd>';
+        $details[] = ['property' => get_string('programdue', 'tool_muprog'), 'value' => $duestr];
 
-        $result .= '<dt class="col-3">' . get_string('programend', 'tool_muprog') . '</dt><dd class="col-9">';
         $end = (object)json_decode($program->enddatejson);
         $types = program::get_program_enddate_types();
         if ($end->type === 'date') {
-            $result .= userdate($end->date);
+            $endstr = userdate($end->date);
         } else if ($end->type === 'delay') {
-            $result .= $types[$end->type] . ' - ' . util::format_delay($end->delay);
+            $endstr = $types[$end->type] . ' - ' . util::format_delay($end->delay);
         } else {
-            $result .= $types[$end->type];
+            $endstr = $types[$end->type];
         }
-        $result .= '</dd>';
-        $result .= '</dl>';
+        $details[] = ['property' => get_string('programend', 'tool_muprog'), 'value' => $endstr];
 
-        return $result;
+        return $this->output->render_from_template('tool_mulib/entity_details', ['details' => $details]);
     }
 
     /**
@@ -183,22 +170,18 @@ class renderer extends \plugin_renderer_base {
      * @return string
      */
     public function render_program_visibility(stdClass $program): string {
-        $result = '';
+        $details = [];
 
-        $result .= '<dl class="row">';
-        $result .= '<dt class="col-3">' . get_string('public', 'tool_muprog') . '</dt><dd class="col-9">'
-            . ($program->public ? get_string('yes') : get_string('no')) . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('cohorts', 'tool_muprog') . '</dt><dd class="col-9">';
+        $details[] = ['property' => get_string('public', 'tool_muprog'), 'value' => ($program->public ? get_string('yes') : get_string('no'))];
         $cohorts = management::fetch_current_cohorts_menu($program->id);
         if ($cohorts) {
-            $result .= implode(', ', array_map('format_string', $cohorts));
+            $cohrotsstr = implode(', ', array_map('format_string', $cohorts));
         } else {
-            $result .= '-';
+            $cohrotsstr = '-';
         }
-        $result .= '</dd>';
-        $result .= '</dl>';
+        $details[] = ['property' => get_string('cohorts', 'tool_muprog'), 'value' => $cohrotsstr];
 
-        return $result;
+        return $this->output->render_from_template('tool_mulib/entity_details', ['details' => $details]);
     }
 
     /**
@@ -529,32 +512,28 @@ class renderer extends \plugin_renderer_base {
 
         $strnotset = get_string('notset', 'tool_muprog');
         $sourceclasses = allocation::get_source_classes();
-        $context = \context::instance_by_id($program->contextid);
         $source = $DB->get_record('tool_muprog_source', ['id' => $allocation->sourceid], '*', MUST_EXIST);
         /** @var \tool_muprog\local\source\base $sourceclass */
         $sourceclass = $sourceclasses[$source->type];
 
-        $result = '';
+        $details = [];
 
-        $result .= '<dl class="row">';
-        $result .= '<dt class="col-3">' . get_string('programstatus', 'tool_muprog') . '</dt><dd class="col-9">'
-            . allocation::get_completion_status_html($program, $allocation) . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('source', 'tool_muprog') . '</dt><dd class="col-9">'
-            . $sourceclass::render_allocation_source($program, $source, $allocation) . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('allocationdate', 'tool_muprog') . '</dt><dd class="col-9">'
-            . userdate($allocation->timeallocated) . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('programstart', 'tool_muprog') . '</dt><dd class="col-9">'
-            . userdate($allocation->timestart) . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('programdue', 'tool_muprog') . '</dt><dd class="col-9">'
-            . (isset($allocation->timedue) ? userdate($allocation->timedue) : $strnotset) . '</dd>';
-        $result .= '<dt class="col-3">' . get_string('programend', 'tool_muprog') . '</dt><dd class="col-9">'
-            . (isset($allocation->timeend) ? userdate($allocation->timeend) : $strnotset) . '</dd>';
+        $details[] = ['property' => get_string('programstatus', 'tool_muprog'),
+            'value' => allocation::get_completion_status_html($program, $allocation)];
+        $details[] = ['property' => get_string('source', 'tool_muprog'),
+            'value' => $sourceclass::render_allocation_source($program, $source, $allocation)];
+        $details[] = ['property' => get_string('allocationdate', 'tool_muprog'),
+            'value' => userdate($allocation->timeallocated)];
+        $details[] = ['property' => get_string('programstart', 'tool_muprog'),
+            'value' => userdate($allocation->timestart)];
+        $details[] = ['property' => get_string('programdue', 'tool_muprog'),
+            'value' => (isset($allocation->timedue) ? userdate($allocation->timedue) : $strnotset)];
+        $details[] = ['property' => get_string('programend', 'tool_muprog'),
+            'value' => (isset($allocation->timeend) ? userdate($allocation->timeend) : $strnotset)];
+        $details[] = ['property' => get_string('programcompletion', 'tool_muprog'),
+            'value' => (isset($allocation->timecompleted) ? userdate($allocation->timecompleted) : $strnotset)];
 
-        $result .= '<dt class="col-3">' . get_string('programcompletion', 'tool_muprog') . '</dt><dd class="col-9">'
-            . (isset($allocation->timecompleted) ? userdate($allocation->timecompleted) : $strnotset) . '</dd>';
-        $result .= '</dl>';
-
-        return $result;
+        return $this->output->render_from_template('tool_mulib/entity_details', ['details' => $details]);
     }
 
     /**
@@ -569,7 +548,7 @@ class renderer extends \plugin_renderer_base {
 
         $result = $this->output->heading(get_string('notificationdates', 'tool_muprog'), 3, ['h4']);
 
-        $result .= '<dl class="row">';
+        $details = [];
 
         $types = notification_manager::get_all_types();
         // phpcs:ignore moodle.Commenting.InlineComment.TypeHintingForeach
@@ -578,13 +557,11 @@ class renderer extends \plugin_renderer_base {
             if ($notificationtype === 'deallocation') {
                 continue;
             }
-            $result .= '<dt class="col-3">';
-            $result .= $classname::get_name();
-            $result .= '</dt><dd class="col-9">';
             $timenotified = notification_manager::get_timenotified($allocation->userid, $program->id, $notificationtype);
-            $result .= ($timenotified ? userdate($timenotified) : $strnotset);
-            $result .= '</dd>';
+            $details[] = ['property' => $classname::get_name(), 'value' => $timenotified ? userdate($timenotified) : $strnotset];
         }
+
+        $result .= $this->output->render_from_template('tool_mulib/entity_details', ['details' => $details]);
 
         return $result;
     }
@@ -725,8 +702,6 @@ class renderer extends \plugin_renderer_base {
     public function render_program_sources(\stdClass $program): string {
         global $DB;
 
-        $result = '';
-
         $sources = [];
         /** @var \tool_muprog\local\source\base[] $sourceclasses */
         $sourceclasses = \tool_muprog\local\allocation::get_source_classes();
@@ -741,17 +716,16 @@ class renderer extends \plugin_renderer_base {
             $sources[$sourcetype] = $sourceclass::render_status($program, $sourcerecord);
         }
 
-        if ($sources) {
-            $result .= '<dl class="row">';
-            foreach ($sources as $sourcetype => $status) {
-                $name = $sourceclasses[$sourcetype]::get_name();
-                $result .= '<dt class="col-3">' . $name . '</dt><dd class="col-9">' . $status . '</dd>';
-            }
-            $result .= '</dl>';
-        } else {
-            $result = get_string('notavailable');
+        if (!$sources) {
+            return get_string('notavailable');
         }
 
-        return $result;
+        $details = [];
+        foreach ($sources as $sourcetype => $status) {
+            $name = $sourceclasses[$sourcetype]::get_name();
+            $details[] = ['property' => $name, 'value' => $status];
+        }
+
+        return $this->output->render_from_template('tool_mulib/entity_details', ['details' => $details]);
     }
 }
