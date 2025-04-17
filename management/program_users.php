@@ -56,7 +56,7 @@ $sources = $DB->get_records('tool_muprog_source', ['programid' => $program->id])
 /** @var \tool_muprog\local\source\base[] $sourceclasses */ // Type hack.
 $sourceclasses = \tool_muprog\local\allocation::get_source_classes();
 
-$actions = new \tool_mulib\output\header_actions(get_string('extra_menu_management_program_users', 'tool_muprog'));
+$actions = new \tool_mulib\output\header_actions(get_string('management_program_users_actions', 'tool_muprog'));
 foreach ($sourceclasses as $sourceclass) {
     $sourcetype = $sourceclass::get_type();
     $sourcerecord = $DB->get_record('tool_muprog_source', ['programid' => $program->id, 'type' => $sourcetype]);

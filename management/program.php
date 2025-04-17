@@ -33,7 +33,7 @@
 /** @var stdClass $COURSE */
 
 use tool_muprog\local\management;
-use tool_mulib\output\dropdown;
+use tool_mulib\output\header_actions;
 
 require('../../../../config.php');
 require_once($CFG->dirroot . '/lib/formslib.php');
@@ -53,20 +53,20 @@ management::setup_program_page($currenturl, $context, $program, 'program_general
 /** @var \tool_muprog\output\management\renderer $managementoutput */
 $managementoutput = $PAGE->get_renderer('tool_muprog', 'management');
 
-$dropdown = new dropdown(get_string('extra_menu_management_program_general', 'tool_muprog'));
+$actions = new header_actions(get_string('management_program_general_actions', 'tool_muprog'));
 if ($program->archived && has_capability('tool/muprog:delete', $context)) {
     $url = new moodle_url('/admin/tool/muprog/management/program_delete.php', ['id' => $program->id]);
     $link = new tool_mulib\output\dialog_form\link($url, get_string('program_delete', 'tool_muprog'));
     $link->set_dialog_size('sm');
     $link->set_after_submit($link::AFTER_SUBMIT_REDIRECT);
-    $dropdown->add_dialog_form($link);
+    $actions->get_dropdown()->add_dialog_form($link);
 }
 if (has_capability('tool/muprog:export', $context)) {
     $url = new moodle_url('/admin/tool/muprog/management/export.php', ['id' => $program->id]);
-    $dropdown->add_item(get_string('export', 'tool_muprog'), $url);
+    $actions->get_dropdown()->add_item(get_string('export', 'tool_muprog'), $url);
 }
-if ($dropdown->has_items()) {
-    $PAGE->add_header_action($OUTPUT->render($dropdown));
+if ($actions->has_items()) {
+    $PAGE->add_header_action($OUTPUT->render($actions));
 }
 
 echo $OUTPUT->header();

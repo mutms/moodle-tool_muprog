@@ -49,9 +49,9 @@ $currenturl = new moodle_url('/admin/tool/muprog/management/program_notification
 
 management::setup_program_page($currenturl, $context, $program, 'program_notifications');
 
-$dropdown = \tool_muprog\local\notification_manager::get_extra_actions($program->id);
-if ($dropdown->has_items()) {
-    $PAGE->add_header_action($OUTPUT->render($dropdown));
+$actions = \tool_muprog\local\notification_manager::get_header_actions($program->id);
+if ($actions->has_items()) {
+    $PAGE->add_header_action($OUTPUT->render($actions));
 }
 
 echo $OUTPUT->header();

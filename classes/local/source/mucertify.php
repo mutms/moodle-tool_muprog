@@ -157,7 +157,7 @@ final class mucertify extends base {
                   JOIN {tool_muprog_program} p ON p.id = pa.programid
                   JOIN {tool_muprog_source} ps ON ps.programid = p.id AND ps.type = 'mucertify' AND ps.id = pa.sourceid
              LEFT JOIN {tool_mucertify_certification} c ON c.id = pa.sourceinstanceid
-                 WHERE c.id IS NULL 
+                 WHERE c.id IS NULL
                        $userselect $certificationselect
               ORDER BY pa.id ASC";
         $allocations = $DB->get_records_sql($sql, $params);
