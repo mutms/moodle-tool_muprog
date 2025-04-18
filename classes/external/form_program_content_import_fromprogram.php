@@ -64,10 +64,8 @@ final class form_program_content_import_fromprogram extends \tool_mulib\external
     public static function execute(string $query, int $programid): array {
         global $DB;
 
-        $params = self::validate_parameters(self::execute_parameters(),
-            ['query' => $query, 'programid' => $programid]);
-        $query = $params['query'];
-        $programid = $params['programid'];
+        ['query' => $query, 'programid' => $programid] = self::validate_parameters(
+            self::execute_parameters(), ['query' => $query, 'programid' => $programid]);
 
         $targetprogram = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
         $context = \context::instance_by_id($targetprogram->contextid);

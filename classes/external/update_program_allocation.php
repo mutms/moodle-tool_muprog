@@ -63,12 +63,8 @@ final class update_program_allocation extends external_api {
      */
     public static function execute(int $programid, int $userid, array $allocationdates = [], ?bool $archived = null): \stdClass {
         global $DB;
-        $params = self::validate_parameters(self::execute_parameters(),
-            ['programid' => $programid, 'userid' => $userid, 'allocationdates' => $allocationdates, 'archived' => $archived]);
-        $userid = $params['userid'];
-        $programid = $params['programid'];
-        $allocationdates = $params['allocationdates'];
-        $archived = $params['archived'];
+        ['programid' => $programid, 'userid' => $userid, 'allocationdates' => $allocationdates, 'archived' => $archived] = self::validate_parameters(
+            self::execute_parameters(), ['programid' => $programid, 'userid' => $userid, 'allocationdates' => $allocationdates, 'archived' => $archived]);
 
         $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
 

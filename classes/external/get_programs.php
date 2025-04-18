@@ -61,8 +61,8 @@ final class get_programs extends external_api {
      */
     public static function execute(array $fieldvalues): array {
         global $DB;
-        $fieldvalues = self::validate_parameters(self::execute_parameters(),
-            ['fieldvalues' => $fieldvalues])['fieldvalues'];
+        ['fieldvalues' => $fieldvalues] = self::validate_parameters(
+            self::execute_parameters(), ['fieldvalues' => $fieldvalues]);
 
         $allowedfieldlist = ['id', 'contextid', 'fullname', 'idnumber', 'public', 'archived', 'tenantid'];
         $params = [];

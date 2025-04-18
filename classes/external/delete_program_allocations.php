@@ -56,10 +56,8 @@ final class delete_program_allocations extends external_api {
      */
     public static function execute(int $programid, array $userids): array {
         global $DB;
-        $params = self::validate_parameters(self::execute_parameters(),
-            ['programid' => $programid, 'userids' => $userids]);
-        $programid = $params['programid'];
-        $userids = $params['userids'];
+        ['programid' => $programid, 'userids' => $userids] = self::validate_parameters(
+            self::execute_parameters(), ['programid' => $programid, 'userids' => $userids]);
 
         $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
 

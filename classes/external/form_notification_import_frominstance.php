@@ -65,19 +65,17 @@ final class form_notification_import_frominstance extends \tool_mulib\external\f
     public static function execute(string $query, int $id): array {
         global $DB;
 
-        $params = self::validate_parameters(self::execute_parameters(),
-            ['query' => $query, 'id' => $id]);
-        $query = $params['query'];
-        $programid = $params['id'];
+        ['query' => $query, 'id' => $id] = self::validate_parameters(
+            self::execute_parameters(), ['query' => $query, 'id' => $id]);
 
-        $targetprogram = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
+        $targetprogram = $DB->get_record('tool_muprog_program', ['id' => $id], '*', MUST_EXIST);
         $context = \context::instance_by_id($targetprogram->contextid);
 
         self::validate_context($context);
         require_capability('tool/muprog:edit', $context);
 
         list($searchsql, $params) = \tool_muprog\local\management::get_program_search_query(null, $query, 'p');
-        $params['programid'] = $programid;
+        $params['programid'] = $id;
 
         $tenantselect = '';
         if (\tool_muprog\local\util::is_mutenancy_active()) {

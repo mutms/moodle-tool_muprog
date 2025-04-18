@@ -63,6 +63,9 @@ final class get_program_allocations extends external_api {
     public static function execute(int $programid, array $userids = []): array {
         global $DB;
 
+        ['programid' => $programid, 'userids' => $userids] = self::validate_parameters(
+            self::execute_parameters(), ['programid' => $programid, 'userids' => $userids]);
+
         $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
 
         // Validate context.
@@ -70,15 +73,8 @@ final class get_program_allocations extends external_api {
         self::validate_context($context);
         require_capability('tool/muprog:view', $context);
 
-        $params = self::validate_parameters(self::execute_parameters(),
-            ['programid' => $programid, 'userids' => $userids]);
-
-        $userids = $params['userids'];
-        $programid = $params['programid'];
-
         $results = [];
         if (empty($userids)) {
-            // TODO: for now treat empty array as all allocations until MDL-78192 adds support for NULLs.
             $allocations = $DB->get_records('tool_muprog_allocation', ['programid' => $programid], 'id');
         } else {
             $allocations = [];

@@ -62,8 +62,7 @@ final class form_export_programids extends \tool_mulib\external\form_autocomplet
     public static function execute(string $query): array {
         global $DB;
 
-        $params = self::validate_parameters(self::execute_parameters(), ['query' => $query]);
-        $query = $params['query'];
+        $params['query'] = self::validate_parameters(self::execute_parameters(), ['query' => $query]);
 
         $syscontext = \context_system::instance();
         self::validate_context($syscontext);

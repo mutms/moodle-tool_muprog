@@ -62,10 +62,8 @@ final class form_item_append_trainingid extends \tool_mulib\external\form_autoco
     public static function execute(string $query, int $programid): array {
         global $DB;
 
-        $params = self::validate_parameters(self::execute_parameters(),
-            ['query' => $query, 'programid' => $programid]);
-        $query = $params['query'];
-        $programid = $params['programid'];
+        ['query' => $query, 'programid' => $programid] = self::validate_parameters(
+            self::execute_parameters(), ['query' => $query, 'programid' => $programid]);
 
         $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
 
@@ -78,6 +76,7 @@ final class form_item_append_trainingid extends \tool_mulib\external\form_autoco
             throw new \core\exception\coding_exception('mutrain is not available');
         }
 
+        $params = ['programid' => $programid];
         $tenantselect = '';
         if (\tool_muprog\local\util::is_mutenancy_active()) {
             $targetprogramtenantid = $DB->get_field('context', 'tenantid', ['id' => $context->id]);
