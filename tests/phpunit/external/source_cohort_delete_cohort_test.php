@@ -51,11 +51,11 @@ final class source_cohort_delete_cohort_test extends \advanced_testcase {
 
         $program1 = $generator->create_program([
             'contextid' => $catcontext1->id,
-            'sources' => ['cohort' => ['cohorts' => [$cohort1->id, $cohort2->id, $cohort3->id]]],
+            'sources' => ['cohort' => ['cohortids' => [$cohort1->id, $cohort2->id, $cohort3->id]]],
         ]);
         $program2 = $generator->create_program([
             'contextid' => $syscontext->id,
-            'sources' => ['cohort' => ['cohorts' => [$cohort2->id, $cohort3->id]]],
+            'sources' => ['cohort' => ['cohortids' => [$cohort2->id, $cohort3->id]]],
         ]);
 
         $user1 = $this->getDataGenerator()->create_user();

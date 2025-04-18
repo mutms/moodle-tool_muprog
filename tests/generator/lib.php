@@ -96,8 +96,14 @@ class tool_muprog_generator extends component_generator_base {
         }
         unset($record->sources);
 
-        $cohorts = empty($record->cohorts) ? [] : $record->cohorts;
+        $cohorts = [];
+        if (!empty($record->cohortids)) {
+            $cohorts = $record->cohortids;
+        } else if (!empty($record->cohorts)) {
+            $cohorts = $record->cohorts;
+        }
         unset($record->cohorts);
+        unset($record->cohortods);
 
         $program = tool_muprog\local\program::create($record);
 
@@ -114,9 +120,8 @@ class tool_muprog_generator extends component_generator_base {
                     $record = $DB->get_record('cohort', ['name' => $cohort], '*', MUST_EXIST);
                     $cohortids[] = $record->id;
                 }
-
             }
-            \tool_muprog\local\program::update_visibility((object)['id' => $program->id, 'public' => $program->public, 'cohorts' => $cohortids]);
+            \tool_muprog\local\program::update_visibility((object)['id' => $program->id, 'public' => $program->public, 'cohortids' => $cohortids]);
         }
 
         foreach ($sources as $source => $data) {

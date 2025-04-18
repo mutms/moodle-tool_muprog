@@ -252,7 +252,7 @@ final class program_test extends \advanced_testcase {
             'descriptionformat' => '2',
             'presentation' => ['some' => 'test'],
             'public' => '1',
-            'cohorts' => [$cohort1->id, $cohort2->id],
+            'cohortids' => [$cohort1->id, $cohort2->id],
             'archived' => '1',
             'creategroups' => '1',
             'timeallocationstart' => (string)(time() - 60 * 60 * 24),
@@ -278,7 +278,7 @@ final class program_test extends \advanced_testcase {
         $this->assertSame($oldprogram->timecreated, $program->timecreated);
 
         $cohorts = $DB->get_records_menu('tool_muprog_cohort', ['programid' => $program->id], 'cohortid ASC', 'id, cohortid');
-        $this->assertSame($data->cohorts, array_values($cohorts));
+        $this->assertSame($data->cohortids, array_values($cohorts));
     }
 
     public function test_update_allocation(): void {
@@ -371,7 +371,7 @@ final class program_test extends \advanced_testcase {
             'sources' => [
                 'manual' => [],
                 'approval' => [],
-                'cohort' => ['cohorts' => [$cohort2->id]],
+                'cohort' => ['cohortids' => [$cohort2->id]],
                 'selfallocation' => [],
             ],
         ];

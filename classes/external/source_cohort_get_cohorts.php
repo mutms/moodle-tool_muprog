@@ -53,8 +53,7 @@ final class source_cohort_get_cohorts extends external_api {
      */
     public static function execute(int $programid): array {
         global $DB;
-        $params = self::validate_parameters(self::execute_parameters(), ['programid' => $programid]);
-        $programid = $params['programid'];
+        ['programid' => $programid] = self::validate_parameters(self::execute_parameters(), ['programid' => $programid]);
 
         $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
 

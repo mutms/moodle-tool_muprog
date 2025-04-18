@@ -37,6 +37,20 @@ $functions = [
         'ajax' => true,
         'loginrequired' => true,
     ],
+    'tool_muprog_form_program_visibility_edit_cohortids' => [
+        'classname' => tool_muprog\external\form_program_visibility_edit_cohortids::class,
+        'description' => 'Return list of cohorts for program visibility.',
+        'type' => 'read',
+        'ajax' => true,
+        'loginrequired' => true,
+    ],
+    'tool_muprog_form_source_cohort_edit_cohortids' => [
+        'classname' => tool_muprog\external\form_source_cohort_edit_cohortids::class,
+        'description' => 'Return list of cohorts for cohort allocation.',
+        'type' => 'read',
+        'ajax' => true,
+        'loginrequired' => true,
+    ],
     'tool_muprog_form_program_content_import_fromprogram' => [
         'classname' => tool_muprog\external\form_program_content_import_fromprogram::class,
         'description' => 'Return list of programs that can be used as source for importing of content.',

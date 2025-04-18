@@ -47,11 +47,11 @@ final class source_cohort_get_cohorts_test extends \advanced_testcase {
         $cohort2 = $this->getDataGenerator()->create_cohort();
         $program1 = $generator->create_program([
             'contextid' => $catcontext1->id,
-            'sources' => ['cohort' => ['cohorts' => [$cohort2->id, $cohort1->id]]],
+            'sources' => ['cohort' => ['cohortids' => [$cohort2->id, $cohort1->id]]],
         ]);
         $program2 = $generator->create_program([
             'contextid' => $syscontext->id,
-            'sources' => ['cohort' => ['cohorts' => [$cohort2->id]]],
+            'sources' => ['cohort' => ['cohortids' => [$cohort2->id]]],
         ]);
 
         $user1 = $this->getDataGenerator()->create_user();

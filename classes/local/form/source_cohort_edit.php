@@ -21,6 +21,7 @@ namespace tool_muprog\local\form;
 use tool_muprog\local\program;
 use tool_muprog\local\allocation;
 use tool_muprog\local\source\cohort;
+use tool_muprog\external\form_source_cohort_edit_cohortids;
 
 /**
  * Edit cohort allocation settings.
@@ -34,7 +35,6 @@ use tool_muprog\local\source\cohort;
 final class source_cohort_edit extends \tool_mulib\local\dialog_form {
     #[\Override]
     protected function definition() {
-        global $DB;
         $mform = $this->_form;
         $context = $this->_customdata['context'];
         $source = $this->_customdata['source'];
@@ -46,18 +46,11 @@ final class source_cohort_edit extends \tool_mulib\local\dialog_form {
             $mform->hardFreeze('enable');
         }
 
-        $options = ['contextid' => $context->id, 'multiple' => true];
-        /** @var \MoodleQuickForm_cohort $cohortsel */
-        $cohortsel = $mform->addElement('cohort', 'cohorts', get_string('source_cohort_cohortstoallocate',
-            'tool_muprog'), $options);
-        // WARNING: The cohort element is not great at all, work around the current value problems here in a very hacky way.
+        form_source_cohort_edit_cohortids::add_form_element(
+            $mform, ['programid' => $program->id], 'cohortids', get_string('source_cohort_cohortstoallocate', 'tool_muprog'));
         if (!empty($source->id)) {
             $cohorts = cohort::fetch_allocation_cohorts_menu($source->id);
-            $cohorts = array_map('format_string', $cohorts);
-            foreach ($cohorts as $cid => $cname) {
-                $cohortsel->addOption($cname, $cid);
-            }
-            $cohortsel->setSelected(array_keys($cohorts));
+            $mform->setDefault('cohortids', array_keys($cohorts));
         }
         $mform->hideIf('cohorts', 'enable', 'eq', 0);
 
@@ -75,6 +68,17 @@ final class source_cohort_edit extends \tool_mulib\local\dialog_form {
     #[\Override]
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
+        $program = $this->_customdata['program'];
+
+        if ($data['enable']) {
+            foreach ($data['cohortids'] as $cohortid) {
+                $error = form_source_cohort_edit_cohortids::validate_cohortid($cohortid, $program->id);
+                if ($error !== null) {
+                    $errors['cohorts'] = $error;
+                    break;
+                }
+            }
+        }
 
         return $errors;
     }

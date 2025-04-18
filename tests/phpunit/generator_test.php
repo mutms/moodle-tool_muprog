@@ -127,7 +127,7 @@ final class generator_test extends \advanced_testcase {
         $this->assertSame((string)$catcontext2->id, $program->contextid);
 
         $data = (object)[
-            'cohorts' => "$cohort1->name, $cohort2->id",
+            'cohortids' => "$cohort1->name, $cohort2->id",
         ];
         $program = $generator->create_program($data);
         $cs = $DB->get_records('tool_muprog_cohort', ['programid' => $program->id]);

@@ -124,15 +124,15 @@ final class selfallocation_test extends \advanced_testcase {
         $this->assertTrue(\tool_muprog\local\source\selfallocation::can_user_request($program1, $source1a, $user1->id));
 
         $program1 = program::update_visibility((object)['id' => $program1->id,
-            'public' => 0, 'cohorts' => [$cohort1->id]]);
+            'public' => 0, 'cohortids' => [$cohort1->id]]);
         $this->assertTrue(\tool_muprog\local\source\selfallocation::can_user_request($program1, $source1a, $user1->id));
 
         $program1 = program::update_visibility((object)['id' => $program1->id,
-            'public' => 0, 'cohorts' => []]);
+            'public' => 0, 'cohortids' => []]);
         $this->assertFalse(\tool_muprog\local\source\selfallocation::can_user_request($program1, $source1a, $user1->id));
 
         $program1 = program::update_visibility((object)['id' => $program1->id,
-            'public' => 1, 'cohorts' => [$cohort1->id]]);
+            'public' => 1, 'cohortids' => [$cohort1->id]]);
         $this->assertTrue(\tool_muprog\local\source\selfallocation::can_user_request($program1, $source1a, $user1->id));
 
         // Allocated already.

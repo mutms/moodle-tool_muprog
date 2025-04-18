@@ -69,7 +69,7 @@ final class cohort_test extends \advanced_testcase {
         $cohort1 = $this->getDataGenerator()->create_cohort();
         $cohort2 = $this->getDataGenerator()->create_cohort();
 
-        $program1 = $generator->create_program(['sources' => ['manual' => [], 'cohort' => ['cohorts' => [$cohort1->id]]]]);
+        $program1 = $generator->create_program(['sources' => ['manual' => [], 'cohort' => ['cohortids' => [$cohort1->id]]]]);
         $source1m = $DB->get_record('tool_muprog_source', ['programid' => $program1->id, 'type' => 'manual'], '*', MUST_EXIST);
         $source1c = $DB->get_record('tool_muprog_source', ['programid' => $program1->id, 'type' => 'cohort'], '*', MUST_EXIST);
 
@@ -77,12 +77,12 @@ final class cohort_test extends \advanced_testcase {
         \cohort_add_member($cohort2->id, $user1->id);
         \cohort_add_member($cohort2->id, $user2->id);
         $program1 = program::update_visibility(
-            (object)['id' => $program1->id, 'public' => 1, 'cohorts' => [$cohort1->id, $cohort2->id]]);
+            (object)['id' => $program1->id, 'public' => 1, 'cohortids' => [$cohort1->id, $cohort2->id]]);
         $allocations = $DB->get_records('tool_muprog_allocation', ['programid' => $program1->id], 'userid ASC');
         $this->assertCount(1, $allocations);
 
         $program1 = program::update_visibility(
-            (object)['id' => $program1->id, 'public' => 1, 'cohorts' => []]);
+            (object)['id' => $program1->id, 'public' => 1, 'cohortids' => []]);
         $allocations = $DB->get_records('tool_muprog_allocation', ['programid' => $program1->id], 'userid ASC');
         $this->assertCount(1, $allocations);
     }
@@ -96,8 +96,8 @@ final class cohort_test extends \advanced_testcase {
         $cohort2 = $this->getDataGenerator()->create_cohort(['name' => 'Cohort B']);
         $cohort3 = $this->getDataGenerator()->create_cohort(['name' => 'Cohort C']);
 
-        $program1 = $generator->create_program(['sources' => ['cohort' => ['cohorts' => [$cohort1->id, $cohort2->id]]]]);
-        $program2 = $generator->create_program(['sources' => ['cohort' => ['cohorts' => [$cohort1->id]]]]);
+        $program1 = $generator->create_program(['sources' => ['cohort' => ['cohortids' => [$cohort1->id, $cohort2->id]]]]);
+        $program2 = $generator->create_program(['sources' => ['cohort' => ['cohortids' => [$cohort1->id]]]]);
         $program3 = $generator->create_program();
 
         $source1id = $DB->get_field('tool_muprog_source', 'id', ['programid' => $program1->id, 'type' => 'cohort']);
@@ -310,11 +310,11 @@ final class cohort_test extends \advanced_testcase {
         $cohort2 = $this->getDataGenerator()->create_cohort();
         $cohort3 = $this->getDataGenerator()->create_cohort();
 
-        $program1 = $generator->create_program(['sources' => ['manual' => [], 'cohort' => ['cohorts' => [$cohort1->id, $cohort2->id]]]]);
+        $program1 = $generator->create_program(['sources' => ['manual' => [], 'cohort' => ['cohortids' => [$cohort1->id, $cohort2->id]]]]);
         $source1m = $DB->get_record('tool_muprog_source', ['programid' => $program1->id, 'type' => 'manual'], '*', MUST_EXIST);
         $source1c = $DB->get_record('tool_muprog_source', ['programid' => $program1->id, 'type' => 'cohort'], '*', MUST_EXIST);
 
-        $program2 = $generator->create_program(['sources' => ['manual' => [], 'cohort' => ['cohorts' => [$cohort1->id]]], 'archived' => 1]);
+        $program2 = $generator->create_program(['sources' => ['manual' => [], 'cohort' => ['cohortids' => [$cohort1->id]]], 'archived' => 1]);
         $source2m = $DB->get_record('tool_muprog_source', ['programid' => $program2->id, 'type' => 'manual'], '*', MUST_EXIST);
         $source2c = $DB->get_record('tool_muprog_source', ['programid' => $program2->id, 'type' => 'cohort'], '*', MUST_EXIST);
 
@@ -422,8 +422,8 @@ final class cohort_test extends \advanced_testcase {
         $cohort2 = $this->getDataGenerator()->create_cohort();
         $cohort3 = $this->getDataGenerator()->create_cohort();
 
-        $program1 = $generator->create_program(['sources' => ['cohort' => ['cohorts' => [$cohort1->id]]]]);
-        $program2 = $generator->create_program(['sources' => ['cohort' => ['cohorts' => [$cohort2->id, $cohort3->id]]]]);
+        $program1 = $generator->create_program(['sources' => ['cohort' => ['cohortids' => [$cohort1->id]]]]);
+        $program2 = $generator->create_program(['sources' => ['cohort' => ['cohortids' => [$cohort2->id, $cohort3->id]]]]);
         $program3 = $generator->create_program(['sources' => []]);
 
         $sql = "SELECT c.cohortid

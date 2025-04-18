@@ -56,9 +56,8 @@ final class source_cohort_delete_cohort extends external_api {
      */
     public static function execute(int $programid, int $cohortid): array {
         global $DB;
-        $params = self::validate_parameters(self::execute_parameters(), ['programid' => $programid, 'cohortid' => $cohortid]);
-        $programid = $params['programid'];
-        $cohortid = $params['cohortid'];
+        ['programid' => $programid, 'cohortid' => $cohortid] = self::validate_parameters(
+            self::execute_parameters(), ['programid' => $programid, 'cohortid' => $cohortid]);
 
         $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
         $source = $DB->get_record('tool_muprog_source', ['programid' => $program->id, 'type' => 'cohort'], '*', MUST_EXIST);
@@ -76,7 +75,7 @@ final class source_cohort_delete_cohort extends external_api {
                 'type' => $source->type,
                 'programid' => $source->programid,
                 'enable' => 1,
-                'cohorts' => array_keys($oldcohorts),
+                'cohortids' => array_keys($oldcohorts),
             ];
             cohort::update_source($data);
         }

@@ -294,12 +294,12 @@ final class management_test extends \advanced_testcase {
         \tool_muprog\local\program::update_visibility((object)[
             'id' => $program1->id,
             'public' => 0,
-            'cohorts' => [$cohort1->id, $cohort2->id],
+            'cohortids' => [$cohort1->id, $cohort2->id],
         ]);
         \tool_muprog\local\program::update_visibility((object)[
             'id' => $program2->id,
             'public' => 1,
-            'cohorts' => [$cohort3->id],
+            'cohortids' => [$cohort3->id],
         ]);
 
         $expected = [

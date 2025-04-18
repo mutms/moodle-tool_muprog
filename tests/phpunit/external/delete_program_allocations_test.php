@@ -56,7 +56,7 @@ final class delete_program_allocations_test extends \advanced_testcase {
         $source1s = $DB->get_record('tool_muprog_source',
             ['programid' => $program1->id, 'type' => 'selfallocation'], '*', MUST_EXIST);
         $program2 = $generator->create_program(
-            ['sources' => ['manual' => [], 'cohort' => ['cohorts' => [$cohort1->id]]], 'contextid' => $catcontext1->id]);
+            ['sources' => ['manual' => [], 'cohort' => ['cohortids' => [$cohort1->id]]], 'contextid' => $catcontext1->id]);
         $source2 = $DB->get_record('tool_muprog_source',
             ['programid' => $program2->id, 'type' => 'manual'], '*', MUST_EXIST);
 

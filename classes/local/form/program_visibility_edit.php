@@ -20,6 +20,7 @@
 namespace tool_muprog\local\form;
 
 use tool_muprog\local\management;
+use tool_muprog\external\form_program_visibility_edit_cohortids;
 
 /**
  * Edit program visibility.
@@ -41,17 +42,10 @@ final class program_visibility_edit extends \tool_mulib\local\dialog_form {
         $mform->setDefault('public', $data->public);
         $mform->addHelpButton('public', 'public', 'tool_muprog');
 
-        $options = ['contextid' => $context->id, 'multiple' => true];
-        /** @var \MoodleQuickForm_cohort $cohortsel */
-        $cohortsel = $mform->addElement('cohort', 'cohorts', get_string('cohorts', 'tool_muprog'), $options);
-        $mform->addHelpButton('cohorts', 'cohorts', 'tool_muprog');
-        // WARNING: The cohort element is not great at all, work around the current value problems here in a very hacky way.
+        form_program_visibility_edit_cohortids::add_form_element(
+            $mform, ['programid' => $data->id], 'cohortids', get_string('cohorts', 'tool_muprog'));
         $cohorts = management::fetch_current_cohorts_menu($data->id);
-        $cohorts = array_map('format_string', $cohorts);
-        foreach ($cohorts as $cid => $cname) {
-            $cohortsel->addOption($cname, $cid);
-        }
-        $cohortsel->setSelected(array_keys($cohorts));
+        $mform->setDefault('cohortids', array_keys($cohorts));
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
@@ -62,27 +56,14 @@ final class program_visibility_edit extends \tool_mulib\local\dialog_form {
 
     #[\Override]
     public function validation($data, $files) {
-        global $DB;
-
         $errors = parent::validation($data, $files);
 
-        $currentcohorts = management::fetch_current_cohorts_menu($data['id']);
-        foreach ($data['cohorts'] as $cohortid) {
-            if (isset($currentcohorts[$cohortid])) {
-                // Allow current.
-                continue;
+        foreach ($data['cohortids'] as $cohortid) {
+            $error = form_program_visibility_edit_cohortids::validate_cohortid($cohortid, $data['id']);
+            if ($error !== null) {
+                $errors['cohorts'] = $error;
+                break;
             }
-            $cohort = $DB->get_record('cohort', ['id' => $cohortid], 'id, contextid, visible');
-            if ($cohort->visible) {
-                // NOTE: add some tenant restrictions here if necessary.
-                continue;
-            }
-            $cohortcontext = \context::instance_by_id($cohort->contextid);
-            if (has_capability('moodle/cohort:view', $cohortcontext)) {
-                continue;
-            }
-            $errors['cohorts'] = get_string('error');
-            break;
         }
 
         return $errors;
