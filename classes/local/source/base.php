@@ -241,10 +241,7 @@ abstract class base {
         $record->id = $DB->insert_record('tool_muprog_allocation', $record);
         $allocation = $DB->get_record('tool_muprog_allocation', ['id' => $record->id], '*', MUST_EXIST);
 
-        \tool_muprog\local\allocation::make_snapshot($allocation->id, 'allocation');
-
-        $event = \tool_muprog\event\user_allocated::create_from_allocation($allocation, $program);
-        $event->trigger();
+        \tool_muprog\event\allocation_created::create_from_allocation($allocation, $program)->trigger();
 
         \tool_muprog\local\notification\allocation::notify_now($user, $program, $source, $allocation);
 
@@ -459,8 +456,6 @@ abstract class base {
         }
         $sourceclass::after_update($oldsource, $data, $source);
 
-        \tool_muprog\local\program::make_snapshot($data->programid, 'update_source');
-
         \tool_muprog\local\allocation::fix_allocation_sources($program->id, null);
         \tool_muprog\local\allocation::fix_enrol_instances($program->id);
         \tool_muprog\local\allocation::fix_user_enrolments($program->id, null);
@@ -484,6 +479,69 @@ abstract class base {
     }
 
     /**
+     * Manually update user allocation data including program completion.
+     *
+     * @param stdClass $allocation
+     * @return stdClass
+     */
+    final public static function update_allocation(stdClass $allocation): stdClass {
+        global $DB;
+
+        $allocation = (object)(array)$allocation;
+
+        $record = $DB->get_record('tool_muprog_allocation', ['id' => $allocation->id], '*', MUST_EXIST);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $record->programid], '*', MUST_EXIST);
+
+        unset($allocation->userid);
+        unset($allocation->sourceid);
+        foreach ((array)$record as $k => $v) {
+            if (!property_exists($allocation, $k)) {
+                $allocation->$k = $v;
+            }
+        }
+
+        $trans = $DB->start_delegated_transaction();
+
+        $record->archived = (int)(bool)$allocation->archived;
+        $record->timeallocated = $allocation->timeallocated;
+        $record->timestart = $allocation->timestart;
+        $record->timedue = $allocation->timedue;
+        if (!$record->timedue) {
+            $record->timedue = null;
+        } else if ($record->timedue <= $record->timestart) {
+            throw new \coding_exception('invalid due date');
+        }
+        $record->timeend = $allocation->timeend;
+        if (!$record->timeend) {
+            $record->timeend = null;
+        } else if ($record->timeend <= $record->timestart) {
+            throw new \coding_exception('invalid end date');
+        }
+        if ($record->timedue && $record->timeend && $record->timedue > $record->timeend) {
+            throw new \coding_exception('invalid due date');
+        }
+        $record->timecompleted = $allocation->timecompleted;
+        if (!$record->timecompleted) {
+            $record->timecompleted = null;
+        }
+
+        $DB->update_record('tool_muprog_allocation', $record);
+        $allocation = $DB->get_record('tool_muprog_allocation', ['id' => $allocation->id], '*', MUST_EXIST);
+
+        \tool_muprog\event\allocation_updated::create_from_allocation($allocation, $program)->trigger();
+
+        $trans->allow_commit();
+
+        allocation::fix_allocation_sources($allocation->programid, $allocation->userid);
+        allocation::fix_user_enrolments($allocation->programid, $allocation->userid);
+        \tool_muprog\local\calendar::fix_allocation_events($allocation, $program);
+
+        \tool_muprog\local\notification_manager::trigger_notifications($allocation->programid, $allocation->userid);
+
+        return $allocation;
+    }
+
+    /**
      * Deallocate user from a program.
      *
      * @param stdClass $program
@@ -492,7 +550,7 @@ abstract class base {
      * @param bool $skipnotify
      * @return void
      */
-    public static function deallocate_user(stdClass $program, stdClass $source, stdClass $allocation, bool $skipnotify = false): void {
+    final public static function deallocate_user(stdClass $program, stdClass $source, stdClass $allocation, bool $skipnotify = false): void {
         global $DB;
 
         if (static::get_type() !== $source->type || $program->id != $allocation->programid || $program->id != $source->programid) {
@@ -502,8 +560,6 @@ abstract class base {
 
         $trans = $DB->start_delegated_transaction();
 
-        \tool_muprog\local\allocation::make_snapshot($allocation->id, 'deallocation');
-
         if ($user && !$skipnotify) {
             \tool_muprog\local\notification\deallocation::notify_now($user, $program, $source, $allocation);
         }
@@ -511,14 +567,13 @@ abstract class base {
 
         self::purge_allocation($allocation->id);
 
+        \tool_muprog\event\allocation_deleted::create_from_allocation($allocation, $program)->trigger();
+
         $trans->allow_commit();
 
         \tool_muprog\local\allocation::fix_allocation_sources($program->id, $allocation->userid);
         \tool_muprog\local\allocation::fix_user_enrolments($program->id, $allocation->userid);
         \tool_muprog\local\calendar::delete_allocation_events($allocation->id);
-
-        $event = \tool_muprog\event\user_deallocated::create_from_allocation($allocation, $program);
-        $event->trigger();
     }
 
     /**

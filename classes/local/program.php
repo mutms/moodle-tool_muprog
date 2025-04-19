@@ -230,17 +230,16 @@ final class program {
         $item->minpoints = null;
         $DB->insert_record('tool_muprog_item', $item);
 
-        $program = self::make_snapshot($data->id, 'add');
+        $program = $DB->get_record('tool_muprog_program', ['id' => $data->id], '*', MUST_EXIST);
 
         // Save custom fields if there are any of them in the form.
         $handler = \tool_muprog\customfield\fields_handler::create();
         $data->id = $program->id;
         $handler->instance_form_save($data);
 
-        $trans->allow_commit();
+        \tool_muprog\event\program_created::create_from_program($program)->trigger();
 
-        $event = \tool_muprog\event\program_created::create_from_program($program);
-        $event->trigger();
+        $trans->allow_commit();
 
         allocation::fix_allocation_sources($program->id, null);
         allocation::fix_enrol_instances($program->id);
@@ -371,7 +370,9 @@ final class program {
             calendar::invalidate_program_events($program->id);
         }
 
-        $program = self::make_snapshot($program->id, 'update_general');
+        $program = $DB->get_record('tool_muprog_program', ['id' => $program->id], '*', MUST_EXIST);
+
+        \tool_muprog\event\program_updated::create_from_program($program)->trigger();
 
         $trans->allow_commit();
 
@@ -379,9 +380,6 @@ final class program {
         allocation::fix_enrol_instances($program->id);
         allocation::fix_user_enrolments($program->id, null);
         calendar::fix_program_events($program);
-
-        $event = \tool_muprog\event\program_updated::create_from_program($program);
-        $event->trigger();
 
         return $program;
     }
@@ -433,7 +431,9 @@ final class program {
         $trans = $DB->start_delegated_transaction();
 
         $DB->set_field('tool_muprog_program', 'archived', '1', ['id' => $program->id]);
-        $program = self::make_snapshot($program->id, 'archive');
+        $program = $DB->get_record('tool_muprog_program', ['id' => $program->id], '*', MUST_EXIST);
+
+        \tool_muprog\event\program_updated::create_from_program($program)->trigger();
 
         $trans->allow_commit();
 
@@ -441,9 +441,6 @@ final class program {
         allocation::fix_enrol_instances($program->id);
         allocation::fix_user_enrolments($program->id, null);
         calendar::fix_program_events($program);
-
-        $event = \tool_muprog\event\program_updated::create_from_program($program);
-        $event->trigger();
 
         return $program;
     }
@@ -466,7 +463,9 @@ final class program {
         $trans = $DB->start_delegated_transaction();
 
         $DB->set_field('tool_muprog_program', 'archived', '0', ['id' => $program->id]);
-        $program = self::make_snapshot($program->id, 'restore');
+        $program = $DB->get_record('tool_muprog_program', ['id' => $program->id], '*', MUST_EXIST);
+
+        \tool_muprog\event\program_updated::create_from_program($program)->trigger();
 
         $trans->allow_commit();
 
@@ -474,9 +473,6 @@ final class program {
         allocation::fix_enrol_instances($program->id);
         allocation::fix_user_enrolments($program->id, null);
         calendar::fix_program_events($program);
-
-        $event = \tool_muprog\event\program_updated::create_from_program($program);
-        $event->trigger();
 
         return $program;
     }
@@ -525,16 +521,15 @@ final class program {
             }
         }
 
-        $program = self::make_snapshot($data->id, 'update_visibility');
+        $program = $DB->get_record('tool_muprog_program', ['id' => $data->id], '*', MUST_EXIST);
+
+        \tool_muprog\event\program_updated::create_from_program($program)->trigger();
 
         $trans->allow_commit();
 
         allocation::fix_allocation_sources($program->id, null);
         allocation::fix_enrol_instances($program->id);
         allocation::fix_user_enrolments($program->id, null);
-
-        $event = \tool_muprog\event\program_updated::create_from_program($program);
-        $event->trigger();
 
         return $program;
     }
@@ -588,7 +583,9 @@ final class program {
             $trans = $DB->start_delegated_transaction();
 
             $DB->update_record('tool_muprog_program', $record);
-            $program = self::make_snapshot($data->id, 'update_allocation');
+            $program = $DB->get_record('tool_muprog_program', ['id' => $record->id], '*', MUST_EXIST);
+
+            \tool_muprog\event\program_updated::create_from_program($program)->trigger();
 
             $trans->allow_commit();
         } else {
@@ -601,8 +598,6 @@ final class program {
 
         if ($updated) {
             calendar::fix_program_events($program);
-            $event = \tool_muprog\event\program_updated::create_from_program($program);
-            $event->trigger();
         }
 
         return $program;
@@ -671,14 +666,14 @@ final class program {
                 throw new \coding_exception('Cannot import source ' . $sourcetype);
             }
             $sourceclass::import_source_data($data->fromprogram, $data->id);
+
+            $targetprogram = $DB->get_record('tool_muprog_program', ['id' => $targetprogram->id], '*', MUST_EXIST);
+            \tool_muprog\event\program_updated::create_from_program($targetprogram)->trigger();
+
             $updated = true;
         }
 
         $trans->allow_commit();
-
-        if ($updated) {
-            $targetprogram = self::make_snapshot($targetprogram->id, 'import_allocation');
-        }
 
         allocation::fix_allocation_sources($targetprogram->id, null);
         allocation::fix_enrol_instances($targetprogram->id);
@@ -686,8 +681,6 @@ final class program {
 
         if ($updated) {
             calendar::fix_program_events($targetprogram);
-            $event = \tool_muprog\event\program_updated::create_from_program($targetprogram);
-            $event->trigger();
         }
 
         return $targetprogram;
@@ -827,7 +820,9 @@ final class program {
 
         $DB->update_record('tool_muprog_program', $record);
 
-        $program = self::make_snapshot($data->id, 'update_scheduling');
+        $program = $DB->get_record('tool_muprog_program', ['id' => $data->id], '*', MUST_EXIST);
+
+        \tool_muprog\event\program_updated::create_from_program($program)->trigger();
 
         $trans->allow_commit();
 
@@ -835,9 +830,6 @@ final class program {
         allocation::fix_enrol_instances($program->id);
         allocation::fix_user_enrolments($program->id, null);
         calendar::fix_program_events($program);
-
-        $event = \tool_muprog\event\program_updated::create_from_program($program);
-        $event->trigger();
 
         return $program;
     }
@@ -856,14 +848,6 @@ final class program {
 
         $program = $DB->get_record('tool_muprog_program', ['id' => $id], '*', MUST_EXIST);
         $context = \context::instance_by_id($program->contextid);
-
-        self::make_snapshot($program->id, 'delete_before');
-
-        $allocations = $DB->get_records('tool_muprog_allocation', ['programid' => $program->id], 'userid ASC', 'id');
-        foreach ($allocations as $allocation) {
-            allocation::make_snapshot($allocation->id, 'program_delete');
-        }
-        unset($allocations);
 
         $pgs = $DB->get_records('tool_muprog_group', ['programid' => $program->id]);
         foreach ($pgs as $pg) {
@@ -903,10 +887,10 @@ final class program {
 
         $DB->delete_records('tool_muprog_program', ['id' => $program->id]);
 
-        self::make_snapshot($program->id, 'delete');
-
         $handler = \tool_muprog\customfield\fields_handler::create();
         $handler->delete_instance($program->id);
+
+        \tool_muprog\event\program_deleted::create_from_program($program)->trigger();
 
         $trans->allow_commit();
 
@@ -914,49 +898,6 @@ final class program {
         allocation::fix_enrol_instances($program->id);
 
         calendar::delete_program_events($program->id);
-
-        $event = \tool_muprog\event\program_deleted::create_from_program($program);
-        $event->trigger();
-    }
-
-    /**
-     * Make a full program snapshot.
-     *
-     * @param int $programid
-     * @param string $reason
-     * @param string|null $explanation
-     * @return \stdClass|null null of program does not exist any more, program record otherwise
-     */
-    public static function make_snapshot(int $programid, string $reason, ?string $explanation = null): ?\stdClass {
-        global $DB, $USER;
-
-        $data = new \stdClass();
-        $data->programid = $programid;
-        $data->reason = $reason;
-        $data->timesnapshot = time();
-        if ($USER->id > 0) {
-            $data->snapshotby = $USER->id;
-        }
-        $data->explanation = $explanation;
-
-        if ($reason === 'delete') {
-            if ($DB->record_exists('tool_muprog_program', ['id' => $programid])) {
-                throw new \coding_exception('deleted program must not exist');
-            }
-            $DB->insert_record('tool_muprog_prg_snapshot', $data);
-            return null;
-        }
-
-        $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
-
-        $data->programjson = util::json_encode($program);
-        $data->itemsjson = util::json_encode($DB->get_records('tool_muprog_item', ['programid' => $program->id], 'id ASC'));
-        $data->cohortsjson = util::json_encode($DB->get_records('tool_muprog_cohort', ['programid' => $program->id], 'id ASC'));
-        $data->sourcesjson = util::json_encode($DB->get_records('tool_muprog_source', ['programid' => $program->id], 'id ASC'));
-
-        $DB->insert_record('tool_muprog_prg_snapshot', $data);
-
-        return $program;
     }
 
     /**

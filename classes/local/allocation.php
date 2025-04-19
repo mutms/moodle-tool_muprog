@@ -846,7 +846,7 @@ final class allocation {
         $rs->close();
 
         // Finally, if top program item is completed, copy the completion time to program allocation,
-        // we do this in a loop one by one in order to trigger the program_completed event.
+        // we do this in a loop one by one in order to trigger the allocation_completed event.
         if ($trace) {
             $trace->output('completing programs', 1);
         }
@@ -882,9 +882,7 @@ final class allocation {
             $source = $DB->get_record('tool_muprog_source', ['id' => $allocation->sourceid]);
             $user = $DB->get_record('user', ['id' => $allocation->userid]);
 
-            self::make_snapshot($allocation->id, 'completion');
-            $event = \tool_muprog\event\program_completed::create_from_allocation($allocation, $program);
-            $event->trigger();
+            \tool_muprog\event\allocation_completed::create_from_allocation($allocation, $program)->trigger();
             notification\completion::notify_now($user, $program, $source, $allocation);
             calendar::delete_allocation_events($allocation->id);
         }
@@ -943,70 +941,6 @@ final class allocation {
     }
 
     /**
-     * Manually update user allocation data including program completion.
-     *
-     * @param stdClass $allocation
-     * @return stdClass
-     */
-    public static function update_user(stdClass $allocation): stdClass {
-        global $DB;
-
-        $allocation = (object)(array)$allocation;
-
-        $record = $DB->get_record('tool_muprog_allocation', ['id' => $allocation->id], '*', MUST_EXIST);
-        $program = $DB->get_record('tool_muprog_program', ['id' => $record->programid], '*', MUST_EXIST);
-
-        unset($allocation->userid);
-        unset($allocation->sourceid);
-        foreach ((array)$record as $k => $v) {
-            if (!property_exists($allocation, $k)) {
-                $allocation->$k = $v;
-            }
-        }
-
-        $trans = $DB->start_delegated_transaction();
-
-        self::make_snapshot($record->id, 'allocation_edit_before');
-
-        $record->archived = (int)(bool)$allocation->archived;
-        $record->timeallocated = $allocation->timeallocated;
-        $record->timestart = $allocation->timestart;
-        $record->timedue = $allocation->timedue;
-        if (!$record->timedue) {
-            $record->timedue = null;
-        } else if ($record->timedue <= $record->timestart) {
-            throw new \coding_exception('invalid due date');
-        }
-        $record->timeend = $allocation->timeend;
-        if (!$record->timeend) {
-            $record->timeend = null;
-        } else if ($record->timeend <= $record->timestart) {
-            throw new \coding_exception('invalid end date');
-        }
-        if ($record->timedue && $record->timeend && $record->timedue > $record->timeend) {
-            throw new \coding_exception('invalid due date');
-        }
-        $record->timecompleted = $allocation->timecompleted;
-        if (!$record->timecompleted) {
-            $record->timecompleted = null;
-        }
-
-        $DB->update_record('tool_muprog_allocation', $record);
-
-        $allocation = self::make_snapshot($record->id, 'allocation_edit');
-
-        $trans->allow_commit();
-
-        self::fix_allocation_sources($allocation->programid, $allocation->userid);
-        self::fix_user_enrolments($allocation->programid, $allocation->userid);
-        calendar::fix_allocation_events($allocation, $program);
-
-        notification_manager::trigger_notifications($allocation->programid, $allocation->userid);
-
-        return $allocation;
-    }
-
-    /**
      * Reset user program progress.
      *
      * @param stdClass $data
@@ -1045,8 +979,6 @@ final class allocation {
 
         $trans = $DB->start_delegated_transaction();
 
-        self::make_snapshot($record->id, 'allocation_reset_before');
-
         course_reset::purge_enrolments($user, $record->programid);
         if ($data->resettype == course_reset::RESETTYPE_STANDARD) {
             course_reset::purge_standard($user, $record->programid);
@@ -1062,8 +994,7 @@ final class allocation {
 
         $record->timecompleted = null;
         $DB->update_record('tool_muprog_allocation', $record);
-
-        $allocation = self::make_snapshot($record->id, 'allocation_reset');
+        $allocation = $DB->get_record('tool_muprog_allocation', ['id' => $record->id], '*', MUST_EXIST);
 
         $trans->allow_commit();
 
@@ -1092,8 +1023,6 @@ final class allocation {
         $item = $DB->get_record('tool_muprog_item', ['id' => $data->itemid, 'programid' => $allocation->programid], '*', MUST_EXIST);
         $completion = $DB->get_record('tool_muprog_completion', ['allocationid' => $allocation->id, 'itemid' => $item->id]);
 
-        self::make_snapshot($allocation->id, 'completion_edit_before');
-
         if ($data->timecompleted) {
             if ($completion) {
                 $DB->set_field('tool_muprog_completion', 'timecompleted', $data->timecompleted, ['id' => $completion->id]);
@@ -1109,8 +1038,6 @@ final class allocation {
                 $DB->delete_records('tool_muprog_completion', ['id' => $completion->id]);
             }
         }
-
-        self::make_snapshot($allocation->id, 'completion_edit');
 
         $trans->allow_commit();
 
@@ -1134,8 +1061,6 @@ final class allocation {
         $item = $DB->get_record('tool_muprog_item', ['id' => $data->itemid, 'programid' => $allocation->programid], '*', MUST_EXIST);
         $completion = $DB->get_record('tool_muprog_completion', ['allocationid' => $allocation->id, 'itemid' => $item->id]);
         $evidence = $DB->get_record('tool_muprog_evidence', ['userid' => $allocation->userid, 'itemid' => $item->id]);
-
-        self::make_snapshot($allocation->id, 'evidence_edit_before');
 
         if ($data->evidencetimecompleted) {
             $evidencejson = util::json_encode(['details' => $data->evidencedetails ?? '']);
@@ -1184,8 +1109,6 @@ final class allocation {
             }
         }
 
-        self::make_snapshot($allocation->id, 'evidence_edit');
-
         $trans->allow_commit();
 
         self::fix_user_enrolments($allocation->programid, $allocation->userid);
@@ -1198,11 +1121,11 @@ final class allocation {
             $completion = $DB->get_record('tool_muprog_completion', ['allocationid' => $allocation->id, 'itemid' => $item->id]);
             if ($allocation->timecompleted && !$completion) {
                 $allocation->timecompleted = null;
-                self::update_user($allocation);
+                base::update_allocation($allocation);
             } else if ($completion && $completion->timecompleted <= time()) {
                 if ($allocation->timecompleted != $completion->timecompleted) {
                     $allocation->timecompleted = $completion->timecompleted;
-                    self::update_user($allocation);
+                    base::update_allocation($allocation);
                 }
             }
         }
@@ -1291,58 +1214,11 @@ final class allocation {
 
         $allocations = $DB->get_records('tool_muprog_allocation', ['userid' => $userid]);
         foreach ($allocations as $allocation) {
-            self::make_snapshot($allocation->id, 'user_deleted');
             $DB->delete_records('tool_muprog_completion', ['allocationid' => $allocation->id]);
         }
         $DB->delete_records('tool_muprog_evidence', ['userid' => $userid]);
         $DB->delete_records('tool_muprog_allocation', ['userid' => $userid]);
         $DB->delete_records('tool_muprog_request', ['userid' => $userid]);
-    }
-
-    /**
-     * Make a full user allocation snapshot.
-     *
-     * @param int $allocationid
-     * @param string $reason snapshot reason type
-     * @param string|null $explanation
-     * @return \stdClass|null allocation record or null if not exists any more
-     */
-    public static function make_snapshot(int $allocationid, string $reason, ?string $explanation = null): ?\stdClass {
-        global $DB, $USER;
-
-        $allocation = $DB->get_record('tool_muprog_allocation', ['id' => $allocationid]);
-        if (!$allocation) {
-            // Must have been just deleted.
-            return null;
-        }
-
-        $data = new \stdClass();
-        $data->allocationid = $allocationid;
-        $data->reason = $reason;
-        $data->timesnapshot = time();
-        if ($USER->id > 0) {
-            $data->snapshotby = $USER->id;
-        }
-        $data->explanation = $explanation;
-
-        foreach ((array)$allocation as $k => $v) {
-            if ($k === 'id' || $k === 'timecreated') {
-                continue;
-            }
-            $data->{$k} = $v;
-        }
-
-        $data->completionsjson = util::json_encode($DB->get_records('tool_muprog_completion', ['allocationid' => $allocation->id], 'id ASC'));
-        $sql = "SELECT e.*
-                  FROM {tool_muprog_evidence} e
-                  JOIN {tool_muprog_item} i ON i.id = e.itemid
-                 WHERE e.userid = :userid AND i.programid = :programid
-              ORDER BY e.id ASC";
-        $data->evidencesjson = util::json_encode($DB->get_records_sql($sql, ['userid' => $allocation->userid, 'programid' => $allocation->programid]));
-
-        $DB->insert_record('tool_muprog_usr_snapshot', $data);
-
-        return $allocation;
     }
 
     /**

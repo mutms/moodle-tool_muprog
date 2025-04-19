@@ -105,7 +105,7 @@ final class update_program_allocation extends external_api {
             throw new \invalid_parameter_exception('Allocation dates are invalid');
         }
 
-        $allocation = allocation::update_user($allocation);
+        $allocation = \tool_muprog\local\source\base::update_allocation($allocation);
         $allocation->sourcetype = $source->type;
         $allocation->deletesupported = $sourceclass::allocation_delete_supported($program, $source, $allocation);
         $allocation->editsupported = $sourceclass::allocation_edit_supported($program, $source, $allocation);

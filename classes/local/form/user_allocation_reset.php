@@ -52,9 +52,8 @@ final class user_allocation_reset extends \tool_mulib\local\dialog_form {
         ];
         $mform->addElement('select', 'resettype', get_string('resettype', 'tool_muprog'), $options);
 
-        /** @var \tool_muprog\local\source\base $coursceclass */
-        $coursceclass = allocation::get_source_classes()[$source->type];
-        if ($coursceclass::allocation_edit_supported($program, $source, $allocation)) {
+        $sourceclass = allocation::get_source_classname($source->type);
+        if ($sourceclass && $sourceclass::allocation_edit_supported($program, $source, $allocation)) {
             $this->editsupported = true;
             $mform->addElement('advcheckbox', 'updateallocation', get_string('updateallocation', 'tool_muprog'));
             $mform->addElement('date_time_selector', 'timestart', get_string('programstart_date', 'tool_muprog'), ['optional' => false]);

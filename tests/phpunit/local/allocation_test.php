@@ -505,43 +505,6 @@ final class allocation_test extends \advanced_testcase {
         \tool_muprog\local\allocation::fix_allocation_sources($program1->id, $user1->id);
     }
 
-    public function test_update_user(): void {
-        global $DB;
-
-        /** @var \tool_muprog_generator $generator */
-        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
-
-        $user1 = $this->getDataGenerator()->create_user();
-        $course1 = $this->getDataGenerator()->create_course();
-        $context1 = \context_course::instance($course1->id);
-        $program1 = $generator->create_program(['fullname' => 'hokus', 'sources' => ['manual' => []]]);
-        $source1 = $DB->get_record('tool_muprog_source', ['programid' => $program1->id, 'type' => 'manual'], '*', MUST_EXIST);
-        manual::allocate_users($program1->id, $source1->id, [$user1->id]);
-        $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
-
-        $now = time();
-
-        $allocation->archived = '0';
-        $allocation->timeallocated = (string)$now;
-        $allocation->timestart = (string)($now - 60 * 60 * 12);
-        $allocation->timedue = (string)($now + 60 * 60 * 10);
-        $allocation->timeend = (string)($now + 60 * 60 * 20);
-        $result = \tool_muprog\local\allocation::update_user($allocation);
-        $this->assertSame((array)$result, (array)$allocation);
-
-        $newallocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
-        $this->assertSame((array)$allocation, (array)$newallocation);
-
-        $allocation->archived = '1';
-        $allocation->timeallocated = (string)$now;
-        $allocation->timestart = (string)($now - 60 * 60 * 12);
-        $allocation->timedue = (string)($now + 60 * 60 * 10);
-        $allocation->timeend = (string)($now + 60 * 60 * 20);
-        \tool_muprog\local\allocation::update_user($allocation);
-        $newallocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
-        $this->assertSame((array)$allocation, (array)$newallocation);
-    }
-
     public function test_reset(): void {
         global $DB;
 
@@ -650,7 +613,7 @@ final class allocation_test extends \advanced_testcase {
         $allocation->timestart = (string)($now - 60 * 60 * 3);
         $allocation->timedue = (string)($now + 60 * 60 * 10);
         $allocation->timeend = (string)($now + 60 * 60 * 20);
-        \tool_muprog\local\allocation::update_user($allocation);
+        \tool_muprog\local\source\base::update_allocation($allocation);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $this->assertSame('Open', \tool_muprog\local\allocation::get_completion_status_plain($program1, $allocation));
 
@@ -713,7 +676,7 @@ final class allocation_test extends \advanced_testcase {
         $allocation->timestart = (string)($now - 60 * 60 * 3);
         $allocation->timedue = (string)($now + 60 * 60 * 10);
         $allocation->timeend = (string)($now + 60 * 60 * 20);
-        \tool_muprog\local\allocation::update_user($allocation);
+        \tool_muprog\local\source\base::update_allocation($allocation);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $this->assertSame('Open', \tool_muprog\local\allocation::get_completion_status_plain($program1, $allocation));
         $this->assertNull($allocation->timecompleted);
@@ -805,7 +768,7 @@ final class allocation_test extends \advanced_testcase {
         ];
         \tool_muprog\local\allocation::update_item_completion($data);
         $allocation->timecompleted = (string)($now - 2000);
-        \tool_muprog\local\allocation::update_user($allocation);
+        \tool_muprog\local\source\base::update_allocation($allocation);
 
         $data7 = (object)[
             'allocationid' => $allocation->id,
@@ -897,7 +860,7 @@ final class allocation_test extends \advanced_testcase {
         $allocation->timedue = (string)($now + 60 * 60 * 10);
         $allocation->timeend = (string)($now + 60 * 60 * 20);
         $allocation->timecompleted = null;
-        \tool_muprog\local\allocation::update_user($allocation);
+        \tool_muprog\local\source\base::update_allocation($allocation);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $this->assertSame('Not open yet', \tool_muprog\local\allocation::get_completion_status_plain($program1, $allocation));
 
@@ -908,7 +871,7 @@ final class allocation_test extends \advanced_testcase {
         $allocation->timedue = (string)($now + 60 * 60 * 10);
         $allocation->timeend = (string)($now + 60 * 60 * 20);
         $allocation->timecompleted = null;
-        \tool_muprog\local\allocation::update_user($allocation);
+        \tool_muprog\local\source\base::update_allocation($allocation);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $this->assertSame('Open', \tool_muprog\local\allocation::get_completion_status_plain($program1, $allocation));
 
@@ -919,7 +882,7 @@ final class allocation_test extends \advanced_testcase {
         $allocation->timedue = (string)($now - 60 * 60 * 1);
         $allocation->timeend = (string)($now + 60 * 60 * 20);
         $allocation->timecompleted = null;
-        \tool_muprog\local\allocation::update_user($allocation);
+        \tool_muprog\local\source\base::update_allocation($allocation);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $this->assertSame('Overdue', \tool_muprog\local\allocation::get_completion_status_plain($program1, $allocation));
 
@@ -930,7 +893,7 @@ final class allocation_test extends \advanced_testcase {
         $allocation->timedue = (string)($now - 60 * 60 * 5);
         $allocation->timeend = (string)($now - 60 * 60 * 1);
         $allocation->timecompleted = null;
-        \tool_muprog\local\allocation::update_user($allocation);
+        \tool_muprog\local\source\base::update_allocation($allocation);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $this->assertSame('Failed', \tool_muprog\local\allocation::get_completion_status_plain($program1, $allocation));
 
@@ -941,7 +904,7 @@ final class allocation_test extends \advanced_testcase {
         $allocation->timedue = (string)($now + 60 * 60 * 10);
         $allocation->timeend = (string)($now + 60 * 60 * 20);
         $allocation->timecompleted = (string)($now - 60 * 60 * 1);
-        \tool_muprog\local\allocation::update_user($allocation);
+        \tool_muprog\local\source\base::update_allocation($allocation);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $this->assertSame('Completed', \tool_muprog\local\allocation::get_completion_status_plain($program1, $allocation));
 
@@ -952,7 +915,7 @@ final class allocation_test extends \advanced_testcase {
         $allocation->timedue = (string)($now + 60 * 60 * 10);
         $allocation->timeend = (string)($now + 60 * 60 * 20);
         $allocation->timecompleted = (string)($now + 60 * 60 * 1);
-        \tool_muprog\local\allocation::update_user($allocation);
+        \tool_muprog\local\source\base::update_allocation($allocation);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $this->assertSame('Completed', \tool_muprog\local\allocation::get_completion_status_plain($program1, $allocation));
 
@@ -963,7 +926,7 @@ final class allocation_test extends \advanced_testcase {
         $allocation->timedue = (string)($now + 60 * 60 * 10);
         $allocation->timeend = (string)($now + 60 * 60 * 20);
         $allocation->timecompleted = null;
-        \tool_muprog\local\allocation::update_user($allocation);
+        \tool_muprog\local\source\base::update_allocation($allocation);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $this->assertSame('Archived', \tool_muprog\local\allocation::get_completion_status_plain($program1, $allocation));
 
@@ -974,7 +937,7 @@ final class allocation_test extends \advanced_testcase {
         $allocation->timedue = (string)($now + 60 * 60 * 10);
         $allocation->timeend = (string)($now + 60 * 60 * 20);
         $allocation->timecompleted = null;
-        \tool_muprog\local\allocation::update_user($allocation);
+        \tool_muprog\local\source\base::update_allocation($allocation);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $this->assertSame('Archived', \tool_muprog\local\allocation::get_completion_status_plain($program1, $allocation));
 
@@ -985,7 +948,7 @@ final class allocation_test extends \advanced_testcase {
         $allocation->timedue = (string)($now - 60 * 60 * 1);
         $allocation->timeend = (string)($now + 60 * 60 * 20);
         $allocation->timecompleted = null;
-        \tool_muprog\local\allocation::update_user($allocation);
+        \tool_muprog\local\source\base::update_allocation($allocation);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $this->assertSame('Archived', \tool_muprog\local\allocation::get_completion_status_plain($program1, $allocation));
 
@@ -996,7 +959,7 @@ final class allocation_test extends \advanced_testcase {
         $allocation->timedue = (string)($now - 60 * 60 * 5);
         $allocation->timeend = (string)($now - 60 * 60 * 1);
         $allocation->timecompleted = null;
-        \tool_muprog\local\allocation::update_user($allocation);
+        \tool_muprog\local\source\base::update_allocation($allocation);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $this->assertSame('Archived', \tool_muprog\local\allocation::get_completion_status_plain($program1, $allocation));
 
@@ -1007,7 +970,7 @@ final class allocation_test extends \advanced_testcase {
         $allocation->timedue = (string)($now + 60 * 60 * 10);
         $allocation->timeend = (string)($now + 60 * 60 * 20);
         $allocation->timecompleted = (string)($now - 60 * 60 * 1);
-        \tool_muprog\local\allocation::update_user($allocation);
+        \tool_muprog\local\source\base::update_allocation($allocation);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $this->assertSame('Archived completed', \tool_muprog\local\allocation::get_completion_status_plain($program1, $allocation));
 
@@ -1018,7 +981,7 @@ final class allocation_test extends \advanced_testcase {
         $allocation->timedue = (string)($now + 60 * 60 * 10);
         $allocation->timeend = (string)($now + 60 * 60 * 20);
         $allocation->timecompleted = (string)($now - 60 * 60 * 1);
-        \tool_muprog\local\allocation::update_user($allocation);
+        \tool_muprog\local\source\base::update_allocation($allocation);
         $program1 = \tool_muprog\local\program::archive($program1->id);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $this->assertSame('Archived completed', \tool_muprog\local\allocation::get_completion_status_plain($program1, $allocation));
@@ -1045,7 +1008,7 @@ final class allocation_test extends \advanced_testcase {
         $allocation->timedue = (string)($now + 60 * 60 * 10);
         $allocation->timeend = (string)($now + 60 * 60 * 20);
         $allocation->timecompleted = null;
-        \tool_muprog\local\allocation::update_user($allocation);
+        \tool_muprog\local\source\base::update_allocation($allocation);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $this->assertStringContainsString('Not open yet', \tool_muprog\local\allocation::get_completion_status_html($program1, $allocation));
 
@@ -1056,7 +1019,7 @@ final class allocation_test extends \advanced_testcase {
         $allocation->timedue = (string)($now + 60 * 60 * 10);
         $allocation->timeend = (string)($now + 60 * 60 * 20);
         $allocation->timecompleted = null;
-        \tool_muprog\local\allocation::update_user($allocation);
+        \tool_muprog\local\source\base::update_allocation($allocation);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $this->assertStringContainsString('Open', allocation::get_completion_status_html($program1, $allocation));
 
@@ -1067,7 +1030,7 @@ final class allocation_test extends \advanced_testcase {
         $allocation->timedue = (string)($now - 60 * 60 * 1);
         $allocation->timeend = (string)($now + 60 * 60 * 20);
         $allocation->timecompleted = null;
-        allocation::update_user($allocation);
+        manual::update_allocation($allocation);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $this->assertStringContainsString('Overdue', allocation::get_completion_status_html($program1, $allocation));
 
@@ -1078,7 +1041,7 @@ final class allocation_test extends \advanced_testcase {
         $allocation->timedue = (string)($now - 60 * 60 * 5);
         $allocation->timeend = (string)($now - 60 * 60 * 1);
         $allocation->timecompleted = null;
-        allocation::update_user($allocation);
+        manual::update_allocation($allocation);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $this->assertStringContainsString('Failed', allocation::get_completion_status_html($program1, $allocation));
 
@@ -1089,7 +1052,7 @@ final class allocation_test extends \advanced_testcase {
         $allocation->timedue = (string)($now + 60 * 60 * 10);
         $allocation->timeend = (string)($now + 60 * 60 * 20);
         $allocation->timecompleted = (string)($now - 60 * 60 * 1);
-        allocation::update_user($allocation);
+        manual::update_allocation($allocation);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $this->assertStringContainsString('Completed', allocation::get_completion_status_html($program1, $allocation));
 
@@ -1100,7 +1063,7 @@ final class allocation_test extends \advanced_testcase {
         $allocation->timedue = (string)($now + 60 * 60 * 10);
         $allocation->timeend = (string)($now + 60 * 60 * 20);
         $allocation->timecompleted = (string)($now + 60 * 60 * 1);
-        allocation::update_user($allocation);
+        manual::update_allocation($allocation);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $this->assertStringContainsString('Completed', allocation::get_completion_status_html($program1, $allocation));
 
@@ -1111,7 +1074,7 @@ final class allocation_test extends \advanced_testcase {
         $allocation->timedue = (string)($now + 60 * 60 * 10);
         $allocation->timeend = (string)($now + 60 * 60 * 20);
         $allocation->timecompleted = null;
-        allocation::update_user($allocation);
+        manual::update_allocation($allocation);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $this->assertStringContainsString('Archived', allocation::get_completion_status_html($program1, $allocation));
 
@@ -1122,7 +1085,7 @@ final class allocation_test extends \advanced_testcase {
         $allocation->timedue = (string)($now + 60 * 60 * 10);
         $allocation->timeend = (string)($now + 60 * 60 * 20);
         $allocation->timecompleted = null;
-        allocation::update_user($allocation);
+        manual::update_allocation($allocation);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $this->assertStringContainsString('Archived', allocation::get_completion_status_html($program1, $allocation));
 
@@ -1133,7 +1096,7 @@ final class allocation_test extends \advanced_testcase {
         $allocation->timedue = (string)($now - 60 * 60 * 1);
         $allocation->timeend = (string)($now + 60 * 60 * 20);
         $allocation->timecompleted = null;
-        allocation::update_user($allocation);
+        manual::update_allocation($allocation);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $this->assertStringContainsString('Archived', allocation::get_completion_status_html($program1, $allocation));
 
@@ -1144,7 +1107,7 @@ final class allocation_test extends \advanced_testcase {
         $allocation->timedue = (string)($now - 60 * 60 * 5);
         $allocation->timeend = (string)($now - 60 * 60 * 1);
         $allocation->timecompleted = null;
-        allocation::update_user($allocation);
+        manual::update_allocation($allocation);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $this->assertStringContainsString('Archived', allocation::get_completion_status_html($program1, $allocation));
 
@@ -1155,7 +1118,7 @@ final class allocation_test extends \advanced_testcase {
         $allocation->timedue = (string)($now + 60 * 60 * 10);
         $allocation->timeend = (string)($now + 60 * 60 * 20);
         $allocation->timecompleted = (string)($now - 60 * 60 * 1);
-        allocation::update_user($allocation);
+        manual::update_allocation($allocation);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $this->assertStringContainsString('Archived completed', allocation::get_completion_status_html($program1, $allocation));
 
@@ -1166,7 +1129,7 @@ final class allocation_test extends \advanced_testcase {
         $allocation->timedue = (string)($now + 60 * 60 * 10);
         $allocation->timeend = (string)($now + 60 * 60 * 20);
         $allocation->timecompleted = (string)($now - 60 * 60 * 1);
-        allocation::update_user($allocation);
+        manual::update_allocation($allocation);
         $program1 = program::archive($program1->id);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $this->assertStringContainsString('Archived completed', allocation::get_completion_status_html($program1, $allocation));
@@ -1218,48 +1181,6 @@ final class allocation_test extends \advanced_testcase {
         $this->assertTrue($DB->record_exists('tool_muprog_completion', ['allocationid' => $allocation2->id, 'itemid' => $item1->get_id()]));
     }
 
-    public function test_make_snapshot(): void {
-        global $DB;
-
-        /** @var \tool_muprog_generator $generator */
-        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
-
-        $user1 = $this->getDataGenerator()->create_user();
-        $user2 = $this->getDataGenerator()->create_user();
-        $course1 = $this->getDataGenerator()->create_course();
-        $context1 = \context_course::instance($course1->id);
-        $program1 = $generator->create_program(['fullname' => 'hokus', 'sources' => ['manual' => []]]);
-        $source1 = $DB->get_record('tool_muprog_source', ['programid' => $program1->id, 'type' => 'manual'], '*', MUST_EXIST);
-        $top1 = program::load_content($program1->id);
-        $item1 = $top1->append_course($top1, $course1->id);
-        manual::allocate_users($program1->id, $source1->id, [$user1->id, $user2->id]);
-
-        $allocation1 = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
-        $allocation2 = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user2->id], '*', MUST_EXIST);
-
-        $data = (object)[
-            'allocationid' => $allocation1->id,
-            'timecompleted' => time(),
-            'itemid' => $item1->get_id(),
-        ];
-        allocation::update_item_completion($data);
-        $allocation1 = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
-
-        $DB->delete_records('tool_muprog_usr_snapshot', []);
-
-        $admin = get_admin();
-        $this->setAdminUser();
-        $this->setCurrentTimeStart();
-        $result = allocation::make_snapshot($allocation1->id, 'some_reason', 'some explanation');
-        $this->assertSame((array)$allocation1, (array)$result);
-        $record = $DB->get_record('tool_muprog_usr_snapshot', ['allocationid' => $allocation1->id]);
-        $this->assertSame($allocation1->id, $record->allocationid);
-        $this->assertSame('some_reason', $record->reason);
-        $this->assertTimeCurrent($record->timesnapshot);
-        $this->assertSame($admin->id, $record->snapshotby);
-        $this->assertSame('some explanation', $record->explanation);
-    }
-
     public function test_get_my_allocations(): void {
         global $DB;
 
@@ -1283,7 +1204,7 @@ final class allocation_test extends \advanced_testcase {
         manual::allocate_users($program2->id, $source2->id, [$user1->id]);
         $allocation2 = $DB->get_record('tool_muprog_allocation', ['programid' => $program2->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $allocation2->archived = 1;
-        allocation::update_user($allocation2);
+        manual::update_allocation($allocation2);
         $source3 = $DB->get_record('tool_muprog_source', ['programid' => $program3->id, 'type' => 'manual'], '*', MUST_EXIST);
         manual::allocate_users($program3->id, $source3->id, [$user1->id]);
         $allocation3 = $DB->get_record('tool_muprog_allocation', ['programid' => $program3->id, 'userid' => $user1->id], '*', MUST_EXIST);

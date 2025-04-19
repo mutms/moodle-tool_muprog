@@ -55,19 +55,12 @@ require_capability('tool/muprog:archive', $context);
 
 $returnurl = new moodle_url('/admin/tool/muprog/management/user_allocation.php', ['id' => $allocation->id]);
 
-/** @var \tool_muprog\local\source\base $coursceclass */
-$coursceclass = allocation::get_source_classes()[$source->type];
-if (!$coursceclass::allocation_archiving_supported($program, $source, $allocation) || !$allocation->archived) {
+$sourceclass = allocation::get_source_classname($source->type);
+if (!$sourceclass || !$sourceclass::allocation_archiving_supported($program, $source, $allocation) || !$allocation->archived) {
     redirect($returnurl);
 }
 
 $user = $DB->get_record('user', ['id' => $allocation->userid], '*', MUST_EXIST);
-
-/** @var \tool_muprog\local\source\base $coursceclass */
-$coursceclass = allocation::get_source_classes()[$source->type];
-if (!$coursceclass::allocation_edit_supported($program, $source, $allocation)) {
-    redirect($returnurl);
-}
 
 $currenturl = new moodle_url('/admin/tool/muprog/management/user_allocation_unarchive.php', ['id' => $allocation->id]);
 
@@ -81,7 +74,7 @@ if ($form->is_cancelled()) {
 
 if ($data = $form->get_data()) {
     $allocation->archived = 0;
-    allocation::update_user($allocation);
+    $sourceclass::update_allocation($allocation);
     $form->redirect_submitted($returnurl);
 }
 

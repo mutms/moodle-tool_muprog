@@ -19,22 +19,20 @@
 namespace tool_muprog\event;
 
 /**
- * User deallocated event.
+ * User allocation updated event.
  *
  * @package    tool_muprog
- * @copyright  2022 Open LMS (https://www.openlms.net/)
  * @copyright  2025 Petr Skoda
- * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class user_deallocated extends \core\event\base {
+final class allocation_updated extends \core\event\base {
     /**
      * Helper for event creation.
      *
      * @param \stdClass $allocation
      * @param \stdClass $program
      *
-     * @return user_deallocated|static
+     * @return static
      */
     public static function create_from_allocation(\stdClass $allocation, \stdClass $program) {
         $context = \context::instance_by_id($program->contextid);
@@ -57,7 +55,7 @@ final class user_deallocated extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->relateduserid' was deallocated from program with id '$this->objectid'";
+        return "The allocation of user with id '$this->relateduserid' to program with id '$this->objectid' was updated";
     }
 
     /**
@@ -66,7 +64,7 @@ final class user_deallocated extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('event_user_deallocated', 'tool_muprog');
+        return get_string('event_allocation_updated', 'tool_muprog');
     }
 
     /**
@@ -75,7 +73,7 @@ final class user_deallocated extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/admin/tool/muprog/management/program.php', ['id' => $this->other['programid']]);
+        return new \moodle_url('/admin/tool/muprog/management/user_allocation.php', ['id' => $this->objectid]);
     }
 
     /**
@@ -84,7 +82,7 @@ final class user_deallocated extends \core\event\base {
      * @return void
      */
     protected function init() {
-        $this->data['crud'] = 'c';
+        $this->data['crud'] = 'u';
         $this->data['edulevel'] = self::LEVEL_OTHER;
         $this->data['objecttable'] = 'tool_muprog_allocation';
     }

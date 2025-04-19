@@ -561,49 +561,6 @@ final class program_test extends \advanced_testcase {
         $this->assertFalse($DB->record_exists('tool_muprog_program', ['id' => $program->id]));
     }
 
-    public function test_make_snapshot(): void {
-        global $DB;
-
-        $syscontext = \context_system::instance();
-        $data = (object)[
-            'fullname' => 'Some program',
-            'idnumber' => 'SP1',
-            'contextid' => $syscontext->id,
-        ];
-        $program = program::create($data);
-        $this->setAdminUser();
-        $admin = get_admin();
-
-        $this->setCurrentTimeStart();
-        $DB->delete_records('tool_muprog_prg_snapshot', []);
-        program::make_snapshot($program->id, 'test', 'some explanation');
-
-        $records = $DB->get_records('tool_muprog_prg_snapshot', []);
-        $this->assertCount(1, $records);
-
-        $record = reset($records);
-        $this->assertSame($program->id, $record->programid);
-        $this->assertSame('test', $record->reason);
-        $this->assertTimeCurrent($record->timesnapshot);
-        $this->assertSame($admin->id, $record->snapshotby);
-        $this->assertSame('some explanation', $record->explanation);
-
-        program::delete($program->id);
-        $this->setCurrentTimeStart();
-        $DB->delete_records('tool_muprog_prg_snapshot', []);
-        program::make_snapshot($program->id, 'delete', 'some explanation');
-
-        $records = $DB->get_records('tool_muprog_prg_snapshot', []);
-        $this->assertCount(1, $records);
-
-        $record = reset($records);
-        $this->assertSame($program->id, $record->programid);
-        $this->assertSame('delete', $record->reason);
-        $this->assertTimeCurrent($record->timesnapshot);
-        $this->assertSame($admin->id, $record->snapshotby);
-        $this->assertSame('some explanation', $record->explanation);
-    }
-
     public function test_load_content(): void {
         $syscontext = \context_system::instance();
         $data = (object)[

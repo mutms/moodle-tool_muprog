@@ -28,9 +28,9 @@ namespace tool_muprog\phpunit\event;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @covers \tool_muprog\event\user_deallocated
+ * @covers \tool_muprog\event\allocation_deleted
  */
-final class user_deallocated_test extends \advanced_testcase {
+final class allocation_deleted_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
@@ -65,14 +65,14 @@ final class user_deallocated_test extends \advanced_testcase {
         $sink->close();
 
         $this->assertCount(2, $events);
-        $this->assertInstanceOf('tool_muprog\event\user_deallocated', $events[1]);
-        $this->assertInstanceOf('core\event\calendar_event_deleted', $events[0]);
-        $event = $events[1];
+        $this->assertInstanceOf('tool_muprog\event\allocation_deleted', $events[0]);
+        $this->assertInstanceOf('core\event\calendar_event_deleted', $events[1]);
+        $event = $events[0];
         $this->assertEquals($syscontext->id, $event->contextid);
         $this->assertSame($allocation->id, $event->objectid);
         $this->assertSame($admin->id, $event->userid);
         $this->assertSame($user->id, $event->relateduserid);
-        $this->assertSame('c', $event->crud);
+        $this->assertSame('d', $event->crud);
         $this->assertSame($event::LEVEL_OTHER, $event->edulevel);
         $this->assertSame('tool_muprog_allocation', $event->objecttable);
         $this->assertSame('User deallocated from program', $event::get_name());

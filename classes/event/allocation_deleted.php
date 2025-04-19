@@ -19,7 +19,7 @@
 namespace tool_muprog\event;
 
 /**
- * Program completed event.
+ * User deallocated event.
  *
  * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
@@ -27,25 +27,22 @@ namespace tool_muprog\event;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class program_completed extends \core\event\base {
+final class allocation_deleted extends \core\event\base {
     /**
      * Helper for event creation.
      *
      * @param \stdClass $allocation
      * @param \stdClass $program
      *
-     * @return program_completed|static
+     * @return static
      */
     public static function create_from_allocation(\stdClass $allocation, \stdClass $program) {
-        if (!$allocation->timecompleted) {
-            throw new \coding_exception('user must have already completed the program');
-        }
         $context = \context::instance_by_id($program->contextid);
         $data = [
             'context' => $context,
             'objectid' => $allocation->id,
             'relateduserid' => $allocation->userid,
-            'other' => ['programid' => $program->id, 'timecompleted' => $allocation->timecompleted],
+            'other' => ['programid' => $program->id],
         ];
         /** @var static $event */
         $event = self::create($data);
@@ -60,7 +57,7 @@ final class program_completed extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->relateduserid' completed program with id '$this->objectid'";
+        return "The user with id '$this->relateduserid' was deallocated from program with id '$this->objectid'";
     }
 
     /**
@@ -69,7 +66,7 @@ final class program_completed extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('event_program_completed', 'tool_muprog');
+        return get_string('event_allocation_deleted', 'tool_muprog');
     }
 
     /**
@@ -78,7 +75,7 @@ final class program_completed extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/admin/tool/muprog/management/user_allocation.php', ['id' => $this->objectid]);
+        return new \moodle_url('/admin/tool/muprog/management/program.php', ['id' => $this->other['programid']]);
     }
 
     /**
@@ -87,8 +84,8 @@ final class program_completed extends \core\event\base {
      * @return void
      */
     protected function init() {
-        $this->data['crud'] = 'c';
-        $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
+        $this->data['crud'] = 'd';
+        $this->data['edulevel'] = self::LEVEL_OTHER;
         $this->data['objecttable'] = 'tool_muprog_allocation';
     }
 }

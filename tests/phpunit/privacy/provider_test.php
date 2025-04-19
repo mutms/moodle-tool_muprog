@@ -161,8 +161,6 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         $writer = writer::with_context($program1context);
         $programdata = $writer->get_data([$strallocation, $this->program1->fullname]);
         $this->assertNotEmpty($programdata);
-        // Verify we have usrsnapshot data in program 1 for user1.
-        $this->assertNotEmpty($programdata->allocation->usersnapshots);
 
         // Verify we have nothing in program 2 for user1.
         $writer = writer::with_context($program2context);
@@ -193,14 +191,6 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         // Get all user allocations match with this context.
         $userallocations = $DB->get_records_sql($sql, ['programid' => $this->program1->id]);
         $this->assertCount(0, $userallocations);
-        // Check for tool_muprog_cert_issue and tool_muprog_usr_snapshot.
-        $snapshots = $DB->get_records_sql(
-            "SELECT 1
-                FROM {tool_muprog_usr_snapshot}
-                WHERE allocationid IN(?, ?)",
-            $allocationids
-        );
-        $this->assertCount(0, $snapshots);
         $certs = $DB->get_records_sql(
             "SELECT 1
                 FROM {tool_muprog_cert_issue}
@@ -228,9 +218,6 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         // Get all user enrolments match with user1.
         $userenrolments = $DB->get_records('tool_muprog_allocation', ['userid' => $this->user3->id]);
         $this->assertCount(2, $userenrolments);
-        // Check for tool_muprog_usr_snapshot with user3.
-        $snapshots = $DB->get_records('tool_muprog_usr_snapshot', ['userid' => $this->user3->id]);
-        $this->assertCount(2, $snapshots);
 
         // Delete everything for the user3 in the context.
         $approvedlist = new approved_contextlist($this->user3, 'tool_muprog', [$program1context->id, $program2context->id]);
@@ -238,9 +225,6 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         // Get all user enrolments match with user3.
         $userenrolments = $DB->get_records('tool_muprog_allocation', ['userid' => $this->user3->id]);
         $this->assertCount(0, $userenrolments);
-        // Check for tool_muprog_usr_snapshot with user3.
-        $snapshots = $DB->get_records('tool_muprog_usr_snapshot', ['userid' => $this->user3->id]);
-        $this->assertCount(0, $snapshots);
         // Check for tool_muprog_request with user3.
         $requests = $DB->get_records('tool_muprog_request', ['userid' => $this->user3->id]);
         $this->assertCount(0, $requests);
@@ -248,9 +232,6 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         // Get all user enrolments accounts.
         $userenrolments = $DB->get_records('tool_muprog_allocation', []);
         $this->assertCount(2, $userenrolments);
-        // Check for tool_muprog_usr_snapshot.
-        $snapshots = $DB->get_records('tool_muprog_usr_snapshot', ['userid' => $this->user1->id]);
-        $this->assertCount(1, $snapshots);
     }
 
     /**
@@ -323,9 +304,6 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         provider::get_users_in_context($userlist1);
         // The user data in $program1context should be deleted.
         $this->assertCount(0, $userlist1);
-        // Check for tool_muprog_usr_snapshot with user3.
-        $snapshots = $DB->get_records('tool_muprog_usr_snapshot', ['userid' => $this->user3->id]);
-        $this->assertCount(0, $snapshots);
         // Check for tool_muprog_request with user3.
         $requests = $DB->get_records('tool_muprog_request', ['userid' => $this->user3->id]);
         $this->assertCount(0, $requests);
@@ -335,9 +313,6 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         provider::get_users_in_context($userlist2);
         // The user data in $program2context should be still present.
         $this->assertCount(2, $userlist2);
-        // Check for tool_muprog_usr_snapshot.
-        $snapshots = $DB->get_records('tool_muprog_usr_snapshot', ['userid' => $this->user2->id]);
-        $this->assertCount(1, $snapshots);
 
         // Convert $userlist2 into an approved_contextlist in the system context.
         $approvedlist2 = new approved_userlist($program2context, $component, $userlist2->get_userids());

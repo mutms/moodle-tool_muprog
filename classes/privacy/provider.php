@@ -119,30 +119,6 @@ class provider implements
             'privacy:metadata:table:tool_muprog_request'
         );
 
-        $collection->add_database_table(
-            'tool_muprog_usr_snapshot',
-            [
-                'allocationid' => 'privacy:metadata:field:allocationid',
-                'reason' => 'privacy:metadata:field:reason',
-                'timesnapshot' => 'privacy:metadata:field:timesnapshot',
-                'snapshotby' => 'privacy:metadata:field:snapshotby',
-                'explanation' => 'privacy:metadata:field:explanation',
-                'programid' => 'privacy:metadata:field:programid',
-                'userid' => 'privacy:metadata:field:userid',
-                'sourceid' => 'privacy:metadata:field:sourceid',
-                'archived' => 'privacy:metadata:field:archived',
-                'sourcedatajson' => 'privacy:metadata:field:sourcedatajson',
-                'timeallocated' => 'privacy:metadata:field:timeallocated',
-                'timestart' => 'privacy:metadata:field:timestart',
-                'timedue' => 'privacy:metadata:field:timedue',
-                'timeend' => 'privacy:metadata:field:timeend',
-                'timecompleted' => 'privacy:metadata:field:timecompleted',
-                'completionsjson' => 'privacy:metadata:field:completionsjson',
-                'evidencesjson' => 'privacy:metadata:field:evidencesjson',
-                            ],
-            'privacy:metadata:table:tool_muprog_usr_snapshot'
-        );
-
         return $collection;
     }
 
@@ -268,30 +244,6 @@ class provider implements
             }
             $evidences->close();
 
-            // Set user snapshot data.
-            $sql = "SELECT reason, timesnapshot, snapshotby, explanation, programid, userid, sourceid,
-                        archived, sourcedatajson, timeallocated, timestart, timedue, timeend,
-                        timecompleted, completionsjson, evidencesjson
-                    FROM {tool_muprog_usr_snapshot}
-                    WHERE allocationid = :allocationid
-                    ORDER BY timesnapshot ASC";
-            $params = ['allocationid' => $allocation->id];
-
-            $snapshots = $DB->get_recordset_sql($sql, $params);
-            foreach ($snapshots as $snapshot) {
-                if (!property_exists($allocation, 'usersnapshots')) {
-                    $allocation->usersnapshots = [];
-                }
-                $snapshot->timesnapshot = \core_privacy\local\request\transform::datetime($snapshot->timesnapshot);
-                $snapshot->timeallocated = \core_privacy\local\request\transform::datetime($snapshot->timeallocated);
-                $snapshot->timestart = \core_privacy\local\request\transform::datetime($snapshot->timestart);
-                $snapshot->timedue = \core_privacy\local\request\transform::datetime($snapshot->timedue);
-                $snapshot->timeend = \core_privacy\local\request\transform::datetime($snapshot->timeend);
-                $snapshot->timecompleted = \core_privacy\local\request\transform::datetime($snapshot->timecompleted);
-                $allocation->usersnapshots[] = $snapshot;
-            }
-            $snapshots->close();
-
             $programcontext = \context::instance_by_id($allocation->contextid);
             unset($allocation->id, $allocation->contextid);
             writer::with_context($programcontext)->export_data(
@@ -352,13 +304,12 @@ class provider implements
             if (!isset($allclasses[$source->type])) {
                 continue;
             }
-            /** @var \tool_muprog\local\source\base $coursceclass */
-            $coursceclass = $allclasses[$source->type];
-            $coursceclass::deallocate_user($program, $source, $allocation);
+            /** @var \tool_muprog\local\source\base $sourceclass */
+            $sourceclass = $allclasses[$source->type];
+            $sourceclass::deallocate_user($program, $source, $allocation);
 
             $params = ['allocationid' => $allocation->id];
             $DB->delete_records('tool_muprog_cert_issue', $params);
-            $DB->delete_records('tool_muprog_usr_snapshot', $params);
         }
         $rs->close();
     }
@@ -397,17 +348,14 @@ class provider implements
             if (!isset($allclasses[$source->type])) {
                 continue;
             }
-            /** @var \tool_muprog\local\source\base $coursceclass */
-            $coursceclass = $allclasses[$source->type];
-            $coursceclass::deallocate_user($program, $source, $allocation);
+            /** @var \tool_muprog\local\source\base $sourceclass */
+            $sourceclass = $allclasses[$source->type];
+            $sourceclass::deallocate_user($program, $source, $allocation);
 
             $params = ['allocationid' => $allocation->id];
             $DB->delete_records('tool_muprog_cert_issue', $params);
         }
         $rs->close();
-
-        $params = ['userid' => $user->id];
-        $DB->delete_records('tool_muprog_usr_snapshot', $params);
     }
 
     /**
@@ -441,14 +389,13 @@ class provider implements
             if (!isset($allclasses[$source->type])) {
                 continue;
             }
-            /** @var \tool_muprog\local\source\base $coursceclass */
-            $coursceclass = $allclasses[$source->type];
-            $coursceclass::deallocate_user($program, $source, $allocation);
+            /** @var \tool_muprog\local\source\base $sourceclass */
+            $sourceclass = $allclasses[$source->type];
+            $sourceclass::deallocate_user($program, $source, $allocation);
 
             $params = ['allocationid' => $allocation->id];
             $DB->delete_records('tool_muprog_cert_issue', $params);
             $params = ['userid' => $allocation->userid];
-            $DB->delete_records('tool_muprog_usr_snapshot', $params);
             $DB->delete_records('tool_muprog_request', $params);
         }
         $rs->close();

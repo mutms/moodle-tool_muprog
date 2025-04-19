@@ -49,7 +49,7 @@ class event_observer {
         $items = $DB->get_records('tool_muprog_item', ['courseid' => $course->id]);
         foreach ($items as $item) {
             if ($item->fullname !== $course->fullname) {
-                // No need for snapshot, the course fullname is just a perfomrance thing
+                // No need for event here, the course fullname is just a performance thing
                 // and a fallback for deleted courses.
                 $DB->set_field('tool_muprog_item', 'fullname', $course->fullname, ['id' => $item->id]);
             }

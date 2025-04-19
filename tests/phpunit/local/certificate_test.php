@@ -161,7 +161,7 @@ final class certificate_test extends \advanced_testcase {
         $allocation2 = $programgenerator->create_program_allocation(['userid' => $user2->id, 'programid' => $program->id]);
 
         $allocation1->timecompleted = time();
-        $allocation1 = \tool_muprog\local\allocation::update_user($allocation1);
+        $allocation1 = \tool_muprog\local\source\base::update_allocation($allocation1);
 
         $this->assertTrue(\tool_muprog\local\certificate::issue($program->id, $user1->id));
         $this->assertSame(1, $DB->count_records('tool_muprog_cert_issue', ['programid' => $program->id, 'allocationid' => $allocation1->id]));
@@ -172,7 +172,7 @@ final class certificate_test extends \advanced_testcase {
         $this->assertFalse(\tool_muprog\local\certificate::issue($program->id, $user1->id));
 
         $allocation1->timecompleted = $allocation1->timecompleted + 11;
-        $allocation1 = \tool_muprog\local\allocation::update_user($allocation1);
+        $allocation1 = \tool_muprog\local\source\base::update_allocation($allocation1);
         $this->assertFalse(\tool_muprog\local\certificate::issue($program->id, $user1->id));
         $this->assertSame(1, $DB->count_records('tool_muprog_cert_issue', ['programid' => $program->id, 'allocationid' => $allocation1->id]));
 
@@ -182,12 +182,12 @@ final class certificate_test extends \advanced_testcase {
         // Archived allocation.
         $allocation2->timecompleted = time();
         $allocation2->archived = 1;
-        $allocation2 = \tool_muprog\local\allocation::update_user($allocation2);
+        $allocation2 = \tool_muprog\local\source\base::update_allocation($allocation2);
         $this->assertFalse(\tool_muprog\local\certificate::issue($program->id, $user2->id));
 
         // Program archived.
         $allocation2->archived = 0;
-        $allocation2 = \tool_muprog\local\allocation::update_user($allocation2);
+        $allocation2 = \tool_muprog\local\source\base::update_allocation($allocation2);
         $program = \tool_muprog\local\program::archive($program->id);
         $this->assertFalse(\tool_muprog\local\certificate::issue($program->id, $user2->id));
 
@@ -231,7 +231,7 @@ final class certificate_test extends \advanced_testcase {
         $source = $DB->get_record('tool_muprog_source', ['programid' => $program->id, 'type' => 'manual'], '*', MUST_EXIST);
 
         $allocation1->timecompleted = time();
-        $allocation1 = \tool_muprog\local\allocation::update_user($allocation1);
+        $allocation1 = \tool_muprog\local\source\base::update_allocation($allocation1);
 
         \tool_muprog\local\certificate::cron();
         $this->assertSame(1, $DB->count_records('tool_muprog_cert_issue', ['programid' => $program->id, 'allocationid' => $allocation1->id]));
@@ -246,9 +246,9 @@ final class certificate_test extends \advanced_testcase {
         $this->assertSame(0, $DB->count_records('tool_muprog_cert_issue', ['programid' => $program->id, 'allocationid' => $allocation2->id]));
 
         $allocation2->timecompleted = time();
-        $allocation2 = \tool_muprog\local\allocation::update_user($allocation2);
+        $allocation2 = \tool_muprog\local\source\base::update_allocation($allocation2);
         $allocation3->timecompleted = time();
-        $allocation3 = \tool_muprog\local\allocation::update_user($allocation3);
+        $allocation3 = \tool_muprog\local\source\base::update_allocation($allocation3);
 
         \tool_muprog\local\certificate::cron();
         $this->assertSame(1, $DB->count_records('tool_muprog_cert_issue', ['programid' => $program->id, 'allocationid' => $allocation2->id]));

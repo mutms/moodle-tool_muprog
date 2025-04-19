@@ -213,7 +213,7 @@ final class mucertify_test extends \advanced_testcase {
         $assignment4 = $DB->get_record('tool_mucertify_assignment',
             ['userid' => $user4->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
         $assignment4->archived = '1';
-        $assignment4 = assignment::update_user($assignment4);
+        $assignment4 = \tool_mucertify\local\source\base::update_assignment($assignment4);
 
         manual::assign_users($certification1->id, $source1->id, [$user5->id], [
             'timewindowstart' => $now - DAYSECS,
@@ -526,7 +526,7 @@ final class mucertify_test extends \advanced_testcase {
         $assignment4 = $DB->get_record('tool_mucertify_assignment',
             ['userid' => $user4->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
         $assignment4->archived = '1';
-        $assignment4 = assignment::update_user($assignment4);
+        $assignment4 = \tool_mucertify\local\source\base::update_assignment($assignment4);
 
         manual::assign_users($certification1->id, $source1->id, [$user5->id], [
             'timewindowstart' => $now - DAYSECS,
@@ -821,7 +821,7 @@ final class mucertify_test extends \advanced_testcase {
         $assignment4 = $DB->get_record('tool_mucertify_assignment',
             ['userid' => $user4->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
         $assignment4->archived = '1';
-        $assignment4 = assignment::update_user($assignment4);
+        $assignment4 = \tool_mucertify\local\source\base::update_assignment($assignment4);
 
         manual::assign_users($certification1->id, $source1->id, [$user5->id], [
             'timewindowstart' => $now - DAYSECS,

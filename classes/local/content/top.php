@@ -216,6 +216,7 @@ final class top extends set {
         if ($parent->programid != $this->programid) {
             throw new \coding_exception('invalid programid');
         }
+        $program = $DB->get_record('tool_muprog_program', ['id' => $this->programid], '*', MUST_EXIST);
         if (isset($this->orphanedsets[$parent->id])) {
             throw new \coding_exception('orphaned set cannot be modified');
         }
@@ -262,7 +263,8 @@ final class top extends set {
 
         $this->fix_content();
 
-        program::make_snapshot($item->programid, 'item_append');
+        \tool_muprog\event\program_updated::create_from_program($program, 'item_append', $item->id)->trigger();
+
         $trans->allow_commit();
 
         // Do not use transactions for enrolments, we can always fix them later.
@@ -286,6 +288,7 @@ final class top extends set {
         if ($parent->programid != $this->programid) {
             throw new \coding_exception('invalid programid');
         }
+        $program = $DB->get_record('tool_muprog_program', ['id' => $this->programid], '*', MUST_EXIST);
         if (isset($this->orphanedsets[$parent->id])) {
             throw new \coding_exception('orphaned set cannot be modified');
         }
@@ -336,7 +339,8 @@ final class top extends set {
 
         $this->fix_content();
 
-        program::make_snapshot($item->programid, 'item_append');
+        \tool_muprog\event\program_updated::create_from_program($program, 'item_append', $item->id)->trigger();
+
         $trans->allow_commit();
 
         // Do not use transactions for enrolments, we can always fix them later.
@@ -359,6 +363,7 @@ final class top extends set {
         if ($parent->programid != $this->programid) {
             throw new \coding_exception('invalid programid');
         }
+        $program = $DB->get_record('tool_muprog_program', ['id' => $this->programid], '*', MUST_EXIST);
         if (isset($this->orphanedsets[$parent->id])) {
             throw new \coding_exception('orphaned set cannot be modified');
         }
@@ -437,7 +442,8 @@ final class top extends set {
 
         $this->fix_content();
 
-        program::make_snapshot($item->programid, 'item_append');
+        \tool_muprog\event\program_updated::create_from_program($program, 'item_append', $item->id)->trigger();
+
         $trans->allow_commit();
 
         // Do not use transactions for enrolments, we can always fix them later.
@@ -460,6 +466,7 @@ final class top extends set {
         if ($set->programid != $this->programid) {
             throw new \coding_exception('invalid programid');
         }
+        $program = $DB->get_record('tool_muprog_program', ['id' => $this->programid], '*', MUST_EXIST);
         if (isset($this->orphanedsets[$set->id])) {
             throw new \coding_exception('orphaned set cannot be modified');
         }
@@ -517,7 +524,8 @@ final class top extends set {
 
         $this->fix_content();
 
-        program::make_snapshot($set->programid, 'item_update');
+        \tool_muprog\event\program_updated::create_from_program($program, 'item_update', $set->id)->trigger();
+
         $trans->allow_commit();
 
         // Do not use transactions for enrolments, we can always fix them later.
@@ -540,6 +548,7 @@ final class top extends set {
         if ($course->programid != $this->programid) {
             throw new \coding_exception('invalid programid');
         }
+        $program = $DB->get_record('tool_muprog_program', ['id' => $this->programid], '*', MUST_EXIST);
 
         if (!array_key_exists('points', $data)) {
             return $course;
@@ -563,7 +572,8 @@ final class top extends set {
 
         $this->fix_content();
 
-        program::make_snapshot($course->programid, 'item_update');
+        \tool_muprog\event\program_updated::create_from_program($program, 'item_update', $course->id)->trigger();
+
         $trans->allow_commit();
 
         // Do not use transactions for enrolments, we can always fix them later.
@@ -586,6 +596,7 @@ final class top extends set {
         if ($training->programid != $this->programid) {
             throw new \coding_exception('invalid programid');
         }
+        $program = $DB->get_record('tool_muprog_program', ['id' => $this->programid], '*', MUST_EXIST);
 
         if (!array_key_exists('points', $data)) {
             return $training;
@@ -609,7 +620,8 @@ final class top extends set {
 
         $this->fix_content();
 
-        program::make_snapshot($training->programid, 'item_update');
+        \tool_muprog\event\program_updated::create_from_program($program, 'item_update', $training->id)->trigger();
+
         $trans->allow_commit();
 
         // Do not use transactions for enrolments, we can always fix them later.
@@ -634,6 +646,7 @@ final class top extends set {
             debugging('Item cannot be moved to self', DEBUG_DEVELOPER);
             return false;
         }
+        $program = $DB->get_record('tool_muprog_program', ['id' => $this->programid], '*', MUST_EXIST);
         if ($itemid == $this->get_id()) {
             debugging('Top item cannot be moved', DEBUG_DEVELOPER);
             return false;
@@ -710,7 +723,8 @@ final class top extends set {
 
         $this->fix_content();
 
-        program::make_snapshot($this->programid, 'item_move');
+        \tool_muprog\event\program_updated::create_from_program($program, 'item_move', $item->id)->trigger();
+
         $trans->allow_commit();
 
         // Do not use transactions for enrolments, we can always fix them later.
@@ -729,6 +743,8 @@ final class top extends set {
     public function delete_item(int $itemid): bool {
         global $DB, $CFG;
         require_once($CFG->dirroot . '/group/lib.php');
+
+        $program = $DB->get_record('tool_muprog_program', ['id' => $this->programid], '*', MUST_EXIST);
 
         $item = $this->find_item($itemid);
         if ($item) {
@@ -790,7 +806,7 @@ final class top extends set {
 
         $this->fix_content();
 
-        program::make_snapshot($this->programid, 'item_delete');
+        \tool_muprog\event\program_updated::create_from_program($program, 'item_delete', $itemid)->trigger();
 
         $trans->allow_commit();
 
@@ -932,7 +948,6 @@ final class top extends set {
 
         $trans = $DB->start_delegated_transaction();
         $this->fix_content();
-        program::make_snapshot($this->programid, 'autorepair');
         $trans->allow_commit();
 
         // Do not use transactions for enrolments, we can always fix them later.

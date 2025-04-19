@@ -136,7 +136,7 @@ final class mucertify extends base {
             debugging('assignment::sync_certifications() is not supposed to be used in transactions without userid', DEBUG_DEVELOPER);
         }
 
-        $coursceclasses = \tool_muprog\local\allocation::get_source_classes();
+        $sourceclasses = \tool_muprog\local\allocation::get_source_classes();
 
         // Delete allocations from deleted certifications.
         $params = [];
@@ -162,7 +162,6 @@ final class mucertify extends base {
               ORDER BY pa.id ASC";
         $allocations = $DB->get_records_sql($sql, $params);
         foreach ($allocations as $allocation) {
-            \tool_muprog\local\allocation::make_snapshot($allocation->id, 'certification_delete');
             self::purge_allocation($allocation->id);
             \tool_muprog\local\allocation::fix_user_enrolments($allocation->programid, $allocation->userid);
             \tool_muprog\local\calendar::delete_allocation_events($allocation->id);
@@ -206,7 +205,6 @@ final class mucertify extends base {
         $allocations = $DB->get_records_sql($sql, $params);
         foreach ($allocations as $allocation) {
             $DB->set_field('tool_muprog_allocation', 'archived', 1, ['id' => $allocation->id]);
-            \tool_muprog\local\allocation::make_snapshot($allocation->id, 'allocation_sync');
             \tool_muprog\local\allocation::fix_user_enrolments($allocation->programid, $allocation->userid);
         }
         unset($allocations);
@@ -252,7 +250,6 @@ final class mucertify extends base {
             $record->timedue = $period->timewindowdue;
             $record->timeend = $period->timewindowend;
             $DB->update_record('tool_muprog_allocation', $record);
-            \tool_muprog\local\allocation::make_snapshot($allocation->id, 'allocation_sync');
             \tool_muprog\local\allocation::fix_user_enrolments($allocation->programid, $allocation->userid);
         }
         unset($allocations);
@@ -302,7 +299,6 @@ final class mucertify extends base {
             $record->timedue = $period->timewindowdue;
             $record->timeend = $period->timewindowend;
             $DB->update_record('tool_muprog_allocation', $record);
-            \tool_muprog\local\allocation::make_snapshot($allocation->id, 'allocation_sync');
             \tool_muprog\local\allocation::fix_user_enrolments($allocation->programid, $allocation->userid);
         }
         unset($allocations);
@@ -367,9 +363,9 @@ final class mucertify extends base {
                 // Remove all previous allocations.
                 if ($allocation) {
                     $delsource = $DB->get_record('tool_muprog_source', ['id' => $allocation->sourceid], '*', MUST_EXIST);
-                    /** @var \tool_muprog\local\source\base $coursceclass */
-                    $coursceclass = $coursceclasses[$delsource->type];
-                    $coursceclass::deallocate_user($program, $delsource, $allocation);
+                    /** @var \tool_muprog\local\source\base $sourceclass */
+                    $sourceclass = $sourceclasses[$delsource->type];
+                    $sourceclass::deallocate_user($program, $delsource, $allocation);
                 }
 
                 course_reset::reset_courses($user, $resettype, $program->id);
@@ -440,7 +436,7 @@ final class mucertify extends base {
             if (!$program) {
                 continue;
             }
-            \tool_mucertify\local\period::program_completed($program, $allocation);
+            \tool_mucertify\local\period::allocation_completed($program, $allocation);
         }
         unset($allocations);
     }

@@ -19,7 +19,7 @@
 namespace tool_muprog\event;
 
 /**
- * Program updated event.
+ * User allocated event.
  *
  * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
@@ -27,25 +27,26 @@ namespace tool_muprog\event;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class program_updated extends \core\event\base {
+final class allocation_created extends \core\event\base {
     /**
      * Helper for event creation.
      *
+     * @param \stdClass $allocation
      * @param \stdClass $program
-     * @param string|null $action
-     * @param int|null $otherid
      *
-     * @return program_updated|static
+     * @return static
      */
-    public static function create_from_program(\stdClass $program, ?string $action = null, ?int $otherid = null) {
+    public static function create_from_allocation(\stdClass $allocation, \stdClass $program) {
         $context = \context::instance_by_id($program->contextid);
         $data = [
             'context' => $context,
-            'objectid' => $program->id,
-            'other' => ['action' => $action, 'otherid' => $otherid],
+            'objectid' => $allocation->id,
+            'relateduserid' => $allocation->userid,
+            'other' => ['programid' => $program->id],
         ];
         /** @var static $event */
         $event = self::create($data);
+        $event->add_record_snapshot('tool_muprog_allocation', $allocation);
         $event->add_record_snapshot('tool_muprog_program', $program);
         return $event;
     }
@@ -56,13 +57,7 @@ final class program_updated extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        $desc = "The user with id '$this->userid' updated program with id '$this->objectid'";
-        if (isset($this->other['action'])) {
-            $action = $this->other['action'];
-            $otherid = $this->other['otherid'] ?? null;
-            $desc .= " (action: $action, otherid: $otherid)";
-        }
-        return $desc;
+        return "The user with id '$this->relateduserid' was allocated to program with id '$this->objectid'";
     }
 
     /**
@@ -71,7 +66,7 @@ final class program_updated extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('event_program_updated', 'tool_muprog');
+        return get_string('event_allocation_created', 'tool_muprog');
     }
 
     /**
@@ -80,7 +75,7 @@ final class program_updated extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/admin/tool/muprog/management/program.php', ['id' => $this->objectid]);
+        return new \moodle_url('/admin/tool/muprog/management/user_allocation.php', ['id' => $this->objectid]);
     }
 
     /**
@@ -89,8 +84,8 @@ final class program_updated extends \core\event\base {
      * @return void
      */
     protected function init() {
-        $this->data['crud'] = 'u';
+        $this->data['crud'] = 'c';
         $this->data['edulevel'] = self::LEVEL_OTHER;
-        $this->data['objecttable'] = 'tool_muprog_program';
+        $this->data['objecttable'] = 'tool_muprog_allocation';
     }
 }

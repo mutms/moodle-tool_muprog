@@ -97,8 +97,7 @@ $PAGE->navbar->add(format_string($program->fullname));
 
 echo $OUTPUT->header();
 
-$event = \tool_muprog\event\catalogue_program_viewed::create_from_program($program);
-$event->trigger();
+\tool_muprog\event\catalogue_program_viewed::create_from_program($program)->trigger();
 
 echo $catalogueoutput->render_program($program);
 

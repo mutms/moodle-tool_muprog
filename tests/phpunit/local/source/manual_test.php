@@ -42,7 +42,7 @@ final class manual_test extends \advanced_testcase {
     }
 
     public function test_get_type(): void {
-        $this->assertSame('manual', \tool_muprog\local\source\manual::get_type());
+        $this->assertSame('manual', manual::get_type());
     }
 
     public function test_is_new_alloved(): void {
@@ -50,9 +50,9 @@ final class manual_test extends \advanced_testcase {
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
         $program = $generator->create_program();
 
-        $this->assertTrue(\tool_muprog\local\source\manual::is_new_allowed($program));
+        $this->assertTrue(manual::is_new_allowed($program));
         \set_config('source_manual_allownew', 0, 'tool_muprog');
-        $this->assertTrue(\tool_muprog\local\source\manual::is_new_allowed($program));
+        $this->assertTrue(manual::is_new_allowed($program));
     }
 
     public function test_is_allocation_possible(): void {
@@ -70,28 +70,28 @@ final class manual_test extends \advanced_testcase {
         $program1 = program::update_allocation(
             (object)['id' => $program1->id, 'timeallocationstart' => null, 'timeallocationend' => null]
         );
-        $this->assertTrue(\tool_muprog\local\source\manual::is_allocation_possible($program1, $source1));
+        $this->assertTrue(manual::is_allocation_possible($program1, $source1));
 
         $program1 = program::update_allocation(
             (object)['id' => $program1->id, 'timeallocationstart' => time() - 100, 'timeallocationend' => time() + 100]
         );
-        $this->assertTrue(\tool_muprog\local\source\manual::is_allocation_possible($program1, $source1));
+        $this->assertTrue(manual::is_allocation_possible($program1, $source1));
 
         $program1 = program::update_allocation(
             (object)['id' => $program1->id, 'timeallocationstart' => time() + 100, 'timeallocationend' => time() + 200]
         );
-        $this->assertFalse(\tool_muprog\local\source\manual::is_allocation_possible($program1, $source1));
+        $this->assertFalse(manual::is_allocation_possible($program1, $source1));
 
         $program1 = program::update_allocation(
             (object)['id' => $program1->id, 'timeallocationstart' => time() - 200, 'timeallocationend' => time() - 100]
         );
-        $this->assertFalse(\tool_muprog\local\source\manual::is_allocation_possible($program1, $source1));
+        $this->assertFalse(manual::is_allocation_possible($program1, $source1));
 
         $program1 = program::update_allocation(
             (object)['id' => $program1->id, 'timeallocationstart' => null, 'timeallocationend' => null]
         );
         $program1 = program::archive($program1->id);
-        $this->assertFalse(\tool_muprog\local\source\manual::is_allocation_possible($program1, $source1));
+        $this->assertFalse(manual::is_allocation_possible($program1, $source1));
     }
 
     public function test_allocate_users(): void {
@@ -112,7 +112,7 @@ final class manual_test extends \advanced_testcase {
         $program2 = $generator->create_program(['sources' => ['manual' => []]]);
         $source2 = $DB->get_record('tool_muprog_source', ['programid' => $program2->id, 'type' => 'manual'], '*', MUST_EXIST);
 
-        \tool_muprog\local\source\manual::allocate_users($program1->id, $source1->id, [$user1->id, $user2->id]);
+        manual::allocate_users($program1->id, $source1->id, [$user1->id, $user2->id]);
         $allocations = $DB->get_records('tool_muprog_allocation', ['programid' => $program1->id], 'id ASC');
         $allocations = array_values($allocations);
         $this->assertCount(2, $allocations);
@@ -135,7 +135,7 @@ final class manual_test extends \advanced_testcase {
             'programend_date' => $now - 20,
         ];
         $program1 = program::update_scheduling($data);
-        \tool_muprog\local\source\manual::allocate_users($program1->id, $source1->id, [$user3->id]);
+        manual::allocate_users($program1->id, $source1->id, [$user3->id]);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user3->id]);
         $this->assertEquals($now, $allocation->timestart);
         $this->assertEquals($now + 1, $allocation->timedue);
@@ -149,12 +149,49 @@ final class manual_test extends \advanced_testcase {
             'timedue' => $now + 60 * 60 * 1,
             'timeend' => $now + 60 * 60 * 2,
         ];
-        \tool_muprog\local\source\manual::allocate_users($program1->id, $source1->id, [$user4->id], $dateoverrides);
+        manual::allocate_users($program1->id, $source1->id, [$user4->id], $dateoverrides);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user4->id]);
         $this->assertSame((string)$dateoverrides['timeallocated'], $allocation->timeallocated);
         $this->assertSame((string)$dateoverrides['timestart'], $allocation->timestart);
         $this->assertSame((string)$dateoverrides['timedue'], $allocation->timedue);
         $this->assertSame((string)$dateoverrides['timeend'], $allocation->timeend);
+    }
+
+    public function test_update_allocation(): void {
+        global $DB;
+
+        /** @var \tool_muprog_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $course1 = $this->getDataGenerator()->create_course();
+        $context1 = \context_course::instance($course1->id);
+        $program1 = $generator->create_program(['fullname' => 'hokus', 'sources' => ['manual' => []]]);
+        $source1 = $DB->get_record('tool_muprog_source', ['programid' => $program1->id, 'type' => 'manual'], '*', MUST_EXIST);
+        manual::allocate_users($program1->id, $source1->id, [$user1->id]);
+        $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
+
+        $now = time();
+
+        $allocation->archived = '0';
+        $allocation->timeallocated = (string)$now;
+        $allocation->timestart = (string)($now - 60 * 60 * 12);
+        $allocation->timedue = (string)($now + 60 * 60 * 10);
+        $allocation->timeend = (string)($now + 60 * 60 * 20);
+        $result = manual::update_allocation($allocation);
+        $this->assertSame((array)$result, (array)$allocation);
+
+        $newallocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
+        $this->assertSame((array)$allocation, (array)$newallocation);
+
+        $allocation->archived = '1';
+        $allocation->timeallocated = (string)$now;
+        $allocation->timestart = (string)($now - 60 * 60 * 12);
+        $allocation->timedue = (string)($now + 60 * 60 * 10);
+        $allocation->timeend = (string)($now + 60 * 60 * 20);
+        manual::update_allocation($allocation);
+        $newallocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
+        $this->assertSame((array)$allocation, (array)$newallocation);
     }
 
     public function test_deallocate_user(): void {
@@ -175,14 +212,14 @@ final class manual_test extends \advanced_testcase {
         $notification = $generator->create_program_notification(['programid' => $program1->id, 'notificationtype' => 'allocation']);
         $this->assertCount(0, $DB->get_records('tool_mulib_notification_user', []));
 
-        \tool_muprog\local\source\manual::allocate_users($program1->id, $source1->id, [$user1->id, $user2->id]);
+        manual::allocate_users($program1->id, $source1->id, [$user1->id, $user2->id]);
         $allocation1 = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $allocation2 = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user2->id], '*', MUST_EXIST);
         $this->assertCount(2, $DB->get_records('tool_mulib_notification_user', []));
         $this->assertCount(1, $DB->get_records('tool_mulib_notification_user', ['userid' => $user1->id]));
         $this->assertCount(1, $DB->get_records('tool_mulib_notification_user', ['userid' => $user2->id]));
 
-        \tool_muprog\local\source\manual::deallocate_user($program1, $source1, $allocation1);
+        manual::deallocate_user($program1, $source1, $allocation1);
         $this->assertFalse($DB->record_exists('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id]));
         $this->assertTrue($DB->record_exists('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user2->id]));
         $this->assertCount(1, $DB->get_records('tool_mulib_notification_user', []));
@@ -230,7 +267,7 @@ final class manual_test extends \advanced_testcase {
             'skipped' => 0,
             'errors' => 0,
         ];
-        $result = \tool_muprog\local\source\manual::process_uploaded_data($data, $csvdata);
+        $result = manual::process_uploaded_data($data, $csvdata);
         $this->assertSame($expected, $result);
         $this->assertTrue($DB->record_exists('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id]));
         $this->assertTrue($DB->record_exists('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user2->id]));
@@ -253,7 +290,7 @@ final class manual_test extends \advanced_testcase {
             'skipped' => 1,
             'errors' => 0,
         ];
-        $result = \tool_muprog\local\source\manual::process_uploaded_data($data, $csvdata);
+        $result = manual::process_uploaded_data($data, $csvdata);
         $this->assertSame($expected, $result);
         $this->assertTrue($DB->record_exists('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id]));
         $this->assertTrue($DB->record_exists('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user2->id]));
@@ -276,7 +313,7 @@ final class manual_test extends \advanced_testcase {
             'skipped' => 0,
             'errors' => 1,
         ];
-        $result = \tool_muprog\local\source\manual::process_uploaded_data($data, $csvdata);
+        $result = manual::process_uploaded_data($data, $csvdata);
         $this->assertSame($expected, $result);
         $this->assertTrue($DB->record_exists('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id]));
         $this->assertTrue($DB->record_exists('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user2->id]));
@@ -343,7 +380,7 @@ final class manual_test extends \advanced_testcase {
             'skipped' => 0,
             'errors' => 2,
         ];
-        $result = \tool_muprog\local\source\manual::process_uploaded_data($data, $csvdata);
+        $result = manual::process_uploaded_data($data, $csvdata);
         $this->assertSame($expected, $result);
 
         $allocation1 = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id]);

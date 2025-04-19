@@ -81,7 +81,7 @@ final class base_test extends \advanced_testcase {
         $this->assertSame(userdate($allocation->timestart), $result['program_startdate']);
         $this->assertSame($strnotset, $result['program_duedate']);
         $this->assertSame($strnotset, $result['program_enddate']);
-        $this->assertSame($strnotset, $result['program_completeddate']);
+        $this->assertSame($strnotset, $result['allocation_completeddate']);
 
         $result = base::get_allocation_placeholders($program1, $source1, $allocation, $user1);
         $this->assertIsArray($result);
@@ -97,7 +97,7 @@ final class base_test extends \advanced_testcase {
         $this->assertSame(userdate($allocation->timestart), $result['program_startdate']);
         $this->assertSame($strnotset, $result['program_duedate']);
         $this->assertSame($strnotset, $result['program_enddate']);
-        $this->assertSame($strnotset, $result['program_completeddate']);
+        $this->assertSame($strnotset, $result['allocation_completeddate']);
 
         $now = time();
         $allocation->archived = '0';
@@ -106,7 +106,7 @@ final class base_test extends \advanced_testcase {
         $allocation->timedue = (string)($now + 60 * 60 * 24 * 10);
         $allocation->timeend = (string)($now + 60 * 60 * 24 * 20);
         $allocation->timecompleted = (string)($now + 60 * 60 * 24 * 1);
-        allocation::update_user($allocation);
+        \tool_muprog\local\source\base::update_allocation($allocation);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
 
         $result = base::get_allocation_placeholders($program1, $source1, $allocation, $user1);
@@ -123,7 +123,7 @@ final class base_test extends \advanced_testcase {
         $this->assertSame(userdate($allocation->timestart), $result['program_startdate']);
         $this->assertSame(userdate($allocation->timedue), $result['program_duedate']);
         $this->assertSame(userdate($allocation->timeend), $result['program_enddate']);
-        $this->assertSame(userdate($allocation->timecompleted), $result['program_completeddate']);
+        $this->assertSame(userdate($allocation->timecompleted), $result['allocation_completeddate']);
     }
 
     public function test_get_notifier(): void {

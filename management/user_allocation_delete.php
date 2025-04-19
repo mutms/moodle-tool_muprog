@@ -57,9 +57,8 @@ $returnurl = new moodle_url('/admin/tool/muprog/management/program_users.php', [
 
 $user = $DB->get_record('user', ['id' => $allocation->userid], '*', MUST_EXIST);
 
-/** @var \tool_muprog\local\source\base $coursceclass */
-$coursceclass = allocation::get_source_classes()[$source->type];
-if (!$coursceclass::allocation_delete_supported($program, $source, $allocation)) {
+$sourceclass = allocation::get_source_classname($source->type);
+if (!$sourceclass || !$sourceclass::allocation_delete_supported($program, $source, $allocation)) {
     redirect($returnurl);
 }
 
@@ -74,7 +73,7 @@ if ($form->is_cancelled()) {
 }
 
 if ($data = $form->get_data()) {
-    $coursceclass::deallocate_user($program, $source, $allocation);
+    $sourceclass::deallocate_user($program, $source, $allocation);
     $form->redirect_submitted($returnurl);
 }
 

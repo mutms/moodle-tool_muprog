@@ -97,7 +97,7 @@ abstract class base extends \tool_mulib\local\notification\notificationtype {
         $a['program_startdate'] = userdate($allocation->timestart);
         $a['program_duedate'] = (isset($allocation->timedue) ? userdate($allocation->timedue) : $strnotset);
         $a['program_enddate'] = (isset($allocation->timeend) ? userdate($allocation->timeend) : $strnotset);
-        $a['program_completeddate'] = (isset($allocation->timecompleted) ? userdate($allocation->timecompleted) : $strnotset);
+        $a['allocation_completeddate'] = (isset($allocation->timecompleted) ? userdate($allocation->timecompleted) : $strnotset);
 
         return $a;
     }
