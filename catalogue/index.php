@@ -44,7 +44,7 @@ $PAGE->set_context($syscontext);
 require_login();
 require_capability('tool/muprog:viewcatalogue', $syscontext);
 
-if (!enrol_is_enabled('muprog')) {
+if (!\tool_muprog\local\util::is_muprog_active()) {
     redirect(new moodle_url('/'));
 }
 

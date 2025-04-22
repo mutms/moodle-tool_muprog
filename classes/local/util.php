@@ -29,6 +29,25 @@ namespace tool_muprog\local;
  */
 final class util {
     /**
+     * Cache existence of programs.
+     */
+    public static function fix_muprog_active(): void {
+        global $DB;
+
+        $active = (int)$DB->record_exists('tool_muprog_program', ['archived' => 0]);
+        set_config('active', $active, 'tool_muprog');
+    }
+
+    /**
+     * Are any programs present?
+     *
+     * @return bool
+     */
+    public static function is_muprog_active(): bool {
+        return (bool)get_config('tool_muprog', 'active');
+    }
+
+    /**
      * Is multi-tenancy available?
      *
      * @return bool

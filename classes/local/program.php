@@ -241,6 +241,8 @@ final class program {
 
         $trans->allow_commit();
 
+        util::fix_muprog_active();
+
         allocation::fix_allocation_sources($program->id, null);
         allocation::fix_enrol_instances($program->id);
         allocation::fix_user_enrolments($program->id, null);
@@ -376,6 +378,8 @@ final class program {
 
         $trans->allow_commit();
 
+        util::fix_muprog_active();
+
         allocation::fix_allocation_sources($program->id, null);
         allocation::fix_enrol_instances($program->id);
         allocation::fix_user_enrolments($program->id, null);
@@ -437,6 +441,8 @@ final class program {
 
         $trans->allow_commit();
 
+        util::fix_muprog_active();
+
         allocation::fix_allocation_sources($program->id, null);
         allocation::fix_enrol_instances($program->id);
         allocation::fix_user_enrolments($program->id, null);
@@ -468,6 +474,8 @@ final class program {
         \tool_muprog\event\program_restored::create_from_program($program)->trigger();
 
         $trans->allow_commit();
+
+        util::fix_muprog_active();
 
         allocation::fix_allocation_sources($program->id, null);
         allocation::fix_enrol_instances($program->id);
@@ -893,6 +901,8 @@ final class program {
         \tool_muprog\event\program_deleted::create_from_program($program)->trigger();
 
         $trans->allow_commit();
+
+        util::fix_muprog_active();
 
         // Delete enrolment instances.
         allocation::fix_enrol_instances($program->id);

@@ -42,7 +42,10 @@ class certificate extends \core\task\scheduled_task {
      * Run task for all program cron stuff.
      */
     public function execute() {
-        if (!enrol_is_enabled('muprog')) {
+        global $DB;
+
+        // Do no use util::is_muprog_active() here, certificates may need to be archived.
+        if (!$DB->record_exists('tool_muprog_program', [])) {
             return;
         }
 

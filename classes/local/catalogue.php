@@ -326,10 +326,6 @@ EOT;
     public static function is_program_visible(\stdClass $program, ?int $userid = null): bool {
         global $DB, $USER;
 
-        if (!enrol_is_enabled('muprog')) {
-            return false;
-        }
-
         if ($userid === null) {
             $userid = $USER->id;
         }
@@ -375,7 +371,7 @@ EOT;
      * @return ?\moodle_url null of programs disabled or user cannot access catalogue
      */
     public static function get_catalogue_url(): ?\moodle_url {
-        if (!enrol_is_enabled('muprog')) {
+        if (!\tool_muprog\local\util::is_muprog_active()) {
             return null;
         }
         if (!isloggedin()) {

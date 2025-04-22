@@ -42,7 +42,10 @@ class cron extends \core\task\scheduled_task {
      * Run task for all program cron stuff.
      */
     public function execute() {
-        if (!enrol_is_enabled('muprog')) {
+        global $DB;
+
+        // Do no use util::is_muprog_active() here, this is used as final cleanup code.
+        if (!$DB->record_exists('tool_muprog_program', [])) {
             return;
         }
 

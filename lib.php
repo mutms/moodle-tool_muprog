@@ -122,7 +122,7 @@ function tool_muprog_core_calendar_provide_event_action(calendar_event $event,
 function tool_muprog_myprofile_navigation(core_user\output\myprofile\tree $tree, $user, $iscurrentuser, $course) {
     global $USER;
 
-    if (!enrol_is_enabled('muprog')) {
+    if (!\tool_muprog\local\util::is_muprog_active()) {
         return;
     }
 
@@ -190,10 +190,6 @@ function tool_muprog_get_tagged_programs($tag, $exclusivemode = false, $fromctx 
  * @param context $coursecategorycontext The context of the course category
  */
 function tool_muprog_extend_navigation_category_settings($navigation, $coursecategorycontext): void {
-    if (!enrol_is_enabled('muprog')) {
-        return;
-    }
-
     if (!has_capability('tool/muprog:view', $coursecategorycontext)) {
         return;
     }

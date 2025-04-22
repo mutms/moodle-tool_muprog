@@ -197,10 +197,6 @@ final class notification_manager extends \tool_mulib\local\notification\manager 
     public static function trigger_notifications(?int $programid, ?int $userid): void {
         global $DB;
 
-        if (!enrol_is_enabled('muprog')) {
-            return;
-        }
-
         $program = null;
         if ($programid) {
             $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);

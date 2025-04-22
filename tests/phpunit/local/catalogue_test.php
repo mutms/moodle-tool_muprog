@@ -610,6 +610,17 @@ final class catalogue_test extends \advanced_testcase {
         $this->assertNull(\tool_muprog\local\catalogue::get_catalogue_url());
 
         $this->setUser(get_admin());
+        $this->assertNull(\tool_muprog\local\catalogue::get_catalogue_url());
+
+        /** @var \tool_muprog_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
+
+        $program1 = $generator->create_program(['archived' => 1]);
+        $this->setUser(get_admin());
+        $this->assertNull(\tool_muprog\local\catalogue::get_catalogue_url());
+
+        $program2 = $generator->create_program(['archived' => 0]);
+        $this->setUser(get_admin());
         $expected = new \moodle_url('/admin/tool/muprog/catalogue/index.php');
         $this->assertSame((string)$expected, (string)\tool_muprog\local\catalogue::get_catalogue_url());
 

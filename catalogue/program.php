@@ -45,7 +45,7 @@ $PAGE->set_context(context_system::instance());
 require_login();
 require_capability('tool/muprog:viewcatalogue', context_system::instance());
 
-if (!enrol_is_enabled('muprog')) {
+if (!\tool_muprog\local\util::is_muprog_active()) {
     redirect(new moodle_url('/'));
 }
 
