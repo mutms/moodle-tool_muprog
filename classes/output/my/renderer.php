@@ -50,7 +50,6 @@ class renderer extends \plugin_renderer_base {
 
         $context = \context::instance_by_id($program->contextid);
         $fullname = format_string($program->fullname);
-        $programicon = $this->output->pix_icon('program', '', 'tool_muprog');
 
         $description = file_rewrite_pluginfile_urls($program->description, 'pluginfile.php', $context->id, 'tool_muprog', 'description', $program->id);
         $description = format_text($description, $program->descriptionformat, ['context' => $context]);
@@ -77,7 +76,7 @@ class renderer extends \plugin_renderer_base {
   $programimage
   <div class="info">
   <div class="info">
-    <h2 class="programname">{$programicon}{$fullname}</h2>
+    <h2 class="programname">{$fullname}</h2>
   </div>$tagsdiv
   <div class="content">
     <div class="summary">$description</div>

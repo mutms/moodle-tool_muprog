@@ -40,6 +40,7 @@ final class allocation extends base {
     protected function get_default_tables(): array {
         return [
             'tool_muprog_allocation',
+            'tool_muprog_program',
         ];
     }
 
@@ -67,12 +68,25 @@ final class allocation extends base {
     }
 
     /**
+     * Return syntax for joining on the program table
+     *
+     * @return string
+     */
+    public function get_program_join(): string {
+        $allocationalias = $this->get_table_alias('tool_muprog_allocation');
+        $programalias = $this->get_table_alias('tool_muprog_program');
+
+        return "LEFT JOIN {tool_muprog_program} {$programalias} ON {$programalias}.id = {$allocationalias}.programid";
+    }
+
+    /**
      * Returns list of all available columns.
      *
      * @return column[]
      */
     protected function get_all_columns(): array {
         $allocationalias = $this->get_table_alias('tool_muprog_allocation');
+        $programalias = $this->get_table_alias('tool_muprog_program');
 
         $dateformat = get_string('strftimedatetimeshort');
 
@@ -126,10 +140,11 @@ final class allocation extends base {
             $this->get_entity_name()
         ))
             ->add_joins($this->get_joins())
+            ->add_join($this->get_program_join())
             ->set_type(column::TYPE_INTEGER)
             ->add_fields("{$allocationalias}.id, {$allocationalias}.programid, {$allocationalias}.timestart, {$allocationalias}.timedue, "
                 . "{$allocationalias}.timeend, {$allocationalias}.timecompleted, {$allocationalias}.archived")
-            ->add_field('(' . "SELECT p.archived FROM {tool_muprog_program} p WHERE p.id = {$allocationalias}.programid" . ')', 'programarchived')
+            ->add_field("{$programalias}.archived", 'programarchived')
             ->set_is_sortable(false)
             ->add_callback(static function($value, \stdClass $row): string {
                 if (!$row->id) {
