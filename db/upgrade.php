@@ -37,7 +37,7 @@ function xmldb_tool_muprog_upgrade($oldversion): bool {
 
     $dbman = $DB->get_manager();
 
-    if ($oldversion < 2025042300) {
+    if ($oldversion < 2025042200) {
         $table = new xmldb_table('tool_muprog_prg_snapshot');
         if ($dbman->table_exists($table)) {
             $dbman->drop_table($table);
@@ -48,10 +48,6 @@ function xmldb_tool_muprog_upgrade($oldversion): bool {
             $dbman->drop_table($table);
         }
 
-        upgrade_plugin_savepoint(true, 2025042300, 'tool', 'muprog');
-    }
-
-    if ($oldversion < 2025042101) {
         $table = new xmldb_table('tool_muprog_allocation');
         $field = new xmldb_field('calendarupdated', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'timecompleted');
 
@@ -59,7 +55,7 @@ function xmldb_tool_muprog_upgrade($oldversion): bool {
             $dbman->add_field($table, $field);
         }
 
-        upgrade_plugin_savepoint(true, 2025042101, 'tool', 'muprog');
+        upgrade_plugin_savepoint(true, 2025042200, 'tool', 'muprog');
     }
 
     return true;
