@@ -5,13 +5,17 @@ Programs is a set of plugins that implements programs, also known as learning pa
 Main features include:
 
 * program content created as a hierarchy of courses and course sets with flexible sequencing rules,
-* _Program catalogue_ where students may browse available programs and related courses,
+* Program catalogue where students may browse available programs and related courses, 
 * multiple sources for allocation of students to programs,
 * advanced program scheduling settings,
 * efficient course enrolment automation,
-* easy-to-use programs management interface.
+* My programs dashboard block,
+* Training value custom course field,
+* easy-to-use program management interface.
 
-This plugin requires following:
+# Installation and requirements
+
+This plugin requires following plugins:
 
 * [Additional tools library plugin](https://github.com/mutms/moodle-tool_mulib)
 * [Program enrolment plugin](https://github.com/mutms/moodle-enrol_muprog)
@@ -24,4 +28,8 @@ Other recommended plugins:
 * [Certificate plugin](https://github.com/moodleworkplace/moodle-tool_certificate)
 * [Program fields for Certificate plugin](https://github.com/mutms/moodle-certificateelement_muprog)
 
-This plugin is compatible with [Multi-tenancy for Moodle™](https://github.com/mutms/moodle-tool_mutenancy).
+This plugin is fully compatible with [Multi-tenancy for Moodle™](https://github.com/mutms/moodle-tool_mutenancy).
+
+## Documentation
+
+See [online documentation](https://github.com/mutms/moodle-tool_muprog/wiki) for more information.
