@@ -50,7 +50,9 @@ final class allocations extends system_report {
     #[\Override]
     protected function initialise(): void {
         global $DB;
-        $this->program = $DB->get_record('tool_muprog_program', ['id' => $this->get_parameters()['programid']], '*', MUST_EXIST);
+        // Make sure programid and context match!
+        $this->program = $DB->get_record('tool_muprog_program',
+            ['id' => $this->get_parameters()['programid'], 'contextid' => $this->get_context()->id], '*', MUST_EXIST);
 
         $this->allocationentity = new allocation();
         $allocationalias = $this->allocationentity->get_table_alias('tool_muprog_allocation');

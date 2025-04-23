@@ -41,8 +41,6 @@ final class programs extends system_report {
 
     #[\Override]
     protected function initialise(): void {
-        $context = $this->get_context();
-
         $this->programentity = new program();
         $this->programalias = $this->programentity->get_table_alias('tool_muprog_program');
 
@@ -54,6 +52,8 @@ final class programs extends system_report {
         $contextalias = $this->programentity->get_table_alias('context');
         $this->add_join($this->programentity->get_context_join());
 
+        // Make sure only programs from context and its subcontexts are shown.
+        $context = $this->get_context();
         $paramlike = database::generate_param_name();
         $this->add_base_condition_sql("({$contextalias}.id = {$context->id} OR {$contextalias}.path LIKE :$paramlike)", [$paramlike => $context->path . '/%']);
 
