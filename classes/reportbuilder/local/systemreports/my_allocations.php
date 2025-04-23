@@ -79,11 +79,17 @@ final class my_allocations extends system_report {
 
     #[\Override]
     protected function can_view(): bool {
+        global $USER;
+
         // Everybody may view own programs.
         if (!\tool_muprog\local\util::is_muprog_active()) {
             return false;
         }
         if (isguestuser() || !isloggedin()) {
+            return false;
+        }
+        $usercontext = $this->get_context();
+        if ($usercontext->contextlevel != CONTEXT_USER || $usercontext->instanceid != $USER->id) {
             return false;
         }
         return true;
