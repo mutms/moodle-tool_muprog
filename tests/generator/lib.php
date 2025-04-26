@@ -49,7 +49,8 @@ class tool_muprog_generator extends component_generator_base {
      * @return stdClass program record
      */
     public function create_program($record = null): stdClass {
-        global $DB;
+        global $DB, $CFG;
+        require_once("$CFG->libdir/filelib.php");
 
         $record = (object)(array)$record;
 
@@ -69,7 +70,10 @@ class tool_muprog_generator extends component_generator_base {
         }
         if (!isset($record->contextid)) {
             if (!empty($record->category)) {
-                $category = $DB->get_record('course_categories', ['name' => $record->category], '*', MUST_EXIST);
+                $category = $DB->get_record('course_categories', ['name' => $record->category]);
+                if (!$category) {
+                    $category = $DB->get_record('course_categories', ['idnumber' => $record->category], '*', MUST_EXIST);
+                }
                 $context = context_coursecat::instance($category->id);
                 $record->contextid = $context->id;
             } else {
@@ -105,6 +109,12 @@ class tool_muprog_generator extends component_generator_base {
         unset($record->cohorts);
         unset($record->cohortods);
 
+        $image = null;
+        if (!empty($record->image)) {
+            $image = $record->image;
+        }
+        unset($record->image);
+
         $program = tool_muprog\local\program::create($record);
 
         if ($cohorts) {
@@ -130,6 +140,29 @@ class tool_muprog_generator extends component_generator_base {
             $data['type'] = $source;
             $data = (object)$data;
             \tool_muprog\local\source\base::update_source($data);
+        }
+
+        if ($image) {
+            $imagefile = $CFG->dirroot . '/' . ltrim($image, '/');
+            if (!file_exists($imagefile)) {
+                throw new Exception('Program image file does not exist');
+            }
+            $context = \context::instance_by_id($program->contextid);
+            $fs = get_file_storage();
+            $filerecord = [
+                'contextid' => $context->id,
+                'component' => 'tool_muprog',
+                'filearea' => 'image',
+                'itemid' => $program->id,
+                'filepath' => '/',
+                'filename' => basename($image),
+            ];
+            $file = $fs->create_file_from_pathname($filerecord, $imagefile);
+            $presenation = (array)json_decode($program->presentationjson);
+            $presenation['image'] = $file->get_filename();
+            $DB->set_field('tool_muprog_program', 'presentationjson',
+                \tool_muprog\local\util::json_encode($presenation), ['id' => $program->id]);
+            $program = $DB->get_record('tool_muprog_program', ['id' => $program->id], '*', MUST_EXIST);
         }
 
         return $program;
@@ -226,7 +259,16 @@ class tool_muprog_generator extends component_generator_base {
             $data = (object)$data;
             $source = \tool_muprog\local\source\manual::update_source($data);
         }
-        \tool_muprog\local\source\manual::allocate_users($program->id, $source->id, [$user->id]);
+
+        $overridable = ['timeallocated', 'timestart', 'timedue', 'timeend'];
+        $dateoverrides = [];
+        foreach ($overridable as $override) {
+            if (!empty($record->{$override}) && is_number($record->{$override})) {
+                $dateoverrides[$override] = $record->{$override};
+            }
+        }
+
+        \tool_muprog\local\source\manual::allocate_users($program->id, $source->id, [$user->id], $dateoverrides);
 
         return $DB->get_record('tool_muprog_allocation', ['programid' => $program->id, 'userid' => $user->id], '*', MUST_EXIST);
     }

@@ -54,6 +54,7 @@ $user = $DB->get_record('user', ['id' => $allocation->userid], '*', MUST_EXIST);
 $currenturl = new moodle_url('/admin/tool/muprog/management/allocation.php', ['id' => $allocation->id]);
 
 management::setup_program_page($currenturl, $context, $program, 'program_users');
+\tool_mulib\local\plugindocs::set_path('tool_muprog', 'management_allocation.md');
 
 $sourceclasses = allocation::get_source_classes();
 /** @var \tool_muprog\local\source\base $sourceclass */

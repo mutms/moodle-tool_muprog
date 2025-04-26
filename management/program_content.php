@@ -54,6 +54,7 @@ require_capability('tool/muprog:view', $context);
 $currenturl = new moodle_url('/admin/tool/muprog/management/program_content.php', ['id' => $id]);
 
 management::setup_program_page($currenturl, $context, $program, 'program_content');
+\tool_mulib\local\plugindocs::set_path('tool_muprog', 'management_program_content.md');
 
 if ($autofix && !$program->archived) {
     require_sesskey();

@@ -121,9 +121,12 @@ final class generator_test extends \advanced_testcase {
         $this->assertSame($cohort1->id, $cs[0]->cohortid);
         $this->assertSame($cohort2->id, $cs[1]->cohortid);
 
-        $category2 = $this->getDataGenerator()->create_category([]);
+        $category2 = $this->getDataGenerator()->create_category(['name' => 'Cat 2', 'idnumber' => 'CT2']);
         $catcontext2 = \context_coursecat::instance($category2->id);
         $program = $generator->create_program(['category' => $category2->name]);
+        $this->assertSame((string)$catcontext2->id, $program->contextid);
+
+        $program = $generator->create_program(['category' => $category2->idnumber]);
         $this->assertSame((string)$catcontext2->id, $program->contextid);
 
         $data = (object)[
@@ -290,5 +293,20 @@ final class generator_test extends \advanced_testcase {
         $this->assertSame($user2->id, $allocation2->userid);
         $this->assertSame($program->id, $allocation2->programid);
         $this->assertSame($source->id, $allocation2->sourceid);
+
+        $now = time();
+        $data = [
+            'program' => $program->fullname,
+            'user' => $user3->username,
+            'timeallocated' => $now - 100,
+            'timestart' => $now - 50,
+            'timedue' => $now + 200,
+            'timeend' => $now + 300,
+        ];
+        $allocation3 = $generator->create_program_allocation($data);
+        $this->assertEquals($data['timeallocated'], $allocation3->timeallocated);
+        $this->assertEquals($data['timestart'], $allocation3->timestart);
+        $this->assertEquals($data['timedue'], $allocation3->timedue);
+        $this->assertEquals($data['timeend'], $allocation3->timeend);
     }
 }

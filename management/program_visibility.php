@@ -49,6 +49,7 @@ require_capability('tool/muprog:view', $context);
 $currenturl = new moodle_url('/admin/tool/muprog/management/program_visibility.php', ['id' => $id]);
 
 management::setup_program_page($currenturl, $context, $program, 'program_visibility');
+\tool_mulib\local\plugindocs::set_path('tool_muprog', 'management_program_visibility.md');
 
 /** @var \tool_muprog\output\management\renderer $managementoutput */
 $managementoutput = $PAGE->get_renderer('tool_muprog', 'management');

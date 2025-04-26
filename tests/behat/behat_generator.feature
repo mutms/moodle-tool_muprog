@@ -52,7 +52,7 @@ Feature: Programs behat generator tests
       | Program 001   | Cat 1      | PR1        | 0       | 0           | Yes    |
       | Program 002   | Cat 2      | PR2        | 0       | 0           | No     |
     And I follow "Program 000"
-    And I follow "Visibility settings"
+    And I follow "Catalogue visibility"
     And I should see "Cohort 1"
     And I should see "Cohort 2"
     And I should not see "Cohort 3"

@@ -59,7 +59,7 @@ Feature: Program visibility management tests
       | viewer1   | pviewer       | System       |           |
 
   @javascript
-  Scenario: Manager may update program visibility settings
+  Scenario: Manager may update program Catalogue visibility
     Given the following "tool_muprog > programs" exist:
       | fullname    | idnumber | category |
       | Program 000 | PR0      |          |
@@ -74,7 +74,7 @@ Feature: Program visibility management tests
     And "Program 003" row "Public" column of "reportbuilder-table" table should contain "No"
 
     When I follow "Program 000"
-    And I follow "Visibility settings"
+    And I follow "Catalogue visibility"
     And I press "Edit"
     And the following fields in the ".modal-dialog" "css_element" match these values:
       | Public             | No             |
@@ -104,7 +104,7 @@ Feature: Program visibility management tests
     And "Program 001" row "Public" column of "reportbuilder-table" table should contain "No"
 
     When I follow "Program 002"
-    And I follow "Visibility settings"
+    And I follow "Catalogue visibility"
     And I press "Edit"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Visible to cohorts | Cohort 2, Cohort 1 |

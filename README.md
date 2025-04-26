@@ -34,4 +34,5 @@ This plugin is fully compatible with [Multi-tenancy](https://github.com/mutms/mo
 
 ## Documentation
 
-See [online documentation](https://github.com/mutms/moodle-tool_muprog/wiki) for more information.
+See [plugin documentation](https://github.com/mutms/moodle-tool_muprog/blob/MOODLE_405_STABLE/docs/en/index.md)
+and [Wiki pages](https://github.com/mutms/moodle-tool_muprog/wiki) for more information.
