@@ -611,7 +611,7 @@ abstract class base {
      *
      * @param int $allocationid
      * @return stdClass allocation record
- */
+     */
     final public static function allocation_archive(int $allocationid): stdClass {
         global $DB;
 
