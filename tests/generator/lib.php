@@ -107,7 +107,7 @@ class tool_muprog_generator extends component_generator_base {
             $cohorts = $record->cohorts;
         }
         unset($record->cohorts);
-        unset($record->cohortods);
+        unset($record->cohortids);
 
         $image = null;
         if (!empty($record->image)) {

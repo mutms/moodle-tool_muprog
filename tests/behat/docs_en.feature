@@ -1,4 +1,4 @@
-@tool @tool_muprog @muTMS
+@tool @tool_muprog @muTMS @javascript
 Feature: Programs plugin English documentation image generator
 
   Background:
@@ -96,7 +96,6 @@ Feature: Programs plugin English documentation image generator
       | Motorcycle Maintenance for Beginners | i        |                        |                        |
       | Motorcycle Maintenance for Beginners | k        |                        |                        |
 
-  @javascript
   Scenario: Documentation screenshots for programs management_index page
     Given I log in as "manager"
     And I am on the "tool_muprog > All programs management" page
@@ -104,7 +103,6 @@ Feature: Programs plugin English documentation image generator
     Then I make documentation screenshot "programs.png" for "tool_muprog" plugin
     And site is restored after documentation screenshots
 
-  @javascript
   Scenario: Documentation screenshots for management_program page
     Given I log in as "manager"
     And I am on the "tool_muprog > All programs management" page
@@ -113,7 +111,6 @@ Feature: Programs plugin English documentation image generator
     Then I make documentation screenshot "program_general.png" for "tool_muprog" plugin
     And site is restored after documentation screenshots
 
-  @javascript
   Scenario: Documentation screenshots for management_program_content page
     Given I log in as "manager"
     And I am on the "tool_muprog > All programs management" page
@@ -123,7 +120,6 @@ Feature: Programs plugin English documentation image generator
     Then I make documentation screenshot "program_content.png" for "tool_muprog" plugin
     And site is restored after documentation screenshots
 
-  @javascript
   Scenario: Documentation screenshots for management_program_visibility page
     Given I log in as "manager"
     And I am on the "tool_muprog > All programs management" page
@@ -133,7 +129,6 @@ Feature: Programs plugin English documentation image generator
     Then I make documentation screenshot "program_visibility.png" for "tool_muprog" plugin
     And site is restored after documentation screenshots
 
-  @javascript
   Scenario: Documentation screenshots for management_program_allocation page
     Given I log in as "manager"
     And I am on the "tool_muprog > All programs management" page
@@ -159,7 +154,6 @@ Feature: Programs plugin English documentation image generator
     Then I make documentation screenshot "program_allocation.png" for "tool_muprog" plugin
     And site is restored after documentation screenshots
 
-  @javascript
   Scenario: Documentation screenshots for management_program_users page
     Given I log in as "manager"
     And I am on the "tool_muprog > All programs management" page
@@ -169,8 +163,7 @@ Feature: Programs plugin English documentation image generator
     Then I make documentation screenshot "program_users.png" for "tool_muprog" plugin
     And site is restored after documentation screenshots
 
-  @javascript
-  Scenario: Documentation screenshots for management_allocation page
+  Scenario: Documentation screenshots for progams management_allocation page
     Given I log in as "manager"
     And I am on the "tool_muprog > All programs management" page
     And I follow "Basic First Aid"
@@ -181,7 +174,6 @@ Feature: Programs plugin English documentation image generator
     Then I make documentation screenshot "allocation.png" for "tool_muprog" plugin
     And site is restored after documentation screenshots
 
-  @javascript
   Scenario: Documentation screenshots for My programs profile page
     Given I log in as "c"
     And I am on the "tool_muprog > My programs" page
@@ -192,7 +184,6 @@ Feature: Programs plugin English documentation image generator
     Then I make documentation screenshot "profile_my_program.png" for "tool_muprog" plugin
     And site is restored after documentation screenshots
 
-  @javascript
   Scenario: Documentation screenshots for My programs block
     Given I log in as "c"
     And I skip tests if "block_muprog_my" is not installed
@@ -212,7 +203,6 @@ Feature: Programs plugin English documentation image generator
     Then I make documentation screenshot "dashboard_my_programs.png" for "tool_muprog" plugin
     And site is restored after documentation screenshots
 
-  @javascript
   Scenario: Documentation screenshots for Program catalogue page
     Given I log in as "a"
     And I am on the "tool_muprog > My programs" page

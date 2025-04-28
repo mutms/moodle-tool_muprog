@@ -22,7 +22,7 @@ and end dates if specified.
 
 Students may be allocated to programs through the following sources:
 
-- **Manual allocation**: A manager with the _Allocate users to programs_ capability in program context may manually allocate students.
+- **Manual allocation**: A manager with the _Allocate users to programs_ capability in program context may manually allocate users.
 - **Self-allocation**: Users can self-allocate by clicking a button in the Program catalogue. An optional access key and maximum user limit may be applied.
 - **Request with approval**: Users can request allocation via the Program catalogue, subject to approval by a manager.
 - **Automatic cohort allocation**: All members of specified cohorts are automatically allocated to the program.

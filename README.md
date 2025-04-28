@@ -8,23 +8,21 @@ learning journeys tailored to meet diverse learning goals and requirements. The 
 provide enhanced flexibility and automation, making it an indispensable tool for managing complex educational
 or training offerings.
 
-**Key features:**
-
-* program content created as a hierarchy of courses, training frameworks and course sets with flexible sequencing rules,
-* Program catalogue where students may browse available programs and related courses, 
-* multiple sources for allocation of students to programs,
-* advanced program scheduling settings,
-* efficient course enrolment automation,
-* easy-to-use program management interface,
-- dedicated _My programs_ profile page,
-- _My programs_ dashboard block for quick access to details.
-
-**Additional benefits**
-
 Programs enhance Moodle's core functionality by bridging gaps in traditional course management.
 They offer solutions for challenges such as organizing courses across categories, managing multi-tenancy for course roles,
 and scheduling individualized course access. With seamless integration into Moodle™, Programs provide a scalable and
 efficient way to manage both small-scale and large-scale learning initiatives and training.
+
+## Key features
+
+* program content created as a hierarchy of courses, training frameworks and course sets with flexible sequencing rules,
+* multiple sources for allocation of students to programs,
+* advanced program scheduling settings,
+* efficient course enrolment automation,
+* easy-to-use _Program management_ interface,
+* _Program catalogue_ where students may browse available programs and related courses,
+* dedicated _My programs profile page_,
+* _My programs dashboard block_ for quick access to details.
 
 ## Requirements
 

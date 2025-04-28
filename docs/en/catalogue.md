@@ -11,6 +11,6 @@ The Program catalogue can be accessed from users' [My programs profile page](pro
 integrated part of the user experience.
 
 Program visibility in the catalogue is managed through the [Program management interface](management_program_visibility.md).
-Please note that archived courses are not visible in the catalogue. The catalogue always adheres to tenant separation rules.  
+Please note that archived programs are not visible in the catalogue. The catalogue always adheres to tenant separation rules.  
 
 ![Program catalogue](img/catalogue.png)
