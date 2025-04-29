@@ -136,8 +136,8 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="sourceid" TYPE="foreign" FIELDS="sourceid" REFTABLE="tool_muprog_source" REFFIELDS="id"/>
-        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="users" REFFIELDS="id"/>
-        <KEY NAME="rejectedby" TYPE="foreign" FIELDS="rejectedby" REFTABLE="users" REFFIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="rejectedby" TYPE="foreign" FIELDS="rejectedby" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="sourceid-userid" UNIQUE="true" FIELDS="sourceid, userid" COMMENT="Only one request for allocation of user per source, delete rejection if they are allowed to retry"/>
@@ -163,7 +163,7 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="programid" TYPE="foreign" FIELDS="programid" REFTABLE="tool_muprog_program" REFFIELDS="id"/>
-        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="users" REFFIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
         <KEY NAME="sourceid" TYPE="foreign" FIELDS="sourceid" REFTABLE="tool_muprog_source" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
@@ -202,8 +202,8 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="itemid" TYPE="foreign" FIELDS="itemid" REFTABLE="tool_muprog_item" REFFIELDS="id"/>
-        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="users" REFFIELDS="id"/>
-        <KEY NAME="createdby" TYPE="foreign" FIELDS="createdby" REFTABLE="users" REFFIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="createdby" TYPE="foreign" FIELDS="createdby" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="itemid-userid" UNIQUE="true" FIELDS="itemid, userid" COMMENT="Only one evidence per item and user allowed"/>
