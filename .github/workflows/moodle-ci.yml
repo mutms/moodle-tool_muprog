@@ -1,6 +1,9 @@
 name: Moodle Plugin CI
 
-on: [push]
+on:
+  push:
+    branches:
+      - '**'
 
 jobs:
   test:
