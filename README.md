@@ -53,5 +53,6 @@ and exists thanks to Open LMS's decision to release it to the public under the G
 Note that the current code is still under development and is not suitable for production use.
 If you require a stable version for a production environment or commercial support,
 please consider [Open LMS Work](https://www.openlms.net/open-lms-work/).
+This plugin is not suitable for existing customers of Open LMS due to the lack of upgrade path.
 
 MuTMS project is not associated with Open LMS or Moodle HQ in any way.
