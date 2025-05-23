@@ -30,6 +30,8 @@ namespace tool_muprog\local\form;
 final class source_manual_allocate extends \tool_mulib\local\dialog_form {
     /** @var array $arguments for WS call to get candidate users */
     protected $arguments;
+    /** @var \tool_muprog\customfield\allocation_handler */
+    protected $handler;
 
     #[\Override]
     protected function definition() {
@@ -53,7 +55,24 @@ final class source_manual_allocate extends \tool_mulib\local\dialog_form {
         $mform->setType('sourceid', PARAM_INT);
         $mform->setDefault('sourceid', $source->id);
 
+        // Add custom fields to the form.
+        $this->handler = \tool_muprog\customfield\allocation_handler::create();
+        $this->handler->set_new_item_context($context);
+        $this->handler->instance_form_definition($mform);
+
         $this->add_action_buttons(true, get_string('source_manual_allocateusers', 'tool_muprog'));
+
+        // Prepare custom fields data.
+        $data = (object)[];
+        $this->handler->instance_form_before_set_data($data);
+        $this->set_data($data);
+    }
+
+    #[\Override]
+    public function definition_after_data() {
+        parent::definition_after_data();
+        $mform = $this->_form;
+        $this->handler->instance_form_definition_after_data($mform, 0);
     }
 
     #[\Override]
@@ -90,7 +109,9 @@ final class source_manual_allocate extends \tool_mulib\local\dialog_form {
             }
         }
 
+        // Add the custom fields validation.
+        $errors = array_merge($errors, $this->handler->instance_form_validation($data, $files));
+
         return $errors;
     }
-
 }

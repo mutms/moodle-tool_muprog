@@ -44,16 +44,18 @@ Feature: Manual program allocation tests
       | Program viewer  | pviewer   |
       | Program manager | pmanager  |
     And the following "permission overrides" exist:
-      | capability                   | permission | role     | contextlevel | reference |
-      | tool/muprog:view             | Allow      | pviewer  | System       |           |
-      | tool/muprog:view             | Allow      | pmanager | System       |           |
-      | tool/muprog:edit             | Allow      | pmanager | System       |           |
-      | tool/muprog:delete           | Allow      | pmanager | System       |           |
-      | tool/muprog:addcourse        | Allow      | pmanager | System       |           |
-      | tool/muprog:allocate         | Allow      | pmanager | System       |           |
-      | tool/muprog:deallocate       | Allow      | pmanager | System       |           |
-      | tool/muprog:manageallocation | Allow      | pmanager | System       |           |
-      | moodle/cohort:view           | Allow      | pmanager | System       |           |
+      | capability                        | permission | role     | contextlevel | reference |
+      | tool/muprog:view                  | Allow      | pviewer  | System       |           |
+      | tool/muprog:view                  | Allow      | pmanager | System       |           |
+      | tool/muprog:edit                  | Allow      | pmanager | System       |           |
+      | tool/muprog:delete                | Allow      | pmanager | System       |           |
+      | tool/muprog:addcourse             | Allow      | pmanager | System       |           |
+      | tool/muprog:allocate              | Allow      | pmanager | System       |           |
+      | tool/muprog:deallocate            | Allow      | pmanager | System       |           |
+      | tool/muprog:manageallocation      | Allow      | pmanager | System       |           |
+      | moodle/cohort:view                | Allow      | pmanager | System       |           |
+      | moodle/site:configview            | Allow      | pmanager | System       |           |
+      | tool/muprog:configurecustomfields | Allow      | pmanager | System       |           |
     And the following "role assigns" exist:
       | user      | role          | contextlevel | reference |
       | manager   | manager       | System       |           |
@@ -334,3 +336,60 @@ Feature: Manual program allocation tests
     And I click on "Allocation actions" "link"
     Then I should see "Update allocation"
     And I should not see "Delete program allocation"
+
+  @javascript
+  Scenario: Set up, add and update custom fields for program allocations
+    And the following "permission overrides" exist:
+      | capability                           | permission | role     | contextlevel | reference |
+      | tool/muprog:admin                    | Allow      | pmanager | System       |           |
+    And I log in as "manager1"
+    And I navigate to "Programs > Program allocation custom fields" in site administration
+    And I press "Add a new category"
+    And I click on "Add a new custom field" "link"
+    And I click on "Short text" "link"
+    And I set the following fields to these values:
+      | Name                                     | Test field 1 |
+      | Short name                               | testfield1   |
+    And I click on "Save changes" "button" in the "Adding a new Short text" "dialogue"
+    And I click on "Add a new custom field" "link"
+    And I click on "Short text" "link"
+    And I set the following fields to these values:
+      | Name                                     | Test field 2 |
+      | Short name                               | testfield2   |
+      | Allocatee                                | 1            |
+    And I click on "Save changes" "button" in the "Adding a new Short text" "dialogue"
+
+    And I am on the "tool_muprog > All programs management" page
+    And I follow "Program 000"
+    And I click on "Allocation settings" "link" in the ".secondary-navigation" "css_element"
+    And I click on "Update Manual allocation" "link"
+    And I set the following fields to these values:
+      | Active | Yes |
+    And I press dialog form button "Update"
+    And I should see "Active" in the "Manual allocation" definition list item
+    And I click on "Users" "link" in the ".secondary-navigation" "css_element"
+
+    When I press "Allocate users"
+    And I set the following fields to these values:
+      | Users        | Student 1 |
+      | Test field 1 | Prvni     |
+      | Test field 2 | ASF2     |
+    And I press dialog form button "Allocate users"
+    And I follow "Student 1"
+    Then I should see "Prvni" in the "Test field 1" definition list item
+    And I should see "ASF2" in the "Test field 2" definition list item
+
+    When I click on "Allocation actions" "link"
+    And I click on "Update allocation" "link"
+    And I set the following fields to these values:
+      | Test field 1 | Druhy     |
+    And I press dialog form button "Update allocation"
+    Then I should see "Druhy" in the "Test field 1" definition list item
+    And I should see "ASF2" in the "Test field 2" definition list item
+
+    And I log out
+    When I log in as "student1"
+    And I am on the "tool_muprog > My programs" page
+    And I follow "Program 000"
+    Then I should see "ASF2" in the "Test field 2" definition list item
+    And I should not see "Test field 1"

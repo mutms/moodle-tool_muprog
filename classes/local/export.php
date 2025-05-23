@@ -104,7 +104,7 @@ final class export {
             }
             $program['enddate'] = $enddate;
 
-            $cfhandler = \tool_muprog\customfield\fields_handler::create();
+            $cfhandler = \tool_muprog\customfield\program_handler::create();
             $cfdatas = $cfhandler->get_instance_data($record->id);
             foreach ($cfdatas as $cfdata) {
                 // We need to use raw internal value here to allow imports.

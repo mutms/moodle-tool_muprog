@@ -67,6 +67,7 @@ if ($form->is_cancelled()) {
 
 if ($data = $form->get_data()) {
     $userids = [];
+    $allocationids = [];
     if ($data->cohortid) {
         $userids = $DB->get_fieldset_select('cohort_members', 'userid', "cohortid = ?", [$data->cohortid]);
     }
@@ -75,8 +76,17 @@ if ($data = $form->get_data()) {
         $userids = array_unique($userids);
     }
     if ($userids) {
-        manual::allocate_users($program->id, $source->id, $userids);
+        $allocationids = manual::allocate_users($program->id, $source->id, $userids);
     }
+
+    // Save custom fields.
+    foreach ($allocationids as $allocationid) {
+        /** @var \tool_muprog\customfield\allocation_handler $handler */
+        $handler = \tool_muprog\customfield\allocation_handler::create();
+        $data->id = $allocationid;
+        $handler->instance_form_save($data);
+    }
+
     $form->redirect_submitted($returnurl);
 }
 

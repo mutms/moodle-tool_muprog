@@ -17,26 +17,28 @@
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
 /**
- * Programs plugin version.
+ * Configuration for program allocation custom fields.
  *
- * @package     tool_muprog
- * @copyright   2022 Open LMS (https://www.openlms.net/)
- * @copyright   2025 Petr Skoda
- * @author      Petr Skoda
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    tool_muprog
+ * @copyright  2025 Petr Skoda
+ * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+/** @var stdClass $CFG */
+/** @var moodle_page $PAGE */
 
-/** @var stdClass $plugin */
-$plugin->component = 'tool_muprog';
-$plugin->version   = 2025052300;
-$plugin->requires  = 2024100700;
-$plugin->maturity  = MATURITY_ALPHA;
-$plugin->supported = [405, 405];
-$plugin->release   = 'mu-4.5.4-10+';
+require('../../../../config.php');
+require_once($CFG->libdir.'/adminlib.php');
 
-$plugin->dependencies = [
-    'tool_mulib' => 2025050100,
-    'enrol_muprog' => 2025050100,
-];
+admin_externalpage_setup('tool_muprog_customfield_allocation');
+
+/** @var \core_customfield\output\renderer $output */
+$output = $PAGE->get_renderer('core_customfield');
+
+$handler = \tool_muprog\customfield\allocation_handler::create();
+$outputpage = new \core_customfield\output\management($handler);
+
+echo $output->header(),
+$output->heading(new lang_string('customfields', 'tool_muprog')),
+$output->render($outputpage),
+$output->footer();

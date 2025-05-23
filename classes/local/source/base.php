@@ -541,13 +541,13 @@ abstract class base {
     /**
      * Manually update user allocation data including program completion.
      *
-     * @param stdClass $allocation
+     * @param stdClass $data
      * @return stdClass
      */
-    final public static function allocation_update(stdClass $allocation): stdClass {
+    final public static function allocation_update(stdClass $data): stdClass {
         global $DB;
 
-        $allocation = (object)(array)$allocation;
+        $allocation = (object)(array)$data;
 
         $record = $DB->get_record('tool_muprog_allocation', ['id' => $allocation->id], '*', MUST_EXIST);
         $program = $DB->get_record('tool_muprog_program', ['id' => $record->programid], '*', MUST_EXIST);
@@ -590,6 +590,10 @@ abstract class base {
         }
 
         $DB->update_record('tool_muprog_allocation', $record);
+
+        $handler = \tool_muprog\customfield\allocation_handler::create();
+        $handler->instance_form_save($data);
+
         $allocation = $DB->get_record('tool_muprog_allocation', ['id' => $allocation->id], '*', MUST_EXIST);
 
         \tool_muprog\event\allocation_updated::create_from_allocation($allocation, $program)->trigger();

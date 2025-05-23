@@ -77,7 +77,7 @@ final class upload {
                 }
             }
 
-            $cfhandler = \tool_muprog\customfield\fields_handler::create();
+            $cfhandler = \tool_muprog\customfield\program_handler::create();
             foreach ($cfhandler->get_fields() as $cfield) {
                 $cfname = 'customfield_' . $cfield->get('shortname');
                 if (isset($rawprogram->$cfname)) {
@@ -187,7 +187,7 @@ final class upload {
             'enddate',
             'sources',
         ];
-        $cfhandler = \tool_muprog\customfield\fields_handler::create();
+        $cfhandler = \tool_muprog\customfield\program_handler::create();
         foreach ($cfhandler->get_fields() as $cfield) {
             $columns[] = 'customfield_' . $cfield->get('shortname');
         }

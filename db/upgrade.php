@@ -58,5 +58,12 @@ function xmldb_tool_muprog_upgrade($oldversion): bool {
         upgrade_plugin_savepoint(true, 2025042200, 'tool', 'muprog');
     }
 
+    if ($oldversion < 2025052300) {
+        // Fix program fields area.
+        $DB->set_field('customfield_category', 'area', 'program', ['component' => 'tool_muprog', 'area' => 'fields']);
+
+        upgrade_plugin_savepoint(true, 2025052300, 'tool', 'muprog');
+    }
+
     return true;
 }

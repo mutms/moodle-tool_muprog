@@ -83,7 +83,7 @@ class renderer extends \plugin_renderer_base {
             'value' => (isset($program->timeallocationstart) ? userdate($program->timeallocationstart) : $strnotset)];
         $details[] = ['property' => get_string('allocationend', 'tool_muprog'),
             'value' => (isset($program->timeallocationend) ? userdate($program->timeallocationend) : $strnotset)];
-        $handler = \tool_muprog\customfield\fields_handler::create();
+        $handler = \tool_muprog\customfield\program_handler::create();
         foreach ($handler->get_instance_data($program->id) as $data) {
             $details[] = ['property' => $data->get_field()->get('name'), 'value' => $data->export_value()];
         }

@@ -29,6 +29,9 @@ namespace tool_muprog\local\form;
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class allocation_update extends \tool_mulib\local\dialog_form {
+    /** @var \tool_muprog\customfield\allocation_handler */
+    protected $handler;
+
     #[\Override]
     protected function definition() {
         $mform = $this->_form;
@@ -51,9 +54,24 @@ final class allocation_update extends \tool_mulib\local\dialog_form {
         $mform->setType('id', PARAM_INT);
         $mform->setDefault('id', $allocation->id);
 
+        // Add custom fields to the form.
+        $this->handler = \tool_muprog\customfield\allocation_handler::create();
+        $this->handler->instance_form_definition($mform);
+
         $this->add_action_buttons(true, get_string('allocation_update', 'tool_muprog'));
 
+        // Prepare custom fields data.
+        $this->handler->instance_form_before_set_data($allocation);
+
         $this->set_data($allocation);
+    }
+
+    #[\Override]
+    public function definition_after_data() {
+        parent::definition_after_data();
+        $mform = $this->_form;
+        $allocation = $this->_customdata['allocation'];
+        $this->handler->instance_form_definition_after_data($mform, $allocation->id);
     }
 
     #[\Override]
@@ -62,6 +80,9 @@ final class allocation_update extends \tool_mulib\local\dialog_form {
 
         $errors = array_merge($errors, \tool_muprog\local\allocation::validate_allocation_dates(
             $data['timestart'], $data['timedue'], $data['timeend']));
+
+        // Add the custom fields validation.
+        $errors = array_merge($errors, $this->handler->instance_form_validation($data, $files));
 
         return $errors;
     }

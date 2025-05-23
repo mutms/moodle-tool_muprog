@@ -233,7 +233,7 @@ final class program {
         $program = $DB->get_record('tool_muprog_program', ['id' => $data->id], '*', MUST_EXIST);
 
         // Save custom fields if there are any of them in the form.
-        $handler = \tool_muprog\customfield\fields_handler::create();
+        $handler = \tool_muprog\customfield\program_handler::create();
         $data->id = $program->id;
         $handler->instance_form_save($data);
 
@@ -342,7 +342,7 @@ final class program {
         $program = self::update_image($data);
 
         // Save custom fields if there are any of them in the form.
-        $handler = \tool_muprog\customfield\fields_handler::create();
+        $handler = \tool_muprog\customfield\program_handler::create();
         $handler->instance_form_save($data);
 
         $item = $DB->get_record('tool_muprog_item', ['programid' => $program->id, 'topitem' => 1], '*', MUST_EXIST);
@@ -895,7 +895,7 @@ final class program {
 
         $DB->delete_records('tool_muprog_program', ['id' => $program->id]);
 
-        $handler = \tool_muprog\customfield\fields_handler::create();
+        $handler = \tool_muprog\customfield\program_handler::create();
         $handler->delete_instance($program->id);
 
         \tool_muprog\event\program_deleted::create_from_program($program)->trigger();
