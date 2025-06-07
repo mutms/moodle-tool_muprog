@@ -88,7 +88,7 @@ class renderer extends \plugin_renderer_base {
                 $url = new moodle_url('/admin/tool/muprog/management/program_archive.php', ['id' => $program->id]);
                 $action = new \tool_mulib\output\dialog_form\icon($url, get_string('program_archive', 'tool_muprog'), 'i/settings');
             }
-            $action->set_dialog_size('');
+            $action->set_dialog_size('sm');
             $archived .= $this->output->render($action);
         }
         $details[] = ['property' => get_string('archived', 'tool_muprog'), 'value' => $archived];
