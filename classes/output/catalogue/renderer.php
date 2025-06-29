@@ -160,7 +160,7 @@ class renderer extends \plugin_renderer_base {
                         $fullname = \html_writer::link($detailurl, $fullname);
                     }
                 } else {
-                    $fullname .= ' <span class="badge badge-danger">' . get_string('errorcoursemissing', 'tool_muprog') . '</span>';
+                    $fullname .= ' <span class="badge bg-danger">' . get_string('errorcoursemissing', 'tool_muprog') . '</span>';
                 }
             }
 

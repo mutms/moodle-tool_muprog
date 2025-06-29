@@ -244,7 +244,7 @@ final class program extends base {
                     $params = ['programid' => $row->id];
                     $missingcount = $DB->count_records_sql($sql, $params);
                     if ($missingcount) {
-                        $count .= '</br><span class="badge badge-danger">' . get_string('errorcoursesmissing', 'tool_muprog', $missingcount) . '</span>';
+                        $count .= '</br><span class="badge bg-danger">' . get_string('errorcoursesmissing', 'tool_muprog', $missingcount) . '</span>';
                     }
 
                 }

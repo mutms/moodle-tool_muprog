@@ -215,9 +215,9 @@ final class upload {
         foreach ($filedata as $program) {
             $program->errors = (array)$program->errors;
             if ($program->errors) {
-                $status = '<div class="badge badge-danger">' . get_string('upload_status_invalid', 'tool_muprog') . '</div>';
+                $status = '<div class="badge bg-danger">' . get_string('upload_status_invalid', 'tool_muprog') . '</div>';
             } else {
-                $status = '<div class="badge badge-info">' . get_string('ok') . '</div>';
+                $status = '<div class="badge bg-info text-dark">' . get_string('ok') . '</div>';
             }
 
             $idnumber = s($program->idnumber);

@@ -1177,21 +1177,21 @@ final class allocation {
 
         if ($program->archived || $allocation->archived) {
             if ($allocation->timecompleted) {
-                $result[] = '<span class="badge badge-success">' . get_string('programstatus_archivedcompleted', 'tool_muprog') . '</span>';
+                $result[] = '<span class="badge bg-success">' . get_string('programstatus_archivedcompleted', 'tool_muprog') . '</span>';
             } else {
-                $result[] = '<span class="badge badge-dark">' . get_string('programstatus_archived', 'tool_muprog') . '</span>';
+                $result[] = '<span class="badge bg-dark">' . get_string('programstatus_archived', 'tool_muprog') . '</span>';
             }
         } else if ($allocation->timecompleted) {
-            $result[] = '<div class="badge badge-success">' . get_string('programstatus_completed', 'tool_muprog') . '</div>';
+            $result[] = '<div class="badge bg-success">' . get_string('programstatus_completed', 'tool_muprog') . '</div>';
         } else if ($allocation->timestart > $now) {
-            $result[] = '<div class="badge badge-light">' . get_string('programstatus_future', 'tool_muprog') . '</div>';
+            $result[] = '<div class="badge bg-light text-dark">' . get_string('programstatus_future', 'tool_muprog') . '</div>';
         } else if ($allocation->timeend && $allocation->timeend < $now) {
-            $result[] = '<div class="badge badge-danger">' . get_string('programstatus_failed', 'tool_muprog') . '</div>';
+            $result[] = '<div class="badge bg-danger">' . get_string('programstatus_failed', 'tool_muprog') . '</div>';
         } else if ($allocation->timedue && $allocation->timedue < $now) {
-            $result[] = '<div class="badge badge-warning">' . get_string('programstatus_overdue', 'tool_muprog') . '</div>';
+            $result[] = '<div class="badge bg-warning text-dark">' . get_string('programstatus_overdue', 'tool_muprog') . '</div>';
         } else {
             // We need something different from tags that use 'badge-info'.
-            $result[] = '<div class="badge badge-primary">' . get_string('programstatus_open', 'tool_muprog') . '</div>';
+            $result[] = '<div class="badge bg-primary">' . get_string('programstatus_open', 'tool_muprog') . '</div>';
         }
 
         return implode(' ', $result);
