@@ -77,7 +77,7 @@ Feature: Upload program completion evidence using csv
     And I press dialog form button "Update"
     And I should see "Active" in the "Manual allocation" definition list item
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
-    And I click on "Users actions" "link"
+    And I click on "Users actions" "button"
     And I should not see "Upload completion evidences"
 
     And I click on "Upload allocations" "link"
@@ -92,7 +92,7 @@ Feature: Upload program completion evidence using csv
       | First line is header       | 1        |
     And I press dialog form button "Upload allocations"
     And I should see "5 users were allocated to program."
-    And I click on "Users actions" "link"
+    And I click on "Users actions" "button"
     And I should see "Upload completion evidences"
 
     And I follow "Student 3"

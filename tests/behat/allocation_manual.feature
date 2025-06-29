@@ -317,19 +317,19 @@ Feature: Manual program allocation tests
     And I follow "Program 000"
     And I follow "Users"
     And I follow "Student 1"
-    And I click on "Allocation actions" "link"
+    And I click on "Allocation actions" "button"
     And I should see "Update allocation"
     And I should not see "Delete program allocation"
 
     When I click on "Archive allocation" "link"
     And I press dialog form button "Archive allocation"
-    And I click on "Allocation actions" "link"
+    And I click on "Allocation actions" "button"
     Then I should not see "Update allocation"
     And I should see "Delete program allocation"
 
     When I click on "Restore allocation" "link"
     And I press dialog form button "Restore allocation"
-    And I click on "Allocation actions" "link"
+    And I click on "Allocation actions" "button"
     Then I should see "Update allocation"
     And I should not see "Delete program allocation"
 
