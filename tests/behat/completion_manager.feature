@@ -77,14 +77,14 @@ Feature: Program completion by managers tests
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | evidencetimecompleted[enabled] | 1        |
       | Details                        | no need! |
-    And I press dialog form button "Update"
+    And I click on "Update" "button" in the ".modal-dialog" "css_element"
     Then I should see "Completed" in the "Program status" definition list item
     And I should see "no need!"
 
     When I click on "Update other evidence" "link" in the "Program 000" "table_row"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | evidencetimecompleted[enabled] | 0        |
-    And I press dialog form button "Update"
+    And I click on "Update" "button" in the ".modal-dialog" "css_element"
     Then I should see "Completed" in the "Program status" definition list item
     And I should not see "no need!"
 
@@ -92,7 +92,7 @@ Feature: Program completion by managers tests
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | evidencetimecompleted[enabled] | 0        |
       | itemrecalculate                | 1        |
-    And I press dialog form button "Update"
+    And I click on "Update" "button" in the ".modal-dialog" "css_element"
     Then I should see "Open" in the "Program status" definition list item
 
     When I am on the "tool_muprog > All programs management" page
@@ -103,19 +103,19 @@ Feature: Program completion by managers tests
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | evidencetimecompleted[enabled] | 1        |
       | Details                        | no need! |
-    And I press dialog form button "Update"
+    And I click on "Update" "button" in the ".modal-dialog" "css_element"
     And I should see "Open" in the "Program status" definition list item
     And I click on "Update other evidence" "link" in the "Course 3" "table_row"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | evidencetimecompleted[enabled] | 1        |
       | Details                        | no need! |
-    And I press dialog form button "Update"
+    And I click on "Update" "button" in the ".modal-dialog" "css_element"
     And I should see "Open" in the "Program status" definition list item
     And I click on "Update other evidence" "link" in the "Course 2" "table_row"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | evidencetimecompleted[enabled] | 1        |
       | Details                        | no need! |
-    And I press dialog form button "Update"
+    And I click on "Update" "button" in the ".modal-dialog" "css_element"
     Then I should see "Completed" in the "Program status" definition list item
     And I should see "no need!"
 
@@ -130,7 +130,7 @@ Feature: Program completion by managers tests
     And I click on "Override program completion" action from "Allocation actions" dropdown
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | timecompleted[enabled] | 1    |
-    And I press dialog form button "Update"
+    And I click on "Update" "button" in the ".modal-dialog" "css_element"
     Then I should see "Completed" in the "Program status" definition list item
 
     When I am on the "tool_muprog > All programs management" page
@@ -140,7 +140,7 @@ Feature: Program completion by managers tests
     And I click on "Override completion" "link" in the "Program 000" "table_row"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | timecompleted[enabled] | 1    |
-    And I press dialog form button "Update"
+    And I click on "Update" "button" in the ".modal-dialog" "css_element"
     Then I should see "Completed" in the "Program status" definition list item
 
     When I am on the "tool_muprog > All programs management" page
@@ -150,15 +150,15 @@ Feature: Program completion by managers tests
     And I click on "Override completion" "link" in the "Course 1" "table_row"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | timecompleted[enabled] | 1    |
-    And I press dialog form button "Update"
+    And I click on "Update" "button" in the ".modal-dialog" "css_element"
     And I should see "Open" in the "Program status" definition list item
     And I click on "Override completion" "link" in the "Course 3" "table_row"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | timecompleted[enabled] | 1    |
-    And I press dialog form button "Update"
+    And I click on "Update" "button" in the ".modal-dialog" "css_element"
     And I should see "Open" in the "Program status" definition list item
     And I click on "Override completion" "link" in the "Course 2" "table_row"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | timecompleted[enabled] | 1    |
-    And I press dialog form button "Update"
+    And I click on "Update" "button" in the ".modal-dialog" "css_element"
     Then I should see "Completed" in the "Program status" definition list item

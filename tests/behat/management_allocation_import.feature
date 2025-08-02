@@ -79,7 +79,7 @@ Feature: Import allocation settings
       | timeallocationend[year]    | 2028 |
       | timeallocationend[hour]    | 09   |
       | timeallocationend[minute]  | 00   |
-    And I press dialog form button "Update allocations"
+    And I click on "Update allocations" "button" in the ".modal-dialog" "css_element"
     And I click on "Update scheduling" "link"
     And I set the following fields to these values:
       | Program start             | Delay start after allocation |
@@ -91,26 +91,26 @@ Feature: Import allocation settings
       | Program end               | End after start |
       | programend_delay[value]   | 10     |
       | programend_delay[type]    | months |
-    And I press dialog form button "Update scheduling"
+    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
     And I click on "Update Automatic cohort allocation" "link"
     And I set the following fields to these values:
       | Active           | Yes                |
       | Allocate cohorts | Cohort 1, Cohort 2 |
-    And I press dialog form button "Update"
+    And I click on "Update" "button" in the ".modal-dialog" "css_element"
     And I click on "Update Requests with approval" "link"
     And I set the following fields to these values:
       | Active             | Yes |
       | Allow new requests | No  |
-    And I press dialog form button "Update"
+    And I click on "Update" "button" in the ".modal-dialog" "css_element"
     And I click on "Update Manual allocation" "link"
     And I set the following fields to these values:
       | Active | Yes |
-    And I press dialog form button "Update"
+    And I click on "Update" "button" in the ".modal-dialog" "css_element"
     And I click on "Update Self allocation" "link"
     And I set the following fields to these values:
       | Active             | Yes |
       | Allow new sign ups | No  |
-    And I press dialog form button "Update"
+    And I click on "Update" "button" in the ".modal-dialog" "css_element"
     And I should see "Thursday, 5 November 2020, 9:00" in the "Allocation start" definition list item
     And I should see "Sunday, 5 November 2028, 9:00" in the "Allocation end" definition list item
     And I should see "Delay start after allocation - 5 months" in the "Program start" definition list item
@@ -137,10 +137,10 @@ Feature: Import allocation settings
     When I click on "Import allocation settings" action from "Allocation settings actions" dropdown
     And I set the following fields to these values:
       | Select program | Program 000 |
-    And I press dialog form button "Continue"
+    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
     And I set the following fields to these values:
       | Allocation start | 1 |
-    And I press dialog form button "Import allocation settings"
+    And I click on "Import allocation settings" "button" in the ".modal-dialog" "css_element"
     Then I should see "Thursday, 5 November 2020, 9:00" in the "Allocation start" definition list item
     And I should see "Not set" in the "Allocation end" definition list item
     And I should see "Start immediately after allocation" in the "Program start" definition list item
@@ -154,7 +154,7 @@ Feature: Import allocation settings
     When I click on "Import allocation settings" action from "Allocation settings actions" dropdown
     And I set the following fields to these values:
       | Select program | Program 000 |
-    And I press dialog form button "Continue"
+    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
     And I set the following fields to these values:
       | Allocation start            | 1 |
       | Allocation end              | 1 |
@@ -165,7 +165,7 @@ Feature: Import allocation settings
       | Automatic cohort allocation | 1 |
       | Manual allocation           | 1 |
       | Self allocation             | 1 |
-    And I press dialog form button "Import allocation settings"
+    And I click on "Import allocation settings" "button" in the ".modal-dialog" "css_element"
     Then I should see "Thursday, 5 November 2020, 9:00" in the "Allocation start" definition list item
     And I should see "Sunday, 5 November 2028, 9:00" in the "Allocation end" definition list item
     And I should see "Delay start after allocation - 5 months" in the "Program start" definition list item

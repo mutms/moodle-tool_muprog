@@ -82,7 +82,7 @@ Feature: Program approval allocations tests
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Active             | Yes |
       | Allow new requests | No  |
-    And I press dialog form button "Update"
+    And I click on "Update" "button" in the ".modal-dialog" "css_element"
     Then I should see "Active; Requests are not allowed" in the "Requests with approval" definition list item
     And I log out
 
@@ -99,7 +99,7 @@ Feature: Program approval allocations tests
     And I click on "Update Requests with approval" "link"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Allow new requests | Yes |
-    And I press dialog form button "Update"
+    And I click on "Update" "button" in the ".modal-dialog" "css_element"
     Then I should see "Active; Requests are allowed" in the "Requests with approval" definition list item
     And I log out
 
@@ -107,9 +107,9 @@ Feature: Program approval allocations tests
     And I am on the "tool_muprog > Program catalogue" page
     And I follow "Program 001"
     And I press "Request access"
-    And I press dialog form button "Cancel"
+    And I click on "Cancel" "button" in the ".modal-dialog" "css_element"
     And I press "Request access"
-    And I press dialog form button "Request access"
+    And I click on "Request access" "button" in the ".modal-dialog" "css_element"
     Then I should see "Access request pending"
     And I log out
 
@@ -119,7 +119,7 @@ Feature: Program approval allocations tests
     And I follow "Requests"
     And I click on "Actions" "link" in the "Student 2" "table_row"
     And I click on "Approve request" "link" in the "Student 2" "table_row"
-    And I press dialog form button "Approve request"
+    And I click on "Approve request" "button" in the ".modal-dialog" "css_element"
     Then I should not see "Student 2"
     And I follow "Users"
     And "Student 2" row "Source" column of "reportbuilder-table" table should contain "Requests with approval"
@@ -136,7 +136,7 @@ Feature: Program approval allocations tests
     And I follow "Users"
     And I click on "Actions" "link" in the "Student 2" "table_row"
     And I click on "Delete program allocation" "link" in the "Student 2" "table_row"
-    And I press dialog form button "Delete program allocation"
+    And I click on "Delete program allocation" "button" in the ".modal-dialog" "css_element"
     Then I should not see "Student 2"
     And I log out
 
@@ -155,7 +155,7 @@ Feature: Program approval allocations tests
     When I click on "Update Requests with approval" "link"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Active | Yes |
-    And I press dialog form button "Update"
+    And I click on "Update" "button" in the ".modal-dialog" "css_element"
     Then I should see "Active" in the "Requests with approval" definition list item
     And I log out
 
@@ -163,7 +163,7 @@ Feature: Program approval allocations tests
     And I am on the "tool_muprog > Program catalogue" page
     And I follow "Program 001"
     And I press "Request access"
-    And I press dialog form button "Request access"
+    And I click on "Request access" "button" in the ".modal-dialog" "css_element"
     Then I should see "Access request pending"
     And I log out
 
@@ -175,7 +175,7 @@ Feature: Program approval allocations tests
     And I click on "Reject request" "link" in the "Student 2" "table_row"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Rejection reason | Sorry mate! |
-    And I press dialog form button "Reject request"
+    And I click on "Reject request" "button" in the ".modal-dialog" "css_element"
     Then I should see "Student 2"
     And I follow "Users"
     And I should not see "Student 2"
@@ -193,7 +193,7 @@ Feature: Program approval allocations tests
     And I follow "Requests"
     And I click on "Actions" "link" in the "Student 2" "table_row"
     And I click on "Delete request" "link" in the "Student 2" "table_row"
-    And I press dialog form button "Delete request"
+    And I click on "Delete request" "button" in the ".modal-dialog" "css_element"
     Then I should not see "Student 2"
     And I log out
 
@@ -201,6 +201,6 @@ Feature: Program approval allocations tests
     And I am on the "tool_muprog > Program catalogue" page
     And I follow "Program 001"
     And I press "Request access"
-    And I press dialog form button "Request access"
+    And I click on "Request access" "button" in the ".modal-dialog" "css_element"
     Then I should see "Access request pending"
     And I log out

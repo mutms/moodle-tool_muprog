@@ -60,7 +60,7 @@ Feature: Program progress reset by managers tests
     And I set the following fields to these values:
       | evidencetimecompleted[enabled] | 1        |
       | Details                        | no need! |
-    And I press dialog form button "Update"
+    And I click on "Update" "button" in the ".modal-dialog" "css_element"
     And I should see "Completed" in the "Program status" definition list item
     And I should see "no need!"
 
@@ -72,7 +72,7 @@ Feature: Program progress reset by managers tests
     And I set the following fields to these values:
       | Reset type         | Standard course purge |
       | Update allocation  | 0                     |
-    And I press dialog form button "Reset program progress"
+    And I click on "Reset program progress" "button" in the ".modal-dialog" "css_element"
     Then I should see "Not set" in the "Program completion date" definition list item
 
     When I click on "Reset program progress" action from "Allocation actions" dropdown
@@ -96,7 +96,7 @@ Feature: Program progress reset by managers tests
       | timeend[day]       | 31   |
       | timeend[hour]      | 09   |
       | timeend[minute]    | 00   |
-    And I press dialog form button "Reset program progress"
+    And I click on "Reset program progress" "button" in the ".modal-dialog" "css_element"
     Then I should see "Not set" in the "Program completion date" definition list item
     And I should see "Sunday, 5 November 2023, 9:00 AM" in the "Program start" definition list item
     And I should see "Monday, 22 January 2024, 9:00 AM" in the "Program due" definition list item
@@ -112,7 +112,7 @@ Feature: Program progress reset by managers tests
       | timestart[minute]  | 00   |
       | timedue[enabled]   | 0    |
       | timeend[enabled]   | 0    |
-    And I press dialog form button "Reset program progress"
+    And I click on "Reset program progress" "button" in the ".modal-dialog" "css_element"
     Then I should see "Not set" in the "Program completion date" definition list item
     And I should see "Tuesday, 5 November 2024, 9:00 AM" in the "Program start" definition list item
     And I should see "Not set" in the "Program due" definition list item

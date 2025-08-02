@@ -55,7 +55,7 @@ Feature: Issuing of certificates for program completion
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Certificate template | Certificate 1 |
       | Expiry date          | Never         |
-    And I press dialog form button "Update program"
+    And I click on "Update program" "button" in the ".modal-dialog" "css_element"
     Then I should see "Certificate 1" in the "Certificate template" definition list item
     And I should see "Never" in the "Expiry date" definition list item
 
@@ -71,7 +71,7 @@ Feature: Issuing of certificates for program completion
       | expirydateabsolute[year]    | 2032          |
       | expirydateabsolute[hour]    | 09            |
       | expirydateabsolute[minute]  | 00            |
-    And I press dialog form button "Update program"
+    And I click on "Update program" "button" in the ".modal-dialog" "css_element"
     Then I should see "Certificate 2" in the "Certificate template" definition list item
     And I should see "Friday, 5 November 2032, 9:00" in the "Expiry date" definition list item
 
@@ -89,12 +89,12 @@ Feature: Issuing of certificates for program completion
       | Expiry date                  | After         |
       | expirydaterelative[number]   | 5             |
       | expirydaterelative[timeunit] | 86400         |
-    And I press dialog form button "Update program"
+    And I click on "Update program" "button" in the ".modal-dialog" "css_element"
     Then I should see "Certificate 1" in the "Certificate template" definition list item
     And I should see "5 days" in the "Expiry date" definition list item
 
     When I press "Delete"
-    And I press dialog form button "Delete"
+    And I click on "Delete" "button" in the ".modal-dialog" "css_element"
     Then I should see "Not set" in the "Certificate template" definition list item
 
   @javascript
@@ -112,7 +112,7 @@ Feature: Issuing of certificates for program completion
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Certificate template | Certificate 1 |
       | Expiry date          | Never         |
-    And I press dialog form button "Update program"
+    And I click on "Update program" "button" in the ".modal-dialog" "css_element"
     And I should see "Certificate 1" in the "Certificate template" definition list item
     And I should see "Never" in the "Expiry date" definition list item
 
@@ -120,13 +120,13 @@ Feature: Issuing of certificates for program completion
     And I click on "Update Manual allocation" "link"
     And I set the following fields to these values:
       | Active | Yes |
-    And I press dialog form button "Update"
+    And I click on "Update" "button" in the ".modal-dialog" "css_element"
     And I should see "Active" in the "Manual allocation" definition list item
     And I follow "Users"
     And I press "Allocate users"
     And I set the following fields to these values:
       | Users | Student 1 |
-    And I press dialog form button "Allocate users"
+    And I click on "Allocate users" "button" in the ".modal-dialog" "css_element"
 
     And I follow "Users"
     And I follow "Student 1"
@@ -134,7 +134,7 @@ Feature: Issuing of certificates for program completion
     And I set the following fields to these values:
       | evidencetimecompleted[enabled] | 1        |
       | Details                        | no need! |
-    And I press dialog form button "Update"
+    And I click on "Update" "button" in the ".modal-dialog" "css_element"
     And I should see "Completed" in the "Program status" definition list item
 
     And I log out

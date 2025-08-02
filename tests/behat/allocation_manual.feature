@@ -79,14 +79,14 @@ Feature: Manual program allocation tests
     And I click on "Update Manual allocation" "link"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Active | Yes |
-    And I press dialog form button "Update"
+    And I click on "Update" "button" in the ".modal-dialog" "css_element"
     And I should see "Active" in the "Manual allocation" definition list item
     And I follow "Users"
 
     When I press "Allocate users"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Users | Student 1, Student 5 |
-    And I press dialog form button "Allocate users"
+    And I click on "Allocate users" "button" in the ".modal-dialog" "css_element"
     Then "Student 1" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
     And "Student 5" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
     And I should not see "Student 2"
@@ -96,7 +96,7 @@ Feature: Manual program allocation tests
     When I press "Allocate users"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Cohort | Cohort 2 |
-    And I press dialog form button "Allocate users"
+    And I click on "Allocate users" "button" in the ".modal-dialog" "css_element"
     Then "Student 1" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
     And "Student 2" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
     And "Student 5" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
@@ -105,12 +105,12 @@ Feature: Manual program allocation tests
 
     When I click on "Actions" "link" in the "Student 2" "table_row"
     And I click on "Delete program allocation" "link" in the "Student 2" "table_row"
-    And I press dialog form button "Cancel"
+    And I click on "Cancel" "button" in the ".modal-dialog" "css_element"
     Then "Student 2" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
 
     When I click on "Actions" "link" in the "Student 2" "table_row"
     And I click on "Delete program allocation" "link" in the "Student 2" "table_row"
-    And I press dialog form button "Delete program allocation"
+    And I click on "Delete program allocation" "button" in the ".modal-dialog" "css_element"
     Then I should not see "Student 2"
 
   @javascript @tool_mutenancy
@@ -132,13 +132,13 @@ Feature: Manual program allocation tests
     And I click on "Update Manual allocation" "link"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Active | Yes |
-    And I press dialog form button "Update"
+    And I click on "Update" "button" in the ".modal-dialog" "css_element"
     And I should see "Active" in the "Manual allocation" definition list item
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
     When I press "Allocate users"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Users | Student 1 |
-    And I press dialog form button "Allocate users"
+    And I click on "Allocate users" "button" in the ".modal-dialog" "css_element"
     Then "Student 1" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
 
     And I am on the "tool_muprog > All programs management" page
@@ -147,20 +147,20 @@ Feature: Manual program allocation tests
     And I click on "Update Manual allocation" "link"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Active | Yes |
-    And I press dialog form button "Update"
+    And I click on "Update" "button" in the ".modal-dialog" "css_element"
     And I should see "Active" in the "Manual allocation" definition list item
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
 
     When I press "Allocate users"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Users | Student 1 |
-    And I press dialog form button "Allocate users"
+    And I click on "Allocate users" "button" in the ".modal-dialog" "css_element"
     And "Student 1" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
 
     And I click on "Switch tenant" "link"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Tenant      | Tenant 1         |
-    And I press dialog form button "Switch tenant"
+    And I click on "Switch tenant" "button" in the ".modal-dialog" "css_element"
 
     And I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
@@ -169,7 +169,7 @@ Feature: Manual program allocation tests
     When I press "Allocate users"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Users | Tenant 1 Student |
-    And I press dialog form button "Allocate users"
+    And I click on "Allocate users" "button" in the ".modal-dialog" "css_element"
     Then "Tenant 1 Student" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
 
     And I am on the "tool_muprog > All programs management" page
@@ -179,7 +179,7 @@ Feature: Manual program allocation tests
     When I press "Allocate users"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Users | Tenant 1 Student |
-    And I press dialog form button "Allocate users"
+    And I click on "Allocate users" "button" in the ".modal-dialog" "css_element"
     Then "Tenant 1 Student" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
 
   @javascript @_file_upload
@@ -191,7 +191,7 @@ Feature: Manual program allocation tests
     And I click on "Update Manual allocation" "link"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Active | Yes |
-    And I press dialog form button "Update"
+    And I click on "Update" "button" in the ".modal-dialog" "css_element"
     And I should see "Active" in the "Manual allocation" definition list item
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
 
@@ -200,12 +200,12 @@ Feature: Manual program allocation tests
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | CSV separator | ,     |
       | Encoding      | UTF-8 |
-    And I press dialog form button "Continue"
+    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
     And the following fields in the ".modal-dialog" "css_element" match these values:
       | User identification column | username |
       | User mapping via           | Username |
       | First line is header       | 1        |
-    And I press dialog form button "Upload allocations"
+    And I click on "Upload allocations" "button" in the ".modal-dialog" "css_element"
     Then I should see "3 users were allocated to program."
     And "Student 1" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
     And "Student 2" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
@@ -216,14 +216,14 @@ Feature: Manual program allocation tests
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | CSV separator | ,     |
       | Encoding      | UTF-8 |
-    And I press dialog form button "Continue"
+    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
     And the following fields in the ".modal-dialog" "css_element" match these values:
       | User identification column | student1@example.com |
       | User mapping via           | Username             |
       | First line is header       | 0                    |
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | User mapping via           | Email address    |
-    And I press dialog form button "Upload allocations"
+    And I click on "Upload allocations" "button" in the ".modal-dialog" "css_element"
     Then I should see "1 users were allocated to program."
     And I should see "2 users were already allocated to program."
     And I should see "1 errors detected when allocating programs."
@@ -237,12 +237,12 @@ Feature: Manual program allocation tests
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | CSV separator | ;     |
       | Encoding      | UTF-8 |
-    And I press dialog form button "Continue"
+    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
     And the following fields in the ".modal-dialog" "css_element" match these values:
       | User identification column | idnumber  |
       | User mapping via           | ID number |
       | First line is header       | 1         |
-    And I press dialog form button "Upload allocations"
+    And I click on "Upload allocations" "button" in the ".modal-dialog" "css_element"
     Then I should see "1 users were allocated to program."
     And I should see "1 users were already allocated to program."
     And "Student 1" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
@@ -277,11 +277,11 @@ Feature: Manual program allocation tests
       | programend_date[day]       | 31   |
       | programend_date[hour]      | 09   |
       | programend_date[minute]    | 00   |
-    And I press dialog form button "Update scheduling"
+    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
     And I click on "Update Manual allocation" "link"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Active | Yes |
-    And I press dialog form button "Update"
+    And I click on "Update" "button" in the ".modal-dialog" "css_element"
     And I should see "Active" in the "Manual allocation" definition list item
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
 
@@ -290,7 +290,7 @@ Feature: Manual program allocation tests
     And I set the following fields to these values:
       | CSV separator | ,     |
       | Encoding      | UTF-8 |
-    And I press dialog form button "Continue"
+    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
     And the following fields in the ".modal-dialog" "css_element" match these values:
       | User identification column | username           |
       | User mapping via           | Username           |
@@ -298,7 +298,7 @@ Feature: Manual program allocation tests
       | Time start column          | startdate          |
       | Time due column            | duedate            |
       | Time end column            | enddate            |
-    And I press dialog form button "Upload allocations"
+    And I click on "Upload allocations" "button" in the ".modal-dialog" "css_element"
     Then I should see "3 users were allocated to program."
     And I should see "3 errors detected when allocating programs."
     Then the following should exist in the "reportbuilder-table" table:
@@ -322,13 +322,13 @@ Feature: Manual program allocation tests
     And I should not see "Delete program allocation"
 
     When I click on "Archive allocation" "link"
-    And I press dialog form button "Archive allocation"
+    And I click on "Archive allocation" "button" in the ".modal-dialog" "css_element"
     And I click on "Allocation actions" "button"
     Then I should not see "Update allocation"
     And I should see "Delete program allocation"
 
     When I click on "Restore allocation" "link"
-    And I press dialog form button "Restore allocation"
+    And I click on "Restore allocation" "button" in the ".modal-dialog" "css_element"
     And I click on "Allocation actions" "button"
     Then I should see "Update allocation"
     And I should not see "Delete program allocation"
@@ -361,7 +361,7 @@ Feature: Manual program allocation tests
     And I click on "Update Manual allocation" "link"
     And I set the following fields to these values:
       | Active | Yes |
-    And I press dialog form button "Update"
+    And I click on "Update" "button" in the ".modal-dialog" "css_element"
     And I should see "Active" in the "Manual allocation" definition list item
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
 
@@ -370,7 +370,7 @@ Feature: Manual program allocation tests
       | Users        | Student 1 |
       | Test field 1 | Prvni     |
       | Test field 2 | ASF2     |
-    And I press dialog form button "Allocate users"
+    And I click on "Allocate users" "button" in the ".modal-dialog" "css_element"
     And I follow "Student 1"
     Then I should see "Prvni" in the "Test field 1" definition list item
     And I should see "ASF2" in the "Test field 2" definition list item
@@ -378,7 +378,7 @@ Feature: Manual program allocation tests
     When I click on "Update allocation" action from "Allocation actions" dropdown
     And I set the following fields to these values:
       | Test field 1 | Druhy     |
-    And I press dialog form button "Update allocation"
+    And I click on "Update allocation" "button" in the ".modal-dialog" "css_element"
     Then I should see "Druhy" in the "Test field 1" definition list item
     And I should see "ASF2" in the "Test field 2" definition list item
 
