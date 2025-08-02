@@ -63,7 +63,9 @@ final class update_program_allocation extends external_api {
     public static function execute(int $programid, int $userid, array $allocationdates = []): \stdClass {
         global $DB;
         ['programid' => $programid, 'userid' => $userid, 'allocationdates' => $allocationdates] = self::validate_parameters(
-            self::execute_parameters(), ['programid' => $programid, 'userid' => $userid, 'allocationdates' => $allocationdates]);
+            self::execute_parameters(),
+            ['programid' => $programid, 'userid' => $userid, 'allocationdates' => $allocationdates]
+        );
 
         $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
 
@@ -72,8 +74,12 @@ final class update_program_allocation extends external_api {
         self::validate_context($context);
         require_capability('tool/muprog:admin', $context);
 
-        $allocation = $DB->get_record('tool_muprog_allocation',
-            ['programid' => $programid, 'userid' => $userid], '*', MUST_EXIST);
+        $allocation = $DB->get_record(
+            'tool_muprog_allocation',
+            ['programid' => $programid, 'userid' => $userid],
+            '*',
+            MUST_EXIST
+        );
 
         $source = $DB->get_record('tool_muprog_source', ['id' => $allocation->sourceid]);
         $sourceclass = allocation::get_source_classname($source->type);
@@ -92,7 +98,10 @@ final class update_program_allocation extends external_api {
             $allocation->$name = $value;
         }
         $errors = allocation::validate_allocation_dates(
-            $allocation->timestart, $allocation->timedue, $allocation->timeend);
+            $allocation->timestart,
+            $allocation->timedue,
+            $allocation->timeend
+        );
         if ($errors) {
             throw new \invalid_parameter_exception('Allocation dates are invalid');
         }

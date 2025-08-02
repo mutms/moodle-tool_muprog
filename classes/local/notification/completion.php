@@ -42,7 +42,7 @@ final class completion extends base {
         global $DB;
 
         $source = null;
-        $loadfunction = function(stdClass $allocation) use (&$program, &$source, &$user): void {
+        $loadfunction = function (stdClass $allocation) use (&$program, &$source, &$user): void {
             global $DB;
             if (!$source || $source->id != $allocation->sourceid) {
                 $source = $DB->get_record('tool_muprog_source', ['id' => $allocation->sourceid], '*', MUST_EXIST);

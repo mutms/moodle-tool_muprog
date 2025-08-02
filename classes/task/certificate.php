@@ -28,7 +28,6 @@ namespace tool_muprog\task;
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class certificate extends \core\task\scheduled_task {
-
     /**
      * Name for this task.
      *

@@ -34,7 +34,6 @@ use core_reportbuilder\local\filters\boolean_select;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class program extends base {
-
     #[\Override]
     protected function get_default_tables(): array {
         return [
@@ -95,7 +94,7 @@ final class program extends base {
             ->set_type(column::TYPE_TEXT)
             ->add_fields("{$programalias}.id, {$programalias}.fullname, {$programalias}.contextid")
             ->set_is_sortable(true)
-            ->set_callback(static function(?string $value, \stdClass $row): string {
+            ->set_callback(static function (?string $value, \stdClass $row): string {
                 if (!$row->id) {
                     return '';
                 }
@@ -117,7 +116,7 @@ final class program extends base {
             ->set_type(column::TYPE_TEXT)
             ->add_fields("{$programalias}.idnumber")
             ->set_is_sortable(true)
-            ->set_callback(static function(?string $value, \stdClass $row): string {
+            ->set_callback(static function (?string $value, \stdClass $row): string {
                 return s($row->idnumber);
             });
 
@@ -131,7 +130,7 @@ final class program extends base {
             ->add_fields("{$programalias}.public, {$programalias}.id, {$programalias}.contextid")
             ->set_is_sortable(true)
             ->set_callback([format::class, 'boolean_as_text'])
-            ->add_callback(static function(string $value, \stdClass $row): string {
+            ->add_callback(static function (string $value, \stdClass $row): string {
                 $context = \context::instance_by_id($row->contextid);
                 if (!has_capability('tool/muprog:view', $context)) {
                     return $value;
@@ -173,7 +172,7 @@ final class program extends base {
             ->set_type(column::TYPE_INTEGER)
             ->add_fields("{$programalias}.contextid")
             ->set_is_sortable(false)
-            ->set_callback(static function(?int $value, \stdClass $row): string {
+            ->set_callback(static function (?int $value, \stdClass $row): string {
                 if (!$row->contextid) {
                     return '';
                 }
@@ -197,13 +196,12 @@ final class program extends base {
             ->set_type(column::TYPE_INTEGER)
             ->add_field('(' . "SELECT COUNT('x')
                                  FROM {tool_muprog_allocation} a
-                                WHERE a.programid = {$programalias}.id" . ')'
-                , 'allocationcount')
+                                WHERE a.programid = {$programalias}.id" . ')', 'allocationcount')
             ->add_field("{$programalias}.id")
             ->add_field("{$programalias}.contextid")
             ->set_is_sortable(true)
             ->set_disabled_aggregation_all()
-            ->set_callback(static function(?int $value, \stdClass $row): string {
+            ->set_callback(static function (?int $value, \stdClass $row): string {
                 $count = $row->allocationcount;
                 $context = \context::instance_by_id($row->contextid);
                 if (has_capability('tool/muprog:view', $context)) {
@@ -222,13 +220,12 @@ final class program extends base {
             ->set_type(column::TYPE_INTEGER)
             ->add_field('(' . "SELECT COUNT('x')
                                  FROM {tool_muprog_item} i
-                                WHERE i.courseid IS NOT NULL AND i.programid = {$programalias}.id" . ')'
-                , 'coursecount')
+                                WHERE i.courseid IS NOT NULL AND i.programid = {$programalias}.id" . ')', 'coursecount')
             ->add_field("{$programalias}.id")
             ->add_field("{$programalias}.contextid")
             ->set_is_sortable(true)
             ->set_disabled_aggregation_all()
-            ->set_callback(static function(?int $value, \stdClass $row): string {
+            ->set_callback(static function (?int $value, \stdClass $row): string {
                 global $DB;
                 $count = $row->coursecount;
                 $context = \context::instance_by_id($row->contextid);
@@ -246,7 +243,6 @@ final class program extends base {
                     if ($missingcount) {
                         $count .= '</br><span class="badge bg-danger">' . get_string('errorcoursesmissing', 'tool_muprog', $missingcount) . '</span>';
                     }
-
                 }
                 return $count;
             });

@@ -122,39 +122,39 @@ final class management_test extends \advanced_testcase {
         $program2 = $generator->create_program(['fullname' => 'Second program', 'idnumber' => 'PRG2', 'description' => 'druhy popis']);
         $program3 = $generator->create_program(['fullname' => 'Third program', 'idnumber' => 'PR3', 'description' => 'treti popis', 'contextid' => $catcontext1->id]);
 
-        list($search, $params) = management::get_program_search_query(null, 'First', 'p');
+        [$search, $params] = management::get_program_search_query(null, 'First', 'p');
         $programids = $DB->get_fieldset_sql("SELECT p.* FROM {tool_muprog_program} AS p WHERE $search ORDER BY p.id ASC", $params);
         $this->assertSame([$program1->id], $programids);
 
-        list($search, $params) = management::get_program_search_query(null, 'First', '');
+        [$search, $params] = management::get_program_search_query(null, 'First', '');
         $programids = $DB->get_fieldset_sql("SELECT * FROM {tool_muprog_program} WHERE $search ORDER BY id ASC", $params);
         $this->assertSame([$program1->id], $programids);
 
-        list($search, $params) = management::get_program_search_query(null, 'PRG', 'p');
+        [$search, $params] = management::get_program_search_query(null, 'PRG', 'p');
         $programids = $DB->get_fieldset_sql("SELECT p.* FROM {tool_muprog_program} AS p WHERE $search ORDER BY p.id ASC", $params);
         $this->assertSame([$program1->id, $program2->id], $programids);
 
-        list($search, $params) = management::get_program_search_query(null, 'popis', 'p');
+        [$search, $params] = management::get_program_search_query(null, 'popis', 'p');
         $programids = $DB->get_fieldset_sql("SELECT p.* FROM {tool_muprog_program} AS p WHERE $search ORDER BY p.id ASC", $params);
         $this->assertSame([$program1->id, $program2->id, $program3->id], $programids);
 
-        list($search, $params) = management::get_program_search_query(null, '', 'p');
+        [$search, $params] = management::get_program_search_query(null, '', 'p');
         $programids = $DB->get_fieldset_sql("SELECT p.* FROM {tool_muprog_program} AS p WHERE $search ORDER BY p.id ASC", $params);
         $this->assertSame([$program1->id, $program2->id, $program3->id], $programids);
 
-        list($search, $params) = management::get_program_search_query($catcontext1, '', 'p');
+        [$search, $params] = management::get_program_search_query($catcontext1, '', 'p');
         $programids = $DB->get_fieldset_sql("SELECT p.* FROM {tool_muprog_program} AS p WHERE $search ORDER BY p.id ASC", $params);
         $this->assertSame([$program3->id], $programids);
 
-        list($search, $params) = management::get_program_search_query($catcontext1, 'PR', 'p');
+        [$search, $params] = management::get_program_search_query($catcontext1, 'PR', 'p');
         $programids = $DB->get_fieldset_sql("SELECT p.* FROM {tool_muprog_program} AS p WHERE $search ORDER BY p.id ASC", $params);
         $this->assertSame([$program3->id], $programids);
 
-        list($search, $params) = management::get_program_search_query($catcontext1, 'PR', '');
+        [$search, $params] = management::get_program_search_query($catcontext1, 'PR', '');
         $programids = $DB->get_fieldset_sql("SELECT * FROM {tool_muprog_program} WHERE $search ORDER BY id ASC", $params);
         $this->assertSame([$program3->id], $programids);
 
-        list($search, $params) = management::get_program_search_query($catcontext1, 'PRG', 'p');
+        [$search, $params] = management::get_program_search_query($catcontext1, 'PRG', 'p');
         $programids = $DB->get_fieldset_sql("SELECT p.* FROM {tool_muprog_program} AS p WHERE $search ORDER BY p.id ASC", $params);
         $this->assertSame([], $programids);
     }

@@ -112,7 +112,7 @@ final class export {
             }
 
             $top = \tool_muprog\local\content\top::load($record->id);
-            $iterator = function(\tool_muprog\local\content\item $item) use (&$iterator): array {
+            $iterator = function (\tool_muprog\local\content\item $item) use (&$iterator): array {
                 global $DB;
                 if ($item instanceof \tool_muprog\local\content\set) {
                     $result = [
@@ -207,7 +207,7 @@ final class export {
             ];
 
             $schema = file_get_contents(__DIR__ . '/../../db/programs_schema.json');
-            list($valid, $errors) = \tool_mulib\local\json_schema::validate($json, $schema);
+            [$valid, $errors] = \tool_mulib\local\json_schema::validate($json, $schema);
             if (!$valid) {
                 $debug = [];
                 foreach ($errors as $i => $lines) {
@@ -231,7 +231,7 @@ final class export {
         global $DB;
 
         if (!empty($data->programids)) {
-            list($in, $params) = $DB->get_in_or_equal($data->programids);
+            [$in, $params] = $DB->get_in_or_equal($data->programids);
             $select = "id $in";
         } else {
             if ($data->contextid) {
@@ -338,7 +338,7 @@ final class export {
         $delimiter = \csv_import_reader::get_delimiter($data->delimiter_name);
 
         if (!empty($data->programids)) {
-            list($in, $params) = $DB->get_in_or_equal($data->programids);
+            [$in, $params] = $DB->get_in_or_equal($data->programids);
             $select = "id $in";
         } else {
             if ($data->contextid) {

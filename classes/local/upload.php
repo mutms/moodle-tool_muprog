@@ -102,10 +102,11 @@ final class upload {
                 ];
                 $top->update_set($top, $update);
 
-                $addfunction = function(
+                $addfunction = function (
                     \tool_muprog\local\content\top $top,
                     \tool_muprog\local\content\set $parent,
-                    stdClass $item) use (&$addfunction): void {
+                    stdClass $item
+                ) use (&$addfunction): void {
 
                     if ($item->itemtype === 'course') {
                         $data = [
@@ -113,14 +114,12 @@ final class upload {
                             'completiondelay' => $item->completiondelay ?? 0,
                         ];
                         $top->append_course($parent, $item->courseid, $data);
-
                     } else if ($item->itemtype === 'training') {
                         $data = [
                             'points' => $item->points ?? 1,
                             'completiondelay' => $item->completiondelay ?? 0,
                         ];
                         $top->append_training($parent, $item->trainingid, $data);
-
                     } else if ($item->itemtype === 'set') {
                         $data = [
                             'points' => $item->points ?? 1,
@@ -196,7 +195,7 @@ final class upload {
             '0' => get_string('no'),
             '1' => get_string('yes'),
         ];
-        $parsedate = function($value): string {
+        $parsedate = function ($value): string {
             if (!$value) {
                 return '';
             }
@@ -204,7 +203,7 @@ final class upload {
             return export::format_date($date);
         };
 
-        $formaterror = function($value): string {
+        $formaterror = function ($value): string {
             if (is_array($value)) {
                 $value = implode('<br />', $value);
             }
@@ -296,18 +295,18 @@ final class upload {
             } else if (empty($program->contents->items)) {
                 $contents = '';
             } else {
-                $itemformatter = function(stdClass $item, int $level) use (&$itemformatter): array {
+                $itemformatter = function (stdClass $item, int $level) use (&$itemformatter): array {
                     global $DB;
                     $padding = str_repeat('-', $level);
                     if ($item->itemtype === 'course') {
                         $coursename = $DB->get_field('course', 'fullname', ['id' => $item->courseid]);
-                        return [$padding. format_string($coursename)];
+                        return [$padding . format_string($coursename)];
                     } else if ($item->itemtype === 'training') {
                         if (util::is_mutrain_available()) {
                             $frameworkname = $DB->get_field('tool_mutrain_framework', 'name', ['id' => $item->trainingid]);
-                            return [$padding. format_string($frameworkname)];
+                            return [$padding . format_string($frameworkname)];
                         } else {
-                            return [$padding. get_string('error')];
+                            return [$padding . get_string('error')];
                         }
                     } else if ($item->itemtype === 'set') {
                         $result[] = $padding . s($item->fullname ?? get_string('set', 'tool_muprog'));
@@ -441,7 +440,6 @@ final class upload {
             if ($programs === null) {
                 return get_string('upload_files_error', 'tool_muprog');
             }
-
         } else if ($jsonfiles) {
             if ($otherfiles) {
                 return get_string('upload_files_error', 'tool_muprog');
@@ -458,7 +456,6 @@ final class upload {
             if ($programs === null) {
                 return get_string('upload_files_error', 'tool_muprog');
             }
-
         } else {
             return get_string('upload_files_error', 'tool_muprog');
         }
@@ -469,7 +466,7 @@ final class upload {
             'programs' => $programs,
         ];
         $schema = file_get_contents(__DIR__ . '/../../db/programs_schema.json');
-        list($valid, $errors) = \tool_mulib\local\json_schema::validate($json, $schema);
+        [$valid, $errors] = \tool_mulib\local\json_schema::validate($json, $schema);
         if (!$valid) {
             $debug = [];
             foreach ($errors as $i => $lines) {
@@ -566,7 +563,7 @@ final class upload {
             if (empty($program->contents)) {
                 $program->contents = null;
             } else {
-                $validator = function($item) use (&$validator): ?string {
+                $validator = function ($item) use (&$validator): ?string {
                     global $DB;
                     if ($item->itemtype === 'course') {
                         unset($item->items);
@@ -578,7 +575,6 @@ final class upload {
                             return get_string('error');
                         }
                         return null;
-
                     } else if ($item->itemtype === 'training' && util::is_mutrain_available()) {
                         unset($item->items);
                         $frameworks = $DB->get_records('tool_mutrain_framework', ['idnumber' => $item->reference]);
@@ -595,7 +591,6 @@ final class upload {
                             }
                         }
                         return null;
-
                     } else if ($item->itemtype === 'set') {
                         if (empty($item->items)) {
                             $item->items = [];
@@ -608,7 +603,6 @@ final class upload {
                         }
                         $item->items = array_values($item->items);
                         return null;
-
                     } else {
                         return get_string('error');
                     }
@@ -689,7 +683,7 @@ final class upload {
             }
             $data = \core_text::trim_utf8_bom($data);
 
-            list($firstline, $rest) = explode("\n", $data, 2);
+            [$firstline, $rest] = explode("\n", $data, 2);
             $delimiter = null;
             foreach ($delimiters as $del) {
                 $cols = explode($del, $firstline);
@@ -762,8 +756,10 @@ final class upload {
                 if (!isset($row[$ci])) {
                     continue;
                 }
-                if ($row[$ci] === ''
-                    && !in_array($colname, ['category', 'description', 'allocationstart', 'allocationend'])) {
+                if (
+                    $row[$ci] === ''
+                    && !in_array($colname, ['category', 'description', 'allocationstart', 'allocationend'])
+                ) {
                     continue;
                 }
                 $value = $row[$ci];
@@ -896,7 +892,6 @@ final class upload {
                     $parent->items[] = $set;
                     $si++;
                     $setmap[$si] = $set;
-
                 } else if ($rawitem['itemtype'] === 'course' || $rawitem['itemtype'] === 'training') {
                     if (isset($rawitem['parentset']) && isset($setmap[$rawitem['parentset']])) {
                         $parent = $setmap[$rawitem['parentset']];
@@ -956,7 +951,7 @@ final class upload {
             if (!str_contains($part, '=')) {
                 continue;
             }
-            list($k, $v) = explode('=', $part, 2);
+            [$k, $v] = explode('=', $part, 2);
             if ($v === '') {
                 $v = null;
             } else if (is_number($v)) {

@@ -81,7 +81,10 @@ final class allocation_reset extends \tool_mulib\local\dialog_form {
 
         if ($this->editsupported && $data['updateallocation']) {
             $errors = array_merge($errors, \tool_muprog\local\allocation::validate_allocation_dates(
-                $data['timestart'], $data['timedue'], $data['timeend']));
+                $data['timestart'],
+                $data['timedue'],
+                $data['timeend']
+            ));
         }
 
         return $errors;

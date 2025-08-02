@@ -52,7 +52,9 @@ echo $OUTPUT->header();
 
 $report = \core_reportbuilder\system_report_factory::create(
     \tool_muprog\reportbuilder\local\systemreports\requests::class,
-    $context, parameters:['programid' => $program->id]);
+    $context,
+    parameters:['programid' => $program->id]
+);
 echo $report->output();
 
 echo $OUTPUT->footer();

@@ -246,7 +246,8 @@ final class program_handler_test extends \advanced_testcase {
         ];
         $program1 = $generator->create_program((object)$data);
         $allocation = $generator->create_program_allocation(
-            ['programid' => $program1->id, 'userid' => $allocated->id]);
+            ['programid' => $program1->id, 'userid' => $allocated->id]
+        );
 
         $handler = program_handler::create();
 

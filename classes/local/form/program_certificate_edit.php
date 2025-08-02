@@ -47,11 +47,20 @@ final class program_certificate_edit extends \tool_mulib\local\dialog_form {
         $elements[] = $mform->createElement('select', 'templateid', get_string('certificatetemplate', 'tool_certificate'), $templateoptions);
 
         if ($canmanagetemplates) {
-            $elements[] = $mform->createElement('static', 'managetemplates', '',
-                $OUTPUT->action_link($manageurl, get_string('managetemplates', 'tool_certificate')));
+            $elements[] = $mform->createElement(
+                'static',
+                'managetemplates',
+                '',
+                $OUTPUT->action_link($manageurl, get_string('managetemplates', 'tool_certificate'))
+            );
         }
-        $mform->addGroup($elements, 'template_group', get_string('certificatetemplate', 'tool_certificate'),
-            \html_writer::div('', 'w-100'), false);
+        $mform->addGroup(
+            $elements,
+            'template_group',
+            get_string('certificatetemplate', 'tool_certificate'),
+            \html_writer::div('', 'w-100'),
+            false
+        );
 
         $rules = [];
         $rules['templateid'][] = [null, 'required', null, 'client'];

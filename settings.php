@@ -33,8 +33,11 @@ defined('MOODLE_INTERNAL') || die();
 
 $ADMIN->add('root', new admin_category('tool_muprog', new lang_string('programs', 'tool_muprog')), 'security');
 
-$settings = new admin_settingpage('tool_muprog_settings',
-    new lang_string('settings', 'tool_muprog'), 'moodle/site:config');
+$settings = new admin_settingpage(
+    'tool_muprog_settings',
+    new lang_string('settings', 'tool_muprog'),
+    'moodle/site:config'
+);
 $ADMIN->add('tool_muprog', $settings);
 if ($ADMIN->fulltree) {
     if (!enrol_is_enabled('muprog')) {
@@ -50,43 +53,64 @@ if ($ADMIN->fulltree) {
         $options = get_default_enrol_roles(context_system::instance());
         $student = get_archetype_roles('student');
         $student = reset($student);
-        $settings->add(new admin_setting_configselect('tool_muprog/roleid',
+        $settings->add(new admin_setting_configselect(
+            'tool_muprog/roleid',
             new lang_string('enrolrole', 'tool_muprog'),
             new lang_string('enrolrole_desc', 'tool_muprog'),
-            $student->id ?? null, $options));
+            $student->id ?? null,
+            $options
+        ));
 
         unset($options);
         unset($student);
     }
 
-    $settings->add(new admin_setting_configcheckbox('tool_muprog/source_approval_allownew',
+    $settings->add(new admin_setting_configcheckbox(
+        'tool_muprog/source_approval_allownew',
         new lang_string('source_approval_allownew', 'tool_muprog'),
-        new lang_string('source_approval_allownew_desc', 'tool_muprog'), 1));
-    $settings->add(new admin_setting_configcheckbox('tool_muprog/source_cohort_allownew',
+        new lang_string('source_approval_allownew_desc', 'tool_muprog'),
+        1
+    ));
+    $settings->add(new admin_setting_configcheckbox(
+        'tool_muprog/source_cohort_allownew',
         new lang_string('source_cohort_allownew', 'tool_muprog'),
-        new lang_string('source_cohort_allownew_desc', 'tool_muprog'), 1));
-    $settings->add(new admin_setting_configcheckbox('tool_muprog/source_selfallocation_allownew',
+        new lang_string('source_cohort_allownew_desc', 'tool_muprog'),
+        1
+    ));
+    $settings->add(new admin_setting_configcheckbox(
+        'tool_muprog/source_selfallocation_allownew',
         new lang_string('source_selfallocation_allownew', 'tool_muprog'),
-        new lang_string('source_selfallocation_allownew_desc', 'tool_muprog'), 1));
-    $settings->add(new admin_setting_configcheckbox('tool_muprog/source_mucertify_allownew',
+        new lang_string('source_selfallocation_allownew_desc', 'tool_muprog'),
+        1
+    ));
+    $settings->add(new admin_setting_configcheckbox(
+        'tool_muprog/source_mucertify_allownew',
         new lang_string('source_mucertify_allownew', 'tool_muprog'),
-        new lang_string('source_mucertify_allownew_desc', 'tool_muprog'), 1));
+        new lang_string('source_mucertify_allownew_desc', 'tool_muprog'),
+        1
+    ));
 }
 
-$ADMIN->add('tool_muprog', new admin_externalpage('tool_muprog_customfield_program',
-     new lang_string('customfields', 'tool_muprog'),
-     new moodle_url("/admin/tool/muprog/management/customfield_program.php"),
-     'tool/muprog:configurecustomfields'));
+$ADMIN->add('tool_muprog', new admin_externalpage(
+    'tool_muprog_customfield_program',
+    new lang_string('customfields', 'tool_muprog'),
+    new moodle_url("/admin/tool/muprog/management/customfield_program.php"),
+    'tool/muprog:configurecustomfields'
+));
 
-$ADMIN->add('tool_muprog', new admin_externalpage('tool_muprog_customfield_allocation',
+$ADMIN->add('tool_muprog', new admin_externalpage(
+    'tool_muprog_customfield_allocation',
     new lang_string('customfields_allocation', 'tool_muprog'),
     new moodle_url("/admin/tool/muprog/management/customfield_allocation.php"),
-    'tool/muprog:configurecustomfields'));
+    'tool/muprog:configurecustomfields'
+));
 
-$ADMIN->add('tool_muprog', new admin_externalpage('tool_muprog_management',
+$ADMIN->add('tool_muprog', new admin_externalpage(
+    'tool_muprog_management',
     new lang_string('management', 'tool_muprog'),
     new moodle_url("/admin/tool/muprog/management/index.php"),
-    'tool/muprog:view'));
+    'tool/muprog:view'
+));
 
 
 $settings = null;

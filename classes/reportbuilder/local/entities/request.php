@@ -33,7 +33,6 @@ use core_reportbuilder\local\filters\select;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class request extends base {
-
     #[\Override]
     protected function get_default_tables(): array {
         return [

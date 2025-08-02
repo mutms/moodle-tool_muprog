@@ -79,8 +79,12 @@ final class calendar_test extends \advanced_testcase {
 
         \tool_muprog\local\calendar::fix_allocation_events($allocation1x1, $program1);
         $this->assertCount(1, $DB->get_records('event', ['component' => 'tool_muprog']));
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)$now, $event->timestart);
         $this->assertSame("$program1->fullname starts", $event->name);
         $this->assertSame($program1->description, $event->description);
@@ -92,8 +96,12 @@ final class calendar_test extends \advanced_testcase {
 
         \tool_muprog\local\calendar::fix_allocation_events($allocation2x1, $program2);
         $this->assertCount(4, $DB->get_records('event', ['component' => 'tool_muprog']));
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now - 100), $event->timestart);
         $this->assertSame("$program2->fullname starts", $event->name);
         $this->assertSame($program2->description, $event->description);
@@ -102,8 +110,12 @@ final class calendar_test extends \advanced_testcase {
         $this->assertSame('0', $event->courseid);
         $this->assertSame('0', $event->groupid);
         $this->assertSame('1', $event->visible);
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_DUE], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_DUE],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now + 200), $event->timestart);
         $this->assertSame("$program2->fullname is due", $event->name);
         $this->assertSame($program2->description, $event->description);
@@ -112,8 +124,12 @@ final class calendar_test extends \advanced_testcase {
         $this->assertSame('0', $event->courseid);
         $this->assertSame('0', $event->groupid);
         $this->assertSame('1', $event->visible);
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_END], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_END],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now + 300), $event->timestart);
         $this->assertSame("$program2->fullname ends", $event->name);
         $this->assertSame($program2->description, $event->description);
@@ -134,8 +150,12 @@ final class calendar_test extends \advanced_testcase {
         $DB->set_field('tool_muprog_allocation', 'calendarupdated', 0, []);
         \tool_muprog\local\calendar::fix_allocation_events($allocation2x1, $program2);
         $this->assertCount(4, $DB->get_records('event', ['component' => 'tool_muprog']));
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now + 100), $event->timestart);
         $this->assertSame("$program2->fullname starts", $event->name);
         $this->assertSame($program2->description, $event->description);
@@ -144,8 +164,12 @@ final class calendar_test extends \advanced_testcase {
         $this->assertSame('0', $event->courseid);
         $this->assertSame('0', $event->groupid);
         $this->assertSame('1', $event->visible);
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_DUE], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_DUE],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now + 1000), $event->timestart);
         $this->assertSame("$program2->fullname is due", $event->name);
         $this->assertSame($program2->description, $event->description);
@@ -154,8 +178,12 @@ final class calendar_test extends \advanced_testcase {
         $this->assertSame('0', $event->courseid);
         $this->assertSame('0', $event->groupid);
         $this->assertSame('1', $event->visible);
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_END], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_END],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now + 2000), $event->timestart);
         $this->assertSame("$program2->fullname ends", $event->name);
         $this->assertSame($program2->description, $event->description);
@@ -171,8 +199,12 @@ final class calendar_test extends \advanced_testcase {
         $DB->update_record('tool_muprog_allocation', $allocation2x1);
         \tool_muprog\local\calendar::fix_allocation_events($allocation2x1, $program2);
         $this->assertCount(2, $DB->get_records('event', ['component' => 'tool_muprog']));
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now - 100), $event->timestart);
         $this->assertSame("$program2->fullname starts", $event->name);
         $this->assertSame($program2->description, $event->description);
@@ -185,8 +217,12 @@ final class calendar_test extends \advanced_testcase {
         $DB->set_field('tool_muprog_allocation', 'calendarupdated', 0, []);
         \tool_muprog\local\calendar::fix_allocation_events($allocation2x1, $program2);
         $this->assertCount(2, $DB->get_records('event', ['component' => 'tool_muprog']));
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now - 100), $event->timestart);
         $this->assertSame("$program2->fullname starts", $event->name);
         $this->assertSame($program2->description, $event->description);
@@ -267,8 +303,12 @@ final class calendar_test extends \advanced_testcase {
 
         \tool_muprog\local\calendar::fix_program_events($program2);
         $this->assertCount(2, $DB->get_records('event', ['component' => 'tool_muprog']));
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now - 100), $event->timestart);
         $this->assertSame("$program2->fullname starts", $event->name);
         $this->assertSame($program2->description, $event->description);
@@ -277,8 +317,12 @@ final class calendar_test extends \advanced_testcase {
         $this->assertSame('0', $event->courseid);
         $this->assertSame('0', $event->groupid);
         $this->assertSame('1', $event->visible);
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation2x2->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation2x2->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now - 100), $event->timestart);
         $this->assertSame("$program2->fullname starts", $event->name);
         $this->assertSame($program2->description, $event->description);
@@ -290,8 +334,12 @@ final class calendar_test extends \advanced_testcase {
 
         \tool_muprog\local\calendar::fix_program_events(null);
         $this->assertCount(5, $DB->get_records('event', ['component' => 'tool_muprog']));
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now), $event->timestart);
         $this->assertSame("$program1->fullname starts", $event->name);
         $this->assertSame($program1->description, $event->description);
@@ -300,8 +348,12 @@ final class calendar_test extends \advanced_testcase {
         $this->assertSame('0', $event->courseid);
         $this->assertSame('0', $event->groupid);
         $this->assertSame('1', $event->visible);
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_DUE], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_DUE],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now + 200), $event->timestart);
         $this->assertSame("$program1->fullname is due", $event->name);
         $this->assertSame($program1->description, $event->description);
@@ -310,8 +362,12 @@ final class calendar_test extends \advanced_testcase {
         $this->assertSame('0', $event->courseid);
         $this->assertSame('0', $event->groupid);
         $this->assertSame('1', $event->visible);
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_END], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_END],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now + 300), $event->timestart);
         $this->assertSame("$program1->fullname ends", $event->name);
         $this->assertSame($program1->description, $event->description);
@@ -320,8 +376,12 @@ final class calendar_test extends \advanced_testcase {
         $this->assertSame('0', $event->courseid);
         $this->assertSame('0', $event->groupid);
         $this->assertSame('1', $event->visible);
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now - 100), $event->timestart);
         $this->assertSame("$program2->fullname starts", $event->name);
         $this->assertSame($program2->description, $event->description);
@@ -330,8 +390,12 @@ final class calendar_test extends \advanced_testcase {
         $this->assertSame('0', $event->courseid);
         $this->assertSame('0', $event->groupid);
         $this->assertSame('1', $event->visible);
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation2x2->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation2x2->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now - 100), $event->timestart);
         $this->assertSame("$program2->fullname starts", $event->name);
         $this->assertSame($program2->description, $event->description);
@@ -345,8 +409,12 @@ final class calendar_test extends \advanced_testcase {
         $DB->update_record('tool_muprog_allocation', $allocation2x1);
         \tool_muprog\local\calendar::fix_program_events(null);
         $this->assertCount(5, $DB->get_records('event', ['component' => 'tool_muprog']));
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now + 100), $event->timestart);
         $this->assertSame("$program2->fullname starts", $event->name);
         $this->assertSame($program2->description, $event->description);
@@ -360,8 +428,12 @@ final class calendar_test extends \advanced_testcase {
         $DB->update_record('tool_muprog_allocation', $allocation2x1);
         \tool_muprog\local\calendar::fix_program_events(null);
         $this->assertCount(6, $DB->get_records('event', ['component' => 'tool_muprog']));
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now + 100), $event->timestart);
         $this->assertSame("$program2->fullname starts", $event->name);
         $this->assertSame($program2->description, $event->description);
@@ -370,8 +442,12 @@ final class calendar_test extends \advanced_testcase {
         $this->assertSame('0', $event->courseid);
         $this->assertSame('0', $event->groupid);
         $this->assertSame('1', $event->visible);
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_DUE], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_DUE],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now + 200), $event->timestart);
         $this->assertSame("$program2->fullname is due", $event->name);
         $this->assertSame($program2->description, $event->description);
@@ -385,8 +461,12 @@ final class calendar_test extends \advanced_testcase {
         $DB->update_record('tool_muprog_allocation', $allocation2x1);
         \tool_muprog\local\calendar::fix_program_events(null);
         $this->assertCount(6, $DB->get_records('event', ['component' => 'tool_muprog']));
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now + 100), $event->timestart);
         $this->assertSame("$program2->fullname starts", $event->name);
         $this->assertSame($program2->description, $event->description);
@@ -395,8 +475,12 @@ final class calendar_test extends \advanced_testcase {
         $this->assertSame('0', $event->courseid);
         $this->assertSame('0', $event->groupid);
         $this->assertSame('1', $event->visible);
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_DUE], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_DUE],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now + 300), $event->timestart);
         $this->assertSame("$program2->fullname is due", $event->name);
         $this->assertSame($program2->description, $event->description);
@@ -415,8 +499,12 @@ final class calendar_test extends \advanced_testcase {
         $DB->update_record('tool_muprog_allocation', $allocation2x1);
         \tool_muprog\local\calendar::fix_program_events(null);
         $this->assertCount(6, $DB->get_records('event', ['component' => 'tool_muprog']));
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now + 100), $event->timestart);
         $this->assertSame("$program2->fullname starts", $event->name);
         $this->assertSame($program2->description, $event->description);
@@ -425,8 +513,12 @@ final class calendar_test extends \advanced_testcase {
         $this->assertSame('0', $event->courseid);
         $this->assertSame('0', $event->groupid);
         $this->assertSame('1', $event->visible);
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_END], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_END],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now + 200), $event->timestart);
         $this->assertSame("$program2->fullname ends", $event->name);
         $this->assertSame($program2->description, $event->description);
@@ -440,8 +532,12 @@ final class calendar_test extends \advanced_testcase {
         $DB->update_record('tool_muprog_allocation', $allocation2x1);
         \tool_muprog\local\calendar::fix_program_events(null);
         $this->assertCount(6, $DB->get_records('event', ['component' => 'tool_muprog']));
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now + 100), $event->timestart);
         $this->assertSame("$program2->fullname starts", $event->name);
         $this->assertSame($program2->description, $event->description);
@@ -450,8 +546,12 @@ final class calendar_test extends \advanced_testcase {
         $this->assertSame('0', $event->courseid);
         $this->assertSame('0', $event->groupid);
         $this->assertSame('1', $event->visible);
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_END], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_END],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now + 300), $event->timestart);
         $this->assertSame("$program2->fullname ends", $event->name);
         $this->assertSame($program2->description, $event->description);
@@ -473,8 +573,12 @@ final class calendar_test extends \advanced_testcase {
         $DB->update_record('tool_muprog_program', $newprogram2);
 
         \tool_muprog\local\calendar::fix_program_events(null);
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now + 100), $event->timestart);
         $this->assertSame("$program2->fullname starts", $event->name);
         $this->assertSame($program2->description, $event->description);
@@ -486,8 +590,12 @@ final class calendar_test extends \advanced_testcase {
 
         $DB->set_field('tool_muprog_allocation', 'calendarupdated', 0, []);
         \tool_muprog\local\calendar::fix_program_events(null);
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now + 100), $event->timestart);
         $this->assertSame("$newprogram2->fullname starts", $event->name);
         $this->assertSame($newprogram2->description, $event->description);
@@ -504,8 +612,12 @@ final class calendar_test extends \advanced_testcase {
         $DB->update_record('tool_muprog_allocation', $allocation2x2);
         \tool_muprog\local\calendar::fix_program_events(null);
         $this->assertCount(1, $DB->get_records('event', ['component' => 'tool_muprog']));
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation2x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now + 100), $event->timestart);
         $this->assertSame("$program2->fullname starts", $event->name);
         $this->assertSame($program2->description, $event->description);
@@ -716,8 +828,12 @@ final class calendar_test extends \advanced_testcase {
         $program1 = \tool_muprog\local\program::update_general((object)$data);
         $this->assertCount(5, $DB->get_records('event', ['component' => 'tool_muprog']));
         $this->assertCount(5, $DB->get_records('event', ['component' => 'tool_muprog', 'visible' => 1]));
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now), $event->timestart);
         $this->assertSame("$program1->fullname starts", $event->name);
         $this->assertSame($program1->description, $event->description);
@@ -734,8 +850,12 @@ final class calendar_test extends \advanced_testcase {
         $program1 = \tool_muprog\local\program::update_general((object)$data);
         $this->assertCount(5, $DB->get_records('event', ['component' => 'tool_muprog']));
         $this->assertCount(5, $DB->get_records('event', ['component' => 'tool_muprog', 'visible' => 1]));
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now), $event->timestart);
         $this->assertSame("$program1->fullname starts", $event->name);
         $this->assertSame($program1->description, $event->description);
@@ -773,8 +893,12 @@ final class calendar_test extends \advanced_testcase {
         manual::allocate_users($program1->id, $source1->id, [$user1->id], $dates);
         $allocation1x1 = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $this->assertCount(3, $DB->get_records('event', ['component' => 'tool_muprog']));
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now), $event->timestart);
         $this->assertSame("$program1->fullname starts", $event->name);
         $this->assertSame($program1->description, $event->description);
@@ -783,8 +907,12 @@ final class calendar_test extends \advanced_testcase {
         $this->assertSame('0', $event->courseid);
         $this->assertSame('0', $event->groupid);
         $this->assertSame('1', $event->visible);
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_DUE], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_DUE],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now + 200), $event->timestart);
         $this->assertSame("$program1->fullname is due", $event->name);
         $this->assertSame($program1->description, $event->description);
@@ -793,8 +921,12 @@ final class calendar_test extends \advanced_testcase {
         $this->assertSame('0', $event->courseid);
         $this->assertSame('0', $event->groupid);
         $this->assertSame('1', $event->visible);
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_END], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_END],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now + 300), $event->timestart);
         $this->assertSame("$program1->fullname ends", $event->name);
         $this->assertSame($program1->description, $event->description);
@@ -844,8 +976,12 @@ final class calendar_test extends \advanced_testcase {
         manual::allocation_delete($program2, $source2, $allocation2x1, true);
         $this->assertCount(4, $DB->get_records('event', ['component' => 'tool_muprog']));
         $this->assertCount(4, $DB->get_records('event', ['component' => 'tool_muprog', 'visible' => 1]));
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now), $event->timestart);
         $this->assertSame("$program1->fullname starts", $event->name);
         $this->assertSame($program1->description, $event->description);
@@ -854,8 +990,12 @@ final class calendar_test extends \advanced_testcase {
         $this->assertSame('0', $event->courseid);
         $this->assertSame('0', $event->groupid);
         $this->assertSame('1', $event->visible);
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_DUE], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_DUE],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now + 200), $event->timestart);
         $this->assertSame("$program1->fullname is due", $event->name);
         $this->assertSame($program1->description, $event->description);
@@ -864,8 +1004,12 @@ final class calendar_test extends \advanced_testcase {
         $this->assertSame('0', $event->courseid);
         $this->assertSame('0', $event->groupid);
         $this->assertSame('1', $event->visible);
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_END], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_END],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now + 300), $event->timestart);
         $this->assertSame("$program1->fullname ends", $event->name);
         $this->assertSame($program1->description, $event->description);
@@ -874,8 +1018,12 @@ final class calendar_test extends \advanced_testcase {
         $this->assertSame('0', $event->courseid);
         $this->assertSame('0', $event->groupid);
         $this->assertSame('1', $event->visible);
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation2x2->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation2x2->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now - 100), $event->timestart);
         $this->assertSame("$program2->fullname starts", $event->name);
         $this->assertSame($program2->description, $event->description);
@@ -912,8 +1060,12 @@ final class calendar_test extends \advanced_testcase {
         ];
         manual::allocate_users($program1->id, $source1->id, [$user1->id], $dates);
         $allocation1x1 = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now), $event->timestart);
         $this->assertSame("$program1->fullname starts", $event->name);
         $this->assertSame($program1->description, $event->description);
@@ -925,8 +1077,12 @@ final class calendar_test extends \advanced_testcase {
 
         $allocation1x1->timestart = (string)($now - 100);
         $allocation1x1 = \tool_muprog\local\source\base::allocation_update($allocation1x1);
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now - 100), $event->timestart);
         $this->assertSame("$program1->fullname starts", $event->name);
         $this->assertSame($program1->description, $event->description);
@@ -963,8 +1119,12 @@ final class calendar_test extends \advanced_testcase {
         ];
         manual::allocate_users($program1->id, $source1->id, [$user1->id], $dates);
         $allocation1x1 = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now), $event->timestart);
         $this->assertSame("$program1->fullname starts", $event->name);
         $this->assertSame($program1->description, $event->description);
@@ -976,8 +1136,10 @@ final class calendar_test extends \advanced_testcase {
 
         $allocation1x1->timecompleted = (string)($now - 100);
         $allocation1x1 = \tool_muprog\local\source\base::allocation_update($allocation1x1);
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START]);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START]
+        );
         $this->assertFalse($event);
     }
 
@@ -1007,8 +1169,12 @@ final class calendar_test extends \advanced_testcase {
         ];
         manual::allocate_users($program1->id, $source1->id, [$user1->id], $dates);
         $allocation1x1 = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START], '*', MUST_EXIST);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now), $event->timestart);
         $this->assertSame("$program1->fullname starts", $event->name);
         $this->assertSame($program1->description, $event->description);
@@ -1019,8 +1185,10 @@ final class calendar_test extends \advanced_testcase {
         $this->assertSame('1', $event->visible);
 
         $allocation1x1 = \tool_muprog\local\source\base::allocation_archive($allocation1x1->id);
-        $event = $DB->get_record('event',
-            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START]);
+        $event = $DB->get_record(
+            'event',
+            ['component' => 'tool_muprog', 'instance' => $allocation1x1->id, 'eventtype' => \tool_muprog\local\calendar::EVENTTYPE_START]
+        );
         $this->assertFalse($event);
     }
 }

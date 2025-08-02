@@ -52,15 +52,20 @@ final class form_item_append_trainingid_test extends \advanced_testcase {
         $traininggenerator = $this->getDataGenerator()->get_plugin_generator('tool_mutrain');
 
         $fielcategory = $this->getDataGenerator()->create_custom_field_category(
-            ['component' => 'core_course', 'area' => 'course']);
+            ['component' => 'core_course', 'area' => 'course']
+        );
         $field1 = $this->getDataGenerator()->create_custom_field(
-            ['categoryid' => $fielcategory->get('id'), 'type' => 'mutrain', 'shortname' => 'field1']);
+            ['categoryid' => $fielcategory->get('id'), 'type' => 'mutrain', 'shortname' => 'field1']
+        );
         $field2 = $this->getDataGenerator()->create_custom_field(
-            ['categoryid' => $fielcategory->get('id'), 'type' => 'mutrain', 'shortname' => 'field2']);
+            ['categoryid' => $fielcategory->get('id'), 'type' => 'mutrain', 'shortname' => 'field2']
+        );
         $field3 = $this->getDataGenerator()->create_custom_field(
-            ['categoryid' => $fielcategory->get('id'), 'type' => 'mutrain', 'shortname' => 'field3']);
+            ['categoryid' => $fielcategory->get('id'), 'type' => 'mutrain', 'shortname' => 'field3']
+        );
         $field4 = $this->getDataGenerator()->create_custom_field(
-            ['categoryid' => $fielcategory->get('id'), 'type' => 'text', 'shortname' => 'field4']);
+            ['categoryid' => $fielcategory->get('id'), 'type' => 'text', 'shortname' => 'field4']
+        );
 
         $data = (object)[
             'name' => 'Some framework',
@@ -113,9 +118,11 @@ final class form_item_append_trainingid_test extends \advanced_testcase {
         role_assign($fviewerroleid, $user1->id, $syscontext->id);
 
         $this->setUser($user1);
-        $response = \tool_muprog\external\form_item_append_trainingid::execute ('', $program1->id);
+        $response = \tool_muprog\external\form_item_append_trainingid::execute('', $program1->id);
         $results = \tool_muprog\external\form_item_append_trainingid::clean_returnvalue(
-            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(), $response);
+            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(),
+            $response
+        );
         $this->assertSame(null, $results['notice']);
         $expectedlist = [
             ['value' => $framework3->id, 'label' => $framework3->name],
@@ -124,9 +131,11 @@ final class form_item_append_trainingid_test extends \advanced_testcase {
         ];
         $this->assertSame($expectedlist, $results['list']);
 
-        $response = \tool_muprog\external\form_item_append_trainingid::execute ('framework', $program1->id);
+        $response = \tool_muprog\external\form_item_append_trainingid::execute('framework', $program1->id);
         $results = \tool_muprog\external\form_item_append_trainingid::clean_returnvalue(
-            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(), $response);
+            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(),
+            $response
+        );
         $this->assertSame(null, $results['notice']);
         $expectedlist = [
             ['value' => $framework3->id, 'label' => $framework3->name],
@@ -135,35 +144,43 @@ final class form_item_append_trainingid_test extends \advanced_testcase {
         ];
         $this->assertSame($expectedlist, $results['list']);
 
-        $response = \tool_muprog\external\form_item_append_trainingid::execute ('Another', $program1->id);
+        $response = \tool_muprog\external\form_item_append_trainingid::execute('Another', $program1->id);
         $results = \tool_muprog\external\form_item_append_trainingid::clean_returnvalue(
-            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(), $response);
+            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(),
+            $response
+        );
         $this->assertSame(null, $results['notice']);
         $expectedlist = [
             ['value' => $framework3->id, 'label' => $framework3->name],
         ];
         $this->assertSame($expectedlist, $results['list']);
 
-        $response = \tool_muprog\external\form_item_append_trainingid::execute ('fr2', $program1->id);
+        $response = \tool_muprog\external\form_item_append_trainingid::execute('fr2', $program1->id);
         $results = \tool_muprog\external\form_item_append_trainingid::clean_returnvalue(
-            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(), $response);
+            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(),
+            $response
+        );
         $this->assertSame(null, $results['notice']);
         $expectedlist = [
             ['value' => $framework2->id, 'label' => $framework2->name],
         ];
         $this->assertSame($expectedlist, $results['list']);
 
-        $response = \tool_muprog\external\form_item_append_trainingid::execute ('xxx', $program1->id);
+        $response = \tool_muprog\external\form_item_append_trainingid::execute('xxx', $program1->id);
         $results = \tool_muprog\external\form_item_append_trainingid::clean_returnvalue(
-            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(), $response);
+            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(),
+            $response
+        );
         $this->assertSame(null, $results['notice']);
         $expectedlist = [];
         $this->assertSame($expectedlist, $results['list']);
 
         $this->setUser($user2);
-        $response = \tool_muprog\external\form_item_append_trainingid::execute ('', $program1->id);
+        $response = \tool_muprog\external\form_item_append_trainingid::execute('', $program1->id);
         $results = \tool_muprog\external\form_item_append_trainingid::clean_returnvalue(
-            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(), $response);
+            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(),
+            $response
+        );
         $this->assertSame(null, $results['notice']);
         $expectedlist = [
             ['value' => $framework2->id, 'label' => $framework2->name],
@@ -172,9 +189,11 @@ final class form_item_append_trainingid_test extends \advanced_testcase {
         $this->assertSame($expectedlist, $results['list']);
 
         $this->setUser($user3);
-        $response = \tool_muprog\external\form_item_append_trainingid::execute ('', $program2->id);
+        $response = \tool_muprog\external\form_item_append_trainingid::execute('', $program2->id);
         $results = \tool_muprog\external\form_item_append_trainingid::clean_returnvalue(
-            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(), $response);
+            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(),
+            $response
+        );
         $this->assertSame(null, $results['notice']);
         $expectedlist = [
             ['value' => $framework2->id, 'label' => $framework2->name],
@@ -184,7 +203,7 @@ final class form_item_append_trainingid_test extends \advanced_testcase {
 
         $this->setUser($user3);
         try {
-            \tool_muprog\external\form_item_append_trainingid::execute ('', $program1->id);
+            \tool_muprog\external\form_item_append_trainingid::execute('', $program1->id);
             $this->fail('Exception expected');
         } catch (\moodle_exception $ex) {
             $this->assertInstanceOf(\required_capability_exception::class, $ex);
@@ -192,7 +211,7 @@ final class form_item_append_trainingid_test extends \advanced_testcase {
 
         $this->setUser($user4);
         try {
-            \tool_muprog\external\form_item_append_trainingid::execute ('', $program1->id);
+            \tool_muprog\external\form_item_append_trainingid::execute('', $program1->id);
             $this->fail('Exception expected');
         } catch (\moodle_exception $ex) {
             $this->assertInstanceOf(\required_capability_exception::class, $ex);
@@ -260,9 +279,11 @@ final class form_item_append_trainingid_test extends \advanced_testcase {
         role_assign($editorroleid, $user2->id, $tenant2catcontext->id);
 
         $this->setUser($user0);
-        $response = \tool_muprog\external\form_item_append_trainingid::execute ('', $program0->id);
+        $response = \tool_muprog\external\form_item_append_trainingid::execute('', $program0->id);
         $results = \tool_muprog\external\form_item_append_trainingid::clean_returnvalue(
-            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(), $response);
+            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(),
+            $response
+        );
         $this->assertSame(null, $results['notice']);
         $expectedlist = [
             ['value' => $framework0->id, 'label' => $framework0->name],
@@ -271,9 +292,11 @@ final class form_item_append_trainingid_test extends \advanced_testcase {
         ];
         $this->assertSame($expectedlist, $results['list']);
 
-        $response = \tool_muprog\external\form_item_append_trainingid::execute ('', $program1->id);
+        $response = \tool_muprog\external\form_item_append_trainingid::execute('', $program1->id);
         $results = \tool_muprog\external\form_item_append_trainingid::clean_returnvalue(
-            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(), $response);
+            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(),
+            $response
+        );
         $this->assertSame(null, $results['notice']);
         $expectedlist = [
             ['value' => $framework0->id, 'label' => $framework0->name],
@@ -281,9 +304,11 @@ final class form_item_append_trainingid_test extends \advanced_testcase {
         ];
         $this->assertSame($expectedlist, $results['list']);
 
-        $response = \tool_muprog\external\form_item_append_trainingid::execute ('', $program2->id);
+        $response = \tool_muprog\external\form_item_append_trainingid::execute('', $program2->id);
         $results = \tool_muprog\external\form_item_append_trainingid::clean_returnvalue(
-            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(), $response);
+            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(),
+            $response
+        );
         $this->assertSame(null, $results['notice']);
         $expectedlist = [
             ['value' => $framework0->id, 'label' => $framework0->name],
@@ -292,9 +317,11 @@ final class form_item_append_trainingid_test extends \advanced_testcase {
         $this->assertSame($expectedlist, $results['list']);
 
         $this->setUser($user2);
-        $response = \tool_muprog\external\form_item_append_trainingid::execute ('', $program2->id);
+        $response = \tool_muprog\external\form_item_append_trainingid::execute('', $program2->id);
         $results = \tool_muprog\external\form_item_append_trainingid::clean_returnvalue(
-            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(), $response);
+            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(),
+            $response
+        );
         $this->assertSame(null, $results['notice']);
         $expectedlist = [
             ['value' => $framework0->id, 'label' => $framework0->name],

@@ -74,9 +74,11 @@ final class allocation_handler_test extends \advanced_testcase {
 
         $program1 = $generator->create_program(['contextid' => $catcontext->id]);
         $allocation1 = $generator->create_program_allocation(
-            ['programid' => $program1->id, 'userid' => $user1->id]);
+            ['programid' => $program1->id, 'userid' => $user1->id]
+        );
         $allocation2 = $generator->create_program_allocation(
-            ['programid' => $program1->id, 'userid' => $user2->id]);
+            ['programid' => $program1->id, 'userid' => $user2->id]
+        );
 
         $this->setUser($manager);
 
@@ -159,9 +161,11 @@ final class allocation_handler_test extends \advanced_testcase {
 
         $program1 = $generator->create_program(['contextid' => $catcontext->id]);
         $allocation1 = $generator->create_program_allocation(
-            ['programid' => $program1->id, 'userid' => $user1->id]);
+            ['programid' => $program1->id, 'userid' => $user1->id]
+        );
         $allocation2 = $generator->create_program_allocation(
-            ['programid' => $program1->id, 'userid' => $user2->id]);
+            ['programid' => $program1->id, 'userid' => $user2->id]
+        );
 
         $this->setUser($manager);
         $data = (object)[
@@ -283,7 +287,8 @@ final class allocation_handler_test extends \advanced_testcase {
             'customfield_testfield4' => 'Test value 4',
         ]);
         $allocation2 = $generator->create_program_allocation(
-            ['programid' => $program1->id, 'userid' => $allocated2->id]);
+            ['programid' => $program1->id, 'userid' => $allocated2->id]
+        );
 
         $handler = allocation_handler::create();
 

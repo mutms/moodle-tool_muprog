@@ -62,8 +62,10 @@ final class notification_manager extends \tool_mulib\local\notification\manager 
 
         $types = self::get_all_types();
 
-        $existing = $DB->get_records('tool_mulib_notification',
-            ['component' => 'tool_muprog', 'instanceid' => $instanceid]);
+        $existing = $DB->get_records(
+            'tool_mulib_notification',
+            ['component' => 'tool_muprog', 'instanceid' => $instanceid]
+        );
         foreach ($existing as $notification) {
             unset($types[$notification->notificationtype]);
         }
@@ -230,8 +232,10 @@ final class notification_manager extends \tool_mulib\local\notification\manager 
     public static function delete_allocation_notifications(\stdClass $allocation) {
         global $DB;
 
-        $notifications = $DB->get_records('tool_mulib_notification',
-            ['component' => 'tool_muprog', 'instanceid' => $allocation->programid]);
+        $notifications = $DB->get_records(
+            'tool_mulib_notification',
+            ['component' => 'tool_muprog', 'instanceid' => $allocation->programid]
+        );
         foreach ($notifications as $notification) {
             /** @var class-string<notification\base> $classname */
             $classname = self::get_classname($notification->notificationtype);
@@ -251,8 +255,10 @@ final class notification_manager extends \tool_mulib\local\notification\manager 
     public static function delete_program_notifications(\stdClass $program) {
         global $DB;
 
-        $notifications = $DB->get_records('tool_mulib_notification',
-            ['component' => 'tool_muprog', 'instanceid' => $program->id]);
+        $notifications = $DB->get_records(
+            'tool_mulib_notification',
+            ['component' => 'tool_muprog', 'instanceid' => $program->id]
+        );
         foreach ($notifications as $notification) {
             \tool_mulib\local\notification\util::notification_delete($notification->id);
         }
@@ -300,7 +306,11 @@ final class notification_manager extends \tool_mulib\local\notification\manager 
     public static function add_import_frominstance_element(int $instanceid, \MoodleQuickForm $mform): void {
         $arguments = ['id' => $instanceid];
         \tool_muprog\external\form_notification_import_frominstance::add_form_element(
-            $mform, $arguments, 'frominstance', get_string('notification_import_from', 'tool_mulib'));
+            $mform,
+            $arguments,
+            'frominstance',
+            get_string('notification_import_from', 'tool_mulib')
+        );
         $mform->addRule('frominstance', null, 'required', null, 'client');
     }
 

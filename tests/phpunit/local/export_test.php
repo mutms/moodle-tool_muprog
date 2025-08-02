@@ -97,8 +97,10 @@ final class export_test extends \advanced_testcase {
         $this->assertSame(['type' => 'allocation'], (array)$programs[0]->startdate);
         $this->assertSame(['type' => 'notset'], (array)$programs[0]->duedate);
         $this->assertSame(['type' => 'notset'], (array)$programs[0]->enddate);
-        $this->assertSame(['itemtype' => 'set', 'completiondelay' => 0, 'sequencetype' => 'allinanyorder', 'items' => []],
-            (array)$programs[0]->contents);
+        $this->assertSame(
+            ['itemtype' => 'set', 'completiondelay' => 0, 'sequencetype' => 'allinanyorder', 'items' => []],
+            (array)$programs[0]->contents
+        );
         $this->assertSame([], $programs[0]->sources);
 
         $programs = \tool_muprog\local\export::export_programs('id = ?', [$program1->id]);
@@ -134,9 +136,11 @@ final class export_test extends \advanced_testcase {
         /** @var \tool_mutrain_generator $traininggenerator */
         $traininggenerator = $this->getDataGenerator()->get_plugin_generator('tool_mutrain');
         $fielcategory = $this->getDataGenerator()->create_custom_field_category(
-            ['component' => 'core_course', 'area' => 'course']);
+            ['component' => 'core_course', 'area' => 'course']
+        );
         $field1 = $this->getDataGenerator()->create_custom_field(
-            ['categoryid' => $fielcategory->get('id'), 'type' => 'mutrain', 'shortname' => 'field1']);
+            ['categoryid' => $fielcategory->get('id'), 'type' => 'mutrain', 'shortname' => 'field1']
+        );
         $data = (object)[
             'name' => 'Some framework',
             'idnumber' => 'fid1',
@@ -187,9 +191,11 @@ final class export_test extends \advanced_testcase {
             /** @var \tool_mutrain_generator $traininggenerator */
             $traininggenerator = $this->getDataGenerator()->get_plugin_generator('tool_mutrain');
             $fielcategory = $this->getDataGenerator()->create_custom_field_category(
-                ['component' => 'core_course', 'area' => 'course']);
+                ['component' => 'core_course', 'area' => 'course']
+            );
             $field1 = $this->getDataGenerator()->create_custom_field(
-                ['categoryid' => $fielcategory->get('id'), 'type' => 'mutrain', 'shortname' => 'field1']);
+                ['categoryid' => $fielcategory->get('id'), 'type' => 'mutrain', 'shortname' => 'field1']
+            );
             $data = (object)[
                 'name' => 'Some framework',
                 'fields' => [$field1->get('id')],
@@ -266,9 +272,11 @@ final class export_test extends \advanced_testcase {
             /** @var \tool_mutrain_generator $traininggenerator */
             $traininggenerator = $this->getDataGenerator()->get_plugin_generator('tool_mutrain');
             $fielcategory = $this->getDataGenerator()->create_custom_field_category(
-                ['component' => 'core_course', 'area' => 'course']);
+                ['component' => 'core_course', 'area' => 'course']
+            );
             $field1 = $this->getDataGenerator()->create_custom_field(
-                ['categoryid' => $fielcategory->get('id'), 'type' => 'mutrain', 'shortname' => 'field1']);
+                ['categoryid' => $fielcategory->get('id'), 'type' => 'mutrain', 'shortname' => 'field1']
+            );
             $data = (object)[
                 'name' => 'Some framework',
                 'fields' => [$field1->get('id')],

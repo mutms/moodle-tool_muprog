@@ -73,26 +73,36 @@ final class source_manual_allocate_users_test extends \advanced_testcase {
         \cohort_add_member($cohort2->id, $user7->id);
 
         $this->setUser($user1);
-        $results = \tool_muprog\external\source_manual_allocate_users::clean_returnvalue(\tool_muprog\external\source_manual_allocate_users::execute_returns(),
-            \tool_muprog\external\source_manual_allocate_users::execute($program1->id, [$user1->id, $user2->id]));
+        $results = \tool_muprog\external\source_manual_allocate_users::clean_returnvalue(
+            \tool_muprog\external\source_manual_allocate_users::execute_returns(),
+            \tool_muprog\external\source_manual_allocate_users::execute($program1->id, [$user1->id, $user2->id])
+        );
         $this->assertCount(2, $results);
-        $results = \tool_muprog\external\source_manual_allocate_users::clean_returnvalue(\tool_muprog\external\source_manual_allocate_users::execute_returns(),
-            \tool_muprog\external\source_manual_allocate_users::execute($program1->id, [$user1->id, $user2->id, $user3->id]));
+        $results = \tool_muprog\external\source_manual_allocate_users::clean_returnvalue(
+            \tool_muprog\external\source_manual_allocate_users::execute_returns(),
+            \tool_muprog\external\source_manual_allocate_users::execute($program1->id, [$user1->id, $user2->id, $user3->id])
+        );
         $this->assertCount(1, $results);
-        $results = \tool_muprog\external\source_manual_allocate_users::clean_returnvalue(\tool_muprog\external\source_manual_allocate_users::execute_returns(),
-            \tool_muprog\external\source_manual_allocate_users::execute($program1->id, [], [$cohort1->id]));
+        $results = \tool_muprog\external\source_manual_allocate_users::clean_returnvalue(
+            \tool_muprog\external\source_manual_allocate_users::execute_returns(),
+            \tool_muprog\external\source_manual_allocate_users::execute($program1->id, [], [$cohort1->id])
+        );
         $this->assertCount(3, $results);
 
         $timestart = time() + YEARSECS;
-        $results = \tool_muprog\external\source_manual_allocate_users::clean_returnvalue(\tool_muprog\external\source_manual_allocate_users::execute_returns(),
-            \tool_muprog\external\source_manual_allocate_users::execute($program1->id, [$user7->id], [], ['timestart' => $timestart]));
+        $results = \tool_muprog\external\source_manual_allocate_users::clean_returnvalue(
+            \tool_muprog\external\source_manual_allocate_users::execute_returns(),
+            \tool_muprog\external\source_manual_allocate_users::execute($program1->id, [$user7->id], [], ['timestart' => $timestart])
+        );
         $this->assertCount(1, $results);
         $record = $DB->get_record('tool_muprog_allocation', ['userid' => $user7->id, 'programid' => $program1->id]);
         $this->assertSame($timestart, (int)$record->timestart);
 
         $timeend = time() + (2 * YEARSECS);
-        $results = \tool_muprog\external\source_manual_allocate_users::clean_returnvalue(\tool_muprog\external\source_manual_allocate_users::execute_returns(),
-            \tool_muprog\external\source_manual_allocate_users::execute($program1->id, [$user8->id], [], ['timeend' => $timeend]));
+        $results = \tool_muprog\external\source_manual_allocate_users::clean_returnvalue(
+            \tool_muprog\external\source_manual_allocate_users::execute_returns(),
+            \tool_muprog\external\source_manual_allocate_users::execute($program1->id, [$user8->id], [], ['timeend' => $timeend])
+        );
         $this->assertCount(1, $results);
         $record = $DB->get_record('tool_muprog_allocation', ['userid' => $user8->id, 'programid' => $program1->id]);
         $this->assertSame($timeend, (int)$record->timeend);
@@ -115,8 +125,10 @@ final class source_manual_allocate_users_test extends \advanced_testcase {
             $this->fail('Exception expected');
         } catch (\moodle_exception $ex) {
             $this->assertInstanceOf(\required_capability_exception::class, $ex);
-            $this->assertSame('Sorry, but you do not currently have permissions to do that (Allocate users to programs).',
-                $ex->getMessage());
+            $this->assertSame(
+                'Sorry, but you do not currently have permissions to do that (Allocate users to programs).',
+                $ex->getMessage()
+            );
         }
 
         $this->setUser($user2);

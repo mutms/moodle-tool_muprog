@@ -45,13 +45,21 @@ final class item_append extends \tool_mulib\local\dialog_form {
         $params = ['programid' => $parentset->get_programid()];
         $exclude = $DB->get_fieldset_select('tool_muprog_item', 'courseid', $select, $params);
 
-        $mform->addElement('course', 'courses', get_string('courses'),
-            ['multiple' => true, 'exclude' => $exclude, 'requiredcapabilities' => ['tool/muprog:addcourse']]);
+        $mform->addElement(
+            'course',
+            'courses',
+            get_string('courses'),
+            ['multiple' => true, 'exclude' => $exclude, 'requiredcapabilities' => ['tool/muprog:addcourse']]
+        );
 
         if (util::is_mutrain_available() && $DB->record_exists('tool_mutrain_framework', ['archived' => 0])) {
             $arguments = ['programid' => $parentset->get_programid()];
             form_item_append_trainingid::add_form_element(
-                $mform, $arguments, 'trainingid', get_string('training', 'tool_muprog'));
+                $mform,
+                $arguments,
+                'trainingid',
+                get_string('training', 'tool_muprog')
+            );
         }
 
         $mform->addElement('select', 'addset', get_string('addset', 'tool_muprog'), ['0' => get_string('no'), '1' => get_string('yes')]);
@@ -79,8 +87,12 @@ final class item_append extends \tool_mulib\local\dialog_form {
         $mform->hideIf('minpoints', 'sequencetype', 'noteq', set::SEQUENCE_TYPE_MINPOINTS);
         $mform->setDefault('minpoints', 1);
 
-        $mform->addElement('duration', 'completiondelay', get_string('completiondelay', 'tool_muprog'),
-            ['optional' => true, 'defaultunit' => DAYSECS]);
+        $mform->addElement(
+            'duration',
+            'completiondelay',
+            get_string('completiondelay', 'tool_muprog'),
+            ['optional' => true, 'defaultunit' => DAYSECS]
+        );
 
         $mform->addElement('hidden', 'parentitemid');
         $mform->setType('parentitemid', PARAM_INT);

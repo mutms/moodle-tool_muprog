@@ -68,7 +68,8 @@ final class my_allocations extends system_report {
         $param = database::generate_param_name();
         $this->add_base_condition_sql(
             "{$allocationalias}.userid = :$param AND {$allocationalias}.archived = 0 AND {$programalias}.archived = 0",
-            [$param => $USER->id]);
+            [$param => $USER->id]
+        );
 
         $this->add_columns();
         $this->add_filters();
@@ -105,7 +106,7 @@ final class my_allocations extends system_report {
 
         $column = $this->programentity->get_column('fullname')
             ->add_field("{$programalias}.id")
-            ->add_callback(static function($value, \stdClass $row): string {
+            ->add_callback(static function ($value, \stdClass $row): string {
                 if (!$value) {
                     return '';
                 }
@@ -122,7 +123,7 @@ final class my_allocations extends system_report {
 
         $column = $this->sourceentity->get_column('type')
             ->add_fields("{$allocationalias}.id, {$sourcealias}.type, {$allocationalias}.programid")
-            ->add_callback(static function($value, \stdClass $row): string {
+            ->add_callback(static function ($value, \stdClass $row): string {
                 global $DB;
                 if (!$row->type) {
                     return '';

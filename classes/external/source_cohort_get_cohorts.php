@@ -33,7 +33,6 @@ use core_external\external_single_structure;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class source_cohort_get_cohorts extends external_api {
-
     /**
      * Describes the external function arguments.
      *

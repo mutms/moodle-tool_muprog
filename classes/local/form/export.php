@@ -44,14 +44,17 @@ final class export extends \moodleform {
         if ($program) {
             // Export was started from a program details page, let them add other programs.
             \tool_muprog\external\form_export_programids::add_form_element(
-                $mform, ['query' => ''], 'programids', get_string('programs', 'tool_muprog'));
+                $mform,
+                ['query' => ''],
+                'programids',
+                get_string('programs', 'tool_muprog')
+            );
             $mform->addRule('programids', null, 'required', null, 'client');
             $mform->setDefault('programids', [$program->id]);
 
             $mform->addElement('hidden', 'id');
             $mform->setType('id', PARAM_INT);
             $mform->setDefault('id', $program->id);
-
         } else {
             // Export started from category, let them select other categories or all programs.
             $mform->addElement('select', 'contextid', get_string('context'), self::get_contextid_options());

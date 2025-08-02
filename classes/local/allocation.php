@@ -1091,9 +1091,12 @@ final class allocation {
             if ($evidence) {
                 if ($completion) {
                     if ($evidence->timecompleted != $completion->timecompleted) {
-                        $DB->set_field('tool_muprog_completion',
-                            'timecompleted', $evidence->timecompleted,
-                            ['id' => $completion->id]);
+                        $DB->set_field(
+                            'tool_muprog_completion',
+                            'timecompleted',
+                            $evidence->timecompleted,
+                            ['id' => $completion->id]
+                        );
                     }
                 } else {
                     $record = new stdClass();
@@ -1295,7 +1298,7 @@ final class allocation {
             return;
         }
 
-        $completionfield = 'pcompletiondate'.$number;
+        $completionfield = 'pcompletiondate' . $number;
         if (empty($user->{$completionfield})) {
             return;
         }
@@ -1304,7 +1307,7 @@ final class allocation {
             $upt->track('enrolments', get_string('invalidcompletiondate', 'tool_muprog', $programname), 'error');
             return;
         }
-        $completionevidence = 'pcompletionevidence'.$number;
+        $completionevidence = 'pcompletionevidence' . $number;
         $evidence = $user->{$completionevidence} ?? '';
 
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program->id, 'userid' => $user->id]);
@@ -1349,7 +1352,8 @@ final class allocation {
     public static function process_evidence_uploaded_data(stdClass $data, array $filedata): array {
         global $DB, $USER;
 
-        if ($data->usermapping !== 'username'
+        if (
+            $data->usermapping !== 'username'
             && $data->usermapping !== 'email'
             && $data->usermapping !== 'idnumber'
         ) {

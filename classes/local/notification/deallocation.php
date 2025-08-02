@@ -52,8 +52,12 @@ final class deallocation extends base {
      * @param stdClass $user
      * @return array
      */
-    public static function get_allocation_placeholders(stdClass $program, stdClass $source, stdClass $allocation,
-                                                       stdClass $user): array {
+    public static function get_allocation_placeholders(
+        stdClass $program,
+        stdClass $source,
+        stdClass $allocation,
+        stdClass $user
+    ): array {
         $a = parent::get_allocation_placeholders($program, $source, $allocation, $user);
         $context = \context::instance_by_id($program->contextid);
         if (has_capability('tool/muprog:view', $context)) {

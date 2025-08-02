@@ -75,10 +75,8 @@ final class allocation_handler extends \core_customfield\handler {
             $allocation = $DB->get_record('tool_muprog_allocation', ['id' => $instanceid], '*', MUST_EXIST);
             $program = $DB->get_record('tool_muprog_program', ['id' => $allocation->programid], '*', MUST_EXIST);
             return context::instance_by_id($program->contextid);
-
         } else if ($this->newitemcontext) {
             return $this->newitemcontext;
-
         } else {
             return \context_system::instance();
         }
@@ -149,13 +147,28 @@ final class allocation_handler extends \core_customfield\handler {
         $mform->setExpanded('customfields_muprog', true);
         $mform->addElement('html', get_string('customfieldvisibleto', 'tool_muprog'));
 
-        $mform->addElement('advcheckbox', 'configdata[visibilitymanagers]',
-            '', get_string('customfieldvisible:viewcapability', 'tool_muprog'), ['group' => 1]);
+        $mform->addElement(
+            'advcheckbox',
+            'configdata[visibilitymanagers]',
+            '',
+            get_string('customfieldvisible:viewcapability', 'tool_muprog'),
+            ['group' => 1]
+        );
 
-        $mform->addElement('advcheckbox', 'configdata[visibilityallocatee]',
-            '', get_string('customfieldvisible:allocatee', 'tool_muprog'), ['group' => 1]);
+        $mform->addElement(
+            'advcheckbox',
+            'configdata[visibilityallocatee]',
+            '',
+            get_string('customfieldvisible:allocatee', 'tool_muprog'),
+            ['group' => 1]
+        );
 
-        $mform->addElement('advcheckbox', 'configdata[visibilityeveryone]',
-            '', get_string('customfieldvisible:everyone', 'tool_muprog'), ['group' => 1]);
+        $mform->addElement(
+            'advcheckbox',
+            'configdata[visibilityeveryone]',
+            '',
+            get_string('customfieldvisible:everyone', 'tool_muprog'),
+            ['group' => 1]
+        );
     }
 }

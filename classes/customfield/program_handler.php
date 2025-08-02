@@ -39,7 +39,6 @@ use MoodleQuickForm;
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class program_handler extends \core_customfield\handler {
-
     /**
      * Context that should be used for new categories created by this handler.
      *
@@ -139,13 +138,28 @@ final class program_handler extends \core_customfield\handler {
         $mform->setExpanded('customfields_muprog', true);
         $mform->addElement('html', get_string('customfieldvisibleto', 'tool_muprog'));
 
-        $mform->addElement('advcheckbox', 'configdata[visibilitymanagers]',
-            '', get_string('customfieldvisible:viewcapability', 'tool_muprog'), ['group' => 1]);
+        $mform->addElement(
+            'advcheckbox',
+            'configdata[visibilitymanagers]',
+            '',
+            get_string('customfieldvisible:viewcapability', 'tool_muprog'),
+            ['group' => 1]
+        );
 
-        $mform->addElement('advcheckbox', 'configdata[visibilityallocated]',
-            '', get_string('customfieldvisible:allocated', 'tool_muprog'), ['group' => 1]);
+        $mform->addElement(
+            'advcheckbox',
+            'configdata[visibilityallocated]',
+            '',
+            get_string('customfieldvisible:allocated', 'tool_muprog'),
+            ['group' => 1]
+        );
 
-        $mform->addElement('advcheckbox', 'configdata[visibilityeveryone]',
-            '', get_string('customfieldvisible:everyone', 'tool_muprog'), ['group' => 1]);
+        $mform->addElement(
+            'advcheckbox',
+            'configdata[visibilityeveryone]',
+            '',
+            get_string('customfieldvisible:everyone', 'tool_muprog'),
+            ['group' => 1]
+        );
     }
 }

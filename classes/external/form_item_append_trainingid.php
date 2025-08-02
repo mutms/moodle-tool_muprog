@@ -63,7 +63,9 @@ final class form_item_append_trainingid extends \tool_mulib\external\form_autoco
         global $DB;
 
         ['query' => $query, 'programid' => $programid] = self::validate_parameters(
-            self::execute_parameters(), ['query' => $query, 'programid' => $programid]);
+            self::execute_parameters(),
+            ['query' => $query, 'programid' => $programid]
+        );
 
         $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
 
@@ -126,7 +128,7 @@ final class form_item_append_trainingid extends \tool_mulib\external\form_autoco
      * @return callable
      */
     public static function get_label_callback(array $arguments): callable {
-        return function($value) use ($arguments): string {
+        return function ($value) use ($arguments): string {
             global $DB;
 
             $framework = $DB->get_record('tool_mutrain_framework', ['id' => $value]);

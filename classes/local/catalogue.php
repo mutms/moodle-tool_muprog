@@ -203,8 +203,11 @@ final class catalogue {
             $programimage = '';
             $presentation = (array)json_decode($program->presentationjson);
             if (!empty($presentation['image'])) {
-                $imageurl = \moodle_url::make_file_url("$CFG->wwwroot/pluginfile.php",
-                    '/' . $context->id . '/tool_muprog/image/' . $program->id . '/'. $presentation['image'], false);
+                $imageurl = \moodle_url::make_file_url(
+                    "$CFG->wwwroot/pluginfile.php",
+                    '/' . $context->id . '/tool_muprog/image/' . $program->id . '/' . $presentation['image'],
+                    false
+                );
                 $programimage = \html_writer::img($imageurl, '', ['class' => 'programimage']);
             }
 
@@ -233,7 +236,7 @@ final class catalogue {
     public function get_programs(): array {
         global $DB;
 
-        list($sql, $params) = $this->get_programs_sql();
+        [$sql, $params] = $this->get_programs_sql();
         return $DB->get_records_sql($sql, $params, $this->page * $this->perpage, $this->perpage);
     }
 
@@ -245,7 +248,7 @@ final class catalogue {
     public function count_programs(): int {
         global $DB;
 
-        list($sql, $params) = $this->get_programs_sql();
+        [$sql, $params] = $this->get_programs_sql();
 
         $sql = util::convert_to_count_sql($sql);
 

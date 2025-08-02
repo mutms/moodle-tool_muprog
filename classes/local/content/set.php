@@ -373,4 +373,3 @@ class set extends item {
         }
     }
 }
-

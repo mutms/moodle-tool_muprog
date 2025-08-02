@@ -76,8 +76,10 @@ if (has_capability('tool/muprog:admin', $context)) {
     ));
 }
 if (has_capability('tool/muprog:manageallocation', $context)) {
-    if ($sourceclass::is_allocation_update_possible($program, $source, $allocation)
-        && !$program->archived && !$allocation->archived) {
+    if (
+        $sourceclass::is_allocation_update_possible($program, $source, $allocation)
+        && !$program->archived && !$allocation->archived
+    ) {
         $actions->get_dropdown()->add_dialog_form(new \tool_mulib\output\dialog_form\link(
             new \moodle_url('/admin/tool/muprog/management/allocation_update.php', ['id' => $allocation->id]),
             get_string('allocation_update', 'tool_muprog')

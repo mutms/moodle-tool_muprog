@@ -37,15 +37,9 @@ use core_privacy\local\request\writer;
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements
-        // Transactions store user data.
-        \core_privacy\local\metadata\provider,
-
-        // The programs plugin has user allocations.
-        \core_privacy\local\request\plugin\provider,
-
-        // This plugin is capable of determining which users have data within it.
-        \core_privacy\local\request\core_userlist_provider {
-
+    \core_privacy\local\request\core_userlist_provider,
+    \core_privacy\local\metadata\provider,
+    \core_privacy\local\request\plugin\provider {
     /**
      * Returns meta data about this system.
      *
@@ -54,8 +48,8 @@ class provider implements
      */
     public static function get_metadata(collection $collection): collection {
         $collection->add_database_table(
-                'tool_muprog_allocation',
-                [
+            'tool_muprog_allocation',
+            [
                     'programid' => 'privacy:metadata:field:programid',
                     'userid' => 'privacy:metadata:field:userid',
                     'sourceid' => 'privacy:metadata:field:sourceid',
@@ -68,7 +62,7 @@ class provider implements
                     'timecompleted' => 'privacy:metadata:field:timecompleted',
                     'timecreated' => 'privacy:metadata:field:timecreated',
                 ],
-                'privacy:metadata:table:tool_muprog_allocation'
+            'privacy:metadata:table:tool_muprog_allocation'
         );
 
         $collection->add_database_table(
@@ -176,7 +170,7 @@ class provider implements
 
         $user = $contextlist->get_user();
 
-        list($contextsql, $contextparams) = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
+        [$contextsql, $contextparams] = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
 
         $sql = "SELECT p.contextid, p.fullname, pa.id, pa.programid, pa.userid,
                     pa.sourceid, pa.archived, pa.sourcedatajson, pa.timeallocated, pa.timestart, pa.timedue, pa.timeend,
@@ -327,7 +321,7 @@ class provider implements
         }
 
         $user = $contextlist->get_user();
-        list($contextsql, $contextparams) = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
+        [$contextsql, $contextparams] = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
 
         $sql = "SELECT pa.*
                   FROM {tool_muprog_program} p
@@ -368,7 +362,7 @@ class provider implements
 
         $context = $userlist->get_context();
         $userids = $userlist->get_userids();
-        list($usersql, $userparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+        [$usersql, $userparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
 
         $sql = "SELECT pa.*
                   FROM {tool_muprog_program} p

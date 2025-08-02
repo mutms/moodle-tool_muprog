@@ -42,7 +42,7 @@ final class upload_files extends \moodleform {
 
         $options = [
             'maxfiles' => -1,
-            'subdirs' => 0 ,
+            'subdirs' => 0,
             'accepted_types' => ['.json', '.zip', '.txt', '.csv'],
             'return_types' => FILE_INTERNAL,
         ];

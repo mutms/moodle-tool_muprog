@@ -47,7 +47,7 @@ class mod_lesson extends base {
 
         $fs = get_file_storage();
 
-        list($courses, $params) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED);
+        [$courses, $params] = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED);
         $params['userid'] = $user->id;
 
         $lessons = "SELECT l.id

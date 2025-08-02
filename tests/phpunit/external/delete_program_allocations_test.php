@@ -50,15 +50,29 @@ final class delete_program_allocations_test extends \advanced_testcase {
         $cohort1 = $this->getDataGenerator()->create_cohort();
 
         $program1 = $generator->create_program(
-            ['sources' => ['manual' => [], 'selfallocation' => []], 'public' => 1]);
-        $source1m = $DB->get_record('tool_muprog_source',
-            ['programid' => $program1->id, 'type' => 'manual'], '*', MUST_EXIST);
-        $source1s = $DB->get_record('tool_muprog_source',
-            ['programid' => $program1->id, 'type' => 'selfallocation'], '*', MUST_EXIST);
+            ['sources' => ['manual' => [], 'selfallocation' => []], 'public' => 1]
+        );
+        $source1m = $DB->get_record(
+            'tool_muprog_source',
+            ['programid' => $program1->id, 'type' => 'manual'],
+            '*',
+            MUST_EXIST
+        );
+        $source1s = $DB->get_record(
+            'tool_muprog_source',
+            ['programid' => $program1->id, 'type' => 'selfallocation'],
+            '*',
+            MUST_EXIST
+        );
         $program2 = $generator->create_program(
-            ['sources' => ['manual' => [], 'cohort' => ['cohortids' => [$cohort1->id]]], 'contextid' => $catcontext1->id]);
-        $source2 = $DB->get_record('tool_muprog_source',
-            ['programid' => $program2->id, 'type' => 'manual'], '*', MUST_EXIST);
+            ['sources' => ['manual' => [], 'cohort' => ['cohortids' => [$cohort1->id]]], 'contextid' => $catcontext1->id]
+        );
+        $source2 = $DB->get_record(
+            'tool_muprog_source',
+            ['programid' => $program2->id, 'type' => 'manual'],
+            '*',
+            MUST_EXIST
+        );
 
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
@@ -86,8 +100,10 @@ final class delete_program_allocations_test extends \advanced_testcase {
         $this->assertTrue($DB->record_exists('tool_muprog_allocation', ['userid' => $user4->id, 'programid' => $program2->id]));
 
         $this->setUser($user1);
-        $result = \tool_muprog\external\delete_program_allocations::clean_returnvalue(\tool_muprog\external\delete_program_allocations::execute_returns(),
-            \tool_muprog\external\delete_program_allocations::execute($program1->id, [$user1->id, $user3->id, $user5->id]));
+        $result = \tool_muprog\external\delete_program_allocations::clean_returnvalue(
+            \tool_muprog\external\delete_program_allocations::execute_returns(),
+            \tool_muprog\external\delete_program_allocations::execute($program1->id, [$user1->id, $user3->id, $user5->id])
+        );
         $this->assertSame([(int)$user1->id, (int)$user3->id], $result);
         $this->assertFalse($DB->record_exists('tool_muprog_allocation', ['userid' => $user1->id, 'programid' => $program1->id]));
         $this->assertTrue($DB->record_exists('tool_muprog_allocation', ['userid' => $user2->id, 'programid' => $program1->id]));
@@ -97,8 +113,10 @@ final class delete_program_allocations_test extends \advanced_testcase {
         $this->assertTrue($DB->record_exists('tool_muprog_allocation', ['userid' => $user4->id, 'programid' => $program2->id]));
 
         $this->setUser($user2);
-        $result = \tool_muprog\external\delete_program_allocations::clean_returnvalue(\tool_muprog\external\delete_program_allocations::execute_returns(),
-            \tool_muprog\external\delete_program_allocations::execute($program2->id, [$user1->id]));
+        $result = \tool_muprog\external\delete_program_allocations::clean_returnvalue(
+            \tool_muprog\external\delete_program_allocations::execute_returns(),
+            \tool_muprog\external\delete_program_allocations::execute($program2->id, [$user1->id])
+        );
         $this->assertSame([(int)$user1->id], $result);
         $this->assertFalse($DB->record_exists('tool_muprog_allocation', ['userid' => $user1->id, 'programid' => $program1->id]));
         $this->assertTrue($DB->record_exists('tool_muprog_allocation', ['userid' => $user2->id, 'programid' => $program1->id]));

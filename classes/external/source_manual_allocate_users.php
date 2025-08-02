@@ -43,11 +43,17 @@ final class source_manual_allocate_users extends external_api {
         return new external_function_parameters([
             'programid' => new external_value(PARAM_INT, 'Program id'),
             'userids' => new external_multiple_structure(
-                new external_value(PARAM_INT, 'User id')
-            , 'User ids to be allocated the program', VALUE_DEFAULT, []),
+                new external_value(PARAM_INT, 'User id'),
+                'User ids to be allocated the program',
+                VALUE_DEFAULT,
+                []
+            ),
             'cohortids' => new external_multiple_structure(
-                new external_value(PARAM_INT, 'Cohort id')
-            , 'Cohort ids to be allocated to the program', VALUE_DEFAULT, []),
+                new external_value(PARAM_INT, 'Cohort id'),
+                'Cohort ids to be allocated to the program',
+                VALUE_DEFAULT,
+                []
+            ),
             'dateoverrides' => new external_single_structure([
                 'timestart' => new external_value(PARAM_INT, 'time start', VALUE_OPTIONAL),
                 'timedue' => new external_value(PARAM_INT, 'time due', VALUE_OPTIONAL),
@@ -67,16 +73,22 @@ final class source_manual_allocate_users extends external_api {
      */
     public static function execute(int $programid, array $userids = [], array $cohortids = [], array $dateoverrides = []): array {
         global $DB;
-        $params = self::validate_parameters(self::execute_parameters(),
-            ['programid' => $programid, 'userids' => $userids, 'cohortids' => $cohortids, 'dateoverrides' => $dateoverrides]);
+        $params = self::validate_parameters(
+            self::execute_parameters(),
+            ['programid' => $programid, 'userids' => $userids, 'cohortids' => $cohortids, 'dateoverrides' => $dateoverrides]
+        );
         $userids = $params['userids'];
         $programid = $params['programid'];
         $cohortids = $params['cohortids'];
         $dateoverrides = $params['dateoverrides'];
 
         $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
-        $source = $DB->get_record('tool_muprog_source',
-            ['type' => 'manual', 'programid' => $program->id], '*', MUST_EXIST);
+        $source = $DB->get_record(
+            'tool_muprog_source',
+            ['type' => 'manual', 'programid' => $program->id],
+            '*',
+            MUST_EXIST
+        );
 
         // Validate context.
         $context = \context::instance_by_id($program->contextid);
@@ -102,7 +114,7 @@ final class source_manual_allocate_users extends external_api {
             $cohort = $DB->get_record('cohort', ['id' => $cohortid], '*', MUST_EXIST);
             $cohortcontext = \context::instance_by_id($cohort->contextid);
             require_capability('moodle/cohort:view', $cohortcontext);
-            $cohrotuserids = $DB->get_fieldset_select('cohort_members', 'userid',  "cohortid = ?", [$cohort->id]);
+            $cohrotuserids = $DB->get_fieldset_select('cohort_members', 'userid', "cohortid = ?", [$cohort->id]);
             foreach ($cohrotuserids as $userid) {
                 if ($DB->record_exists('tool_muprog_allocation', ['userid' => $userid, 'programid' => $program->id])) {
                     continue;
@@ -137,7 +149,8 @@ final class source_manual_allocate_users extends external_api {
      */
     public static function execute_returns(): external_multiple_structure {
         return new external_multiple_structure(
-            new external_value(PARAM_INT, 'User id')
-        , 'List of users who were enrolled');
+            new external_value(PARAM_INT, 'User id'),
+            'List of users who were enrolled'
+        );
     }
 }

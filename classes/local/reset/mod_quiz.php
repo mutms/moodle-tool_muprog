@@ -48,7 +48,7 @@ class mod_quiz extends base {
         // There is no simple way to delete all quiz data, there will be leftovers in questions
         // database tables.
 
-        list($courses, $params) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED);
+        [$courses, $params] = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED);
         $params['userid'] = $user->id;
 
         $quizzes = "SELECT q.id

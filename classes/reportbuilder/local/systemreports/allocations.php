@@ -51,8 +51,12 @@ final class allocations extends system_report {
     protected function initialise(): void {
         global $DB;
         // Make sure programid and context match!
-        $this->program = $DB->get_record('tool_muprog_program',
-            ['id' => $this->get_parameters()['programid'], 'contextid' => $this->get_context()->id], '*', MUST_EXIST);
+        $this->program = $DB->get_record(
+            'tool_muprog_program',
+            ['id' => $this->get_parameters()['programid'], 'contextid' => $this->get_context()->id],
+            '*',
+            MUST_EXIST
+        );
 
         $this->allocationentity = new allocation();
         $allocationalias = $this->allocationentity->get_table_alias('tool_muprog_allocation');
@@ -103,7 +107,7 @@ final class allocations extends system_report {
         $column = $this->userentity->get_column('fullname');
         $column
             ->add_fields("$allocationalias.id")
-            ->add_callback(static function(string $fullname, \stdClass $row): string {
+            ->add_callback(static function (string $fullname, \stdClass $row): string {
                 $url = new \moodle_url('/admin/tool/muprog/management/allocation.php', ['id' => $row->id]);
                 return \html_writer::link($url, $fullname);
             });
@@ -179,7 +183,7 @@ final class allocations extends system_report {
         $url = new moodle_url('/admin/tool/muprog/management/allocation_update.php', ['id' => ':id']);
         $link = new \tool_mulib\output\dialog_form\link($url, get_string('allocation_update', 'tool_muprog'), 'i/settings');
         $this->add_action($link->create_report_action()
-            ->add_callback(static function(\stdclass $row) use ($program): bool {
+            ->add_callback(static function (\stdclass $row) use ($program): bool {
                 global $DB;
                 if (!$row->id) {
                     return false;
@@ -200,13 +204,12 @@ final class allocations extends system_report {
                     return false;
                 }
                 return $sourceclass::is_allocation_update_possible($program, $source, $allocation);
-            })
-        );
+            }));
 
         $url = new moodle_url('/admin/tool/muprog/management/allocation_delete.php', ['id' => ':id']);
         $link = new \tool_mulib\output\dialog_form\link($url, get_string('deleteallocation', 'tool_muprog'), 'i/delete');
         $this->add_action($link->create_report_action(['class' => 'text-danger'])
-            ->add_callback(static function(\stdclass $row) use ($program): bool {
+            ->add_callback(static function (\stdclass $row) use ($program): bool {
                 global $DB;
                 if (!$row->id) {
                     return false;
@@ -224,7 +227,6 @@ final class allocations extends system_report {
                     return false;
                 }
                 return $sourceclass::is_allocation_delete_possible($program, $source, $allocation);
-            })
-        );
+            }));
     }
 }

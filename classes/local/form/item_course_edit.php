@@ -43,8 +43,12 @@ final class item_course_edit extends \tool_mulib\local\dialog_form {
         $mform->setType('points', PARAM_INT);
         $mform->setDefault('points', $course->get_points());
 
-        $mform->addElement('duration', 'completiondelay', get_string('completiondelay', 'tool_muprog'),
-            ['optional' => true, 'defaultunit' => DAYSECS]);
+        $mform->addElement(
+            'duration',
+            'completiondelay',
+            get_string('completiondelay', 'tool_muprog'),
+            ['optional' => true, 'defaultunit' => DAYSECS]
+        );
         $mform->setDefault('completiondelay', $course->get_completiondelay());
 
         $mform->addElement('hidden', 'id');

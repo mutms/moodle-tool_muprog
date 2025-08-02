@@ -34,7 +34,6 @@ use core_external\external_single_structure;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class get_programs extends external_api {
-
     /**
      * Describes the external function arguments.
      *
@@ -48,7 +47,9 @@ final class get_programs extends external_api {
                         'field' => new external_value(PARAM_ALPHANUM, 'The name of the field to be searched by list of'
                             . ' acceptable fields is : id, contextid, fullname, idnumber, public, archived, tenantid'),
                         'value' => new external_value(PARAM_RAW, 'Value of the field to be searched, NULL allowed only for tenantid'),
-                    ]), 'Program search parameters'
+                    ]
+                ),
+                'Program search parameters'
             ),
         ]);
     }
@@ -62,23 +63,25 @@ final class get_programs extends external_api {
     public static function execute(array $fieldvalues): array {
         global $DB;
         ['fieldvalues' => $fieldvalues] = self::validate_parameters(
-            self::execute_parameters(), ['fieldvalues' => $fieldvalues]);
+            self::execute_parameters(),
+            ['fieldvalues' => $fieldvalues]
+        );
 
         $allowedfieldlist = ['id', 'contextid', 'fullname', 'idnumber', 'public', 'archived', 'tenantid'];
         $params = [];
         $where = [];
         $tenantjoin = '';
         foreach ($fieldvalues as $fieldvalue) {
-            list('field' => $field, 'value' => $value) = $fieldvalue;
+            ['field' => $field, 'value' => $value] = $fieldvalue;
             if (!in_array($field, $allowedfieldlist, true)) {
-                throw new \invalid_parameter_exception('Invalid field name: '. $field);
+                throw new \invalid_parameter_exception('Invalid field name: ' . $field);
             }
             if (array_key_exists($field, $params)) {
-                throw new \invalid_parameter_exception('Invalid duplicate field name: '. $field);
+                throw new \invalid_parameter_exception('Invalid duplicate field name: ' . $field);
             }
             if ($field === 'tenantid') {
                 if (!\tool_muprog\local\util::is_mutenancy_active()) {
-                    throw new \invalid_parameter_exception('Invalid field name: '. $field);
+                    throw new \invalid_parameter_exception('Invalid field name: ' . $field);
                 }
                 if ($value === null) {
                     $tenantjoin = "JOIN {context} c ON c.id = p.contextid AND c.tenantid IS NULL";
@@ -87,7 +90,7 @@ final class get_programs extends external_api {
                 }
             } else {
                 if ($value === null) {
-                    throw new \invalid_parameter_exception('Field value cannot be NULL: '. $field);
+                    throw new \invalid_parameter_exception('Field value cannot be NULL: ' . $field);
                 }
                 $where[] = "p.$field = :$field";
             }
@@ -110,14 +113,22 @@ final class get_programs extends external_api {
             $context = \context::instance_by_id($program->contextid);
             if (has_capability('tool/muprog:view', $context)) {
                 self::validate_context($context);
-                $sources = $DB->get_records_menu('tool_muprog_source',
-                    ['programid' => $program->id], 'type ASC', 'type');
+                $sources = $DB->get_records_menu(
+                    'tool_muprog_source',
+                    ['programid' => $program->id],
+                    'type ASC',
+                    'type'
+                );
                 $program->sources = array_keys($sources);
                 if ($program->public) {
                     $program->cohortids = [];
                 } else {
-                    $cohorts = $DB->get_records_menu('tool_muprog_cohort',
-                        ['programid' => $program->id], 'cohortid ASC', 'cohortid');
+                    $cohorts = $DB->get_records_menu(
+                        'tool_muprog_cohort',
+                        ['programid' => $program->id],
+                        'cohortid ASC',
+                        'cohortid'
+                    );
                     $program->cohortids = array_keys($cohorts);
                 }
                 $results[] = $program;
@@ -152,10 +163,12 @@ final class get_programs extends external_api {
                 'enddatejson' => new external_value(PARAM_RAW, 'End date calculation logic in json format'),
                 'timecreated' => new external_value(PARAM_INT, 'Program creation date'),
                 'sources' => new external_multiple_structure(
-                    new external_value(PARAM_ALPHANUMEXT, 'Internal source name'), 'Enabled allocation sources'
+                    new external_value(PARAM_ALPHANUMEXT, 'Internal source name'),
+                    'Enabled allocation sources'
                 ),
                 'cohortids' => new external_multiple_structure(
-                    new external_value(PARAM_INT, 'Cohort id'), 'Visible cohorts for non-public programs'
+                    new external_value(PARAM_INT, 'Cohort id'),
+                    'Visible cohorts for non-public programs'
                 ),
             ], 'List of programs')
         );

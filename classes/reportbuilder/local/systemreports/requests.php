@@ -51,8 +51,12 @@ final class requests extends system_report {
     protected function initialise(): void {
         global $DB;
         // Make sure programid and context match!
-        $this->program = $DB->get_record('tool_muprog_program',
-            ['id' => $this->get_parameters()['programid'], 'contextid' => $this->get_context()->id], '*', MUST_EXIST);
+        $this->program = $DB->get_record(
+            'tool_muprog_program',
+            ['id' => $this->get_parameters()['programid'], 'contextid' => $this->get_context()->id],
+            '*',
+            MUST_EXIST
+        );
 
         $this->requestentity = new request();
         $requestalias = $this->requestentity->get_table_alias('tool_muprog_request');
@@ -164,7 +168,7 @@ final class requests extends system_report {
         $url = new moodle_url('/admin/tool/muprog/management/source_approval_approve.php', ['id' => ':id']);
         $link = new \tool_mulib\output\dialog_form\link($url, get_string('source_approval_requestapprove', 'tool_muprog'), 'requestapprove', 'tool_muprog');
         $this->add_action($link->create_report_action()
-            ->add_callback(static function(\stdclass $row) use ($program): bool {
+            ->add_callback(static function (\stdclass $row) use ($program): bool {
                 global $DB;
                 if (!$row->id) {
                     return false;
@@ -179,13 +183,12 @@ final class requests extends system_report {
                     return false;
                 }
                 return true;
-            })
-        );
+            }));
 
         $url = new moodle_url('/admin/tool/muprog/management/source_approval_reject.php', ['id' => ':id']);
         $link = new \tool_mulib\output\dialog_form\link($url, get_string('source_approval_requestreject', 'tool_muprog'), 'requestreject', 'tool_muprog');
         $this->add_action($link->create_report_action()
-            ->add_callback(static function(\stdclass $row) use ($program): bool {
+            ->add_callback(static function (\stdclass $row) use ($program): bool {
                 if (!$row->id) {
                     return false;
                 }
@@ -196,14 +199,12 @@ final class requests extends system_report {
                     return false;
                 }
                 return true;
-
-            })
-        );
+            }));
 
         $url = new moodle_url('/admin/tool/muprog/management/source_approval_delete.php', ['id' => ':id']);
         $link = new \tool_mulib\output\dialog_form\link($url, get_string('source_approval_requestdelete', 'tool_muprog'), 'i/delete');
         $this->add_action($link->create_report_action(['class' => 'text-danger'])
-            ->add_callback(static function(\stdclass $row) use ($program): bool {
+            ->add_callback(static function (\stdclass $row) use ($program): bool {
                 global $DB;
                 if (!$row->id) {
                     return false;
@@ -218,7 +219,6 @@ final class requests extends system_report {
                     return true;
                 }
                 return false;
-            })
-        );
+            }));
     }
 }

@@ -181,8 +181,12 @@ final class manual extends base {
         $result = [];
 
         $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
-        $source = $DB->get_record('tool_muprog_source',
-            ['id' => $sourceid, 'type' => static::get_type(), 'programid' => $program->id], '*', MUST_EXIST);
+        $source = $DB->get_record(
+            'tool_muprog_source',
+            ['id' => $sourceid, 'type' => static::get_type(), 'programid' => $program->id],
+            '*',
+            MUST_EXIST
+        );
 
         if (count($userids) === 0) {
             return $result;
@@ -221,7 +225,8 @@ final class manual extends base {
     public static function process_uploaded_data(stdClass $data, array $filedata): array {
         global $DB, $USER;
 
-        if ($data->usermapping !== 'username'
+        if (
+            $data->usermapping !== 'username'
             && $data->usermapping !== 'email'
             && $data->usermapping !== 'idnumber'
         ) {
@@ -361,7 +366,7 @@ final class manual extends base {
 
         // This only works if the user is not already allocated in the program.
         $dateoverrides = [];
-        $datefields = ['timestart' => 'pstartdate'.$number, 'timedue' => 'pduedate'.$number, 'timeend' => 'penddate'.$number];
+        $datefields = ['timestart' => 'pstartdate' . $number, 'timedue' => 'pduedate' . $number, 'timeend' => 'penddate' . $number];
 
         foreach ($datefields as $key => $datefield) {
             if (!empty($user->{$datefield})) {
@@ -385,4 +390,3 @@ final class manual extends base {
         $upt->track('enrolments', get_string('source_manual_userupload_allocated', 'tool_muprog', $programname), 'info');
     }
 }
-

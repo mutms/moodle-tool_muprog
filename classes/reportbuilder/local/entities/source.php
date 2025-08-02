@@ -32,7 +32,6 @@ use core_reportbuilder\local\filters\select;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class source extends base {
-
     #[\Override]
     protected function get_default_tables(): array {
         return [
@@ -80,7 +79,7 @@ final class source extends base {
             ->set_type(column::TYPE_TEXT)
             ->add_fields("{$sourcealias}.type")
             ->set_is_sortable(false)
-            ->set_callback(static function(?string $value, \stdClass $row): string {
+            ->set_callback(static function (?string $value, \stdClass $row): string {
                 if (!$value) {
                     return '';
                 }

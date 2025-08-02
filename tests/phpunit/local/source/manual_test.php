@@ -488,7 +488,7 @@ final class manual_test extends \advanced_testcase {
             // phpcs:ignore moodle.Commenting.MissingDocblock.MissingTestcaseMethodDescription
             public function track($col, $msg, $level = 'normal', $merge = true) {
                 if (!in_array($col, $this->columns)) {
-                    throw new \Exception('Incorrect column:'.$col);
+                    throw new \Exception('Incorrect column:' . $col);
                 }
                 if (!$merge) {
                     $this->result[$col][$level] = [];
@@ -688,7 +688,7 @@ final class manual_test extends \advanced_testcase {
             // phpcs:ignore moodle.Commenting.MissingDocblock.MissingTestcaseMethodDescription
             public function track($col, $msg, $level = 'normal', $merge = true) {
                 if (!in_array($col, $this->columns)) {
-                    throw new \Exception('Incorrect column:'.$col);
+                    throw new \Exception('Incorrect column:' . $col);
                 }
                 if (!$merge) {
                     $this->result[$col][$level] = [];

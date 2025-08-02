@@ -34,7 +34,6 @@ use core_external\external_single_structure;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class source_cohort_delete_cohort extends external_api {
-
     /**
      * Describes the external function arguments.
      *
@@ -57,7 +56,9 @@ final class source_cohort_delete_cohort extends external_api {
     public static function execute(int $programid, int $cohortid): array {
         global $DB;
         ['programid' => $programid, 'cohortid' => $cohortid] = self::validate_parameters(
-            self::execute_parameters(), ['programid' => $programid, 'cohortid' => $cohortid]);
+            self::execute_parameters(),
+            ['programid' => $programid, 'cohortid' => $cohortid]
+        );
 
         $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
         $source = $DB->get_record('tool_muprog_source', ['programid' => $program->id, 'type' => 'cohort'], '*', MUST_EXIST);

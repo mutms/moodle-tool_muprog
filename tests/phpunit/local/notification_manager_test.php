@@ -179,15 +179,19 @@ final class notification_manager_test extends \advanced_testcase {
         role_assign($viewerroleid, $user1->id, $catcontext1->id);
 
         $this->setUser($user1);
-        $this->assertSame('https://www.example.com/moodle/admin/tool/muprog/management/program_notifications.php?id=' . $program1->id,
-            notification_manager::get_instance_management_url($program1->id)->out(false));
+        $this->assertSame(
+            'https://www.example.com/moodle/admin/tool/muprog/management/program_notifications.php?id=' . $program1->id,
+            notification_manager::get_instance_management_url($program1->id)->out(false)
+        );
 
         $this->setUser($user2);
         $this->assertSame(null, notification_manager::get_instance_management_url($program1->id));
 
         $this->setAdminUser();
-        $this->assertSame('https://www.example.com/moodle/admin/tool/muprog/management/program_notifications.php?id=' . $program1->id,
-            notification_manager::get_instance_management_url($program1->id)->out(false));
+        $this->assertSame(
+            'https://www.example.com/moodle/admin/tool/muprog/management/program_notifications.php?id=' . $program1->id,
+            notification_manager::get_instance_management_url($program1->id)->out(false)
+        );
     }
 
     public function test_trigger_notifications(): void {
@@ -379,11 +383,15 @@ final class notification_manager_test extends \advanced_testcase {
         $notificationsbeforeimport = $DB->get_records('tool_mulib_notification');
         $this->assertCount(3, $notificationsbeforeimport);
         \tool_mulib\local\notification\util::notification_import(
-            (object)['component' => 'tool_muprog', 'instanceid' => $program2->id, 'frominstance' => $program1->id], [$notification1->id, $notification2->id]);
+            (object)['component' => 'tool_muprog', 'instanceid' => $program2->id, 'frominstance' => $program1->id],
+            [$notification1->id, $notification2->id]
+        );
         $notificationsafterimport = $DB->get_records('tool_mulib_notification');
         $this->assertCount(4, $notificationsafterimport);
-        $allocationnotificationprogram2 = $DB->get_record('tool_mulib_notification',
-            ['component' => 'tool_muprog', 'notificationtype' => 'allocation', 'instanceid' => $program2->id]);
+        $allocationnotificationprogram2 = $DB->get_record(
+            'tool_mulib_notification',
+            ['component' => 'tool_muprog', 'notificationtype' => 'allocation', 'instanceid' => $program2->id]
+        );
         $this->assertSame('{"subject":"You are allocated","body":"Welcome to the program"}', $allocationnotificationprogram2->customjson);
     }
 }
