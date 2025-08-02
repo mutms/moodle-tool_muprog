@@ -142,13 +142,13 @@ Feature: Programs plugin English documentation image generator
       | timeallocationstart[year]    | 2025 |
       | timeallocationstart[hour]    | 10   |
       | timeallocationstart[minute]  | 00   |
-    And I press dialog form button "Update allocations"
+    And I click on "Update allocations" "button" in the ".modal-dialog" "css_element"
     And I click on "Update scheduling" "link"
     And I set the following fields to these values:
       | Program due             | Due after start |
       | programdue_delay[value] | 3               |
       | programdue_delay[type]  | months          |
-    And I press dialog form button "Update scheduling"
+    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
     And I change window size to "1208x900"
 
     Then I make documentation screenshot "program_allocation.png" for "tool_muprog" plugin

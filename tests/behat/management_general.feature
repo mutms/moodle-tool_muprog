@@ -68,7 +68,7 @@ Feature: General programs management tests
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Program name  | Program 001 |
       | Program ID    | PR01        |
-    And I press dialog form button "Add program"
+    And I click on "Add program" "button" in the ".modal-dialog" "css_element"
     Then I should see "Program 001" in the "Program name" definition list item
     And I should see "PR01" in the "Program ID" definition list item
     And I should see "System" in the "Category" definition list item
@@ -98,7 +98,7 @@ Feature: General programs management tests
     And I upload "admin/tool/muprog/tests/fixtures/badge.png" file to "Program image" filemanager
     And I set the field "Context" to "Cat 2"
     And I set the field "Tags" to "Mathematics, Algebra"
-    And I press dialog form button "Add program"
+    And I click on "Add program" "button" in the ".modal-dialog" "css_element"
     Then I should see "Program 001" in the "Program name" definition list item
     And I should see "PR01" in the "Program ID" definition list item
     And I should see "Cat 2" in the "Category" definition list item
@@ -120,13 +120,13 @@ Feature: General programs management tests
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Program name  | Program 001 |
       | Program ID    | PR01        |
-    And I press dialog form button "Add program"
+    And I click on "Add program" "button" in the ".modal-dialog" "css_element"
 
     When I press "Edit"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Program name  | Program 002 |
       | Program ID    | PR02        |
-    And I press dialog form button "Update program"
+    And I click on "Update program" "button" in the ".modal-dialog" "css_element"
     Then I should see "Program 002" in the "Program name" definition list item
     And I should see "PR02" in the "Program ID" definition list item
     And I should see "System" in the "Category" definition list item
@@ -141,14 +141,14 @@ Feature: General programs management tests
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Program name  | Program 001 |
       | Program ID    | PR01        |
-    And I press dialog form button "Add program"
+    And I click on "Add program" "button" in the ".modal-dialog" "css_element"
 
     When I click on "Archive program" "link"
-    And I press dialog form button "Archive program"
+    And I click on "Archive program" "button" in the ".modal-dialog" "css_element"
     Then I should see "Yes" in the "Archived" definition list item
 
     When I click on "Restore program" "link"
-    And I press dialog form button "Restore program"
+    And I click on "Restore program" "button" in the ".modal-dialog" "css_element"
     Then I should see "No" in the "Archived" definition list item
 
   @javascript
@@ -159,13 +159,13 @@ Feature: General programs management tests
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Program name  | Program 001 |
       | Program ID    | PR01        |
-    And I press dialog form button "Add program"
+    And I click on "Add program" "button" in the ".modal-dialog" "css_element"
     And I click on "Archive program" "link"
-    And I press dialog form button "Archive program"
+    And I click on "Archive program" "button" in the ".modal-dialog" "css_element"
     And I should see "Yes" in the "Archived" definition list item
 
     When I click on "Delete program" action from "Program actions" dropdown
-    And I press dialog form button "Delete program"
+    And I click on "Delete program" "button" in the ".modal-dialog" "css_element"
     Then I should see "No programs found"
 
   @javascript @_file_upload
@@ -178,7 +178,7 @@ Feature: General programs management tests
       | Program ID    | PR02        |
     And I set the field "Context" to "Cat 1"
     And I set the field "Tags" to "Logic"
-    And I press dialog form button "Add program"
+    And I click on "Add program" "button" in the ".modal-dialog" "css_element"
 
     When I press "Edit"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
@@ -189,7 +189,7 @@ Feature: General programs management tests
     And I upload "admin/tool/muprog/tests/fixtures/badge.png" file to "Program image" filemanager
     And I set the field "Context" to "Cat 2"
     And I set the field "Tags" to "Mathematics, Algebra"
-    And I press dialog form button "Update program"
+    And I click on "Update program" "button" in the ".modal-dialog" "css_element"
     Then I should see "Program 001" in the "Program name" definition list item
     And I should see "PR01" in the "Program ID" definition list item
     And I should see "Cat 2" in the "Category" definition list item
@@ -221,7 +221,7 @@ Feature: General programs management tests
       | Program name       | Program 007       |
       | Program ID         | P007              |
       | Test field         | Test value        |
-    And I press dialog form button "Add program"
+    And I click on "Add program" "button" in the ".modal-dialog" "css_element"
 
   @javascript
   Scenario: Manager may see there are deleted courses in program in list of programs

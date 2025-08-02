@@ -47,7 +47,7 @@ Feature: Program allocation management tests
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Program name  | Program 001 |
       | Program ID    | PR01        |
-    And I press dialog form button "Add program"
+    And I click on "Add program" "button" in the ".modal-dialog" "css_element"
     And I follow "Allocation settings"
     And I should see "Not set" in the "Allocation start" definition list item
     And I should see "Not set" in the "Allocation end" definition list item
@@ -78,7 +78,7 @@ Feature: Program allocation management tests
       | timeallocationstart[year]    | 2020 |
       | timeallocationstart[hour]    | 09   |
       | timeallocationstart[minute]  | 00   |
-    And I press dialog form button "Update allocations"
+    And I click on "Update allocations" "button" in the ".modal-dialog" "css_element"
     Then I should see "Thursday, 5 November 2020, 9:00" in the "Allocation start" definition list item
     And I should see "Not set" in the "Allocation end" definition list item
 
@@ -90,7 +90,7 @@ Feature: Program allocation management tests
       | timeallocationend[year]      | 2020 |
       | timeallocationend[hour]      | 20   |
       | timeallocationend[minute]    | 00   |
-    And I press dialog form button "Update allocations"
+    And I click on "Update allocations" "button" in the ".modal-dialog" "css_element"
     Then I should see "Error"
     When  I set the following fields in the ".modal-dialog" "css_element" to these values:
       | timeallocationend[enabled]   | 1    |
@@ -99,7 +99,7 @@ Feature: Program allocation management tests
       | timeallocationend[year]      | 2020 |
       | timeallocationend[hour]      | 20   |
       | timeallocationend[minute]    | 00   |
-    And I press dialog form button "Update allocations"
+    And I click on "Update allocations" "button" in the ".modal-dialog" "css_element"
     Then I should see "Thursday, 5 November 2020, 9:00" in the "Allocation start" definition list item
     And I should see "Tuesday, 10 November 2020, 8:00" in the "Allocation end" definition list item
 
@@ -107,21 +107,21 @@ Feature: Program allocation management tests
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | timeallocationstart[enabled] | 0    |
       | timeallocationend[enabled]   | 0    |
-    And I press dialog form button "Cancel"
+    And I click on "Cancel" "button" in the ".modal-dialog" "css_element"
     Then I should see "Thursday, 5 November 2020, 9:00" in the "Allocation start" definition list item
     And I should see "Tuesday, 10 November 2020, 8:00" in the "Allocation end" definition list item
 
     When I click on "Update allocations" "link"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | timeallocationstart[enabled] | 0    |
-    And I press dialog form button "Update allocations"
+    And I click on "Update allocations" "button" in the ".modal-dialog" "css_element"
     And I should see "Not set" in the "Allocation start" definition list item
     And I should see "Tuesday, 10 November 2020, 8:00" in the "Allocation end" definition list item
 
     When I click on "Update allocations" "link"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | timeallocationend[enabled]   | 0    |
-    And I press dialog form button "Update allocations"
+    And I click on "Update allocations" "button" in the ".modal-dialog" "css_element"
     And I should see "Not set" in the "Allocation start" definition list item
     And I should see "Not set" in the "Allocation end" definition list item
 
@@ -144,7 +144,7 @@ Feature: Program allocation management tests
       | programstart_date[year]    | 2032 |
       | programstart_date[hour]    | 09   |
       | programstart_date[minute]  | 00   |
-    And I press dialog form button "Update scheduling"
+    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
     Then I should see "Friday, 5 November 2032, 9:00" in the "Program start" definition list item
 
     When I click on "Update scheduling" "link"
@@ -152,7 +152,7 @@ Feature: Program allocation management tests
       | Program start             | Delay start after allocation |
       | programstart_delay[value] | 5      |
       | programstart_delay[type]  | months |
-    And I press dialog form button "Update scheduling"
+    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
     Then I should see "Delay start after allocation - 5 months" in the "Program start" definition list item
 
     When I click on "Update scheduling" "link"
@@ -160,7 +160,7 @@ Feature: Program allocation management tests
       | Program start             | Delay start after allocation |
       | programstart_delay[value] | 3      |
       | programstart_delay[type]  | days   |
-    And I press dialog form button "Update scheduling"
+    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
     Then I should see "Delay start after allocation - 3 days" in the "Program start" definition list item
 
     When I click on "Update scheduling" "link"
@@ -168,13 +168,13 @@ Feature: Program allocation management tests
       | Program start             | Delay start after allocation |
       | programstart_delay[value] | 7      |
       | programstart_delay[type]  | hours  |
-    And I press dialog form button "Update scheduling"
+    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
     Then I should see "Delay start after allocation - 7 hours" in the "Program start" definition list item
 
     When I click on "Update scheduling" "link"
     And I set the following fields to these values:
       | Program start             | Start immediately after allocation |
-    And I press dialog form button "Update scheduling"
+    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
     Then I should see "Start immediately after allocation" in the "Program start" definition list item
 
     When I click on "Update scheduling" "link"
@@ -185,7 +185,7 @@ Feature: Program allocation management tests
       | programdue_date[year]    | 2032 |
       | programdue_date[hour]    | 09   |
       | programdue_date[minute]  | 00   |
-    And I press dialog form button "Update scheduling"
+    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
     Then I should see "Friday, 5 November 2032, 9:00" in the "Program due" definition list item
 
     When I click on "Update scheduling" "link"
@@ -193,7 +193,7 @@ Feature: Program allocation management tests
       | Program due             | Due after start |
       | programdue_delay[value] | 5      |
       | programdue_delay[type]  | months |
-    And I press dialog form button "Update scheduling"
+    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
     Then I should see "Due after start - 5 months" in the "Program due" definition list item
 
     When I click on "Update scheduling" "link"
@@ -201,7 +201,7 @@ Feature: Program allocation management tests
       | Program due             | Due after start |
       | programdue_delay[value] | 3      |
       | programdue_delay[type]  | days   |
-    And I press dialog form button "Update scheduling"
+    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
     Then I should see "Due after start - 3 days" in the "Program due" definition list item
 
     When I click on "Update scheduling" "link"
@@ -209,13 +209,13 @@ Feature: Program allocation management tests
       | Program due             | Due after start |
       | programdue_delay[value] | 7      |
       | programdue_delay[type]  | hours  |
-    And I press dialog form button "Update scheduling"
+    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
     Then I should see "Due after start - 7 hours" in the "Program due" definition list item
 
     When I click on "Update scheduling" "link"
     And I set the following fields to these values:
       | Program due             | Not set |
-    And I press dialog form button "Update scheduling"
+    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
     Then I should see "Not set" in the "Program due" definition list item
 
     When I click on "Update scheduling" "link"
@@ -226,7 +226,7 @@ Feature: Program allocation management tests
       | programend_date[year]    | 2032 |
       | programend_date[hour]    | 09   |
       | programend_date[minute]  | 00   |
-    And I press dialog form button "Update scheduling"
+    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
     Then I should see "Friday, 5 November 2032, 9:00" in the "Program end" definition list item
 
     When I click on "Update scheduling" "link"
@@ -234,7 +234,7 @@ Feature: Program allocation management tests
       | Program end             | End after start |
       | programend_delay[value] | 5      |
       | programend_delay[type]  | months |
-    And I press dialog form button "Update scheduling"
+    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
     Then I should see "End after start - 5 months" in the "Program end" definition list item
 
     When I click on "Update scheduling" "link"
@@ -242,7 +242,7 @@ Feature: Program allocation management tests
       | Program end             | End after start |
       | programend_delay[value] | 3      |
       | programend_delay[type]  | days   |
-    And I press dialog form button "Update scheduling"
+    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
     Then I should see "End after start - 3 days" in the "Program end" definition list item
 
     When I click on "Update scheduling" "link"
@@ -250,13 +250,13 @@ Feature: Program allocation management tests
       | Program end             | End after start |
       | programend_delay[value] | 7      |
       | programend_delay[type]  | hours  |
-    And I press dialog form button "Update scheduling"
+    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
     Then I should see "End after start - 7 hours" in the "Program end" definition list item
 
     When I click on "Update scheduling" "link"
     And I set the following fields to these values:
       | Program end             | Not set |
-    And I press dialog form button "Update scheduling"
+    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
     Then I should see "Not set" in the "Program end" definition list item
 
     When I click on "Update scheduling" "link"
@@ -274,7 +274,7 @@ Feature: Program allocation management tests
       | programend_date[year]    | 2032 |
       | programend_date[hour]    | 09   |
       | programend_date[minute]  | 00   |
-    And I press dialog form button "Update scheduling"
+    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
     Then I should see "Error"
     And I set the following fields to these values:
       | Program end              | At a fixed date |
@@ -290,7 +290,7 @@ Feature: Program allocation management tests
       | programdue_date[year]    | 2032 |
       | programdue_date[hour]    | 09   |
       | programdue_date[minute]  | 00   |
-    And I press dialog form button "Update scheduling"
+    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
     Then I should see "Error"
     And I set the following fields to these values:
       | Program due              | At a fixed date |
@@ -299,7 +299,7 @@ Feature: Program allocation management tests
       | programdue_date[year]    | 2032 |
       | programdue_date[hour]    | 09   |
       | programdue_date[minute]  | 00   |
-    And I press dialog form button "Update scheduling"
+    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
     Then I should see "Error"
     And I set the following fields to these values:
       | Program due              | At a fixed date |
@@ -308,7 +308,7 @@ Feature: Program allocation management tests
       | programdue_date[year]    | 2032 |
       | programdue_date[hour]    | 09   |
       | programdue_date[minute]  | 00   |
-    And I press dialog form button "Update scheduling"
+    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
     Then I should see "Friday, 5 November 2032, 9:00" in the "Program start" definition list item
     And I should see "Monday, 15 November 2032, 9:00" in the "Program due" definition list item
     And I should see "Saturday, 20 November 2032, 9:00" in the "Program end" definition list item

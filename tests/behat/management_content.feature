@@ -67,7 +67,7 @@ Feature: Program content management tests
       | completiondelay[enabled]  | 1            |
       | completiondelay[number]   | 3            |
       | completiondelay[timeunit] | days         |
-    Then I press dialog form button "Append item"
+    Then I click on "Append item" "button" in the ".modal-dialog" "css_element"
     And I should see "123" in the "Course 1" "table_row"
     And I should see "Completion delay: 3 days" in the "Course 1" "table_row"
 
@@ -80,7 +80,7 @@ Feature: Program content management tests
       | completiondelay[enabled]  | 1            |
       | completiondelay[number]   | 7            |
       | completiondelay[timeunit] | days         |
-    And I press dialog form button "Append item"
+    And I click on "Append item" "button" in the ".modal-dialog" "css_element"
     Then I should see "All in order" in the "First set" "table_row"
     And I should see "321" in the "First set" "table_row"
     And I should see "Completion delay: 7 days" in the "First set" "table_row"
@@ -95,7 +95,7 @@ Feature: Program content management tests
       | completiondelay[enabled]  | 1            |
       | completiondelay[number]   | 5            |
       | completiondelay[timeunit] | days         |
-    And I press dialog form button "Append item"
+    And I click on "Append item" "button" in the ".modal-dialog" "css_element"
     Then I should see "At least 2" in the "Second set" "table_row"
     And I should see "Completion delay: 5 days" in the "Second set" "table_row"
 
@@ -105,7 +105,7 @@ Feature: Program content management tests
       | Add new set     | 1                |
       | Full name       | Third set        |
       | Completion type | All in any order |
-    And I press dialog form button "Append item"
+    And I click on "Append item" "button" in the ".modal-dialog" "css_element"
     Then I should see "All in any order" in the "Third set" "table_row"
 
     When I click on "Append item" "link" in the "Program 000" "table_row"
@@ -115,7 +115,7 @@ Feature: Program content management tests
       | Completion type  | Minimum X points |
       | Minimum X points | 7                |
       | Points           | 456              |
-    And I press dialog form button "Append item"
+    And I click on "Append item" "button" in the ".modal-dialog" "css_element"
     Then I should see "Minimum 7 points" in the "Fourth set" "table_row"
     And I should see "456" in the "Fourth set" "table_row"
 
@@ -129,7 +129,7 @@ Feature: Program content management tests
       | completiondelay[enabled]  | 1            |
       | completiondelay[number]   | 2            |
       | completiondelay[timeunit] | days         |
-    And I press dialog form button "Update"
+    And I click on "Update" "button" in the ".modal-dialog" "css_element"
     Then I should see "All in order" in the "Program 000" "table_row"
     And I should see "Completion delay: 2 days" in the "Program 000" "table_row"
 
@@ -147,7 +147,7 @@ Feature: Program content management tests
       | completiondelay[enabled]  | 1                |
       | completiondelay[number]   | 11               |
       | completiondelay[timeunit] | days             |
-    And I press dialog form button "Update set"
+    And I click on "Update set" "button" in the ".modal-dialog" "css_element"
     Then I should see "All in order" in the "Treti set" "table_row"
     And I should see "77" in the "Treti set" "table_row"
     And I should see "Completion delay: 11 days" in the "Treti set" "table_row"
@@ -166,7 +166,7 @@ Feature: Program content management tests
       | At least X                | 3                |
       | Points                    | 0                |
       | completiondelay[enabled]  | 0                |
-    And I press dialog form button "Update set"
+    And I click on "Update set" "button" in the ".modal-dialog" "css_element"
     Then I should see "At least 3" in the "Third set" "table_row"
     And I should see "0" in the "Third set" "table_row"
     And I should not see "Completion delay" in the "Third set" "table_row"
@@ -181,7 +181,7 @@ Feature: Program content management tests
       | Completion type | Minimum X points |
       | Minimum X points| 10               |
       | Points          | 11               |
-    And I press dialog form button "Update set"
+    And I click on "Update set" "button" in the ".modal-dialog" "css_element"
     Then I should see "Minimum 10 points" in the "Third set" "table_row"
     And I should see "11" in the "Third set" "table_row"
 
@@ -194,7 +194,7 @@ Feature: Program content management tests
     And I set the following fields to these values:
       | Points                    | 789              |
       | completiondelay[enabled]  | 0                |
-    And I press dialog form button "Update course"
+    And I click on "Update course" "button" in the ".modal-dialog" "css_element"
     Then I should see "789" in the "Course 1" "table_row"
     And I should not see "Completion delay" in the "Course 1" "table_row"
 
@@ -206,7 +206,7 @@ Feature: Program content management tests
       | completiondelay[enabled]  | 1                |
       | completiondelay[number]   | 4                |
       | completiondelay[timeunit] | days             |
-    And I press dialog form button "Update course"
+    And I click on "Update course" "button" in the ".modal-dialog" "css_element"
     Then I should see "789" in the "Course 1" "table_row"
     And I should see "Completion delay: 4 days" in the "Course 1" "table_row"
 
@@ -251,42 +251,42 @@ Feature: Program content management tests
     # Deleting of items
 
     When I click on "Remove course" "link" in the "Course 5" "table_row"
-    And I press dialog form button "Cancel"
+    And I click on "Cancel" "button" in the ".modal-dialog" "css_element"
     Then I should see "Course 5"
 
     When I click on "Remove course" "link" in the "Course 5" "table_row"
-    And I press dialog form button "Remove course"
+    And I click on "Remove course" "button" in the ".modal-dialog" "css_element"
     Then I should not see "Course 5"
 
     When I click on "Delete set" "link" in the "Fourth set" "table_row"
-    And I press dialog form button "Delete set"
+    And I click on "Delete set" "button" in the ".modal-dialog" "css_element"
     Then I should not see "Fourth set"
 
     When I click on "Delete set" "link" in the "Third set" "table_row"
-    And I press dialog form button "Cancel"
+    And I click on "Cancel" "button" in the ".modal-dialog" "css_element"
     Then I should see "Third set"
 
     When I click on "Delete set" "link" in the "Third set" "table_row"
-    And I press dialog form button "Delete set"
+    And I click on "Delete set" "button" in the ".modal-dialog" "css_element"
     Then I should not see "Third set"
 
     When I click on "Remove course" "link" in the "Course 3" "table_row"
-    And I press dialog form button "Remove course"
+    And I click on "Remove course" "button" in the ".modal-dialog" "css_element"
 
     When I click on "Remove course" "link" in the "Course 4" "table_row"
-    And I press dialog form button "Remove course"
+    And I click on "Remove course" "button" in the ".modal-dialog" "css_element"
 
     When I click on "Remove course" "link" in the "Course 1" "table_row"
-    And I press dialog form button "Remove course"
+    And I click on "Remove course" "button" in the ".modal-dialog" "css_element"
 
     When I click on "Remove course" "link" in the "Course 2" "table_row"
-    And I press dialog form button "Remove course"
+    And I click on "Remove course" "button" in the ".modal-dialog" "css_element"
 
     When I click on "Delete set" "link" in the "Second set" "table_row"
-    And I press dialog form button "Delete set"
+    And I click on "Delete set" "button" in the ".modal-dialog" "css_element"
 
     When I click on "Delete set" "link" in the "First set" "table_row"
-    And I press dialog form button "Delete set"
+    And I click on "Delete set" "button" in the ".modal-dialog" "css_element"
 
   @javascript
   Scenario: Manager may add deleted references to missing courses from program
@@ -312,7 +312,7 @@ Feature: Program content management tests
     And I should not see "Course is missing" in the "Course 3" "table_row"
 
     When I click on "Remove course" "link" in the "Course 1" "table_row"
-    And I press dialog form button "Remove course"
+    And I click on "Remove course" "button" in the ".modal-dialog" "css_element"
     Then I should not see "Course 1"
     And I should see "Course 2"
     And I should see "Course 3"
@@ -346,7 +346,7 @@ Feature: Program content management tests
     When I click on "Append item" "link" in the "Program 000" "table_row"
     And I set the following fields to these values:
       | Training                  | TFR 001   |
-    And I press dialog form button "Append item"
+    And I click on "Append item" "button" in the ".modal-dialog" "css_element"
     Then I should see "Required training: 10" in the "TFR 001" "table_row"
 
     When I click on "Update training" "link" in the "TFR 001" "table_row"
@@ -355,13 +355,13 @@ Feature: Program content management tests
       | completiondelay[enabled]  | 1                |
       | completiondelay[number]   | 3                |
       | completiondelay[timeunit] | days             |
-    And I press dialog form button "Update training"
+    And I click on "Update training" "button" in the ".modal-dialog" "css_element"
     Then I should see "789" in the "TFR 001" "table_row"
     And I should see "Completion delay: 3 days" in the "TFR 001" "table_row"
     And I should see "Required training: 10" in the "TFR 001" "table_row"
 
     When I click on "Remove training" "link" in the "TFR 001" "table_row"
-    And I press dialog form button "Remove training"
+    And I click on "Remove training" "button" in the ".modal-dialog" "css_element"
     Then I should not see "TFR 001"
 
   @javascript @tool_mutenancy
@@ -375,7 +375,7 @@ Feature: Program content management tests
     And I click on "Switch tenant" "link"
     And I set the following fields to these values:
       | Tenant      | Tenant 1         |
-    And I press dialog form button "Switch tenant"
+    And I click on "Switch tenant" "button" in the ".modal-dialog" "css_element"
 
     When I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
@@ -383,11 +383,11 @@ Feature: Program content management tests
     And I click on "Append item" "link" in the "Program 000" "table_row"
     And I set the following fields to these values:
       | Courses | Course 1 |
-    And I press dialog form button "Append item"
+    And I click on "Append item" "button" in the ".modal-dialog" "css_element"
     Then I should see "Course 1" in the "#program_content" "css_element"
 
     When I click on "Append item" "link" in the "Program 000" "table_row"
     And I set the following fields to these values:
       | Courses | Course 4 |
-    And I press dialog form button "Append item"
+    And I click on "Append item" "button" in the ".modal-dialog" "css_element"
     Then I should see "Course 4" in the "#program_content" "css_element"

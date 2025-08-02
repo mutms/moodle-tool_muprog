@@ -61,13 +61,13 @@ Feature: Import program content
     And I click on "Append item" "link" in the "Program 000" "table_row"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Courses | Course 1 |
-    And I press dialog form button "Append item"
+    And I click on "Append item" "button" in the ".modal-dialog" "css_element"
     And I click on "Append item" "link" in the "Program 000" "table_row"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Add new set     | 1            |
       | Full name       | First set    |
       | Completion type | All in order |
-    And I press dialog form button "Append item"
+    And I click on "Append item" "button" in the ".modal-dialog" "css_element"
     And I should see "All in order" in the "First set" "table_row"
     And I click on "Append item" "link" in the "First set" "table_row"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
@@ -76,7 +76,7 @@ Feature: Import program content
       | Full name       | Second set   |
       | Completion type | At least X   |
       | At least X      | 2            |
-    And I press dialog form button "Append item"
+    And I click on "Append item" "button" in the ".modal-dialog" "css_element"
     And I should see "At least 2" in the "Second set" "table_row"
     And I click on "Append item" "link" in the "Program 000" "table_row"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
@@ -84,7 +84,7 @@ Feature: Import program content
       | Add new set     | 1                |
       | Full name       | Third set        |
       | Completion type | All in any order |
-    And I press dialog form button "Append item"
+    And I click on "Append item" "button" in the ".modal-dialog" "css_element"
     And I should see "All in any order" in the "Third set" "table_row"
 
     And I am on the "tool_muprog > All programs management" page
@@ -93,7 +93,7 @@ Feature: Import program content
     And I click on "Append item" "link" in the "Program 002" "table_row"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Courses | Course 6 |
-    And I press dialog form button "Append item"
+    And I click on "Append item" "button" in the ".modal-dialog" "css_element"
 
     And I am on the "tool_muprog > All programs management" page
     And I follow "Program 001"
@@ -102,8 +102,8 @@ Feature: Import program content
     When I click on "Import program content" "link" in the "Program 001" "table_row"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
      | Select program | Program 000 |
-    And I press dialog form button "Continue"
-    And I press dialog form button "Import program content"
+    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
+    And I click on "Import program content" "button" in the ".modal-dialog" "css_element"
     Then I should see "Course 1"
     And I should see "First set"
     And I should see "Second set"
@@ -111,8 +111,8 @@ Feature: Import program content
     When I click on "Import program content" "link" in the "Program 001" "table_row"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Select program | Program 002 |
-    And I press dialog form button "Continue"
-    And I press dialog form button "Import program content"
+    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
+    And I click on "Import program content" "button" in the ".modal-dialog" "css_element"
     Then I should see "Course 6"
     And I should see "Course 1"
 
@@ -142,8 +142,8 @@ Feature: Import program content
     When I click on "Import program content" "link" in the "Program 000" "table_row"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Select program | Program 004 |
-    And I press dialog form button "Continue"
-    And I press dialog form button "Import program content"
+    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
+    And I click on "Import program content" "button" in the ".modal-dialog" "css_element"
     Then I should not see "Course 1"
     And I should see "Course 2"
     And I should see "Course 3"

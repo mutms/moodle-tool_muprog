@@ -50,7 +50,7 @@ Feature: Program notifications management tests
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Program name  | Program 001 |
       | Program ID    | PR01        |
-    And I press dialog form button "Add program"
+    And I click on "Add program" "button" in the ".modal-dialog" "css_element"
     And I follow "Notifications"
     When I click on "Add notification" "link"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
@@ -64,7 +64,7 @@ Feature: Program notifications management tests
       | Completed program ended | 1 |
       | Failed program ended    | 1 |
       | User deallocated        | 1 |
-    And I press dialog form button "Add notification"
+    And I click on "Add notification" "button" in the ".modal-dialog" "css_element"
     Then the following should exist in the "tool_muprog_notifications" table:
       | Notification            | Customised | Enabled |
       | User allocated          | No         | Yes     |
@@ -118,16 +118,16 @@ Feature: Program notifications management tests
       | Program end date soon  | 1   |
       | Program completed      | 1   |
       | Failed program ended   | 1   |
-    And I press dialog form button "Add notification"
+    And I click on "Add notification" "button" in the ".modal-dialog" "css_element"
     And I click on "Update notification" "link" in the "User allocated" "table_row"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Enabled                | 1   |
       | Customised             | 1   |
-    And I press dialog form button "Update notification"
+    And I click on "Update notification" "button" in the ".modal-dialog" "css_element"
     And I click on "Update notification" "link" in the "Failed program ended" "table_row"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Enabled                | 0   |
-    And I press dialog form button "Update notification"
+    And I click on "Update notification" "button" in the ".modal-dialog" "css_element"
     And I am on the "tool_muprog > All programs management" page
     And I follow "Program 001"
     And I follow "Notifications"
@@ -136,26 +136,26 @@ Feature: Program notifications management tests
       | User allocated        | 1   |
       | Program overdue       | 1   |
       | Program completed     | 1   |
-    And I press dialog form button "Add notification"
+    And I click on "Add notification" "button" in the ".modal-dialog" "css_element"
     And I click on "Update notification" "link" in the "User allocated" "table_row"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Enabled                | 0   |
-    And I press dialog form button "Update notification"
+    And I click on "Update notification" "button" in the ".modal-dialog" "css_element"
     And I click on "Update notification" "link" in the "Program completed" "table_row"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Enabled                | 1   |
       | Customised             | 1   |
-    And I press dialog form button "Update notification"
+    And I click on "Update notification" "button" in the ".modal-dialog" "css_element"
 
     When I click on "Import notifications" action from "Notification actions" dropdown
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Import from           | Program 000   |
-    And I press dialog form button "Continue"
+    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
     And I should not see "Failed program ended"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | User allocated        | 1   |
       | Program due date soon | 1   |
-    And I press dialog form button "Import notifications"
+    And I click on "Import notifications" "button" in the ".modal-dialog" "css_element"
     Then the following should exist in the "tool_muprog_notifications" table:
       | Notification            | Customised | Enabled |
       | Program completed       | Yes        | Yes     |

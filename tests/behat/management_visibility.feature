@@ -81,11 +81,11 @@ Feature: Program visibility management tests
       | Visible to cohorts |                |
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Public             | Yes            |
-    And I press dialog form button "Update program"
+    And I click on "Update program" "button" in the ".modal-dialog" "css_element"
     Then I press "Edit"
     And the following fields in the ".modal-dialog" "css_element" match these values:
       | Public             | Yes            |
-    And I press dialog form button "Cancel"
+    And I click on "Cancel" "button" in the ".modal-dialog" "css_element"
     And I am on the "tool_muprog > All programs management" page
     And "Program 000" row "Public" column of "reportbuilder-table" table should contain "Yes"
 
@@ -93,12 +93,12 @@ Feature: Program visibility management tests
     And I press "Edit"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Visible to cohorts | Cohort 1 |
-    And I press dialog form button "Update program"
+    And I click on "Update program" "button" in the ".modal-dialog" "css_element"
     Then I should see "Cohort 1"
     And I press "Edit"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Visible to cohorts | Cohort 2 |
-    And I press dialog form button "Update program"
+    And I click on "Update program" "button" in the ".modal-dialog" "css_element"
     And I should see "Cohort 2"
     And I am on the "tool_muprog > All programs management" page
     And "Program 001" row "Public" column of "reportbuilder-table" table should contain "No"
@@ -108,7 +108,7 @@ Feature: Program visibility management tests
     And I press "Edit"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Visible to cohorts | Cohort 2, Cohort 1 |
-    And I press dialog form button "Update program"
+    And I click on "Update program" "button" in the ".modal-dialog" "css_element"
     Then I should see "Cohort 1"
     And I should see "Cohort 2"
 
