@@ -75,20 +75,23 @@ final class source_cohort_add_cohort_test extends \advanced_testcase {
 
         $result = \tool_muprog\external\source_cohort_add_cohort::clean_returnvalue(
             \tool_muprog\external\source_cohort_add_cohort::execute_returns(),
-            \tool_muprog\external\source_cohort_add_cohort::execute($program1->id, $cohort1->id));
+            \tool_muprog\external\source_cohort_add_cohort::execute($program1->id, $cohort1->id)
+        );
         $this->assertCount(1, $result);
         $this->assertEquals($cohort1->id, $result[0]['id']);
 
         $result = \tool_muprog\external\source_cohort_add_cohort::clean_returnvalue(
             \tool_muprog\external\source_cohort_add_cohort::execute_returns(),
-            \tool_muprog\external\source_cohort_add_cohort::execute($program1->id, $cohort2->id));
+            \tool_muprog\external\source_cohort_add_cohort::execute($program1->id, $cohort2->id)
+        );
         $this->assertCount(2, $result);
         $this->assertEquals($cohort1->id, $result[0]['id']);
         $this->assertEquals($cohort2->id, $result[1]['id']);
 
         $result = \tool_muprog\external\source_cohort_add_cohort::clean_returnvalue(
             \tool_muprog\external\source_cohort_add_cohort::execute_returns(),
-            \tool_muprog\external\source_cohort_add_cohort::execute($program1->id, $cohort2->id));
+            \tool_muprog\external\source_cohort_add_cohort::execute($program1->id, $cohort2->id)
+        );
         $this->assertCount(2, $result);
         $this->assertEquals($cohort1->id, $result[0]['id']);
         $this->assertEquals($cohort2->id, $result[1]['id']);
@@ -98,8 +101,10 @@ final class source_cohort_add_cohort_test extends \advanced_testcase {
             $this->fail('Exception excepted');
         } catch (\moodle_exception $ex) {
             $this->assertInstanceOf(\required_capability_exception::class, $ex);
-            $this->assertSame('Sorry, but you do not currently have permissions to do that (View site-wide cohorts).',
-                $ex->getMessage());
+            $this->assertSame(
+                'Sorry, but you do not currently have permissions to do that (View site-wide cohorts).',
+                $ex->getMessage()
+            );
         }
 
         try {
@@ -107,8 +112,10 @@ final class source_cohort_add_cohort_test extends \advanced_testcase {
             $this->fail('Exception excepted');
         } catch (\moodle_exception $ex) {
             $this->assertInstanceOf(\required_capability_exception::class, $ex);
-            $this->assertSame('Sorry, but you do not currently have permissions to do that (Add and update programs).',
-                $ex->getMessage());
+            $this->assertSame(
+                'Sorry, but you do not currently have permissions to do that (Add and update programs).',
+                $ex->getMessage()
+            );
         }
 
         $this->setUser($user2);
@@ -118,8 +125,10 @@ final class source_cohort_add_cohort_test extends \advanced_testcase {
             $this->fail('Exception excepted');
         } catch (\moodle_exception $ex) {
             $this->assertInstanceOf(\required_capability_exception::class, $ex);
-            $this->assertSame('Sorry, but you do not currently have permissions to do that (Add and update programs).',
-                $ex->getMessage());
+            $this->assertSame(
+                'Sorry, but you do not currently have permissions to do that (Add and update programs).',
+                $ex->getMessage()
+            );
         }
     }
 
@@ -164,20 +173,23 @@ final class source_cohort_add_cohort_test extends \advanced_testcase {
 
         $result = \tool_muprog\external\source_cohort_add_cohort::clean_returnvalue(
             \tool_muprog\external\source_cohort_add_cohort::execute_returns(),
-            \tool_muprog\external\source_cohort_add_cohort::execute($program0->id, $cohort0->id));
+            \tool_muprog\external\source_cohort_add_cohort::execute($program0->id, $cohort0->id)
+        );
         $this->assertCount(1, $result);
         $this->assertEquals($cohort0->id, $result[0]['id']);
 
         $result = \tool_muprog\external\source_cohort_add_cohort::clean_returnvalue(
             \tool_muprog\external\source_cohort_add_cohort::execute_returns(),
-            \tool_muprog\external\source_cohort_add_cohort::execute($program0->id, $cohort1->id));
+            \tool_muprog\external\source_cohort_add_cohort::execute($program0->id, $cohort1->id)
+        );
         $this->assertCount(2, $result);
         $this->assertEquals($cohort0->id, $result[0]['id']);
         $this->assertEquals($cohort1->id, $result[1]['id']);
 
         $result = \tool_muprog\external\source_cohort_add_cohort::clean_returnvalue(
             \tool_muprog\external\source_cohort_add_cohort::execute_returns(),
-            \tool_muprog\external\source_cohort_add_cohort::execute($program0->id, $cohort2->id));
+            \tool_muprog\external\source_cohort_add_cohort::execute($program0->id, $cohort2->id)
+        );
         $this->assertCount(3, $result);
         $this->assertEquals($cohort0->id, $result[0]['id']);
         $this->assertEquals($cohort1->id, $result[1]['id']);
@@ -185,13 +197,15 @@ final class source_cohort_add_cohort_test extends \advanced_testcase {
 
         $result = \tool_muprog\external\source_cohort_add_cohort::clean_returnvalue(
             \tool_muprog\external\source_cohort_add_cohort::execute_returns(),
-            \tool_muprog\external\source_cohort_add_cohort::execute($program1->id, $cohort0->id));
+            \tool_muprog\external\source_cohort_add_cohort::execute($program1->id, $cohort0->id)
+        );
         $this->assertCount(1, $result);
         $this->assertEquals($cohort0->id, $result[0]['id']);
 
         $result = \tool_muprog\external\source_cohort_add_cohort::clean_returnvalue(
             \tool_muprog\external\source_cohort_add_cohort::execute_returns(),
-            \tool_muprog\external\source_cohort_add_cohort::execute($program1->id, $cohort1->id));
+            \tool_muprog\external\source_cohort_add_cohort::execute($program1->id, $cohort1->id)
+        );
         $this->assertCount(2, $result);
         $this->assertEquals($cohort0->id, $result[0]['id']);
         $this->assertEquals($cohort1->id, $result[1]['id']);

@@ -221,8 +221,12 @@ final class approval extends base {
         }
 
         $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
-        $source = $DB->get_record('tool_muprog_source',
-            ['id' => $sourceid, 'type' => static::get_type(), 'programid' => $program->id], '*', MUST_EXIST);
+        $source = $DB->get_record(
+            'tool_muprog_source',
+            ['id' => $sourceid, 'type' => static::get_type(), 'programid' => $program->id],
+            '*',
+            MUST_EXIST
+        );
 
         $user = $DB->get_record('user', ['id' => $USER->id, 'deleted' => 0], '*', MUST_EXIST);
         if ($DB->record_exists('tool_muprog_allocation', ['programid' => $program->id, 'userid' => $user->id])) {
@@ -449,4 +453,3 @@ final class approval extends base {
         return $result;
     }
 }
-

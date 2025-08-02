@@ -156,8 +156,10 @@ final class course_reset {
                       JOIN {tool_muprog_item} i ON i.courseid = cm.course
                       JOIN {context} ctx ON ctx.instanceid = cm.id AND ctx.contextlevel = :modulecontext
                      WHERE cm.module = :mid AND i.programid = :programid";
-            $contextids = $DB->get_fieldset_sql($sql,
-                ['mid' => $mid, 'programid' => $programid, 'modulecontext' => CONTEXT_MODULE]);
+            $contextids = $DB->get_fieldset_sql(
+                $sql,
+                ['mid' => $mid, 'programid' => $programid, 'modulecontext' => CONTEXT_MODULE]
+            );
             if (!$contextids) {
                 continue;
             }
@@ -165,8 +167,11 @@ final class course_reset {
             try {
                 $privacyclass::delete_data_for_user($list);
             } catch (\Throwable $ex) {
-                debugging("Exception detected in $privacyclass::delete_data_for_user(): " . $ex->getMessage(),
-                    DEBUG_DEVELOPER, $ex->getTrace());
+                debugging(
+                    "Exception detected in $privacyclass::delete_data_for_user(): " . $ex->getMessage(),
+                    DEBUG_DEVELOPER,
+                    $ex->getTrace()
+                );
             }
         }
     }

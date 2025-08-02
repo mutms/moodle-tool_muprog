@@ -80,7 +80,8 @@ final class get_program_allocations_test extends \advanced_testcase {
 
         $results = \tool_muprog\external\get_program_allocations::clean_returnvalue(
             \tool_muprog\external\get_program_allocations::execute_returns(),
-            \tool_muprog\external\get_program_allocations::execute($program1->id));
+            \tool_muprog\external\get_program_allocations::execute($program1->id)
+        );
         $this->assertCount(3, $results);
         $result = (object)$results[0];
         $this->assertSame((int)$allocation1->id, $result->id);
@@ -120,12 +121,14 @@ final class get_program_allocations_test extends \advanced_testcase {
 
         $results = \tool_muprog\external\get_program_allocations::clean_returnvalue(
             \tool_muprog\external\get_program_allocations::execute_returns(),
-            \tool_muprog\external\get_program_allocations::execute($program1->id, []));
+            \tool_muprog\external\get_program_allocations::execute($program1->id, [])
+        );
         $this->assertCount(3, $results);
 
         $results = \tool_muprog\external\get_program_allocations::clean_returnvalue(
             \tool_muprog\external\get_program_allocations::execute_returns(),
-            \tool_muprog\external\get_program_allocations::execute($program1->id, [$user1->id, $user3->id]));
+            \tool_muprog\external\get_program_allocations::execute($program1->id, [$user1->id, $user3->id])
+        );
         $this->assertCount(1, $results);
         $result = (object)$results[0];
         $this->assertSame((int)$allocation1->id, $result->id);
@@ -135,7 +138,8 @@ final class get_program_allocations_test extends \advanced_testcase {
 
         $results = \tool_muprog\external\get_program_allocations::clean_returnvalue(
             \tool_muprog\external\get_program_allocations::execute_returns(),
-            \tool_muprog\external\get_program_allocations::execute($program1->id, [$user3->id]));
+            \tool_muprog\external\get_program_allocations::execute($program1->id, [$user3->id])
+        );
         $this->assertCount(0, $results);
 
         try {
@@ -149,7 +153,8 @@ final class get_program_allocations_test extends \advanced_testcase {
         $this->setAdminUser();
         $results = \tool_muprog\external\get_program_allocations::clean_returnvalue(
             \tool_muprog\external\get_program_allocations::execute_returns(),
-            \tool_muprog\external\get_program_allocations::execute($program3->id));
+            \tool_muprog\external\get_program_allocations::execute($program3->id)
+        );
         $this->assertCount(0, $results);
     }
 }

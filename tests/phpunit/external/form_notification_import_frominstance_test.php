@@ -31,7 +31,6 @@ namespace tool_muprog\phpunit\external;
  * @covers \tool_muprog\external\form_notification_import_frominstance
  */
 final class form_notification_import_frominstance_test extends \advanced_testcase {
-
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
@@ -105,9 +104,11 @@ final class form_notification_import_frominstance_test extends \advanced_testcas
         role_assign($editroleid, $user1->id, $syscontext->id);
         role_assign($cloneroleid, $user1->id, $syscontext->id);
         $this->setUser($user1);
-        $response = \tool_muprog\external\form_notification_import_frominstance::execute ('', $program1->id);
+        $response = \tool_muprog\external\form_notification_import_frominstance::execute('', $program1->id);
         $results = \tool_muprog\external\form_notification_import_frominstance::clean_returnvalue(
-            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(), $response);
+            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(),
+            $response
+        );
         $this->assertSame(null, $results['notice']);
         $this->assertCount(2, $results['list']);
         $this->assertSame($program2->id, $results['list'][0]['value']);
@@ -116,9 +117,11 @@ final class form_notification_import_frominstance_test extends \advanced_testcas
         role_assign($editroleid, $user2->id, $syscontext->id);
         role_assign($cloneroleid, $user2->id, $catcontext1->id);
         $this->setUser($user2);
-        $response = \tool_muprog\external\form_notification_import_frominstance::execute ('', $program1->id);
+        $response = \tool_muprog\external\form_notification_import_frominstance::execute('', $program1->id);
         $results = \tool_muprog\external\form_notification_import_frominstance::clean_returnvalue(
-            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(), $response);
+            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(),
+            $response
+        );
         $this->assertSame(null, $results['notice']);
         $this->assertCount(1, $results['list']);
         $this->assertSame($program2->id, $results['list'][0]['value']);

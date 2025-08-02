@@ -81,20 +81,24 @@ final class form_program_content_import_fromprogram_test extends \advanced_testc
         $user1 = $this->getDataGenerator()->create_user();
 
         $this->setAdminUser();
-        $response = \tool_muprog\external\form_program_content_import_fromprogram::execute ('', $program1->id);
+        $response = \tool_muprog\external\form_program_content_import_fromprogram::execute('', $program1->id);
         $results = \tool_muprog\external\form_program_content_import_fromprogram::clean_returnvalue(
-            \tool_muprog\external\form_program_content_import_fromprogram::execute_returns(), $response);
+            \tool_muprog\external\form_program_content_import_fromprogram::execute_returns(),
+            $response
+        );
         $this->assertSame(null, $results['notice']);
         $this->assertCount(2, $results['list']);
 
         $this->setUser($user1);
         try {
-            $response = \tool_muprog\external\form_program_content_import_fromprogram::execute ('', $program1->id);
+            $response = \tool_muprog\external\form_program_content_import_fromprogram::execute('', $program1->id);
             $this->fail('Exception excepted');
         } catch (\moodle_exception $ex) {
             $this->assertInstanceOf(\required_capability_exception::class, $ex);
-            $this->assertSame('Sorry, but you do not currently have permissions to do that (Add and update programs).',
-                $ex->getMessage());
+            $this->assertSame(
+                'Sorry, but you do not currently have permissions to do that (Add and update programs).',
+                $ex->getMessage()
+            );
         }
     }
 
@@ -144,16 +148,18 @@ final class form_program_content_import_fromprogram_test extends \advanced_testc
 
         $this->setUser($user0);
         try {
-            $response = \tool_muprog\external\form_program_content_import_fromprogram::execute ('', $program1->id);
+            $response = \tool_muprog\external\form_program_content_import_fromprogram::execute('', $program1->id);
             $this->fail('Exception excepted');
         } catch (\moodle_exception $ex) {
             $this->assertInstanceOf(\required_capability_exception::class, $ex);
-            $this->assertSame('Sorry, but you do not currently have permissions to do that (Add and update programs).',
-                $ex->getMessage());
+            $this->assertSame(
+                'Sorry, but you do not currently have permissions to do that (Add and update programs).',
+                $ex->getMessage()
+            );
         }
 
         $this->setUser($user1);
-        $response = \tool_muprog\external\form_program_content_import_fromprogram::execute ('', $program1->id);
+        $response = \tool_muprog\external\form_program_content_import_fromprogram::execute('', $program1->id);
         $this->assertCount(1, $response['list']);
         $program3resp = array_pop($response['list']);
         $this->assertSame($program3->id, $program3resp['value']);

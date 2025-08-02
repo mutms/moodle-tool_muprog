@@ -43,7 +43,11 @@ final class program_visibility_edit extends \tool_mulib\local\dialog_form {
         $mform->addHelpButton('public', 'public', 'tool_muprog');
 
         form_program_visibility_edit_cohortids::add_form_element(
-            $mform, ['programid' => $data->id], 'cohortids', get_string('cohorts', 'tool_muprog'));
+            $mform,
+            ['programid' => $data->id],
+            'cohortids',
+            get_string('cohorts', 'tool_muprog')
+        );
         $cohorts = management::fetch_current_cohorts_menu($data->id);
         $mform->setDefault('cohortids', array_keys($cohorts));
 

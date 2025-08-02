@@ -65,7 +65,8 @@ final class source_cohort_get_cohorts_test extends \advanced_testcase {
 
         $result = \tool_muprog\external\source_cohort_get_cohorts::clean_returnvalue(
             \tool_muprog\external\source_cohort_get_cohorts::execute_returns(),
-            \tool_muprog\external\source_cohort_get_cohorts::execute($program1->id));
+            \tool_muprog\external\source_cohort_get_cohorts::execute($program1->id)
+        );
         $this->assertCount(2, $result);
         $firstcohort = (object)$result[0];
         $this->assertSame((int)$cohort1->id, $firstcohort->id);
@@ -83,8 +84,10 @@ final class source_cohort_get_cohorts_test extends \advanced_testcase {
             $this->fail('Exception expected');
         } catch (\moodle_exception $ex) {
             $this->assertInstanceOf(\required_capability_exception::class, $ex);
-            $this->assertSame('Sorry, but you do not currently have permissions to do that (View programs management).',
-                $ex->getMessage());
+            $this->assertSame(
+                'Sorry, but you do not currently have permissions to do that (View programs management).',
+                $ex->getMessage()
+            );
         }
 
         try {
@@ -101,14 +104,17 @@ final class source_cohort_get_cohorts_test extends \advanced_testcase {
             $this->fail('Exception expected');
         } catch (\moodle_exception $ex) {
             $this->assertInstanceOf(\required_capability_exception::class, $ex);
-            $this->assertSame('Sorry, but you do not currently have permissions to do that (View programs management).',
-                $ex->getMessage());
+            $this->assertSame(
+                'Sorry, but you do not currently have permissions to do that (View programs management).',
+                $ex->getMessage()
+            );
         }
 
         $this->setAdminUser();
         $result = \tool_muprog\external\source_cohort_get_cohorts::clean_returnvalue(
             \tool_muprog\external\source_cohort_get_cohorts::execute_returns(),
-            \tool_muprog\external\source_cohort_get_cohorts::execute($program2->id));
+            \tool_muprog\external\source_cohort_get_cohorts::execute($program2->id)
+        );
         $this->assertCount(1, $result);
         $firstcohort = (object)$result[0];
         $this->assertEquals($cohort2->id, $firstcohort->id);

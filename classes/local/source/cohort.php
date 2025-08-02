@@ -112,7 +112,7 @@ final class cohort extends base {
             \core_collator::asort($cohorts);
             if ($cohorts) {
                 $cohorts = array_map('format_string', $cohorts);
-                $result .= ' (' . implode(', ', $cohorts) .')';
+                $result .= ' (' . implode(', ', $cohorts) . ')';
             }
         }
 

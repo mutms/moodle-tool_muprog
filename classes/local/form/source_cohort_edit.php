@@ -47,7 +47,11 @@ final class source_cohort_edit extends \tool_mulib\local\dialog_form {
         }
 
         form_source_cohort_edit_cohortids::add_form_element(
-            $mform, ['programid' => $program->id], 'cohortids', get_string('source_cohort_cohortstoallocate', 'tool_muprog'));
+            $mform,
+            ['programid' => $program->id],
+            'cohortids',
+            get_string('source_cohort_cohortstoallocate', 'tool_muprog')
+        );
         if (!empty($source->id)) {
             $cohorts = cohort::fetch_allocation_cohorts_menu($source->id);
             $mform->setDefault('cohortids', array_keys($cohorts));

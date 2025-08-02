@@ -73,7 +73,7 @@ final class program_evidence_upload_options extends \tool_mulib\local\dialog_for
 
         $mform->addElement('select', 'detailscolumn', get_string('evidence_details', 'tool_muprog'), $options);
 
-        $mform->addElement('textarea', 'details', get_string('evidence_detailsdefault' , 'tool_muprog'));
+        $mform->addElement('textarea', 'details', get_string('evidence_detailsdefault', 'tool_muprog'));
         $mform->setType('details', PARAM_RAW);  // Plain text only.
 
         $mform->addElement('hidden', 'programid');

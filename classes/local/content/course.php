@@ -163,4 +163,3 @@ final class course extends item {
         ];
     }
 }
-

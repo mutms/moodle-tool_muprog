@@ -67,7 +67,7 @@ final class form_export_programids extends \tool_mulib\external\form_autocomplet
         $syscontext = \context_system::instance();
         self::validate_context($syscontext);
 
-        list($searchsql, $params) = \tool_muprog\local\management::get_program_search_query(null, $query, 'p');
+        [$searchsql, $params] = \tool_muprog\local\management::get_program_search_query(null, $query, 'p');
 
         $sql = "SELECT p.id, p.fullname, p.contextid
                   FROM {tool_muprog_program} p
@@ -106,7 +106,7 @@ final class form_export_programids extends \tool_mulib\external\form_autocomplet
      * @return callable
      */
     public static function get_label_callback(array $arguments): callable {
-        return function($value) use ($arguments): string {
+        return function ($value) use ($arguments): string {
             global $DB;
 
             $program = $DB->get_record('tool_muprog_program', ['id' => $value]);

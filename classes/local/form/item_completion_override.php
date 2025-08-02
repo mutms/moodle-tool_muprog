@@ -38,19 +38,29 @@ final class item_completion_override extends \tool_mulib\local\dialog_form {
         $completion = $this->_customdata['completion'];
         $evidence = $this->_customdata['evidence'];
 
-        $mform->addElement('static', 'staticitem', get_string('item', 'tool_muprog'),
-            format_string($item->fullname));
+        $mform->addElement(
+            'static',
+            'staticitem',
+            get_string('item', 'tool_muprog'),
+            format_string($item->fullname)
+        );
 
         if ($allocation->timecompleted) {
-            $mform->addElement('static', 'staticprogramcompletion',
+            $mform->addElement(
+                'static',
+                'staticprogramcompletion',
                 get_string('programcompletion', 'tool_muprog'),
-                userdate($allocation->timecompleted));
+                userdate($allocation->timecompleted)
+            );
         }
 
         if ($evidence) {
-            $mform->addElement('static', 'staticevidencedate',
+            $mform->addElement(
+                'static',
+                'staticevidencedate',
                 get_string('evidencedate', 'tool_muprog'),
-                userdate($evidence->timecompleted));
+                userdate($evidence->timecompleted)
+            );
         }
 
         $mform->addElement('date_time_selector', 'timecompleted', get_string('completiondate', 'tool_muprog'), ['optional' => true]);

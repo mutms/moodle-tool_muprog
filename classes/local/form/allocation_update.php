@@ -79,7 +79,10 @@ final class allocation_update extends \tool_mulib\local\dialog_form {
         $errors = parent::validation($data, $files);
 
         $errors = array_merge($errors, \tool_muprog\local\allocation::validate_allocation_dates(
-            $data['timestart'], $data['timedue'], $data['timeend']));
+            $data['timestart'],
+            $data['timedue'],
+            $data['timeend']
+        ));
 
         // Add the custom fields validation.
         $errors = array_merge($errors, $this->handler->instance_form_validation($data, $files));

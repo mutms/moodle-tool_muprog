@@ -165,15 +165,23 @@ final class mucertify_test extends \advanced_testcase {
             'programid1' => $program1->id,
         ];
         $certification1 = $generator->create_certification($data);
-        $source1 = $DB->get_record('tool_mucertify_source',
-            ['type' => 'manual', 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $source1 = $DB->get_record(
+            'tool_mucertify_source',
+            ['type' => 'manual', 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $data = [
             'sources' => ['manual' => []],
             'programid1' => $program2->id,
         ];
         $certification2 = $generator->create_certification($data);
-        $source2 = $DB->get_record('tool_mucertify_source',
-            ['type' => 'manual', 'certificationid' => $certification2->id], '*', MUST_EXIST);
+        $source2 = $DB->get_record(
+            'tool_mucertify_source',
+            ['type' => 'manual', 'certificationid' => $certification2->id],
+            '*',
+            MUST_EXIST
+        );
 
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
@@ -210,8 +218,12 @@ final class mucertify_test extends \advanced_testcase {
             'timewindowdue' => null,
             'timewindowend' => null,
         ]);
-        $assignment4 = $DB->get_record('tool_mucertify_assignment',
-            ['userid' => $user4->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $assignment4 = $DB->get_record(
+            'tool_mucertify_assignment',
+            ['userid' => $user4->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $assignment4 = \tool_mucertify\local\source\base::assignment_archive($assignment4->id);
 
         manual::assign_users($certification1->id, $source1->id, [$user5->id], [
@@ -219,8 +231,12 @@ final class mucertify_test extends \advanced_testcase {
             'timewindowdue' => null,
             'timewindowend' => null,
         ]);
-        $period5 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user5->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period5 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user5->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $period5 = period::override_dates((object)['id' => $period5->id, 'timerevoked' => $now]);
 
         manual::assign_users($certification1->id, $source1->id, [$user6->id], [
@@ -230,8 +246,12 @@ final class mucertify_test extends \advanced_testcase {
             'timefrom' => $now - WEEKSECS,
             'timeuntil' => $now + DAYSECS,
         ]);
-        $period6 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user6->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period6 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user6->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $period6 = period::override_dates((object)['id' => $period6->id, 'timecertified' => $now]);
 
         manual::assign_users($certification1->id, $source1->id, [$user7->id], [
@@ -292,29 +312,61 @@ final class mucertify_test extends \advanced_testcase {
         $this->assertSame(null, $allocation7->timedue);
         $this->assertSame(null, $allocation7->timeend);
 
-        $period1 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user1->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period1 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user1->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame($allocation1->id, $period1->allocationid);
-        $period2 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user2->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period2 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user2->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame($allocation2->id, $period2->allocationid);
-        $period3 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user3->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period3 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user3->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame(null, $period3->allocationid);
-        $period4 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user4->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period4 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user4->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame(null, $period4->allocationid);
-        $period5 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user5->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period5 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user5->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame(null, $period5->allocationid);
-        $period6 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user6->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period6 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user6->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame(null, $period6->allocationid);
-        $period7 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user7->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period7 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user7->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame($allocation7->id, $period7->allocationid);
-        $period8 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user8->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period8 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user8->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame(null, $period8->allocationid);
     }
 
@@ -338,15 +390,23 @@ final class mucertify_test extends \advanced_testcase {
             'programid1' => $program1->id,
         ];
         $certification1 = $generator->create_certification($data);
-        $source1 = $DB->get_record('tool_mucertify_source',
-            ['type' => 'manual', 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $source1 = $DB->get_record(
+            'tool_mucertify_source',
+            ['type' => 'manual', 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $data = [
             'sources' => ['manual' => []],
             'programid1' => $program2->id,
         ];
         $certification2 = $generator->create_certification($data);
-        $source2 = $DB->get_record('tool_mucertify_source',
-            ['type' => 'manual', 'certificationid' => $certification2->id], '*', MUST_EXIST);
+        $source2 = $DB->get_record(
+            'tool_mucertify_source',
+            ['type' => 'manual', 'certificationid' => $certification2->id],
+            '*',
+            MUST_EXIST
+        );
 
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
@@ -398,32 +458,62 @@ final class mucertify_test extends \advanced_testcase {
         ]);
         $allocation1 = $DB->get_record('tool_muprog_allocation', [
             'sourceid' => $program1source->id, 'userid' => $user1->id], '*', MUST_EXIST);
-        $period1 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user1->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period1 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user1->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $allocation2 = $DB->get_record('tool_muprog_allocation', [
             'sourceid' => $program1source->id, 'userid' => $user2->id], '*', MUST_EXIST);
-        $period2 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user2->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
-        $assignment3 = $DB->get_record('tool_mucertify_assignment',
-            ['userid' => $user3->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period2 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user2->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
+        $assignment3 = $DB->get_record(
+            'tool_mucertify_assignment',
+            ['userid' => $user3->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $allocation3 = $DB->get_record('tool_muprog_allocation', [
             'sourceid' => $program1source->id, 'userid' => $user3->id], '*', MUST_EXIST);
-        $period3 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user3->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period3 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user3->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $allocation4 = $DB->get_record('tool_muprog_allocation', [
             'sourceid' => $program1source->id, 'userid' => $user4->id], '*', MUST_EXIST);
-        $period4 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user4->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period4 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user4->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $allocation5 = $DB->get_record('tool_muprog_allocation', [
             'sourceid' => $program1source->id, 'userid' => $user5->id], '*', MUST_EXIST);
-        $period5 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user5->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period5 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user5->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $allocation6 = $DB->get_record('tool_muprog_allocation', [
             'sourceid' => $program1source->id, 'userid' => $user6->id], '*', MUST_EXIST);
-        $period6 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user6->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
-        $this->assertCount(6, $DB->get_records('tool_muprog_allocation',
-            ['sourceid' => $program1source->id, 'archived' => 0]));
+        $period6 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user6->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
+        $this->assertCount(6, $DB->get_records(
+            'tool_muprog_allocation',
+            ['sourceid' => $program1source->id, 'archived' => 0]
+        ));
         $allocation7 = $DB->get_record('tool_muprog_allocation', [
             'sourceid' => $program1sourcemanual->id, 'userid' => $user7->id], '*', MUST_EXIST);
         $this->assertSame('0', $allocation7->archived);
@@ -448,12 +538,18 @@ final class mucertify_test extends \advanced_testcase {
         $DB->update_record('tool_mucertify_period', $period6);
 
         \tool_muprog\local\source\mucertify::sync_certifications(null, null);
-        $this->assertCount(1, $DB->get_records('tool_muprog_allocation',
-            ['sourceid' => $program1source->id, 'archived' => 0]));
-        $this->assertCount(4, $DB->get_records('tool_muprog_allocation',
-            ['sourceid' => $program1source->id, 'archived' => 1]));
-        $this->assertFalse($DB->record_exists('tool_muprog_allocation',
-            ['id' => $period4->allocationid]));
+        $this->assertCount(1, $DB->get_records(
+            'tool_muprog_allocation',
+            ['sourceid' => $program1source->id, 'archived' => 0]
+        ));
+        $this->assertCount(4, $DB->get_records(
+            'tool_muprog_allocation',
+            ['sourceid' => $program1source->id, 'archived' => 1]
+        ));
+        $this->assertFalse($DB->record_exists(
+            'tool_muprog_allocation',
+            ['id' => $period4->allocationid]
+        ));
 
         $allocations = $DB->get_records('tool_muprog_allocation', [], 'id ASC');
         \tool_muprog\local\source\mucertify::sync_certifications(null, null);
@@ -462,10 +558,14 @@ final class mucertify_test extends \advanced_testcase {
         $certification1->archived = '1';
         $DB->update_record('tool_mucertify_certification', $certification1);
         \tool_muprog\local\source\mucertify::sync_certifications(null, null);
-        $this->assertCount(0, $DB->get_records('tool_muprog_allocation',
-            ['sourceid' => $program1source->id, 'archived' => 0]));
-        $this->assertCount(5, $DB->get_records('tool_muprog_allocation',
-            ['sourceid' => $program1source->id, 'archived' => 1]));
+        $this->assertCount(0, $DB->get_records(
+            'tool_muprog_allocation',
+            ['sourceid' => $program1source->id, 'archived' => 0]
+        ));
+        $this->assertCount(5, $DB->get_records(
+            'tool_muprog_allocation',
+            ['sourceid' => $program1source->id, 'archived' => 1]
+        ));
 
         $allocations = $DB->get_records('tool_muprog_allocation', [], 'id ASC');
         \tool_muprog\local\source\mucertify::sync_certifications(null, null);
@@ -473,10 +573,14 @@ final class mucertify_test extends \advanced_testcase {
 
         $DB->delete_records('tool_mucertify_assignment', ['id' => $assignment3->id]);
         \tool_muprog\local\source\mucertify::sync_certifications(null, null);
-        $this->assertCount(0, $DB->get_records('tool_muprog_allocation',
-            ['sourceid' => $program1source->id, 'archived' => 0]));
-        $this->assertCount(4, $DB->get_records('tool_muprog_allocation',
-            ['sourceid' => $program1source->id, 'archived' => 1]));
+        $this->assertCount(0, $DB->get_records(
+            'tool_muprog_allocation',
+            ['sourceid' => $program1source->id, 'archived' => 0]
+        ));
+        $this->assertCount(4, $DB->get_records(
+            'tool_muprog_allocation',
+            ['sourceid' => $program1source->id, 'archived' => 1]
+        ));
 
         $allocations = $DB->get_records('tool_muprog_allocation', [], 'id ASC');
         \tool_muprog\local\source\mucertify::sync_certifications(null, null);
@@ -484,10 +588,14 @@ final class mucertify_test extends \advanced_testcase {
 
         $DB->delete_records('tool_mucertify_certification', ['id' => $certification1->id]);
         \tool_muprog\local\source\mucertify::sync_certifications(null, null);
-        $this->assertCount(0, $DB->get_records('tool_muprog_allocation',
-            ['sourceid' => $program1source->id, 'archived' => 0]));
-        $this->assertCount(0, $DB->get_records('tool_muprog_allocation',
-            ['sourceid' => $program1source->id, 'archived' => 1]));
+        $this->assertCount(0, $DB->get_records(
+            'tool_muprog_allocation',
+            ['sourceid' => $program1source->id, 'archived' => 0]
+        ));
+        $this->assertCount(0, $DB->get_records(
+            'tool_muprog_allocation',
+            ['sourceid' => $program1source->id, 'archived' => 1]
+        ));
     }
 
     public function test_sync_certifications_restore(): void {
@@ -509,15 +617,23 @@ final class mucertify_test extends \advanced_testcase {
             'programid1' => $program1->id,
         ];
         $certification1 = $generator->create_certification($data);
-        $source1 = $DB->get_record('tool_mucertify_source',
-            ['type' => 'manual', 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $source1 = $DB->get_record(
+            'tool_mucertify_source',
+            ['type' => 'manual', 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $data = [
             'sources' => ['manual' => []],
             'programid1' => $program2->id,
         ];
         $certification2 = $generator->create_certification($data);
-        $source2 = $DB->get_record('tool_mucertify_source',
-            ['type' => 'manual', 'certificationid' => $certification2->id], '*', MUST_EXIST);
+        $source2 = $DB->get_record(
+            'tool_mucertify_source',
+            ['type' => 'manual', 'certificationid' => $certification2->id],
+            '*',
+            MUST_EXIST
+        );
 
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
@@ -554,8 +670,12 @@ final class mucertify_test extends \advanced_testcase {
             'timewindowdue' => null,
             'timewindowend' => null,
         ]);
-        $assignment4 = $DB->get_record('tool_mucertify_assignment',
-            ['userid' => $user4->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $assignment4 = $DB->get_record(
+            'tool_mucertify_assignment',
+            ['userid' => $user4->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $assignment4 = \tool_mucertify\local\source\base::assignment_archive($assignment4->id);
 
         manual::assign_users($certification1->id, $source1->id, [$user5->id], [
@@ -563,8 +683,12 @@ final class mucertify_test extends \advanced_testcase {
             'timewindowdue' => null,
             'timewindowend' => null,
         ]);
-        $period5 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user5->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period5 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user5->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $period5 = period::override_dates((object)['id' => $period5->id, 'timerevoked' => $now]);
 
         manual::assign_users($certification1->id, $source1->id, [$user6->id], [
@@ -574,8 +698,12 @@ final class mucertify_test extends \advanced_testcase {
             'timefrom' => $now - WEEKSECS,
             'timeuntil' => $now + DAYSECS,
         ]);
-        $period6 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user6->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period6 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user6->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $period6 = period::override_dates((object)['id' => $period6->id, 'timecertified' => $now]);
 
         manual::assign_users($certification1->id, $source1->id, [$user7->id], [
@@ -634,29 +762,61 @@ final class mucertify_test extends \advanced_testcase {
         $this->assertSame(null, $allocation7->timedue);
         $this->assertSame(null, $allocation7->timeend);
 
-        $period1 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user1->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period1 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user1->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame($allocation1->id, $period1->allocationid);
-        $period2 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user2->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period2 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user2->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame($allocation2->id, $period2->allocationid);
-        $period3 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user3->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period3 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user3->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame(null, $period3->allocationid);
-        $period4 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user4->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period4 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user4->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame($allocation4->id, $period4->allocationid);
-        $period5 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user5->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period5 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user5->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame($allocation5->id, $period5->allocationid);
-        $period6 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user6->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period6 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user6->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame($allocation6->id, $period6->allocationid);
-        $period7 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user7->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period7 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user7->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame($allocation7->id, $period7->allocationid);
-        $period8 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user8->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period8 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user8->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame(null, $period8->allocationid);
     }
 
@@ -675,8 +835,12 @@ final class mucertify_test extends \advanced_testcase {
             'programid1' => $program1->id,
         ];
         $certification1 = $generator->create_certification($data);
-        $source1 = $DB->get_record('tool_mucertify_source',
-            ['type' => 'manual', 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $source1 = $DB->get_record(
+            'tool_mucertify_source',
+            ['type' => 'manual', 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
 
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
@@ -696,13 +860,21 @@ final class mucertify_test extends \advanced_testcase {
 
         $allocation1 = $DB->get_record('tool_muprog_allocation', [
             'sourceid' => $program1source->id, 'userid' => $user1->id], '*', MUST_EXIST);
-        $period1 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user1->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period1 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user1->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
 
         $allocation2 = $DB->get_record('tool_muprog_allocation', [
             'sourceid' => $program1source->id, 'userid' => $user2->id], '*', MUST_EXIST);
-        $period2 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user2->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period2 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user2->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
 
         $allocation1->timedue = (string)($now + DAYSECS);
         $DB->update_record('tool_muprog_allocation', $allocation1);
@@ -803,15 +975,23 @@ final class mucertify_test extends \advanced_testcase {
             'programid1' => $program1->id,
         ];
         $certification1 = $generator->create_certification($data);
-        $source1 = $DB->get_record('tool_mucertify_source',
-            ['type' => 'manual', 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $source1 = $DB->get_record(
+            'tool_mucertify_source',
+            ['type' => 'manual', 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $data = [
             'sources' => ['manual' => []],
             'programid1' => $program2->id,
         ];
         $certification2 = $generator->create_certification($data);
-        $source2 = $DB->get_record('tool_mucertify_source',
-            ['type' => 'manual', 'certificationid' => $certification2->id], '*', MUST_EXIST);
+        $source2 = $DB->get_record(
+            'tool_mucertify_source',
+            ['type' => 'manual', 'certificationid' => $certification2->id],
+            '*',
+            MUST_EXIST
+        );
 
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
@@ -848,8 +1028,12 @@ final class mucertify_test extends \advanced_testcase {
             'timewindowdue' => null,
             'timewindowend' => null,
         ]);
-        $assignment4 = $DB->get_record('tool_mucertify_assignment',
-            ['userid' => $user4->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $assignment4 = $DB->get_record(
+            'tool_mucertify_assignment',
+            ['userid' => $user4->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $assignment4 = \tool_mucertify\local\source\base::assignment_archive($assignment4->id);
 
         manual::assign_users($certification1->id, $source1->id, [$user5->id], [
@@ -857,8 +1041,12 @@ final class mucertify_test extends \advanced_testcase {
             'timewindowdue' => null,
             'timewindowend' => null,
         ]);
-        $period5 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user5->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period5 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user5->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $period5 = period::override_dates((object)['id' => $period5->id, 'timerevoked' => $now]);
 
         manual::assign_users($certification1->id, $source1->id, [$user6->id], [
@@ -868,8 +1056,12 @@ final class mucertify_test extends \advanced_testcase {
             'timefrom' => $now - WEEKSECS,
             'timeuntil' => $now + DAYSECS,
         ]);
-        $period6 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user6->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period6 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user6->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $period6 = period::override_dates((object)['id' => $period6->id, 'timecertified' => $now - 30]);
 
         manual::assign_users($certification1->id, $source1->id, [$user7->id], [
@@ -877,8 +1069,12 @@ final class mucertify_test extends \advanced_testcase {
             'timewindowdue' => null,
             'timewindowend' => null,
         ]);
-        $period7 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user7->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period7 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user7->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $period7 = period::override_dates((object)['id' => $period7->id, 'timewindowstart' => $now + WEEKSECS]);
 
         $this->assertCount(7, $DB->get_records('tool_muprog_allocation', []));
@@ -892,17 +1088,33 @@ final class mucertify_test extends \advanced_testcase {
         $this->assertCount(7, $DB->get_records('tool_mucertify_period', []));
         $this->assertCount(3, $DB->get_records('tool_mucertify_period', ['timecertified' => null]));
 
-        $period1 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user1->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period1 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user1->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $this->assertTimeCurrent($period1->timecertified);
-        $period2 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user2->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period2 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user2->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $this->assertTimeCurrent($period2->timecertified);
-        $period3 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user3->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period3 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user3->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $this->assertTimeCurrent($period3->timecertified);
-        $period6 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user6->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period6 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user6->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame((string)($now - 30), $period6->timecertified);
     }
 
@@ -924,15 +1136,19 @@ final class mucertify_test extends \advanced_testcase {
 
         $course = $this->getDataGenerator()->create_course(['enablecompletion' => true]);
         $enrol = $DB->get_record('enrol', ['courseid' => $course->id, 'enrol' => 'manual'], '*', MUST_EXIST);
-        $forum = $this->getDataGenerator()->create_module('forum',
-            ['course' => $course->id, 'completion' => 1, 'completionview' => \COMPLETION_VIEW_REQUIRED]);
+        $forum = $this->getDataGenerator()->create_module(
+            'forum',
+            ['course' => $course->id, 'completion' => 1, 'completionview' => \COMPLETION_VIEW_REQUIRED]
+        );
         $discussion = $forumgenerator->create_discussion(['course' => $course->id, 'forum' => $forum->id, 'userid' => $admin->id]);
         $cm = \cm_info::create(get_coursemodule_from_instance('forum', $forum->id));
 
         $course2 = $this->getDataGenerator()->create_course(['enablecompletion' => true]);
         $enrol2 = $DB->get_record('enrol', ['courseid' => $course2->id, 'enrol' => 'manual'], '*', MUST_EXIST);
-        $forum2 = $this->getDataGenerator()->create_module('forum',
-            ['course' => $course2->id, 'completion' => 1, 'completionview' => \COMPLETION_VIEW_REQUIRED]);
+        $forum2 = $this->getDataGenerator()->create_module(
+            'forum',
+            ['course' => $course2->id, 'completion' => 1, 'completionview' => \COMPLETION_VIEW_REQUIRED]
+        );
         $discussion2 = $forumgenerator->create_discussion(['course' => $course2->id, 'forum' => $forum2->id, 'userid' => $admin->id]);
         $cm2 = \cm_info::create(get_coursemodule_from_instance('forum', $forum2->id));
 
@@ -990,21 +1206,41 @@ final class mucertify_test extends \advanced_testcase {
         $this->getDataGenerator()->enrol_user($user3->id, $course2->id);
 
         $certification0 = $generator->create_certification(
-            ['sources' => ['manual' => []], 'programid1' => $program->id, 'periods_resettype1' => course_reset::RESETTYPE_NONE]);
-        $source0 = $DB->get_record('tool_mucertify_source',
-            ['type' => 'manual', 'certificationid' => $certification0->id], '*', MUST_EXIST);
+            ['sources' => ['manual' => []], 'programid1' => $program->id, 'periods_resettype1' => course_reset::RESETTYPE_NONE]
+        );
+        $source0 = $DB->get_record(
+            'tool_mucertify_source',
+            ['type' => 'manual', 'certificationid' => $certification0->id],
+            '*',
+            MUST_EXIST
+        );
         $certification1 = $generator->create_certification(
-            ['sources' => ['manual' => []], 'programid1' => $program->id, 'periods_resettype1' => course_reset::RESETTYPE_DEALLOCATE]);
-        $source1 = $DB->get_record('tool_mucertify_source',
-            ['type' => 'manual', 'certificationid' => $certification1->id], '*', MUST_EXIST);
+            ['sources' => ['manual' => []], 'programid1' => $program->id, 'periods_resettype1' => course_reset::RESETTYPE_DEALLOCATE]
+        );
+        $source1 = $DB->get_record(
+            'tool_mucertify_source',
+            ['type' => 'manual', 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $certification2 = $generator->create_certification(
-            ['sources' => ['manual' => []], 'programid1' => $program->id, 'periods_resettype1' => course_reset::RESETTYPE_STANDARD]);
-        $source2 = $DB->get_record('tool_mucertify_source',
-            ['type' => 'manual', 'certificationid' => $certification2->id], '*', MUST_EXIST);
+            ['sources' => ['manual' => []], 'programid1' => $program->id, 'periods_resettype1' => course_reset::RESETTYPE_STANDARD]
+        );
+        $source2 = $DB->get_record(
+            'tool_mucertify_source',
+            ['type' => 'manual', 'certificationid' => $certification2->id],
+            '*',
+            MUST_EXIST
+        );
         $certification3 = $generator->create_certification(
-            ['sources' => ['manual' => []], 'programid1' => $program->id, 'periods_resettype1' => course_reset::RESETTYPE_FULL]);
-        $source3 = $DB->get_record('tool_mucertify_source',
-            ['type' => 'manual', 'certificationid' => $certification3->id], '*', MUST_EXIST);
+            ['sources' => ['manual' => []], 'programid1' => $program->id, 'periods_resettype1' => course_reset::RESETTYPE_FULL]
+        );
+        $source3 = $DB->get_record(
+            'tool_mucertify_source',
+            ['type' => 'manual', 'certificationid' => $certification3->id],
+            '*',
+            MUST_EXIST
+        );
 
         manual::assign_users($certification0->id, $source0->id, [$user0->id], [
             'timewindowstart' => $now - DAYSECS,
@@ -1028,8 +1264,12 @@ final class mucertify_test extends \advanced_testcase {
         ]);
 
         $this->assertTrue($DB->record_exists('tool_muprog_allocation', ['id' => $mallocation0->id]));
-        $period0 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user0->id, 'certificationid' => $certification0->id], '*', MUST_EXIST);
+        $period0 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user0->id, 'certificationid' => $certification0->id],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame('0', $period0->allocationid);
         $this->assertTrue($DB->record_exists('user_enrolments', ['enrolid' => $enrol->id, 'userid' => $user0->id]));
         $post = $DB->get_record('forum_posts', ['id' => $post0->id]);
@@ -1041,8 +1281,12 @@ final class mucertify_test extends \advanced_testcase {
         $this->assertFalse($DB->record_exists('tool_muprog_allocation', ['id' => $mallocation1->id]));
         $callocation1 = $DB->get_record('tool_muprog_allocation', ['userid' => $user1->id, 'programid' => $program->id]);
         $this->assertSame($programsource->id, $callocation1->sourceid);
-        $period1 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user1->id, 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $period1 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user1->id, 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame($callocation1->id, $period1->allocationid);
         $this->assertTrue($DB->record_exists('user_enrolments', ['enrolid' => $enrol->id, 'userid' => $user1->id]));
         $post = $DB->get_record('forum_posts', ['id' => $post1->id]);
@@ -1054,8 +1298,12 @@ final class mucertify_test extends \advanced_testcase {
         $this->assertFalse($DB->record_exists('tool_muprog_allocation', ['id' => $mallocation2->id]));
         $callocation2 = $DB->get_record('tool_muprog_allocation', ['userid' => $user2->id, 'programid' => $program->id]);
         $this->assertSame($programsource->id, $callocation2->sourceid);
-        $period2 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user2->id, 'certificationid' => $certification2->id], '*', MUST_EXIST);
+        $period2 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user2->id, 'certificationid' => $certification2->id],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame($callocation2->id, $period2->allocationid);
         $this->assertFalse($DB->record_exists('user_enrolments', ['enrolid' => $enrol->id, 'userid' => $user2->id]));
         $post = $DB->get_record('forum_posts', ['id' => $post2->id]);
@@ -1067,8 +1315,12 @@ final class mucertify_test extends \advanced_testcase {
         $this->assertFalse($DB->record_exists('tool_muprog_allocation', ['id' => $mallocation3->id]));
         $callocation3 = $DB->get_record('tool_muprog_allocation', ['userid' => $user3->id, 'programid' => $program->id]);
         $this->assertSame($programsource->id, $callocation3->sourceid);
-        $period3 = $DB->get_record('tool_mucertify_period',
-            ['userid' => $user3->id, 'certificationid' => $certification3->id], '*', MUST_EXIST);
+        $period3 = $DB->get_record(
+            'tool_mucertify_period',
+            ['userid' => $user3->id, 'certificationid' => $certification3->id],
+            '*',
+            MUST_EXIST
+        );
         $this->assertSame($callocation3->id, $period3->allocationid);
         $this->assertFalse($DB->record_exists('user_enrolments', ['enrolid' => $enrol->id, 'userid' => $user3->id]));
         $post = $DB->get_record('forum_posts', ['id' => $post3->id]);
@@ -1107,15 +1359,23 @@ final class mucertify_test extends \advanced_testcase {
             'programid1' => $program1->id,
         ];
         $certification1 = $generator->create_certification($data);
-        $source1 = $DB->get_record('tool_mucertify_source',
-            ['type' => 'manual', 'certificationid' => $certification1->id], '*', MUST_EXIST);
+        $source1 = $DB->get_record(
+            'tool_mucertify_source',
+            ['type' => 'manual', 'certificationid' => $certification1->id],
+            '*',
+            MUST_EXIST
+        );
         $data = [
             'sources' => ['manual' => []],
             'programid1' => $program2->id,
         ];
         $certification2 = $generator->create_certification($data);
-        $source2 = $DB->get_record('tool_mucertify_source',
-            ['type' => 'manual', 'certificationid' => $certification2->id], '*', MUST_EXIST);
+        $source2 = $DB->get_record(
+            'tool_mucertify_source',
+            ['type' => 'manual', 'certificationid' => $certification2->id],
+            '*',
+            MUST_EXIST
+        );
 
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();

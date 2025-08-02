@@ -42,7 +42,11 @@ final class source_manual_allocate extends \tool_mulib\local\dialog_form {
 
         $this->arguments = ['programid' => $program->id];
         \tool_muprog\external\form_source_manual_allocate_users::add_form_element(
-            $mform, $this->arguments, 'users', get_string('users'));
+            $mform,
+            $this->arguments,
+            'users',
+            get_string('users')
+        );
 
         $options = ['contextid' => $context->id, 'multiple' => false];
         $mform->addElement('cohort', 'cohortid', get_string('cohort', 'cohort'), $options);
@@ -101,7 +105,10 @@ final class source_manual_allocate extends \tool_mulib\local\dialog_form {
         if ($data['users']) {
             foreach ($data['users'] as $userid) {
                 $error = \tool_muprog\external\form_source_manual_allocate_users::validate_form_value(
-                    $this->arguments, $userid, $context);
+                    $this->arguments,
+                    $userid,
+                    $context
+                );
                 if ($error !== null) {
                     $errors['users'] = $error;
                     break;

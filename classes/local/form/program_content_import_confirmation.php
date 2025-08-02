@@ -75,7 +75,7 @@ final class program_content_import_confirmation extends \tool_mulib\local\dialog
         $programid = $data['fromprogram'];
         $programcontextid = $DB->get_field('tool_muprog_program', 'contextid', ['id' => $programid]);
         $context = \context::instance_by_id($programcontextid);
-        if (!has_capability('tool/muprog:clone', $context )) {
+        if (!has_capability('tool/muprog:clone', $context)) {
             $errors['fromprogram'] = get_string('error');
         }
         return $errors;

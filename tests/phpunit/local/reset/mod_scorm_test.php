@@ -51,7 +51,7 @@ final class mod_scorm_test extends \advanced_testcase {
         $course1 = $this->getDataGenerator()->create_course();
         $scorm1 = $scormgenerator->create_instance([
             'course' => $course1->id,
-            'packagefilepath' => $CFG->dirroot.'/mod/scorm/tests/packages/singlescobasic.zip',
+            'packagefilepath' => $CFG->dirroot . '/mod/scorm/tests/packages/singlescobasic.zip',
         ]);
         $cm1 = get_coursemodule_from_instance('scorm', $scorm1->id);
         $context1 = \context_module::instance($cm1->id);
@@ -59,7 +59,7 @@ final class mod_scorm_test extends \advanced_testcase {
         $course2 = $this->getDataGenerator()->create_course();
         $scorm2 = $scormgenerator->create_instance([
             'course' => $course2->id,
-            'packagefilepath' => $CFG->dirroot.'/mod/scorm/tests/packages/singlescobasic.zip',
+            'packagefilepath' => $CFG->dirroot . '/mod/scorm/tests/packages/singlescobasic.zip',
         ]);
         $cm2 = get_coursemodule_from_instance('scorm', $scorm2->id);
         $context2 = \context_module::instance($cm2->id);

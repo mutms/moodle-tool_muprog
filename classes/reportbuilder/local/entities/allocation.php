@@ -35,7 +35,6 @@ use core_reportbuilder\local\filters\date;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class allocation extends base {
-
     #[\Override]
     protected function get_default_tables(): array {
         return [
@@ -146,7 +145,7 @@ final class allocation extends base {
                 . "{$allocationalias}.timeend, {$allocationalias}.timecompleted, {$allocationalias}.archived")
             ->add_field("{$programalias}.archived", 'programarchived')
             ->set_is_sortable(false)
-            ->add_callback(static function($value, \stdClass $row): string {
+            ->add_callback(static function ($value, \stdClass $row): string {
                 if (!$row->id) {
                     return '';
                 }

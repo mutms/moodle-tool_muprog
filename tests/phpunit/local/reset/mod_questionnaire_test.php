@@ -51,8 +51,8 @@ final class mod_questionnaire_test extends \advanced_testcase {
 
         $this->setAdminUser();
         $questionnairegenerator->create_and_fully_populate(2, 2, 2, 1);
-        list($course1, $course2) = array_values($DB->get_records_select('course', "category > 0", [], 'id ASC'));
-        list($student1, $student2) = array_values($DB->get_records_select('user', "username != 'guest' AND username != 'admin'", [], 'id ASC'));
+        [$course1, $course2] = array_values($DB->get_records_select('course', "category > 0", [], 'id ASC'));
+        [$student1, $student2] = array_values($DB->get_records_select('user', "username != 'guest' AND username != 'admin'", [], 'id ASC'));
 
         /** @var \tool_muprog_generator $programgenerator */
         $programgenerator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');

@@ -50,7 +50,7 @@ final class tool_mutrain {
     public static function completion_updated(\tool_mutrain\hook\completion_updated $hook): void {
         global $DB;
 
-        list($fselect, $params) = $DB->get_in_or_equal($hook->get_frameworkids(), SQL_PARAMS_NAMED);
+        [$fselect, $params] = $DB->get_in_or_equal($hook->get_frameworkids(), SQL_PARAMS_NAMED);
         $fselect = "pi.trainingid $fselect";
         $params['userid'] = $hook->get_userid();
 

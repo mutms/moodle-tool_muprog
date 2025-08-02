@@ -66,7 +66,9 @@ final class form_program_allocation_import_fromprogram extends \tool_mulib\exter
         global $DB;
 
         ['query' => $query, 'programid' => $programid] = self::validate_parameters(
-            self::execute_parameters(), ['query' => $query, 'programid' => $programid]);
+            self::execute_parameters(),
+            ['query' => $query, 'programid' => $programid]
+        );
 
         $targetprogram = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
         $context = \context::instance_by_id($targetprogram->contextid);
@@ -74,7 +76,7 @@ final class form_program_allocation_import_fromprogram extends \tool_mulib\exter
         self::validate_context($context);
         require_capability('tool/muprog:edit', $context);
 
-        list($searchsql, $params) = \tool_muprog\local\management::get_program_search_query(null, $query, 'p');
+        [$searchsql, $params] = \tool_muprog\local\management::get_program_search_query(null, $query, 'p');
         $params['programid'] = $programid;
 
         $tenantselect = '';

@@ -38,8 +38,12 @@ final class item_evidence_edit extends \tool_mulib\local\dialog_form {
         $completion = $this->_customdata['completion'];
         $evidence = $this->_customdata['evidence'];
 
-        $mform->addElement('static', 'staticitem', get_string('item', 'tool_muprog'),
-            format_string($item->fullname));
+        $mform->addElement(
+            'static',
+            'staticitem',
+            get_string('item', 'tool_muprog'),
+            format_string($item->fullname)
+        );
 
         if ($completion && $completion->timecompleted) {
             $strcompleted = userdate($completion->timecompleted);
@@ -53,7 +57,7 @@ final class item_evidence_edit extends \tool_mulib\local\dialog_form {
             $mform->setDefault('evidencetimecompleted', $evidence->timecompleted);
         }
 
-        $mform->addElement('textarea', 'evidencedetails', get_string('evidence_details' , 'tool_muprog'));
+        $mform->addElement('textarea', 'evidencedetails', get_string('evidence_details', 'tool_muprog'));
         $mform->setType('evidencedetails', PARAM_RAW); // Plain text only.
         if ($evidence && $evidence->evidencejson) {
             $data = (object)json_decode($evidence->evidencejson);
@@ -63,7 +67,7 @@ final class item_evidence_edit extends \tool_mulib\local\dialog_form {
         }
         $mform->hideIf('evidencedetails', 'evidencetimecompleted[enabled]', 'notchecked');
 
-        $mform->addElement('advcheckbox', 'itemrecalculate', get_string('itemrecalculate' , 'tool_muprog'));
+        $mform->addElement('advcheckbox', 'itemrecalculate', get_string('itemrecalculate', 'tool_muprog'));
         if (!$item->topitem && $evidence && $completion && $evidence->timecompleted == $completion->timecompleted) {
             $mform->setDefault('itemrecalculate', 1);
         }

@@ -895,7 +895,7 @@ final class top extends set {
 
         $this->fix_previous(null);
 
-        $saveclosure = function(item $item) use (&$saveclosure, &$DB): void {
+        $saveclosure = function (item $item) use (&$saveclosure, &$DB): void {
             $record = $item->get_record();
             if ($record['id']) {
                 $oldrecord = $DB->get_record('tool_muprog_item', ['id' => $record['id']]);
@@ -955,4 +955,3 @@ final class top extends set {
         allocation::fix_user_enrolments($this->programid, null);
     }
 }
-

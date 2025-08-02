@@ -66,7 +66,9 @@ final class form_notification_import_frominstance extends \tool_mulib\external\f
         global $DB;
 
         ['query' => $query, 'id' => $id] = self::validate_parameters(
-            self::execute_parameters(), ['query' => $query, 'id' => $id]);
+            self::execute_parameters(),
+            ['query' => $query, 'id' => $id]
+        );
 
         $targetprogram = $DB->get_record('tool_muprog_program', ['id' => $id], '*', MUST_EXIST);
         $context = \context::instance_by_id($targetprogram->contextid);
@@ -74,7 +76,7 @@ final class form_notification_import_frominstance extends \tool_mulib\external\f
         self::validate_context($context);
         require_capability('tool/muprog:edit', $context);
 
-        list($searchsql, $params) = \tool_muprog\local\management::get_program_search_query(null, $query, 'p');
+        [$searchsql, $params] = \tool_muprog\local\management::get_program_search_query(null, $query, 'p');
         $params['programid'] = $id;
 
         $tenantselect = '';

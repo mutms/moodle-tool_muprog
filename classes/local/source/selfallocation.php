@@ -201,8 +201,12 @@ final class selfallocation extends base {
         global $DB, $USER;
 
         $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
-        $source = $DB->get_record('tool_muprog_source',
-            ['id' => $sourceid, 'type' => static::get_type(), 'programid' => $program->id], '*', MUST_EXIST);
+        $source = $DB->get_record(
+            'tool_muprog_source',
+            ['id' => $sourceid, 'type' => static::get_type(), 'programid' => $program->id],
+            '*',
+            MUST_EXIST
+        );
 
         $user = $DB->get_record('user', ['id' => $USER->id, 'deleted' => 0], '*', MUST_EXIST);
         $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program->id, 'userid' => $user->id]);
@@ -254,15 +258,17 @@ final class selfallocation extends base {
      */
     public static function encode_datajson(stdClass $formdata): string {
         $data = ['maxusers' => null, 'key' => null, 'allowsignup' => 1];
-        if (isset($formdata->selfallocation_maxusers)
+        if (
+            isset($formdata->selfallocation_maxusers)
             && trim($formdata->selfallocation_maxusers) !== ''
-            && $formdata->selfallocation_maxusers >= 0) {
-
+            && $formdata->selfallocation_maxusers >= 0
+        ) {
             $data['maxusers'] = (int)$formdata->selfallocation_maxusers;
         }
-        if (isset($formdata->selfallocation_key)
-            && trim($formdata->selfallocation_key) !== '') {
-
+        if (
+            isset($formdata->selfallocation_key)
+            && trim($formdata->selfallocation_key) !== ''
+        ) {
             $data['key'] = (string)$formdata->selfallocation_key;
         }
         if (isset($formdata->selfallocation_allowsignup)) {
@@ -303,4 +309,3 @@ final class selfallocation extends base {
         return $result;
     }
 }
-

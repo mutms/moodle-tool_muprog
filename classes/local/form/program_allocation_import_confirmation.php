@@ -137,7 +137,7 @@ final class program_allocation_import_confirmation extends \tool_mulib\local\dia
 
         // Check if the user has capability to copy the selected program.
         $context = \context::instance_by_id($fromprogram->contextid);
-        if (!has_capability('tool/muprog:clone', $context )) {
+        if (!has_capability('tool/muprog:clone', $context)) {
             $errors['fromprogram'] = get_string('error');
         }
 
@@ -148,7 +148,8 @@ final class program_allocation_import_confirmation extends \tool_mulib\local\dia
         if ($data['importallocationend']) {
             $targetprogram->timeallocationend = $fromprogram->timeallocationend;
         }
-        if ($targetprogram->timeallocationstart && $targetprogram->timeallocationend
+        if (
+            $targetprogram->timeallocationstart && $targetprogram->timeallocationend
             && $targetprogram->timeallocationstart >= $targetprogram->timeallocationend
         ) {
             if ($data['importallocationstart']) {

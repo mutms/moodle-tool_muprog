@@ -61,14 +61,16 @@ final class form_program_visibility_edit_cohortids extends \tool_mulib\external\
         global $DB;
 
         ['query' => $query, 'programid' => $programid] = self::validate_parameters(
-            self::execute_parameters(), ['query' => $query, 'programid' => $programid]);
+            self::execute_parameters(),
+            ['query' => $query, 'programid' => $programid]
+        );
 
         $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
         $context = \context::instance_by_id($program->contextid);
         self::validate_context($context);
         require_capability('tool/muprog:edit', $context);
 
-        list($searchsql, $params) = self::get_cohort_search_query($query, 'ch');
+        [$searchsql, $params] = self::get_cohort_search_query($query, 'ch');
         $tenantselect = "";
         if (\tool_muprog\local\util::is_mutenancy_active()) {
             if ($context->tenantid) {

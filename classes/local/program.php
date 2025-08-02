@@ -49,7 +49,7 @@ final class program {
      */
     public static function get_image_filemanager_options(): array {
         global $CFG;
-        return ['maxbytes' => $CFG->maxbytes, 'maxfiles' => 1, 'subdirs' => 0 , 'accepted_types' => ['.jpg', '.jpeg', '.jpe', '.png']];
+        return ['maxbytes' => $CFG->maxbytes, 'maxfiles' => 1, 'subdirs' => 0, 'accepted_types' => ['.jpg', '.jpeg', '.jpe', '.png']];
     }
 
     /**
@@ -207,8 +207,15 @@ final class program {
 
         if ($editorused) {
             $editoroptions = self::get_description_editor_options($data->contextid);
-            $data = file_postupdate_standard_editor($data, 'description', $editoroptions, $editoroptions['context'],
-                'tool_muprog', 'description', $data->id);
+            $data = file_postupdate_standard_editor(
+                $data,
+                'description',
+                $editoroptions,
+                $editoroptions['context'],
+                'tool_muprog',
+                'description',
+                $data->id
+            );
             if ($rawdescription !== $data->description) {
                 $DB->set_field('tool_muprog_program', 'description', $data->description, ['id' => $data->id]);
             }
@@ -279,8 +286,13 @@ final class program {
             // so the $oldcontext should be still here.
             $oldcontext = \context::instance_by_id($oldprogram->contextid, IGNORE_MISSING);
             if ($oldcontext) {
-                get_file_storage()->move_area_files_to_new_context($oldprogram->contextid, $context->id,
-                    'tool_muprog', 'description', $data->id);
+                get_file_storage()->move_area_files_to_new_context(
+                    $oldprogram->contextid,
+                    $context->id,
+                    'tool_muprog',
+                    'description',
+                    $data->id
+                );
                 // Delete tags even if they are not enabled before move,
                 // tags API is not designed to deal with this,
                 // we cannot create instance of deleted context.
@@ -309,8 +321,15 @@ final class program {
             $data->description = $data->description_editor['text'];
             $data->descriptionformat = $data->description_editor['format'];
             $editoroptions = self::get_description_editor_options($data->contextid);
-            $data = file_postupdate_standard_editor($data, 'description', $editoroptions, $editoroptions['context'],
-                'tool_muprog', 'description', $data->id);
+            $data = file_postupdate_standard_editor(
+                $data,
+                'description',
+                $editoroptions,
+                $editoroptions['context'],
+                'tool_muprog',
+                'description',
+                $data->id
+            );
         }
         if (isset($data->description)) {
             $record->description = $data->description;
@@ -494,7 +513,8 @@ final class program {
     public static function update_visibility(stdClass $data): stdClass {
         global $DB;
 
-        if ((isset($data->cohortids) && !is_array($data->cohortids))
+        if (
+            (isset($data->cohortids) && !is_array($data->cohortids))
             || empty($data->id) || !isset($data->public)
         ) {
             throw new \coding_exception('Invalid data');
@@ -582,8 +602,10 @@ final class program {
         } else {
             $record->timeallocationend = $oldprogram->timeallocationend;
         }
-        if ($record->timeallocationstart && $record->timeallocationend
-            && $record->timeallocationstart >= $record->timeallocationend) {
+        if (
+            $record->timeallocationstart && $record->timeallocationend
+            && $record->timeallocationstart >= $record->timeallocationend
+        ) {
             throw new \coding_exception('Allocation start must be earlier than end');
         }
 
@@ -655,8 +677,10 @@ final class program {
             if (!property_exists($record, 'timeallocationend')) {
                 $record->timeallocationend = $targetprogram->timeallocationend;
             }
-            if ($record->timeallocationstart && $record->timeallocationend
-                && $record->timeallocationstart >= $record->timeallocationend) {
+            if (
+                $record->timeallocationstart && $record->timeallocationend
+                && $record->timeallocationstart >= $record->timeallocationend
+            ) {
                 throw new \coding_exception('Allocation start must be earlier than end');
             }
             $updated = true;

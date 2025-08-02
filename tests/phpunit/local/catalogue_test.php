@@ -40,20 +40,28 @@ final class catalogue_test extends \advanced_testcase {
 
     public function test_get_current_url(): void {
         $catalogue = new \tool_muprog\local\catalogue([]);
-        $this->assertSame('https://www.example.com/moodle/admin/tool/muprog/catalogue/index.php',
-            $catalogue->get_current_url()->out(false));
+        $this->assertSame(
+            'https://www.example.com/moodle/admin/tool/muprog/catalogue/index.php',
+            $catalogue->get_current_url()->out(false)
+        );
 
         $catalogue = new \tool_muprog\local\catalogue(['searchtext' => '']);
-        $this->assertSame('https://www.example.com/moodle/admin/tool/muprog/catalogue/index.php',
-            $catalogue->get_current_url()->out(false));
+        $this->assertSame(
+            'https://www.example.com/moodle/admin/tool/muprog/catalogue/index.php',
+            $catalogue->get_current_url()->out(false)
+        );
 
         $catalogue = new \tool_muprog\local\catalogue(['page' => 10, 'searchtext' => 'abc']);
-        $this->assertSame('https://www.example.com/moodle/admin/tool/muprog/catalogue/index.php?page=10&searchtext=abc',
-            $catalogue->get_current_url()->out(false));
+        $this->assertSame(
+            'https://www.example.com/moodle/admin/tool/muprog/catalogue/index.php?page=10&searchtext=abc',
+            $catalogue->get_current_url()->out(false)
+        );
 
         $catalogue = new \tool_muprog\local\catalogue(['page' => 10, 'searchtext' => 'abc', 'perpage' => 12]);
-        $this->assertSame('https://www.example.com/moodle/admin/tool/muprog/catalogue/index.php?page=10&perpage=12&searchtext=abc',
-            $catalogue->get_current_url()->out(false));
+        $this->assertSame(
+            'https://www.example.com/moodle/admin/tool/muprog/catalogue/index.php?page=10&perpage=12&searchtext=abc',
+            $catalogue->get_current_url()->out(false)
+        );
     }
 
     public function test_is_filtering(): void {
@@ -342,7 +350,6 @@ final class catalogue_test extends \advanced_testcase {
         $programs = $catalogue->get_programs();
         $this->assertSame([(int)$program1->id, (int)$program2->id, (int)$program4->id, (int)$program6->id], array_keys($programs));
         $this->assertSame(4, $catalogue->count_programs());
-
     }
 
     public function test_is_program_visible(): void {

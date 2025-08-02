@@ -79,8 +79,12 @@ final class item_set_edit extends \tool_mulib\local\dialog_form {
         }
         $mform->setDefault('minpoints', $minpoints);
 
-        $mform->addElement('duration', 'completiondelay', get_string('completiondelay', 'tool_muprog'),
-            ['optional' => true, 'defaultunit' => DAYSECS]);
+        $mform->addElement(
+            'duration',
+            'completiondelay',
+            get_string('completiondelay', 'tool_muprog'),
+            ['optional' => true, 'defaultunit' => DAYSECS]
+        );
         $mform->setDefault('completiondelay', $set->get_completiondelay());
 
         $mform->addElement('hidden', 'id');

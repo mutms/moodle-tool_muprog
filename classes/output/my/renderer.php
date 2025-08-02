@@ -65,8 +65,11 @@ class renderer extends \plugin_renderer_base {
         $programimage = '';
         $presentation = (array)json_decode($program->presentationjson);
         if (!empty($presentation['image'])) {
-            $imageurl = \moodle_url::make_file_url("$CFG->wwwroot/pluginfile.php",
-                '/' . $context->id . '/tool_muprog/image/' . $program->id . '/'. $presentation['image'], false);
+            $imageurl = \moodle_url::make_file_url(
+                "$CFG->wwwroot/pluginfile.php",
+                '/' . $context->id . '/tool_muprog/image/' . $program->id . '/' . $presentation['image'],
+                false
+            );
             $programimage = '<div class="programimage">' . \html_writer::img($imageurl, '') . '</div>';
         }
 
@@ -96,20 +99,34 @@ class renderer extends \plugin_renderer_base {
             $details->add($data->get_field()->get('name'), $data->export_value());
         }
 
-        $details->add(get_string('programstatus', 'tool_muprog'),
-            allocation::get_completion_status_html($program, $allocation));
-        $details->add(get_string('source', 'tool_muprog'),
-            $sourceclass::render_allocation_source($program, $source, $allocation));
-        $details->add(get_string('allocationdate', 'tool_muprog'),
-            userdate($allocation->timeallocated));
-        $details->add(get_string('programstart', 'tool_muprog'),
-            userdate($allocation->timestart));
-        $details->add(get_string('programdue', 'tool_muprog'),
-            (isset($allocation->timedue) ? userdate($allocation->timedue) : $strnotset));
-        $details->add(get_string('programend', 'tool_muprog'),
-            (isset($allocation->timeend) ? userdate($allocation->timeend) : $strnotset));
-        $details->add(get_string('completiondate', 'tool_muprog'),
-            (isset($allocation->timecompleted) ? userdate($allocation->timecompleted) : $strnotset));
+        $details->add(
+            get_string('programstatus', 'tool_muprog'),
+            allocation::get_completion_status_html($program, $allocation)
+        );
+        $details->add(
+            get_string('source', 'tool_muprog'),
+            $sourceclass::render_allocation_source($program, $source, $allocation)
+        );
+        $details->add(
+            get_string('allocationdate', 'tool_muprog'),
+            userdate($allocation->timeallocated)
+        );
+        $details->add(
+            get_string('programstart', 'tool_muprog'),
+            userdate($allocation->timestart)
+        );
+        $details->add(
+            get_string('programdue', 'tool_muprog'),
+            (isset($allocation->timedue) ? userdate($allocation->timedue) : $strnotset)
+        );
+        $details->add(
+            get_string('programend', 'tool_muprog'),
+            (isset($allocation->timeend) ? userdate($allocation->timeend) : $strnotset)
+        );
+        $details->add(
+            get_string('completiondate', 'tool_muprog'),
+            (isset($allocation->timecompleted) ? userdate($allocation->timecompleted) : $strnotset)
+        );
 
         $handler = \tool_muprog\customfield\allocation_handler::create();
         foreach ($handler->get_instance_data($allocation->id) as $data) {
@@ -136,7 +153,7 @@ class renderer extends \plugin_renderer_base {
         $top = program::load_content($program->id);
 
         $rows = [];
-        $renderercolumns = function(item $item, $itemdepth) use (&$renderercolumns, &$rows, $allocation, &$DB): void {
+        $renderercolumns = function (item $item, $itemdepth) use (&$renderercolumns, &$rows, $allocation, &$DB): void {
             $fullname = $item->get_fullname();
             $id = $item->get_id();
             $padding = str_repeat('&nbsp;', $itemdepth * 6);

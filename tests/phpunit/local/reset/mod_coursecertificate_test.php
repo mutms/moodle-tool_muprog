@@ -107,23 +107,35 @@ final class mod_coursecertificate_test extends \advanced_testcase {
 
         $this->assertCount(3, $DB->get_records('tool_certificate_issues', []));
         $this->assertCount(3, $DB->get_records('tool_certificate_issues', ['archived' => 0]));
-        $this->assertCount(1, $DB->get_records('tool_certificate_issues',
-            ['templateid' => $certificate1->get_id(), 'courseid' => $course1->id, 'userid' => $student1->id]));
-        $this->assertCount(1, $DB->get_records('tool_certificate_issues',
-            ['templateid' => $certificate1->get_id(), 'courseid' => $course2->id, 'userid' => $student1->id]));
-        $this->assertCount(1, $DB->get_records('tool_certificate_issues',
-            ['templateid' => $certificate1->get_id(), 'courseid' => $course1->id, 'userid' => $student2->id]));
+        $this->assertCount(1, $DB->get_records(
+            'tool_certificate_issues',
+            ['templateid' => $certificate1->get_id(), 'courseid' => $course1->id, 'userid' => $student1->id]
+        ));
+        $this->assertCount(1, $DB->get_records(
+            'tool_certificate_issues',
+            ['templateid' => $certificate1->get_id(), 'courseid' => $course2->id, 'userid' => $student1->id]
+        ));
+        $this->assertCount(1, $DB->get_records(
+            'tool_certificate_issues',
+            ['templateid' => $certificate1->get_id(), 'courseid' => $course1->id, 'userid' => $student2->id]
+        ));
 
         course_reset::purge_enrolments($student1, $program1->id);
         course_reset::purge_standard($student1, $program1->id);
 
         $this->assertCount(2, $DB->get_records('tool_certificate_issues', ['archived' => 0]));
         $this->assertCount(1, $DB->get_records('tool_certificate_issues', ['archived' => 1]));
-        $this->assertCount(1, $DB->get_records('tool_certificate_issues',
-            ['templateid' => $certificate1->get_id(), 'courseid' => $course1->id, 'userid' => $student1->id, 'archived' => 1]));
-        $this->assertCount(1, $DB->get_records('tool_certificate_issues',
-            ['templateid' => $certificate1->get_id(), 'courseid' => $course2->id, 'userid' => $student1->id, 'archived' => 0]));
-        $this->assertCount(1, $DB->get_records('tool_certificate_issues',
-            ['templateid' => $certificate1->get_id(), 'courseid' => $course1->id, 'userid' => $student2->id, 'archived' => 0]));
+        $this->assertCount(1, $DB->get_records(
+            'tool_certificate_issues',
+            ['templateid' => $certificate1->get_id(), 'courseid' => $course1->id, 'userid' => $student1->id, 'archived' => 1]
+        ));
+        $this->assertCount(1, $DB->get_records(
+            'tool_certificate_issues',
+            ['templateid' => $certificate1->get_id(), 'courseid' => $course2->id, 'userid' => $student1->id, 'archived' => 0]
+        ));
+        $this->assertCount(1, $DB->get_records(
+            'tool_certificate_issues',
+            ['templateid' => $certificate1->get_id(), 'courseid' => $course1->id, 'userid' => $student2->id, 'archived' => 0]
+        ));
     }
 }

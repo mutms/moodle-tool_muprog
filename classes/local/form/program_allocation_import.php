@@ -34,7 +34,11 @@ final class program_allocation_import extends \tool_mulib\local\dialog_form {
 
         $arguments = ['programid' => $customdata['id']];
         \tool_muprog\external\form_program_allocation_import_fromprogram::add_form_element(
-            $mform, $arguments, 'fromprogram', get_string('importselectprogram', 'tool_muprog'));
+            $mform,
+            $arguments,
+            'fromprogram',
+            get_string('importselectprogram', 'tool_muprog')
+        );
         $mform->addRule('fromprogram', null, 'required', null, 'client');
 
         $mform->addElement('hidden', 'id');
@@ -53,7 +57,7 @@ final class program_allocation_import extends \tool_mulib\local\dialog_form {
         $programid = $data['fromprogram'];
         $programcontextid = $DB->get_field('tool_muprog_program', 'contextid', ['id' => $programid]);
         $context = \context::instance_by_id($programcontextid);
-        if (!has_capability('tool/muprog:clone', $context )) {
+        if (!has_capability('tool/muprog:clone', $context)) {
             $errors['fromprogram'] = get_string('error');
         }
         return $errors;

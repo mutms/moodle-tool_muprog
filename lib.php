@@ -55,7 +55,8 @@ function tool_muprog_pluginfile($course, $cm, $context, $filearea, $args, $force
     if (!$program) {
         send_file_not_found();
     }
-    if (!has_capability('tool/muprog:view', $context)
+    if (
+        !has_capability('tool/muprog:view', $context)
         && !\tool_muprog\local\catalogue::is_program_visible($program)
     ) {
         send_file_not_found();
@@ -93,8 +94,11 @@ function tool_muprog_pre_course_category_delete(\stdClass $category) {
  * @param int $userid ID override for calendar events
  * @return \core_calendar\local\event\entities\action_interface|null
  */
-function tool_muprog_core_calendar_provide_event_action(calendar_event $event,
-        \core_calendar\action_factory $factory, int $userid = 0) {
+function tool_muprog_core_calendar_provide_event_action(
+    calendar_event $event,
+    \core_calendar\action_factory $factory,
+    int $userid = 0
+) {
 
     global $DB;
 
@@ -179,8 +183,18 @@ function tool_muprog_get_tagged_programs($tag, $exclusivemode = false, $fromctx 
     $content = $result['content'];
     $totalpages = ceil($result['totalcount'] / $perpage);
 
-    return new core_tag\output\tagindex($tag, 'tool_muprog', 'program', $content,
-        $exclusivemode, 0, 0, 1, $page, $totalpages);
+    return new core_tag\output\tagindex(
+        $tag,
+        'tool_muprog',
+        'program',
+        $content,
+        $exclusivemode,
+        0,
+        0,
+        1,
+        $page,
+        $totalpages
+    );
 }
 
 /**

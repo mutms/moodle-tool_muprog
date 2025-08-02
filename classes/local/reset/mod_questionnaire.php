@@ -45,7 +45,7 @@ class mod_questionnaire extends base {
             return;
         }
 
-        list($courses, $params) = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED);
+        [$courses, $params] = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED);
         $params['userid'] = $user->id;
 
         $questionnaires = "SELECT q.id

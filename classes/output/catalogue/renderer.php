@@ -66,8 +66,11 @@ class renderer extends \plugin_renderer_base {
         $programimage = '';
         $presentation = (array)json_decode($program->presentationjson);
         if (!empty($presentation['image'])) {
-            $imageurl = \moodle_url::make_file_url("$CFG->wwwroot/pluginfile.php",
-                '/' . $context->id . '/tool_muprog/image/' . $program->id . '/'. $presentation['image'], false);
+            $imageurl = \moodle_url::make_file_url(
+                "$CFG->wwwroot/pluginfile.php",
+                '/' . $context->id . '/tool_muprog/image/' . $program->id . '/' . $presentation['image'],
+                false
+            );
             $programimage = '<div class="programimage">' . \html_writer::img($imageurl, '') . '</div>';
         }
 
@@ -77,12 +80,18 @@ class renderer extends \plugin_renderer_base {
 
         $details = new \tool_mulib\output\entity_details();
 
-        $details->add(get_string('programstatus', 'tool_muprog'),
-            get_string('errornoallocation', 'tool_muprog'));
-        $details->add(get_string('allocationstart', 'tool_muprog'),
-            (isset($program->timeallocationstart) ? userdate($program->timeallocationstart) : $strnotset));
-        $details->add(get_string('allocationend', 'tool_muprog'),
-            (isset($program->timeallocationend) ? userdate($program->timeallocationend) : $strnotset));
+        $details->add(
+            get_string('programstatus', 'tool_muprog'),
+            get_string('errornoallocation', 'tool_muprog')
+        );
+        $details->add(
+            get_string('allocationstart', 'tool_muprog'),
+            (isset($program->timeallocationstart) ? userdate($program->timeallocationstart) : $strnotset)
+        );
+        $details->add(
+            get_string('allocationend', 'tool_muprog'),
+            (isset($program->timeallocationend) ? userdate($program->timeallocationend) : $strnotset)
+        );
         $handler = \tool_muprog\customfield\program_handler::create();
         foreach ($handler->get_instance_data($program->id) as $data) {
             $details->add($data->get_field()->get('name'), $data->export_value());
@@ -126,7 +135,7 @@ class renderer extends \plugin_renderer_base {
         $top = program::load_content($program->id);
 
         $rows = [];
-        $renderercolumns = function(item $item, $itemdepth) use (&$renderercolumns, &$rows, &$DB): void {
+        $renderercolumns = function (item $item, $itemdepth) use (&$renderercolumns, &$rows, &$DB): void {
             $fullname = $item->get_fullname();
             $id = $item->get_id();
             $padding = str_repeat('&nbsp;', $itemdepth * 6);

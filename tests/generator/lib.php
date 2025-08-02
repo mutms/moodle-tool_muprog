@@ -160,8 +160,12 @@ class tool_muprog_generator extends component_generator_base {
             $file = $fs->create_file_from_pathname($filerecord, $imagefile);
             $presenation = (array)json_decode($program->presentationjson);
             $presenation['image'] = $file->get_filename();
-            $DB->set_field('tool_muprog_program', 'presentationjson',
-                \tool_muprog\local\util::json_encode($presenation), ['id' => $program->id]);
+            $DB->set_field(
+                'tool_muprog_program',
+                'presentationjson',
+                \tool_muprog\local\util::json_encode($presenation),
+                ['id' => $program->id]
+            );
             $program = $DB->get_record('tool_muprog_program', ['id' => $program->id], '*', MUST_EXIST);
         }
 

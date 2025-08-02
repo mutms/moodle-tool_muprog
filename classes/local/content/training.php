@@ -101,9 +101,10 @@ final class training extends item {
             return get_string('error');
         }
 
-        if ($framework->archived || $allocation->archived
-            || $allocation->timestart > $now || ($allocation->timeend && $allocation->timeend <= $now)) {
-
+        if (
+            $framework->archived || $allocation->archived
+            || $allocation->timestart > $now || ($allocation->timeend && $allocation->timeend <= $now)
+        ) {
             return get_string('trainingcompletion', 'tool_muprog', $framework->requiredtraining);
         }
 
@@ -232,4 +233,3 @@ final class training extends item {
         ];
     }
 }
-

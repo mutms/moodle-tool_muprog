@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Commenting.InlineComment.TypeHintingMatch
 
 namespace tool_muprog\external;
 
@@ -43,7 +44,8 @@ final class delete_program_allocations extends external_api {
             'programid' => new external_value(PARAM_INT, 'Program id'),
             'userids' => new external_multiple_structure(
                 new external_value(PARAM_INT, 'User id'),
-                'User ids to be deallocated from program'),
+                'User ids to be deallocated from program'
+            ),
         ]);
     }
 
@@ -57,7 +59,9 @@ final class delete_program_allocations extends external_api {
     public static function execute(int $programid, array $userids): array {
         global $DB;
         ['programid' => $programid, 'userids' => $userids] = self::validate_parameters(
-            self::execute_parameters(), ['programid' => $programid, 'userids' => $userids]);
+            self::execute_parameters(),
+            ['programid' => $programid, 'userids' => $userids]
+        );
 
         $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
 
@@ -72,14 +76,18 @@ final class delete_program_allocations extends external_api {
         // Check all data is valid first.
         $deallocate = [];
         foreach ($userids as $userid) {
-            $allocationrecord = $DB->get_record('tool_muprog_allocation',
-                ['programid' => $programid, 'userid' => $userid]);
+            $allocationrecord = $DB->get_record(
+                'tool_muprog_allocation',
+                ['programid' => $programid, 'userid' => $userid]
+            );
             if (!$allocationrecord) {
                 // Not allocated - ignore.
                 continue;
             }
-            if (!isset($sources[$allocationrecord->sourceid])
-                || !isset($sourceclasses[$sources[$allocationrecord->sourceid]->type])) {
+            if (
+                !isset($sources[$allocationrecord->sourceid])
+                || !isset($sourceclasses[$sources[$allocationrecord->sourceid]->type])
+            ) {
                 // This was not included in get_program_allocations results.
                 throw new \invalid_parameter_exception('Invalid user allocation');
             }
@@ -98,7 +106,7 @@ final class delete_program_allocations extends external_api {
         // Deallocate after validation of all data.
         foreach ($deallocate as $v) {
             /** @var class-string<\tool_muprog\local\source\base> $sourceclass */
-            list($sourceclass, $source, $allocationrecord) = $v;
+            [$sourceclass, $source, $allocationrecord] = $v;
             $sourceclass::allocation_delete($program, $source, $allocationrecord);
         }
 
@@ -111,7 +119,8 @@ final class delete_program_allocations extends external_api {
      */
     public static function execute_returns(): external_multiple_structure {
         return new external_multiple_structure(
-            new external_value(PARAM_INT, 'User id')
-            , 'List of users who were de allocated');
+            new external_value(PARAM_INT, 'User id'),
+            'List of users who were de allocated'
+        );
     }
 }

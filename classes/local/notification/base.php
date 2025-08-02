@@ -67,8 +67,12 @@ abstract class base extends \tool_mulib\local\notification\notificationtype {
      * @param stdClass $user
      * @return array
      */
-    public static function get_allocation_placeholders(stdClass $program, stdClass $source, stdClass $allocation,
-                                                       stdClass $user): array {
+    public static function get_allocation_placeholders(
+        stdClass $program,
+        stdClass $source,
+        stdClass $allocation,
+        stdClass $user
+    ): array {
         /** @var \tool_muprog\local\source\base[] $sourceclasses */
         $sourceclasses = \tool_muprog\local\allocation::get_source_classes();
         if (isset($sourceclasses[$source->type])) {

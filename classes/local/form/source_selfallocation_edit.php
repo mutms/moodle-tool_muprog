@@ -45,8 +45,12 @@ final class source_selfallocation_edit extends \tool_mulib\local\dialog_form {
             $mform->hardFreeze('enable');
         }
 
-        $mform->addElement('select', 'selfallocation_allowsignup', get_string('source_selfallocation_allowsignup', 'tool_muprog'),
-            ['1' => get_string('yes'), '0' => get_string('no')]);
+        $mform->addElement(
+            'select',
+            'selfallocation_allowsignup',
+            get_string('source_selfallocation_allowsignup', 'tool_muprog'),
+            ['1' => get_string('yes'), '0' => get_string('no')]
+        );
         $mform->setDefault('selfallocation_allowsignup', 1);
         $mform->hideIf('selfallocation_allowsignup', 'enable', 'eq', '0');
 

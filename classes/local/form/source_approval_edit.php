@@ -44,8 +44,12 @@ final class source_approval_edit extends \tool_mulib\local\dialog_form {
             $mform->hardFreeze('enable');
         }
 
-        $mform->addElement('select', 'approval_allowrequest', get_string('source_approval_allowrequest', 'tool_muprog'),
-            ['1' => get_string('yes'), '0' => get_string('no')]);
+        $mform->addElement(
+            'select',
+            'approval_allowrequest',
+            get_string('source_approval_allowrequest', 'tool_muprog'),
+            ['1' => get_string('yes'), '0' => get_string('no')]
+        );
         $mform->setDefault('approval_allowrequest', $source->approval_allowrequest);
         $mform->hideIf('approval_allowrequest', 'enable', 'eq', '0');
 
