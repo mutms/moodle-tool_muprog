@@ -33,10 +33,8 @@
 /** @var stdClass $COURSE */
 /** @var stdClass $USER */
 
-// phpcs:ignoreFile moodle.Files.MoodleInternal.MoodleInternalGlobalState
-if (!empty($_SERVER['HTTP_X_MULIB_DIALOG_FORM_REQUEST'])) {
-    define('AJAX_SCRIPT', true);
-}
+define('AJAX_SCRIPT', true);
+
 require('../../../../config.php');
 
 $sourceid = required_param('sourceid', PARAM_INT);
@@ -55,11 +53,6 @@ $source = $DB->get_record('tool_muprog_source', ['id' => $sourceid, 'type' => 's
 $program = $DB->get_record('tool_muprog_program', ['id' => $source->programid], '*', MUST_EXIST);
 $programcontext = context::instance_by_id($program->contextid);
 
-$PAGE->set_heading(get_string('catalogue', 'tool_muprog'));
-$PAGE->navigation->override_active_url(new moodle_url('/admin/tool/muprog/catalogue/index.php'));
-$PAGE->set_title(get_string('catalogue', 'tool_muprog'));
-$PAGE->navbar->add(format_string($program->fullname));
-
 if (!\tool_muprog\local\source\selfallocation::can_user_request($program, $source, $USER->id)) {
     redirect(new moodle_url('/admin/tool/muprog/catalogue/index.php'));
 }
@@ -69,21 +62,15 @@ $returnurl = new moodle_url('/admin/tool/muprog/catalogue/program.php', ['id' =>
 $form = new tool_muprog\local\form\source_selfallocation(null, ['source' => $source, 'program' => $program]);
 
 if ($form->is_cancelled()) {
-    redirect($returnurl);
+    $form->ajax_form_cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
     tool_muprog\local\source\selfallocation::signup($program->id, $source->id);
-    $form->redirect_submitted($returnurl);
+    $form->ajax_form_submitted($returnurl);
 }
 
 /** @var \tool_muprog\output\catalogue\renderer $catalogueoutput */
 $catalogueoutput = $PAGE->get_renderer('tool_muprog', 'catalogue');
 
-echo $OUTPUT->header();
-
-echo $catalogueoutput->render_program($program);
-
-echo $form->render();
-
-echo $OUTPUT->footer();
+$form->ajax_form_render();

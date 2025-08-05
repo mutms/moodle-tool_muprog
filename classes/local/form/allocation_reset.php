@@ -31,7 +31,7 @@ use tool_muprog\local\course_reset;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class allocation_reset extends \tool_mulib\local\dialog_form {
+final class allocation_reset extends \tool_mulib\local\ajax_form {
     /** @var bool editing supported*/
     private $editsupported;
 

@@ -18,8 +18,6 @@
 
 namespace tool_muprog\local\form;
 
-use tool_muprog\local\source\manual;
-
 /**
  * Allocate users via file upload.
  *
@@ -29,7 +27,7 @@ use tool_muprog\local\source\manual;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class source_manual_upload_file extends \tool_mulib\local\dialog_form {
+final class source_manual_upload_file extends \tool_mulib\local\ajax_form {
     #[\Override]
     protected function definition() {
         global $CFG;

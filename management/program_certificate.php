@@ -26,16 +26,15 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use tool_muprog\local\management;
+
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
 /** @var core_renderer $OUTPUT */
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
 
-use tool_muprog\local\management;
-
 require('../../../../config.php');
-require_once($CFG->dirroot . '/lib/formslib.php');
 
 $id = required_param('id', PARAM_INT);
 
@@ -63,14 +62,14 @@ echo $OUTPUT->header();
 $buttons = [];
 if (has_capability('tool/muprog:edit', $context)) {
     $editurl = new moodle_url('/admin/tool/muprog/management/program_certificate_edit.php', ['id' => $program->id]);
-    $editbutton = new tool_mulib\output\dialog_form\button($editurl, get_string('edit'));
-    $editbutton->set_dialog_name(get_string('certificate', 'tool_certificate'));
+    $editbutton = new tool_mulib\output\ajax_form\button($editurl, get_string('edit'));
+    $editbutton->set_modal_title(get_string('certificate', 'tool_certificate'));
     $buttons[] = $OUTPUT->render($editbutton);
 
     if ($cert) {
         $deleteurl = new moodle_url('/admin/tool/muprog/management/program_certificate_delete.php', ['id' => $program->id]);
-        $deletebutton = new tool_mulib\output\dialog_form\button($deleteurl, get_string('delete'));
-        $deletebutton->set_dialog_name(get_string('certificate', 'tool_certificate'));
+        $deletebutton = new tool_mulib\output\ajax_form\button($deleteurl, get_string('delete'));
+        $deletebutton->set_modal_title(get_string('certificate', 'tool_certificate'));
         $buttons[] = $OUTPUT->render($deletebutton);
     }
 }

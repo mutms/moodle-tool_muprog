@@ -166,7 +166,7 @@ final class requests extends system_report {
         $program = $this->program;
 
         $url = new moodle_url('/admin/tool/muprog/management/source_approval_approve.php', ['id' => ':id']);
-        $link = new \tool_mulib\output\dialog_form\link($url, get_string('source_approval_requestapprove', 'tool_muprog'), 'requestapprove', 'tool_muprog');
+        $link = new \tool_mulib\output\ajax_form\link($url, get_string('source_approval_requestapprove', 'tool_muprog'), 'requestapprove', 'tool_muprog');
         $this->add_action($link->create_report_action()
             ->add_callback(static function (\stdclass $row) use ($program): bool {
                 global $DB;
@@ -186,7 +186,7 @@ final class requests extends system_report {
             }));
 
         $url = new moodle_url('/admin/tool/muprog/management/source_approval_reject.php', ['id' => ':id']);
-        $link = new \tool_mulib\output\dialog_form\link($url, get_string('source_approval_requestreject', 'tool_muprog'), 'requestreject', 'tool_muprog');
+        $link = new \tool_mulib\output\ajax_form\link($url, get_string('source_approval_requestreject', 'tool_muprog'), 'requestreject', 'tool_muprog');
         $this->add_action($link->create_report_action()
             ->add_callback(static function (\stdclass $row) use ($program): bool {
                 if (!$row->id) {
@@ -202,7 +202,7 @@ final class requests extends system_report {
             }));
 
         $url = new moodle_url('/admin/tool/muprog/management/source_approval_delete.php', ['id' => ':id']);
-        $link = new \tool_mulib\output\dialog_form\link($url, get_string('source_approval_requestdelete', 'tool_muprog'), 'i/delete');
+        $link = new \tool_mulib\output\ajax_form\link($url, get_string('source_approval_requestdelete', 'tool_muprog'), 'i/delete');
         $this->add_action($link->create_report_action(['class' => 'text-danger'])
             ->add_callback(static function (\stdclass $row) use ($program): bool {
                 global $DB;

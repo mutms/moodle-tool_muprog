@@ -26,23 +26,19 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use tool_muprog\local\program;
+use tool_muprog\local\content\set;
+use tool_muprog\local\content\top;
+
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
 /** @var core_renderer $OUTPUT */
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
 
-use tool_muprog\local\management;
-use tool_muprog\local\program;
-use tool_muprog\local\content\set;
-use tool_muprog\local\content\top;
+define('AJAX_SCRIPT', true);
 
-// phpcs:ignoreFile moodle.Files.MoodleInternal.MoodleInternalGlobalState
-if (!empty($_SERVER['HTTP_X_MULIB_DIALOG_FORM_REQUEST'])) {
-    define('AJAX_SCRIPT', true);
-}
 require('../../../../config.php');
-require_once($CFG->dirroot . '/lib/formslib.php');
 
 $id = required_param('id', PARAM_INT);
 
@@ -54,7 +50,8 @@ $context = context::instance_by_id($program->contextid);
 require_capability('tool/muprog:edit', $context);
 
 $currenturl = new moodle_url('/admin/tool/muprog/management/item_set_edit.php', ['id' => $item->id]);
-management::setup_program_page($currenturl, $context, $program, 'program_content');
+$PAGE->set_context($context);
+$PAGE->set_url($currenturl);
 
 $returnurl = new moodle_url('/admin/tool/muprog/management/program_content.php', ['id' => $program->id]);
 
@@ -71,22 +68,12 @@ if (!$set || !($set instanceof set)) {
 $form = new \tool_muprog\local\form\item_set_edit(null, ['set' => $set, 'context' => $context]);
 
 if ($form->is_cancelled()) {
-    redirect($returnurl);
+    $form->ajax_form_cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
     $top->update_set($set, (array)$data);
-    $form->redirect_submitted($returnurl);
+    $form->ajax_form_submitted($returnurl);
 }
 
-echo $OUTPUT->header();
-
-if ($set instanceof top) {
-    echo $OUTPUT->heading(get_string('program_update', 'tool_muprog'), 3);
-} else {
-    echo $OUTPUT->heading(get_string('updateset', 'tool_muprog'), 3);
-}
-
-echo $form->render();
-
-echo $OUTPUT->footer();
+$form->ajax_form_render();

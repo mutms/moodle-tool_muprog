@@ -32,15 +32,9 @@
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
 
-use tool_muprog\local\management;
-use tool_muprog\local\program;
+define('AJAX_SCRIPT', true);
 
-// phpcs:ignoreFile moodle.Files.MoodleInternal.MoodleInternalGlobalState
-if (!empty($_SERVER['HTTP_X_MULIB_DIALOG_FORM_REQUEST'])) {
-    define('AJAX_SCRIPT', true);
-}
 require('../../../../config.php');
-require_once($CFG->dirroot . '/lib/formslib.php');
 
 $programid = required_param('programid', PARAM_INT);
 $type = required_param('type', PARAM_ALPHANUMEXT);
@@ -53,6 +47,9 @@ $context = context::instance_by_id($program->contextid);
 require_capability('tool/muprog:edit', $context);
 
 $currenturl = new moodle_url('/admin/tool/muprog/management/program_source_edit.php', ['id' => $program->id]);
+$PAGE->set_context($context);
+$PAGE->set_url($currenturl);
+
 $returnurl = new moodle_url('/admin/tool/muprog/management/program_allocation.php', ['id' => $program->id]);
 
 /** @var \tool_muprog\local\source\base[] $sourceclasses */
@@ -61,8 +58,6 @@ if (!isset($sourceclasses[$type])) {
     throw new coding_exception('Invalid source type');
 }
 $sourceclass = $sourceclasses[$type];
-
-management::setup_program_page($currenturl, $context, $program, 'program_allocation');
 
 if ($source) {
     if (!$sourceclass::is_update_allowed($program)) {
@@ -83,20 +78,17 @@ if ($source) {
 }
 $source = $sourceclass::decode_datajson($source);
 
+/** @var \tool_mulib\local\ajax_form $formclass */
 $formclass = $sourceclass::get_edit_form_class();
 $form = new $formclass(null, ['source' => $source, 'program' => $program, 'context' => $context]);
 
 if ($form->is_cancelled()) {
-    redirect($returnurl);
+    $form->ajax_form_cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
     tool_muprog\local\source\base::update_source($data);
-    $form->redirect_submitted($returnurl);
+    $form->ajax_form_submitted($returnurl);
 }
 
-echo $OUTPUT->header();
-
-echo $form->render();
-
-echo $OUTPUT->footer();
+$form->ajax_form_render();

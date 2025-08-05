@@ -26,7 +26,6 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use tool_muprog\local\management;
 use tool_muprog\local\allocation;
 
 /** @var moodle_database $DB */
@@ -35,12 +34,9 @@ use tool_muprog\local\allocation;
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
 
-// phpcs:ignoreFile moodle.Files.MoodleInternal.MoodleInternalGlobalState
-if (!empty($_SERVER['HTTP_X_MULIB_DIALOG_FORM_REQUEST'])) {
-    define('AJAX_SCRIPT', true);
-}
+define('AJAX_SCRIPT', true);
+
 require('../../../../config.php');
-require_once($CFG->dirroot . '/lib/formslib.php');
 
 $id = required_param('id', PARAM_INT);
 
@@ -53,6 +49,10 @@ $source = $DB->get_record('tool_muprog_source', ['id' => $allocation->sourceid],
 $context = context::instance_by_id($program->contextid);
 require_capability('tool/muprog:allocate', $context);
 
+$currenturl = new moodle_url('/admin/tool/muprog/management/allocation_restore.php', ['id' => $allocation->id]);
+$PAGE->set_context($context);
+$PAGE->set_url($currenturl);
+
 $returnurl = new moodle_url('/admin/tool/muprog/management/allocation.php', ['id' => $allocation->id]);
 
 $sourceclass = allocation::get_source_classname($source->type);
@@ -62,25 +62,15 @@ if (!$sourceclass || !$sourceclass::is_allocation_restore_possible($program, $so
 
 $user = $DB->get_record('user', ['id' => $allocation->userid], '*', MUST_EXIST);
 
-$currenturl = new moodle_url('/admin/tool/muprog/management/allocation_restore.php', ['id' => $allocation->id]);
-
-management::setup_program_page($currenturl, $context, $program, 'program_users');
-
 $form = new \tool_muprog\local\form\allocation_restore(null, ['allocation' => $allocation, 'user' => $user, 'context' => $context]);
 
 if ($form->is_cancelled()) {
-    redirect($returnurl);
+    $form->ajax_form_cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
     $sourceclass::allocation_restore($allocation->id);
-    $form->redirect_submitted($returnurl);
+    $form->ajax_form_submitted($returnurl);
 }
 
-echo $OUTPUT->header();
-
-echo $OUTPUT->heading(fullname($user), 3);
-
-echo $form->render();
-
-echo $OUTPUT->footer();
+$form->ajax_form_render();

@@ -32,12 +32,8 @@
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
 
-use tool_muprog\local\management;
+define('AJAX_SCRIPT', true);
 
-// phpcs:ignoreFile moodle.Files.MoodleInternal.MoodleInternalGlobalState
-if (!empty($_SERVER['HTTP_X_MULIB_DIALOG_FORM_REQUEST'])) {
-    define('AJAX_SCRIPT', true);
-}
 require('../../../../config.php');
 
 $id = required_param('id', PARAM_INT);
@@ -52,24 +48,20 @@ $context = context::instance_by_id($program->contextid);
 require_capability('tool/muprog:allocate', $context);
 
 $currenturl = new moodle_url('/admin/tool/muprog/management/source_approval_reject.php', ['id' => $id]);
-
-management::setup_program_page($currenturl, $context, $program, 'program_approval_requests');
+$PAGE->set_context($context);
+$PAGE->set_url($currenturl);
 
 $returnurl = new moodle_url('/admin/tool/muprog/management/source_approval_requests.php', ['id' => $program->id]);
 
 $form = new \tool_muprog\local\form\source_approval_reject(null, ['request' => $request, 'user' => $user, 'program' => $program, 'context' => $context]);
 
 if ($form->is_cancelled()) {
-    redirect($returnurl);
+    $form->ajax_form_cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
     tool_muprog\local\source\approval::reject_request($request->id, $data->reason);
-    $form->redirect_submitted($returnurl);
+    $form->ajax_form_submitted($returnurl);
 }
 
-echo $OUTPUT->header();
-
-echo $form->render();
-
-echo $OUTPUT->footer();
+$form->ajax_form_render();

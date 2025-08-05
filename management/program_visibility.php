@@ -26,17 +26,15 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use tool_muprog\local\management;
+
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
 /** @var core_renderer $OUTPUT */
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
 
-use tool_muprog\local\management;
-use tool_muprog\local\program;
-
 require('../../../../config.php');
-require_once($CFG->dirroot . '/lib/formslib.php');
 
 $id = required_param('id', PARAM_INT);
 
@@ -59,7 +57,8 @@ echo $OUTPUT->header();
 $buttons = [];
 if (has_capability('tool/muprog:edit', $context)) {
     $editurl = new moodle_url('/admin/tool/muprog/management/program_visibility_edit.php', ['id' => $program->id]);
-    $editbutton = new tool_mulib\output\dialog_form\button($editurl, get_string('edit'));
+    $editbutton = new tool_mulib\output\ajax_form\button($editurl, get_string('edit'));
+    $editbutton->set_modal_title(get_string('program_update', 'tool_muprog'));
     $buttons[] = $OUTPUT->render($editbutton);
 }
 

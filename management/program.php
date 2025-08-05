@@ -26,14 +26,14 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use tool_muprog\local\management;
+use tool_mulib\output\header_actions;
+
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
 /** @var core_renderer $OUTPUT */
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
-
-use tool_muprog\local\management;
-use tool_mulib\output\header_actions;
 
 require('../../../../config.php');
 require_once($CFG->dirroot . '/lib/formslib.php');
@@ -57,10 +57,10 @@ $managementoutput = $PAGE->get_renderer('tool_muprog', 'management');
 $actions = new header_actions(get_string('management_program_general_actions', 'tool_muprog'));
 if ($program->archived && has_capability('tool/muprog:delete', $context)) {
     $url = new moodle_url('/admin/tool/muprog/management/program_delete.php', ['id' => $program->id]);
-    $link = new tool_mulib\output\dialog_form\link($url, get_string('program_delete', 'tool_muprog'));
-    $link->set_dialog_size('sm');
-    $link->set_after_submit($link::AFTER_SUBMIT_REDIRECT);
-    $actions->get_dropdown()->add_dialog_form($link);
+    $link = new tool_mulib\output\ajax_form\link($url, get_string('program_delete', 'tool_muprog'));
+    $link->set_form_size('sm');
+    $link->set_submitted_action($link::SUBMITTED_ACTION_REDIRECT);
+    $actions->get_dropdown()->add_ajax_form($link);
 }
 if (has_capability('tool/muprog:export', $context)) {
     $url = new moodle_url('/admin/tool/muprog/management/export.php', ['id' => $program->id]);
@@ -75,7 +75,7 @@ echo $OUTPUT->header();
 $buttons = [];
 if (has_capability('tool/muprog:edit', $context)) {
     $url = new moodle_url('/admin/tool/muprog/management/program_update.php', ['id' => $program->id]);
-    $editbutton = new tool_mulib\output\dialog_form\button($url, get_string('edit'));
+    $editbutton = new tool_mulib\output\ajax_form\button($url, get_string('edit'));
     $buttons[] = $OUTPUT->render($editbutton);
 }
 

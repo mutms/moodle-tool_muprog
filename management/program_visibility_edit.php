@@ -26,21 +26,17 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use tool_muprog\local\program;
+
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
 /** @var core_renderer $OUTPUT */
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
 
-use tool_muprog\local\management;
-use tool_muprog\local\program;
+define('AJAX_SCRIPT', true);
 
-// phpcs:ignoreFile moodle.Files.MoodleInternal.MoodleInternalGlobalState
-if (!empty($_SERVER['HTTP_X_MULIB_DIALOG_FORM_REQUEST'])) {
-    define('AJAX_SCRIPT', true);
-}
 require('../../../../config.php');
-require_once($CFG->dirroot . '/lib/formslib.php');
 
 $id = required_param('id', PARAM_INT);
 
@@ -51,8 +47,8 @@ $context = context::instance_by_id($program->contextid);
 require_capability('tool/muprog:edit', $context);
 
 $currenturl = new moodle_url('/admin/tool/muprog/management/program_visibility_edit.php', ['id' => $id]);
-
-management::setup_program_page($currenturl, $context, $program, 'program_visibility');
+$PAGE->set_context($context);
+$PAGE->set_url($currenturl);
 
 $current = new stdClass();
 $current->id = $program->id;
@@ -63,16 +59,12 @@ $form = new \tool_muprog\local\form\program_visibility_edit(null, ['data' => $cu
 $returnurl = new moodle_url('/admin/tool/muprog/management/program_visibility.php', ['id' => $program->id]);
 
 if ($form->is_cancelled()) {
-    redirect($returnurl);
+    $form->ajax_form_cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
     program::update_visibility($data);
-    $form->redirect_submitted($returnurl);
+    $form->ajax_form_submitted($returnurl);
 }
 
-echo $OUTPUT->header();
-
-echo $form->render();
-
-echo $OUTPUT->footer();
+$form->ajax_form_render();

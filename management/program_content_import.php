@@ -25,19 +25,16 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use tool_muprog\local\program;
+
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
 /** @var core_renderer $OUTPUT */
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
 
-use tool_muprog\local\management;
-use tool_muprog\local\program;
+define('AJAX_SCRIPT', true);
 
-// phpcs:ignoreFile moodle.Files.MoodleInternal.MoodleInternalGlobalState
-if (!empty($_SERVER['HTTP_X_MULIB_DIALOG_FORM_REQUEST'])) {
-    define('AJAX_SCRIPT', true);
-}
 require('../../../../config.php');
 
 $id = required_param('id', PARAM_INT);
@@ -50,7 +47,8 @@ $context = context::instance_by_id($targetprogram->contextid);
 require_capability('tool/muprog:edit', $context);
 
 $currenturl = new moodle_url('/admin/tool/muprog/management/program_content_import.php', ['id' => $targetprogram->id, 'fromprogram' => $fromprogram]);
-management::setup_program_page($currenturl, $context, $targetprogram, 'program_content');
+$PAGE->set_context($context);
+$PAGE->set_url($currenturl);
 
 $returnurl = new moodle_url('/admin/tool/muprog/management/program_content.php', ['id' => $targetprogram->id]);
 
@@ -84,15 +82,8 @@ if (!$form) {
     if ($data = $form->get_data()) {
         $from = $DB->get_record('tool_muprog_program', ['id' => $data->fromprogram], '*', MUST_EXIST);
         $top->content_import($data);
-        $form->redirect_submitted($returnurl);
+        $form->ajax_form_submitted($returnurl);
     }
 }
 
-echo $OUTPUT->header();
-echo $OUTPUT->heading(format_string($targetprogram->fullname));
-
-echo $OUTPUT->heading(get_string('importprogramcontent', 'tool_muprog'), 3);
-
-echo $form->render();
-
-echo $OUTPUT->footer();
+$form->ajax_form_render();

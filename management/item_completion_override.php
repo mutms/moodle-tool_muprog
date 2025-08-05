@@ -26,21 +26,17 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use tool_muprog\local\allocation;
+
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
 /** @var core_renderer $OUTPUT */
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
 
-use tool_muprog\local\management;
-use tool_muprog\local\allocation;
+define('AJAX_SCRIPT', true);
 
-// phpcs:ignoreFile moodle.Files.MoodleInternal.MoodleInternalGlobalState
-if (!empty($_SERVER['HTTP_X_MULIB_DIALOG_FORM_REQUEST'])) {
-    define('AJAX_SCRIPT', true);
-}
 require('../../../../config.php');
-require_once($CFG->dirroot . '/lib/formslib.php');
 
 $allocationid = required_param('allocationid', PARAM_INT);
 $itemid = required_param('itemid', PARAM_INT);
@@ -58,11 +54,11 @@ $program = $DB->get_record('tool_muprog_program', ['id' => $allocation->programi
 $context = context::instance_by_id($program->contextid);
 require_capability('tool/muprog:admin', $context);
 
-$returnurl = new moodle_url('/admin/tool/muprog/management/allocation.php', ['id' => $allocation->id]);
-
 $currenturl = new moodle_url('/admin/tool/muprog/management/item_completion_override.php', ['allocationid' => $allocation->id, 'itemid' => $item->id]);
+$PAGE->set_context($context);
+$PAGE->set_url($currenturl);
 
-management::setup_program_page($currenturl, $context, $program, 'program_users');
+$returnurl = new moodle_url('/admin/tool/muprog/management/allocation.php', ['id' => $allocation->id]);
 
 $form = new \tool_muprog\local\form\item_completion_override(null, [
     'allocation' => $allocation, 'item' => $item, 'user' => $user,
@@ -70,19 +66,12 @@ $form = new \tool_muprog\local\form\item_completion_override(null, [
 ]);
 
 if ($form->is_cancelled()) {
-    redirect($returnurl);
+    $form->ajax_form_cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
     allocation::update_item_completion($data);
-    $form->redirect_submitted($returnurl);
+    $form->ajax_form_submitted($returnurl);
 }
 
-echo $OUTPUT->header();
-
-echo $OUTPUT->heading(fullname($user), 3);
-echo $OUTPUT->heading(get_string('itemcompletion', 'tool_muprog'), 4);
-
-echo $form->render();
-
-echo $OUTPUT->footer();
+$form->ajax_form_render();

@@ -449,8 +449,8 @@ abstract class base {
         if (has_capability('tool/muprog:edit', $context) && static::is_update_allowed($program)) {
             $label = get_string('updatesource', 'tool_muprog', static::get_name());
             $editurl = new \moodle_url('/admin/tool/muprog/management/program_source_edit.php', ['programid' => $program->id, 'type' => $type]);
-            $editbutton = new \tool_mulib\output\dialog_form\icon($editurl, $label, 'i/settings');
-            $editbutton->set_dialog_name(static::get_name());
+            $editbutton = new \tool_mulib\output\ajax_form\icon($editurl, $label, 'i/settings');
+            $editbutton->set_modal_title(static::get_name());
             $result .= ' ' . $OUTPUT->render($editbutton);
         }
 

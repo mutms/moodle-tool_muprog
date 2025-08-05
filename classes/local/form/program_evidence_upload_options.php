@@ -26,7 +26,7 @@ namespace tool_muprog\local\form;
  * @author     Farhan Karmali
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class program_evidence_upload_options extends \tool_mulib\local\dialog_form {
+final class program_evidence_upload_options extends \tool_mulib\local\ajax_form {
     #[\Override]
     protected function definition() {
         $mform = $this->_form;

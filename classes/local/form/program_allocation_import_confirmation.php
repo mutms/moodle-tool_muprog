@@ -29,7 +29,7 @@ use tool_muprog\local\util;
  * @author     Farhan Karmali
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class program_allocation_import_confirmation extends \tool_mulib\local\dialog_form {
+final class program_allocation_import_confirmation extends \tool_mulib\local\ajax_form {
     #[\Override]
     protected function definition() {
         global $DB, $PAGE;

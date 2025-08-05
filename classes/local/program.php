@@ -38,6 +38,9 @@ final class program {
      * @return array
      */
     public static function get_description_editor_options(int $contextid): array {
+        global $CFG;
+        require_once($CFG->dirroot . '/lib/formslib.php');
+
         $context = \context::instance_by_id($contextid);
         return ['maxfiles' => EDITOR_UNLIMITED_FILES, 'maxbytes' => get_site()->maxbytes, 'context' => $context];
     }

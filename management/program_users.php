@@ -26,16 +26,15 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use tool_muprog\local\management;
+
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
 /** @var core_renderer $OUTPUT */
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
 
-use tool_muprog\local\management;
-
 require('../../../../config.php');
-require_once($CFG->dirroot . '/lib/formslib.php');
 
 $id = required_param('id', PARAM_INT);
 
@@ -70,8 +69,8 @@ $canmanageevidence = has_capability('tool/muprog:manageevidence', $context);
 $totalcount = $DB->count_records('tool_muprog_allocation', ['programid' => $program->id]);
 if ($totalcount && !$program->archived && $canmanageevidence) {
     $url = new \moodle_url('/admin/tool/muprog/management/program_evidence_upload.php', ['programid' => $id]);
-    $link = new \tool_mulib\output\dialog_form\link($url, get_string('evidenceupload', 'tool_muprog'));
-    $actions->get_dropdown()->add_dialog_form($link);
+    $link = new \tool_mulib\output\ajax_form\link($url, get_string('evidenceupload', 'tool_muprog'));
+    $actions->get_dropdown()->add_ajax_form($link);
 }
 if ($actions->has_items()) {
     $PAGE->add_header_action($OUTPUT->render($actions));

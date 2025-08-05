@@ -26,21 +26,17 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use tool_muprog\local\program;
+use tool_muprog\local\content\training;
+
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
 /** @var core_renderer $OUTPUT */
 /** @var stdClass $CFG */
 
-use tool_muprog\local\management;
-use tool_muprog\local\program;
-use tool_muprog\local\content\training;
+define('AJAX_SCRIPT', true);
 
-// phpcs:ignoreFile moodle.Files.MoodleInternal.MoodleInternalGlobalState
-if (!empty($_SERVER['HTTP_X_MULIB_DIALOG_FORM_REQUEST'])) {
-    define('AJAX_SCRIPT', true);
-}
 require('../../../../config.php');
-require_once($CFG->dirroot . '/lib/formslib.php');
 
 $id = required_param('id', PARAM_INT);
 
@@ -56,7 +52,8 @@ if (!\tool_muprog\local\util::is_mutrain_available()) {
 }
 
 $currenturl = new moodle_url('/admin/tool/muprog/management/item_training_edit.php', ['id' => $item->id]);
-management::setup_program_page($currenturl, $context, $program, 'program_content');
+$PAGE->set_context($context);
+$PAGE->set_url($currenturl);
 
 $returnurl = new moodle_url('/admin/tool/muprog/management/program_content.php', ['id' => $program->id]);
 
@@ -73,18 +70,12 @@ if (!$training || !($training instanceof training)) {
 $form = new \tool_muprog\local\form\item_training_edit(null, ['training' => $training, 'context' => $context]);
 
 if ($form->is_cancelled()) {
-    redirect($returnurl);
+    $form->ajax_form_cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
     $top->update_training($training, (array)$data);
-    $form->redirect_submitted($returnurl);
+    $form->ajax_form_submitted($returnurl);
 }
 
-echo $OUTPUT->header();
-
-echo $OUTPUT->heading(get_string('updatetraining', 'tool_muprog'), 3);
-
-echo $form->render();
-
-echo $OUTPUT->footer();
+$form->ajax_form_render();

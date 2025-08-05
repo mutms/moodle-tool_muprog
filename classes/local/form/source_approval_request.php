@@ -27,7 +27,7 @@ namespace tool_muprog\local\form;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class source_approval_request extends \tool_mulib\local\dialog_form {
+final class source_approval_request extends \tool_mulib\local\ajax_form {
     #[\Override]
     protected function definition() {
         $mform = $this->_form;

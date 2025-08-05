@@ -18,10 +18,8 @@
 
 namespace tool_muprog\local\form;
 
-use tool_muprog\local\content\set;
 use tool_muprog\local\content\course;
 use tool_muprog\local\content\training;
-use tool_muprog\local\content\top;
 
 /**
  * Delete program content item.
@@ -32,7 +30,7 @@ use tool_muprog\local\content\top;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class item_delete extends \tool_mulib\local\dialog_form {
+final class item_delete extends \tool_mulib\local\ajax_form {
     #[\Override]
     protected function definition() {
         $mform = $this->_form;

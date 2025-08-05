@@ -31,15 +31,9 @@
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
 
-use tool_muprog\local\management;
-use tool_muprog\local\source\manual;
+define('AJAX_SCRIPT', true);
 
-// phpcs:ignoreFile moodle.Files.MoodleInternal.MoodleInternalGlobalState
-if (!empty($_SERVER['HTTP_X_MULIB_DIALOG_FORM_REQUEST'])) {
-    define('AJAX_SCRIPT', true);
-}
 require('../../../../config.php');
-require_once($CFG->dirroot . '/lib/formslib.php');
 
 $programid = required_param('programid', PARAM_INT);
 $draftitemid = optional_param('csvfile', null, PARAM_INT);
@@ -51,13 +45,14 @@ $context = context::instance_by_id($program->contextid);
 require_capability('tool/muprog:manageevidence', $context);
 
 $currenturl = new moodle_url('/admin/tool/muprog/management/program_evidence_upload.php', ['programid' => $programid]);
+$PAGE->set_context($context);
+$PAGE->set_url($currenturl);
+
 $returnurl = new moodle_url('/admin/tool/muprog/management/program_users.php', ['id' => $programid]);
 
 if ($program->archived) {
     redirect($returnurl);
 }
-
-management::setup_program_page($currenturl, $context, $program, 'program_users');
 
 $filedata = null;
 if ($draftitemid && confirm_sesskey()) {
@@ -72,7 +67,7 @@ if (!$filedata) {
 }
 
 if ($form->is_cancelled()) {
-    redirect($returnurl);
+    $form->ajax_form_cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
@@ -92,7 +87,7 @@ if ($data = $form->get_data()) {
             \core\notification::add($message, \core\output\notification::NOTIFY_WARNING);
         }
 
-        $form->redirect_submitted($returnurl);
+        $form->ajax_form_submitted($returnurl);
     }
     if (!$filedata && $form instanceof \tool_muprog\local\form\program_evidence_upload_file) {
         $filedata = \tool_muprog\local\util::get_uploaded_data($draftitemid);
@@ -103,10 +98,4 @@ if ($data = $form->get_data()) {
     }
 }
 
-echo $OUTPUT->header();
-
-echo $OUTPUT->heading(get_string('evidenceupload', 'tool_muprog'), 3);
-
-echo $form->render();
-
-echo $OUTPUT->footer();
+$form->ajax_form_render();

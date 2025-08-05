@@ -26,21 +26,17 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use tool_muprog\local\source\manual;
+
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
 /** @var core_renderer $OUTPUT */
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
 
-use tool_muprog\local\management;
-use tool_muprog\local\source\manual;
+define('AJAX_SCRIPT', true);
 
-// phpcs:ignoreFile moodle.Files.MoodleInternal.MoodleInternalGlobalState
-if (!empty($_SERVER['HTTP_X_MULIB_DIALOG_FORM_REQUEST'])) {
-    define('AJAX_SCRIPT', true);
-}
 require('../../../../config.php');
-require_once($CFG->dirroot . '/lib/formslib.php');
 
 $sourceid = required_param('sourceid', PARAM_INT);
 $draftitemid = optional_param('csvfile', null, PARAM_INT);
@@ -53,13 +49,14 @@ $context = context::instance_by_id($program->contextid);
 require_capability('tool/muprog:allocate', $context);
 
 $currenturl = new moodle_url('/admin/tool/muprog/management/source_manual_upload.php', ['sourceid' => $source->id]);
+$PAGE->set_context($context);
+$PAGE->set_url($currenturl);
+
 $returnurl = new moodle_url('/admin/tool/muprog/management/program_users.php', ['id' => $program->id]);
 
 if (!manual::is_allocation_possible($program, $source)) {
     redirect($returnurl);
 }
-
-management::setup_program_page($currenturl, $context, $program, 'program_users');
 
 $filedata = null;
 if ($draftitemid && confirm_sesskey()) {
@@ -74,7 +71,7 @@ if (!$filedata) {
 }
 
 if ($form->is_cancelled()) {
-    redirect($returnurl);
+    $form->ajax_form_cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
@@ -94,7 +91,7 @@ if ($data = $form->get_data()) {
             \core\notification::add($message, \core\output\notification::NOTIFY_WARNING);
         }
 
-        $form->redirect_submitted($returnurl);
+        $form->ajax_form_submitted($returnurl);
     }
     if (!$filedata && $form instanceof \tool_muprog\local\form\source_manual_upload_file) {
         $filedata = \tool_muprog\local\util::get_uploaded_data($draftitemid);
@@ -105,10 +102,4 @@ if ($data = $form->get_data()) {
     }
 }
 
-echo $OUTPUT->header();
-
-echo $OUTPUT->heading(get_string('source_manual_uploadusers', 'tool_muprog'), 3);
-
-echo $form->render();
-
-echo $OUTPUT->footer();
+$form->ajax_form_render();

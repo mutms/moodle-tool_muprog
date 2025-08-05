@@ -70,7 +70,7 @@ $allocation = $DB->get_record('tool_muprog_allocation', ['id' => $allocation->id
 $actions = new header_actions(get_string('management_allocation_actions', 'tool_muprog'));
 
 if (has_capability('tool/muprog:admin', $context)) {
-    $actions->get_dropdown()->add_dialog_form(new \tool_mulib\output\dialog_form\link(
+    $actions->get_dropdown()->add_ajax_form(new \tool_mulib\output\ajax_form\link(
         new moodle_url('/admin/tool/muprog/management/program_completion_override.php', ['id' => $allocation->id]),
         get_string('programcompletionoverride', 'tool_muprog')
     ));
@@ -80,7 +80,7 @@ if (has_capability('tool/muprog:manageallocation', $context)) {
         $sourceclass::is_allocation_update_possible($program, $source, $allocation)
         && !$program->archived && !$allocation->archived
     ) {
-        $actions->get_dropdown()->add_dialog_form(new \tool_mulib\output\dialog_form\link(
+        $actions->get_dropdown()->add_ajax_form(new \tool_mulib\output\ajax_form\link(
             new \moodle_url('/admin/tool/muprog/management/allocation_update.php', ['id' => $allocation->id]),
             get_string('allocation_update', 'tool_muprog')
         ));
@@ -88,7 +88,7 @@ if (has_capability('tool/muprog:manageallocation', $context)) {
 }
 if ($allocation->archived && has_capability('tool/muprog:allocate', $context)) {
     if ($sourceclass::is_allocation_restore_possible($program, $source, $allocation)) {
-        $actions->get_dropdown()->add_dialog_form(new \tool_mulib\output\dialog_form\link(
+        $actions->get_dropdown()->add_ajax_form(new \tool_mulib\output\ajax_form\link(
             new \moodle_url('/admin/tool/muprog/management/allocation_restore.php', ['id' => $allocation->id]),
             get_string('allocation_restore', 'tool_muprog')
         ));
@@ -96,24 +96,24 @@ if ($allocation->archived && has_capability('tool/muprog:allocate', $context)) {
 }
 if ($allocation->archived && has_capability('tool/muprog:deallocate', $context)) {
     if ($sourceclass::is_allocation_delete_possible($program, $source, $allocation)) {
-        $link = new \tool_mulib\output\dialog_form\link(
+        $link = new \tool_mulib\output\ajax_form\link(
             new \moodle_url('/admin/tool/muprog/management/allocation_delete.php', ['id' => $allocation->id]),
             get_string('deleteallocation', 'tool_muprog')
         );
-        $link->set_after_submit($link::AFTER_SUBMIT_REDIRECT);
-        $actions->get_dropdown()->add_dialog_form($link);
+        $link->set_submitted_action($link::SUBMITTED_ACTION_REDIRECT);
+        $actions->get_dropdown()->add_ajax_form($link);
     }
 }
 if (!$allocation->archived && has_capability('tool/muprog:deallocate', $context)) {
     if ($sourceclass::is_allocation_archive_possible($program, $source, $allocation)) {
-        $actions->get_dropdown()->add_dialog_form(new \tool_mulib\output\dialog_form\link(
+        $actions->get_dropdown()->add_ajax_form(new \tool_mulib\output\ajax_form\link(
             new \moodle_url('/admin/tool/muprog/management/allocation_archive.php', ['id' => $allocation->id]),
             get_string('allocation_archive', 'tool_muprog')
         ));
     }
 }
 if (!$program->archived && !$allocation->archived && has_capability('tool/muprog:reset', $context)) {
-    $actions->get_dropdown()->add_dialog_form(new \tool_mulib\output\dialog_form\link(
+    $actions->get_dropdown()->add_ajax_form(new \tool_mulib\output\ajax_form\link(
         new \moodle_url('/admin/tool/muprog/management/allocation_reset.php', ['id' => $allocation->id]),
         get_string('allocation_reset', 'tool_muprog')
     ));

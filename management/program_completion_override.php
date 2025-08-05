@@ -32,15 +32,9 @@
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
 
-use tool_muprog\local\management;
-use tool_muprog\local\allocation;
+define('AJAX_SCRIPT', true);
 
-// phpcs:ignoreFile moodle.Files.MoodleInternal.MoodleInternalGlobalState
-if (!empty($_SERVER['HTTP_X_MULIB_DIALOG_FORM_REQUEST'])) {
-    define('AJAX_SCRIPT', true);
-}
 require('../../../../config.php');
-require_once($CFG->dirroot . '/lib/formslib.php');
 
 $id = required_param('id', PARAM_INT);
 
@@ -58,14 +52,14 @@ $returnurl = new moodle_url('/admin/tool/muprog/management/program_completion_ov
 $user = $DB->get_record('user', ['id' => $allocation->userid], '*', MUST_EXIST);
 
 $currenturl = new moodle_url('/admin/tool/muprog/management/program_completion_override.php', ['id' => $allocation->id]);
-
-management::setup_program_page($currenturl, $context, $program, 'program_users');
+$PAGE->set_context($context);
+$PAGE->set_url($currenturl);
 
 $form = new \tool_muprog\local\form\program_completion_override(null,
     ['program' => $program, 'allocation' => $allocation, 'user' => $user, 'context' => $context]);
 
 if ($form->is_cancelled()) {
-    redirect($returnurl);
+    $form->ajax_form_cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
@@ -73,13 +67,7 @@ if ($data = $form->get_data()) {
         $allocation->timecompleted = $data->timecompleted;
         \tool_muprog\local\source\base::allocation_update($allocation);
     }
-    $form->redirect_submitted($returnurl);
+    $form->ajax_form_submitted($returnurl);
 }
 
-echo $OUTPUT->header();
-
-echo $OUTPUT->heading(fullname($user), 3);
-
-echo $form->render();
-
-echo $OUTPUT->footer();
+$form->ajax_form_render();

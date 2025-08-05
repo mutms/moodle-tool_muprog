@@ -20,7 +20,6 @@
 namespace tool_muprog\local\form;
 
 use tool_muprog\local\program;
-use tool_muprog\local\allocation;
 
 /**
  * Edit program scheduling settings.
@@ -31,7 +30,7 @@ use tool_muprog\local\allocation;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class program_scheduling_edit extends \tool_mulib\local\dialog_form {
+final class program_scheduling_edit extends \tool_mulib\local\ajax_form {
     #[\Override]
     protected function definition() {
         $mform = $this->_form;

@@ -18,8 +18,6 @@
 
 namespace tool_muprog\local\form;
 
-use tool_muprog\local\source\manual;
-
 /**
  * Upload user program completions.
  *
@@ -28,7 +26,7 @@ use tool_muprog\local\source\manual;
  * @author     Farhan Karmali
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class program_evidence_upload_file extends \tool_mulib\local\dialog_form {
+final class program_evidence_upload_file extends \tool_mulib\local\ajax_form {
     #[\Override]
     protected function definition() {
         global $CFG;

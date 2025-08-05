@@ -148,7 +148,7 @@ final class approval extends base {
         }
 
         $url = new \moodle_url('/admin/tool/muprog/catalogue/source_approval_request.php', ['sourceid' => $source->id]);
-        $button = new \tool_mulib\output\dialog_form\button($url, get_string('source_approval_makerequest', 'tool_muprog'));
+        $button = new \tool_mulib\output\ajax_form\button($url, get_string('source_approval_makerequest', 'tool_muprog'));
 
         $button = $OUTPUT->render($button);
 

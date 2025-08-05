@@ -28,7 +28,7 @@ namespace tool_muprog\local\form;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class allocation_update extends \tool_mulib\local\dialog_form {
+final class allocation_update extends \tool_mulib\local\ajax_form {
     /** @var \tool_muprog\customfield\allocation_handler */
     protected $handler;
 
