@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Files.LineLength.TooLong
 
 /**
  * Program allocation import interface.
@@ -58,8 +59,10 @@ if ($targetprogram->archived) {
 
 $form = null;
 if (!$fromprogram) {
-    $form = new \tool_muprog\local\form\program_allocation_import(null,
-        ['id' => $targetprogram->id, 'contextid' => $context->id]);
+    $form = new \tool_muprog\local\form\program_allocation_import(
+        null,
+        ['id' => $targetprogram->id, 'contextid' => $context->id]
+    );
     if ($form->is_cancelled()) {
         $form->ajax_form_cancelled($returnurl);
     } else if ($data = $form->get_data()) {
@@ -70,12 +73,13 @@ if (!$fromprogram) {
 }
 
 if (!$form) {
-    $form = new \tool_muprog\local\form\program_allocation_import_confirmation(null,
-        ['context' => $context, 'id' => $targetprogram->id, 'fromprogram' => $fromprogram]);
+    $form = new \tool_muprog\local\form\program_allocation_import_confirmation(
+        null,
+        ['context' => $context, 'id' => $targetprogram->id, 'fromprogram' => $fromprogram]
+    );
 
     if ($form->is_cancelled()) {
         $form->ajax_form_cancelled($returnurl);
-
     } else if ($data = $form->get_data()) {
         $from = $DB->get_record('tool_muprog_program', ['id' => $data->fromprogram], '*', MUST_EXIST);
         program::import_allocation($data);

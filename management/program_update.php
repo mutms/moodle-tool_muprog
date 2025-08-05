@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Files.LineLength.TooLong
 
 /**
  * Update program.
@@ -51,8 +52,15 @@ $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
 
 $editoroptions = program::get_description_editor_options($context->id);
-$program = file_prepare_standard_editor($program, 'description', $editoroptions,
-    $context, 'tool_muprog', 'description', $program->id);
+$program = file_prepare_standard_editor(
+    $program,
+    'description',
+    $editoroptions,
+    $context,
+    'tool_muprog',
+    'description',
+    $program->id
+);
 $program->tags = core_tag_tag::get_item_tags_array('tool_muprog', 'program', $program->id);
 
 $program->image = file_get_submitted_draft_itemid('image');
