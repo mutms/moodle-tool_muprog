@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Files.LineLength.TooLong
 
 /**
  * Program content import interface.
@@ -60,8 +61,10 @@ $top = program::load_content($targetprogram->id);
 
 $form = null;
 if (!$fromprogram) {
-    $form = new \tool_muprog\local\form\program_content_import(null,
-        ['id' => $targetprogram->id, 'contextid' => $context->id]);
+    $form = new \tool_muprog\local\form\program_content_import(
+        null,
+        ['id' => $targetprogram->id, 'contextid' => $context->id]
+    );
     if ($form->is_cancelled()) {
         redirect($returnurl);
     } else if ($data = $form->get_data()) {
@@ -72,8 +75,10 @@ if (!$fromprogram) {
 }
 
 if (!$form) {
-    $form = new \tool_muprog\local\form\program_content_import_confirmation(null,
-        ['id' => $targetprogram->id, 'contextid' => $context->id, 'fromprogram' => $fromprogram]);
+    $form = new \tool_muprog\local\form\program_content_import_confirmation(
+        null,
+        ['id' => $targetprogram->id, 'contextid' => $context->id, 'fromprogram' => $fromprogram]
+    );
 
     if ($form->is_cancelled()) {
         redirect($returnurl);

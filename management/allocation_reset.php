@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Files.LineLength.TooLong
 
 /**
  * Program management interface.
@@ -61,8 +62,10 @@ if ($program->archived || $allocation->archived) {
     redirect($returnurl);
 }
 
-$form = new \tool_muprog\local\form\allocation_reset(null,
-    ['allocation' => $allocation, 'user' => $user, 'context' => $context, 'source' => $source, 'program' => $program]);
+$form = new \tool_muprog\local\form\allocation_reset(
+    null,
+    ['allocation' => $allocation, 'user' => $user, 'context' => $context, 'source' => $source, 'program' => $program]
+);
 
 if ($form->is_cancelled()) {
     $form->ajax_form_cancelled($returnurl);

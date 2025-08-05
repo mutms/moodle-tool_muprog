@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Files.LineLength.TooLong
 
 /**
  * Program management interface.
@@ -55,8 +56,10 @@ $currenturl = new moodle_url('/admin/tool/muprog/management/program_completion_o
 $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
 
-$form = new \tool_muprog\local\form\program_completion_override(null,
-    ['program' => $program, 'allocation' => $allocation, 'user' => $user, 'context' => $context]);
+$form = new \tool_muprog\local\form\program_completion_override(
+    null,
+    ['program' => $program, 'allocation' => $allocation, 'user' => $user, 'context' => $context]
+);
 
 if ($form->is_cancelled()) {
     $form->ajax_form_cancelled($returnurl);
