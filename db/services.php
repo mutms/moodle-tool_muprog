@@ -30,57 +30,57 @@ defined('MOODLE_INTERNAL') || die();
 
 $functions = [
     // Form element autocompletion WS.
-    'tool_muprog_form_source_manual_allocate_users' => [
-        'classname' => tool_muprog\external\form_source_manual_allocate_users::class,
+    'tool_muprog_form_autocomplete_source_manual_allocate_users' => [
+        'classname' => tool_muprog\external\form_autocomplete\source_manual_allocate_users::class,
         'description' => 'Return list of user candidates for program allocation.',
         'type' => 'read',
         'ajax' => true,
         'loginrequired' => true,
     ],
-    'tool_muprog_form_program_visibility_edit_cohortids' => [
-        'classname' => tool_muprog\external\form_program_visibility_edit_cohortids::class,
+    'tool_muprog_form_autocomplete_program_visibility_edit_cohortids' => [
+        'classname' => tool_muprog\external\form_autocomplete\program_visibility_edit_cohortids::class,
         'description' => 'Return list of cohorts for program visibility.',
         'type' => 'read',
         'ajax' => true,
         'loginrequired' => true,
     ],
-    'tool_muprog_form_source_cohort_edit_cohortids' => [
-        'classname' => tool_muprog\external\form_source_cohort_edit_cohortids::class,
+    'tool_muprog_form_autocomplete_source_cohort_edit_cohortids' => [
+        'classname' => tool_muprog\external\form_autocomplete\source_cohort_edit_cohortids::class,
         'description' => 'Return list of cohorts for cohort allocation.',
         'type' => 'read',
         'ajax' => true,
         'loginrequired' => true,
     ],
-    'tool_muprog_form_program_content_import_fromprogram' => [
-        'classname' => tool_muprog\external\form_program_content_import_fromprogram::class,
+    'tool_muprog_form_autocomplete_program_content_import_fromprogram' => [
+        'classname' => tool_muprog\external\form_autocomplete\program_content_import_fromprogram::class,
         'description' => 'Return list of programs that can be used as source for importing of content.',
         'type' => 'read',
         'ajax' => true,
         'loginrequired' => true,
     ],
-    'tool_muprog_form_notification_import_frominstance' => [
-        'classname' => tool_muprog\external\form_notification_import_frominstance::class,
+    'tool_muprog_form_autocomplete_notification_import_frominstance' => [
+        'classname' => tool_muprog\external\form_autocomplete\notification_import_frominstance::class,
          'description' => 'Return list of programs that can be used as source for importing of notifications.',
          'type' => 'read',
          'ajax' => true,
          'loginrequired' => true,
     ],
-    'tool_muprog_form_program_allocation_import_fromprogram' => [
-        'classname' => tool_muprog\external\form_program_allocation_import_fromprogram::class,
+    'tool_muprog_form_autocomplete_program_allocation_import_fromprogram' => [
+        'classname' => tool_muprog\external\form_autocomplete\program_allocation_import_fromprogram::class,
         'description' => 'Return list of programs that can be used as source for importing program allocation.',
         'type' => 'read',
         'ajax' => true,
         'loginrequired' => true,
     ],
-    'tool_muprog_form_item_append_trainingid' => [
-        'classname' => \tool_muprog\external\form_item_append_trainingid::class,
+    'tool_muprog_form_autocomplete_item_append_trainingid' => [
+        'classname' => \tool_muprog\external\form_autocomplete\item_append_trainingid::class,
         'description' => 'Return list of framework candidates for adding of items.',
         'type' => 'read',
         'ajax' => true,
         'loginrequired' => true,
     ],
-    'tool_muprog_form_export_programids' => [
-        'classname' => \tool_muprog\external\form_export_programids::class,
+    'tool_muprog_form_autocomplete_export_programids' => [
+        'classname' => \tool_muprog\external\form_autocomplete\export_programids::class,
         'description' => 'Return list of candidate programs for export.',
         'type' => 'read',
         'ajax' => true,

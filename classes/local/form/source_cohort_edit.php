@@ -19,7 +19,7 @@
 namespace tool_muprog\local\form;
 
 use tool_muprog\local\source\cohort;
-use tool_muprog\external\form_source_cohort_edit_cohortids;
+use tool_muprog\external\form_autocomplete\source_cohort_edit_cohortids;
 
 /**
  * Edit cohort allocation settings.
@@ -44,11 +44,12 @@ final class source_cohort_edit extends \tool_mulib\local\ajax_form {
             $mform->hardFreeze('enable');
         }
 
-        form_source_cohort_edit_cohortids::add_form_element(
+        source_cohort_edit_cohortids::add_element(
             $mform,
             ['programid' => $program->id],
             'cohortids',
-            get_string('source_cohort_cohortstoallocate', 'tool_muprog')
+            get_string('source_cohort_cohortstoallocate', 'tool_muprog'),
+            $context
         );
         if (!empty($source->id)) {
             $cohorts = cohort::fetch_allocation_cohorts_menu($source->id);
@@ -71,10 +72,12 @@ final class source_cohort_edit extends \tool_mulib\local\ajax_form {
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
         $program = $this->_customdata['program'];
+        $context = $this->_customdata['context'];
 
+        $args = ['programid' => $program->id];
         if ($data['enable']) {
             foreach ($data['cohortids'] as $cohortid) {
-                $error = form_source_cohort_edit_cohortids::validate_cohortid($cohortid, $program->id);
+                $error = source_cohort_edit_cohortids::validate_value($cohortid, $args, $context);
                 if ($error !== null) {
                     $errors['cohorts'] = $error;
                     break;

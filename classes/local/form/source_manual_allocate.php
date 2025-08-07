@@ -18,6 +18,8 @@
 
 namespace tool_muprog\local\form;
 
+use tool_muprog\external\form_autocomplete\source_manual_allocate_users;
+
 /**
  * Allocate users and cohorts manually.
  *
@@ -41,11 +43,12 @@ final class source_manual_allocate extends \tool_mulib\local\ajax_form {
         $context = $this->_customdata['context'];
 
         $this->arguments = ['programid' => $program->id];
-        \tool_muprog\external\form_source_manual_allocate_users::add_form_element(
+        source_manual_allocate_users::add_element(
             $mform,
             $this->arguments,
             'users',
-            get_string('users')
+            get_string('users'),
+            $context
         );
 
         $options = ['contextid' => $context->id, 'multiple' => false];
@@ -104,9 +107,9 @@ final class source_manual_allocate extends \tool_mulib\local\ajax_form {
 
         if ($data['users']) {
             foreach ($data['users'] as $userid) {
-                $error = \tool_muprog\external\form_source_manual_allocate_users::validate_form_value(
-                    $this->arguments,
+                $error = source_manual_allocate_users::validate_value(
                     $userid,
+                    $this->arguments,
                     $context
                 );
                 if ($error !== null) {

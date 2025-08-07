@@ -16,68 +16,68 @@
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace tool_muprog\external;
+namespace tool_muprog\external\form_autocomplete;
 
 use core_external\external_function_parameters;
 use core_external\external_value;
 
 /**
- * Provides list of programs from which the user can import notifications.
+ * Provides list of programs from which the user can import content.
  *
  * @package     tool_muprog
- * @copyright   2024 Open LMS (https://www.openlms.net/)
+ * @copyright   2023 Open LMS (https://www.openlms.net/)
  * @copyright   2025 Petr Skoda
  * @author      Farhan Karmali
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class form_notification_import_frominstance extends \tool_mulib\external\form_autocomplete_field {
-    /** @var int max results */
-    const MAX_RESULTS = 20;
+final class program_content_import_fromprogram extends \tool_mulib\external\form_autocomplete\base {
+    /** @var string|null program table */
+    protected const ITEM_TABLE = 'tool_muprog_program';
+    /** @var string|null field used for item name */
+    protected const ITEM_FIELD = 'fullname';
 
-    /**
-     * True means returned field data is array, false means value is scalar.
-     *
-     * @return bool
-     */
-    public static function is_multi_select_field(): bool {
+    #[\Override]
+    public static function get_multiple(): bool {
         return false;
     }
 
-    /**
-     * Describes the external function arguments.
-     *
-     * @return external_function_parameters
-     */
+    #[\Override]
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'query' => new external_value(PARAM_RAW, 'The search query', VALUE_REQUIRED),
-            'id' => new external_value(PARAM_INT, 'Program id', VALUE_REQUIRED),
+            'programid' => new external_value(PARAM_INT, 'Program id', VALUE_REQUIRED),
         ]);
     }
 
     /**
-     * Gets list of programs that user can import notifications from.
+     * Gets list of available programs.
      *
      * @param string $query The search request.
-     * @param int $id The Program to which the program notifications have to be imported, we will exclude this program.
+     * @param int $programid The Program to which the program has to be imported, we will exclude this program.
      * @return array
      */
-    public static function execute(string $query, int $id): array {
+    public static function execute(string $query, int $programid): array {
         global $DB;
 
-        ['query' => $query, 'id' => $id] = self::validate_parameters(
+        [
+            'query' => $query,
+            'programid' => $programid,
+        ] = self::validate_parameters(
             self::execute_parameters(),
-            ['query' => $query, 'id' => $id]
+            [
+                'query' => $query,
+                'programid' => $programid,
+            ]
         );
 
-        $targetprogram = $DB->get_record('tool_muprog_program', ['id' => $id], '*', MUST_EXIST);
+        $targetprogram = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
         $context = \context::instance_by_id($targetprogram->contextid);
 
         self::validate_context($context);
         require_capability('tool/muprog:edit', $context);
 
         [$searchsql, $params] = \tool_muprog\local\management::get_program_search_query(null, $query, 'p');
-        $params['programid'] = $id;
+        $params['programid'] = $programid;
 
         $tenantselect = '';
         if (\tool_muprog\local\util::is_mutenancy_active()) {
@@ -93,34 +93,40 @@ final class form_notification_import_frominstance extends \tool_mulib\external\f
                   JOIN {context} c ON c.id = p.contextid
                  WHERE p.id <> :programid AND $searchsql
                        $tenantselect
-                       AND EXISTS(
-                           SELECT 1
-                             FROM {tool_mulib_notification} lon
-                            WHERE lon.instanceid = p.id AND lon.component = 'tool_muprog' AND lon.enabled = 1
-                       )
               ORDER BY p.fullname ASC";
         $rs = $DB->get_recordset_sql($sql, $params);
 
-        $notice = null;
-        $list = [];
+        $programs = [];
         $count = 0;
         foreach ($rs as $program) {
-            if ($count > self::MAX_RESULTS) {
-                $notice = get_string('toomanyrecords', 'tool_mulib', self::MAX_RESULTS);
-                break;
-            }
-            $pcontext = \context::instance_by_id($program->contextid);
-            if (!has_capability('tool/muprog:clone', $pcontext)) {
+            $context = \context::instance_by_id($program->contextid);
+            if (!has_capability('tool/muprog:clone', $context)) {
                 continue;
             }
+            $programs[] = $program;
             $count++;
-            $list[] = ['value' => $program->id, 'label' => format_string($program->fullname)];
+            if ($count > self::MAX_RESULTS) {
+                break;
+            }
         }
         $rs->close();
 
-        return [
-            'notice' => $notice,
-            'list' => $list,
-        ];
+        return self::prepare_result($programs, $context);
+    }
+
+    #[\Override]
+    public static function validate_value(int $value, array $args, \context $context): ?string {
+        global $DB;
+
+        $program = $DB->get_record('tool_muprog_program', ['id' => $value]);
+        if (!$program) {
+            return get_string('error');
+        }
+        $context = \context::instance_by_id($program->contextid);
+        if (!has_capability('tool/muprog:clone', $context)) {
+            return get_string('error');
+        }
+
+        return null;
     }
 }

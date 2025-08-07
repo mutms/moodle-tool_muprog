@@ -20,7 +20,7 @@
 namespace tool_muprog\local\form;
 
 use tool_muprog\local\management;
-use tool_muprog\external\form_program_visibility_edit_cohortids;
+use tool_muprog\external\form_autocomplete\program_visibility_edit_cohortids;
 
 /**
  * Edit program visibility.
@@ -42,11 +42,12 @@ final class program_visibility_edit extends \tool_mulib\local\ajax_form {
         $mform->setDefault('public', $data->public);
         $mform->addHelpButton('public', 'public', 'tool_muprog');
 
-        form_program_visibility_edit_cohortids::add_form_element(
+        program_visibility_edit_cohortids::add_element(
             $mform,
             ['programid' => $data->id],
             'cohortids',
-            get_string('cohorts', 'tool_muprog')
+            get_string('cohorts', 'tool_muprog'),
+            $context
         );
         $cohorts = management::fetch_current_cohorts_menu($data->id);
         $mform->setDefault('cohortids', array_keys($cohorts));
@@ -61,9 +62,11 @@ final class program_visibility_edit extends \tool_mulib\local\ajax_form {
     #[\Override]
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
+        $program = $this->_customdata['data'];
+        $context = $this->_customdata['context'];
 
         foreach ($data['cohortids'] as $cohortid) {
-            $error = form_program_visibility_edit_cohortids::validate_cohortid($cohortid, $data['id']);
+            $error = program_visibility_edit_cohortids::validate_value($cohortid, ['programid' => $program->id], $context);
             if ($error !== null) {
                 $errors['cohorts'] = $error;
                 break;

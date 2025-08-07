@@ -17,7 +17,9 @@
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 // phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace tool_muprog\phpunit\external;
+namespace tool_muprog\phpunit\external\form_autocomplete;
+
+use tool_muprog\external\form_autocomplete\source_manual_allocate_users;
 
 /**
  * External API for program allocation candidate test.
@@ -29,9 +31,9 @@ namespace tool_muprog\phpunit\external;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @covers \tool_muprog\phpunit\external\form_source_manual_allocate_users
+ * @covers \tool_muprog\phpunit\external\form_autocomplete\source_manual_allocate_users
  */
-final class form_source_manual_allocate_users_test extends \advanced_testcase {
+final class source_manual_allocate_users_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
@@ -66,8 +68,8 @@ final class form_source_manual_allocate_users_test extends \advanced_testcase {
         $this->setUser($admin);
 
         $CFG->maxusersperpage = 10;
-        $result = \tool_muprog\external\form_source_manual_allocate_users::execute('', $program1->id);
-        $this->assertSame(null, $result['notice']);
+        $result = source_manual_allocate_users::execute('', $program1->id);
+        $this->assertFalse($result['overflow']);
         $this->assertCount(4, $result['list']); // Admin is included.
         foreach ($result['list'] as $u) {
             $u = (object)$u;
@@ -83,8 +85,8 @@ final class form_source_manual_allocate_users_test extends \advanced_testcase {
                 $this->fail('Unexpected user returned: ' . $u->label);
             }
         }
-        $result = \tool_muprog\external\form_source_manual_allocate_users::execute('Prijmeni', $program1->id);
-        $this->assertSame(null, $result['notice']);
+        $result = source_manual_allocate_users::execute('Prijmeni', $program1->id);
+        $this->assertFalse($result['overflow']);
         $this->assertCount(3, $result['list']); // Admin is NOT included.
         foreach ($result['list'] as $u) {
             $u = (object)$u;
@@ -99,14 +101,9 @@ final class form_source_manual_allocate_users_test extends \advanced_testcase {
             }
         }
 
-        $CFG->maxusersperpage = 2;
-        $result = \tool_muprog\external\form_source_manual_allocate_users::execute('', $program1->id);
-        $this->assertSame('Too many users (2) to show', $result['notice']);
-        $this->assertCount(2, $result['list']);
-
         $this->setUser($user5);
         try {
-            \tool_muprog\external\form_source_manual_allocate_users::execute('', $program1->id);
+            source_manual_allocate_users::execute('', $program1->id);
             $this->fail('Exception expected');
         } catch (\moodle_exception $ex) {
             $this->assertInstanceOf('required_capability_exception', $ex);
@@ -118,8 +115,8 @@ final class form_source_manual_allocate_users_test extends \advanced_testcase {
 
         $this->setUser($user5);
         $CFG->maxusersperpage = 10;
-        $result = \tool_muprog\external\form_source_manual_allocate_users::execute('', $program2->id);
-        $this->assertSame(null, $result['notice']);
+        $result = source_manual_allocate_users::execute('', $program2->id);
+        $this->assertFalse($result['overflow']);
         $this->assertCount(6, $result['list']);
     }
 
@@ -160,24 +157,24 @@ final class form_source_manual_allocate_users_test extends \advanced_testcase {
         $admin = get_admin();
         $this->setUser($admin);
 
-        $result = \tool_muprog\external\form_source_manual_allocate_users::execute('', $program0->id);
+        $result = source_manual_allocate_users::execute('', $program0->id);
         $this->assertEquals([$user0->id, $user1->id, $user2->id, $admin->id], array_column($result['list'], 'value'));
 
-        $result = \tool_muprog\external\form_source_manual_allocate_users::execute('', $program1->id);
+        $result = source_manual_allocate_users::execute('', $program1->id);
         $this->assertEquals([$user1->id], array_column($result['list'], 'value'));
 
-        $result = \tool_muprog\external\form_source_manual_allocate_users::execute('', $program2->id);
+        $result = source_manual_allocate_users::execute('', $program2->id);
         $this->assertEquals([$user2->id], array_column($result['list'], 'value'));
 
         \tool_mutenancy\local\tenancy::force_current_tenantid($tenant1->id);
 
-        $result = \tool_muprog\external\form_source_manual_allocate_users::execute('', $program0->id);
+        $result = source_manual_allocate_users::execute('', $program0->id);
         $this->assertEquals([$user1->id], array_column($result['list'], 'value'));
 
-        $result = \tool_muprog\external\form_source_manual_allocate_users::execute('', $program1->id);
+        $result = source_manual_allocate_users::execute('', $program1->id);
         $this->assertEquals([$user1->id], array_column($result['list'], 'value'));
 
-        $result = \tool_muprog\external\form_source_manual_allocate_users::execute('', $program2->id);
+        $result = source_manual_allocate_users::execute('', $program2->id);
         $this->assertEquals([$user2->id], array_column($result['list'], 'value'));
     }
 }

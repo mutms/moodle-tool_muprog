@@ -20,7 +20,7 @@
 namespace tool_muprog\local\form;
 
 use tool_muprog\local\content\set;
-use tool_muprog\external\form_item_append_trainingid;
+use tool_muprog\external\form_autocomplete\item_append_trainingid;
 use tool_muprog\local\util;
 
 /**
@@ -40,6 +40,7 @@ final class item_append extends \tool_mulib\local\ajax_form {
         $mform = $this->_form;
         /** @var set $parentset */
         $parentset = $this->_customdata['parentset'];
+        $context = $this->_customdata['context'];
 
         $select = 'programid = :programid AND courseid IS NOT NULL';
         $params = ['programid' => $parentset->get_programid()];
@@ -53,12 +54,13 @@ final class item_append extends \tool_mulib\local\ajax_form {
         );
 
         if (util::is_mutrain_available() && $DB->record_exists('tool_mutrain_framework', ['archived' => 0])) {
-            $arguments = ['programid' => $parentset->get_programid()];
-            form_item_append_trainingid::add_form_element(
+            $args = ['programid' => $parentset->get_programid()];
+            item_append_trainingid::add_element(
                 $mform,
-                $arguments,
+                $args,
                 'trainingid',
-                get_string('training', 'tool_muprog')
+                get_string('training', 'tool_muprog'),
+                $context
             );
         }
 
@@ -147,8 +149,8 @@ final class item_append extends \tool_mulib\local\ajax_form {
         }
 
         if (!empty($data['trainingid'])) {
-            $arguments = ['programid' => $parentset->get_programid()];
-            $error = form_item_append_trainingid::validate_form_value($arguments, $data['trainingid']);
+            $args = ['programid' => $parentset->get_programid()];
+            $error = item_append_trainingid::validate_value($data['trainingid'], $args, $context);
             if ($error !== null) {
                 $errors['trainingid'] = $error;
             }

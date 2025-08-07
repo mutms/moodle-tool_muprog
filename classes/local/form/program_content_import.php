@@ -18,11 +18,14 @@
 
 namespace tool_muprog\local\form;
 
+use tool_muprog\external\form_autocomplete\program_content_import_fromprogram;
+
 /**
  * Add program content items.
  *
  * @package    tool_muprog
  * @copyright  2023 Open LMS (https://www.openlms.net/)
+ * @copyright  2025 Petr Skoda
  * @author     Farhan Karmali
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -30,36 +33,38 @@ final class program_content_import extends \tool_mulib\local\ajax_form {
     #[\Override]
     protected function definition() {
         $mform = $this->_form;
-        $customdata = $this->_customdata;
+        $targetprogram = $this->_customdata['targetprogram'];
+        $context = $this->_customdata['context'];
 
-        $arguments = ['programid' => $customdata['id']];
-        \tool_muprog\external\form_program_content_import_fromprogram::add_form_element(
+        $ars = ['programid' => $targetprogram->id];
+        program_content_import_fromprogram::add_element(
             $mform,
-            $arguments,
+            $ars,
             'fromprogram',
-            get_string('importselectprogram', 'tool_muprog')
+            get_string('importselectprogram', 'tool_muprog'),
+            $context
         );
         $mform->addRule('fromprogram', null, 'required', null, 'client');
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
-        $mform->setDefault('id', $customdata['id']);
+        $mform->setDefault('id', $targetprogram->id);
 
         $this->add_action_buttons(true, get_string('continue'));
     }
 
     #[\Override]
     public function validation($data, $files) {
-        global $DB;
         $errors = parent::validation($data, $files);
+        $targetprogram = $this->_customdata['targetprogram'];
+        $context = $this->_customdata['context'];
 
-        // Check if the user has capability to copy the selected program.
-        $programid = $data['fromprogram'];
-        $programcontextid = $DB->get_field('tool_muprog_program', 'contextid', ['id' => $programid]);
-        $context = \context::instance_by_id($programcontextid);
-        if (!has_capability('tool/muprog:clone', $context)) {
-            $errors['fromprogram'] = get_string('error');
+        $args = ['programid' => $targetprogram->id];
+        $error = program_content_import_fromprogram::validate_value($data['fromprogram'], $args, $context);
+        if ($error !== null) {
+            $errors['fromprogram'] = $error;
         }
+
         return $errors;
     }
 }

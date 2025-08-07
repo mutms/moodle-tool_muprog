@@ -16,7 +16,7 @@
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace tool_muprog\external;
+namespace tool_muprog\external\form_autocomplete;
 
 use core_external\external_function_parameters;
 use core_external\external_value;
@@ -30,21 +30,13 @@ use core_external\external_value;
  * @author      Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class form_source_manual_allocate_users extends \tool_mulib\external\form_autocomplete_field {
-    /**
-     * True means returned field data is array, false means value is scalar.
-     *
-     * @return bool
-     */
-    public static function is_multi_select_field(): bool {
+final class source_manual_allocate_users extends \tool_mulib\external\form_autocomplete\user {
+    #[\Override]
+    public static function get_multiple(): bool {
         return true;
     }
 
-    /**
-     * Describes the external function arguments.
-     *
-     * @return external_function_parameters
-     */
+    #[\Override]
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'query' => new external_value(PARAM_RAW, 'The search query', VALUE_REQUIRED),
@@ -60,7 +52,7 @@ final class form_source_manual_allocate_users extends \tool_mulib\external\form_
      * @return array
      */
     public static function execute(string $query, int $programid): array {
-        global $DB, $CFG, $OUTPUT;
+        global $DB, $CFG;
 
         ['query' => $query, 'programid' => $programid] = self::validate_parameters(
             self::execute_parameters(),
@@ -88,8 +80,8 @@ final class form_source_manual_allocate_users extends \tool_mulib\external\form_
         }
 
         $additionalfields = $fields->get_sql('usr')->selects;
-        $sqlquery = <<<SQL
-            SELECT usr.id {$additionalfields}
+        $sql = <<<SQL
+            SELECT usr.*
               FROM {user} usr
          LEFT JOIN {tool_muprog_allocation} pa ON (pa.userid = usr.id AND pa.programid = :programid)
              WHERE pa.id IS NULL AND {$searchsql} {$tenantwhere}
@@ -97,38 +89,12 @@ final class form_source_manual_allocate_users extends \tool_mulib\external\form_
           ORDER BY {$sortsql}
 SQL;
 
-        $rs = $DB->get_recordset_sql($sqlquery, $params, 0, $CFG->maxusersperpage + 1);
-
-        return self::prepare_user_list($rs, $extrafields);
+        $users = $DB->get_records_sql($sql, $params, 0, self::MAX_RESULTS + 1);
+        return self::prepare_result($users, $context);
     }
 
-    /**
-     * Return function that return label for given value.
-     *
-     * @param array $arguments
-     * @return callable
-     */
-    public static function get_label_callback(array $arguments): callable {
-        return function ($value) use ($arguments): string {
-            global $DB;
-
-            $record = $DB->get_record('user', ['id' => $value]);
-
-            $context = \context_tenant::instance($arguments['tenantid']);
-
-            return self::prepare_user_label($record, $context);
-        };
-    }
-
-    /**
-     * Validate values.
-     *
-     * @param array $arguments
-     * @param mixed $value
-     * @param \context $context
-     * @return string|null error message, NULL means value is ok
-     */
-    public static function validate_form_value(array $arguments, $value, \context $context): ?string {
+    #[\Override]
+    public static function validate_value(int $value, array $args, \context $context): ?string {
         global $DB;
 
         if (!$value) {
@@ -140,7 +106,7 @@ SQL;
             return get_string('error');
         }
 
-        if ($DB->record_exists('tool_muprog_allocation', ['programid' => $arguments['programid'], 'userid' => $user->id])) {
+        if ($DB->record_exists('tool_muprog_allocation', ['programid' => $args['programid'], 'userid' => $user->id])) {
             return get_string('error');
         }
 

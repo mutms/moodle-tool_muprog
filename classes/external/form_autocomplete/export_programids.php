@@ -16,7 +16,7 @@
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace tool_muprog\external;
+namespace tool_muprog\external\form_autocomplete;
 
 use core_external\external_function_parameters;
 use core_external\external_value;
@@ -26,27 +26,22 @@ use core_external\external_value;
  *
  * @package     tool_muprog
  * @copyright   2024 Open LMS (https://www.openlms.net/)
+ * @copyright   2025 Petr Skoda
  * @author      Farhan Karmali
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class form_export_programids extends \tool_mulib\external\form_autocomplete_field {
-    /** @var int max results */
-    const MAX_RESULTS = 20;
+final class export_programids extends \tool_mulib\external\form_autocomplete\base {
+    /** @var string|null program table */
+    protected const ITEM_TABLE = 'tool_muprog_program';
+    /** @var string|null field used for item name */
+    protected const ITEM_FIELD = 'fullname';
 
-    /**
-     * True means returned field data is array, false means value is scalar.
-     *
-     * @return bool
-     */
-    public static function is_multi_select_field(): bool {
+    #[\Override]
+    public static function get_multiple(): bool {
         return true;
     }
 
-    /**
-     * Describes the external function arguments.
-     *
-     * @return external_function_parameters
-     */
+    #[\Override]
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'query' => new external_value(PARAM_RAW, 'The search query', VALUE_REQUIRED),
@@ -76,65 +71,37 @@ final class form_export_programids extends \tool_mulib\external\form_autocomplet
               ORDER BY p.fullname ASC";
         $rs = $DB->get_recordset_sql($sql, $params);
 
-        $notice = null;
-        $list = [];
+        $programs = [];
         $count = 0;
         foreach ($rs as $program) {
             $context = \context::instance_by_id($program->contextid);
             if (!has_capability('tool/muprog:export', $context)) {
                 continue;
             }
+            $programs[] = $program;
             $count++;
             if ($count > self::MAX_RESULTS) {
-                $notice = get_string('toomanyrecords', 'tool_mulib', self::MAX_RESULTS);
                 break;
             }
-            $list[] = ['value' => $program->id, 'label' => format_string($program->fullname)];
         }
         $rs->close();
 
-        return [
-            'notice' => $notice,
-            'list' => $list,
-        ];
+        return self::prepare_result($programs, $syscontext);
     }
 
-    /**
-     * Return function that return label for given value.
-     *
-     * @param array $arguments
-     * @return callable
-     */
-    public static function get_label_callback(array $arguments): callable {
-        return function ($value) use ($arguments): string {
-            global $DB;
-
-            $program = $DB->get_record('tool_muprog_program', ['id' => $value]);
-            if (!$program) {
-                return get_string('error');
-            }
-            return format_string($program->fullname);
-        };
-    }
-
-    /**
-     * Validate user can export programs.
-     *
-     * @param array $programids
-     * @return string|null null means ids ok, string is error
-     */
-    public static function validate_programids(array $programids): ?string {
+    #[\Override]
+    public static function validate_value(int $value, array $args, \context $context): ?string {
         global $DB;
-        foreach ($programids as $programid) {
-            $program = $DB->get_record('tool_muprog_program', ['id' => $programid]);
-            if (!$program) {
-                return get_string('error');
-            }
-            $context = \context::instance_by_id($program->contextid);
-            if (!has_capability('tool/muprog:export', $context)) {
-                return get_string('error');
-            }
+
+        $program = $DB->get_record('tool_muprog_program', ['id' => $value]);
+        if (!$program) {
+            return get_string('error');
         }
+        $context = \context::instance_by_id($program->contextid);
+        if (!has_capability('tool/muprog:export', $context)) {
+            return get_string('error');
+        }
+
         return null;
     }
 }

@@ -76,7 +76,7 @@ if ($program) {
 }
 
 $form = new \tool_muprog\local\form\export(null,
-    ['program' => $program, 'contextid' => $contextid, 'archived' => $archived]);
+    ['program' => $program, 'context' => $context, 'contextid' => $contextid, 'archived' => $archived]);
 
 if ($form->is_cancelled()) {
     redirect($returnurl);

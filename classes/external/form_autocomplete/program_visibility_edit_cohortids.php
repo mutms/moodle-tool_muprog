@@ -16,7 +16,7 @@
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace tool_muprog\external;
+namespace tool_muprog\external\form_autocomplete;
 
 use core_external\external_function_parameters;
 use core_external\external_value;
@@ -28,21 +28,13 @@ use core_external\external_value;
  * @copyright   2025 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class form_program_visibility_edit_cohortids extends \tool_mulib\external\form_autocomplete_field_cohort {
-    /**
-     * True means returned field data is array, false means value is scalar.
-     *
-     * @return bool
-     */
-    public static function is_multi_select_field(): bool {
+final class program_visibility_edit_cohortids extends \tool_mulib\external\form_autocomplete\cohort {
+    #[\Override]
+    public static function get_multiple(): bool {
         return true;
     }
 
-    /**
-     * Describes the external function arguments.
-     *
-     * @return external_function_parameters
-     */
+    #[\Override]
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
             'query' => new external_value(PARAM_RAW, 'The search query', VALUE_REQUIRED),
@@ -60,9 +52,15 @@ final class form_program_visibility_edit_cohortids extends \tool_mulib\external\
     public static function execute(string $query, int $programid): array {
         global $DB;
 
-        ['query' => $query, 'programid' => $programid] = self::validate_parameters(
+        [
+            'query' => $query,
+            'programid' => $programid,
+        ] = self::validate_parameters(
             self::execute_parameters(),
-            ['query' => $query, 'programid' => $programid]
+            [
+                'query' => $query,
+                'programid' => $programid,
+            ]
         );
 
         $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
@@ -86,19 +84,28 @@ final class form_program_visibility_edit_cohortids extends \tool_mulib\external\
               ORDER BY ch.name ASC";
         $rs = $DB->get_recordset_sql($sql, $params);
 
-        return self::prepare_cohort_list($rs);
+        $cohorts = [];
+        $i = 0;
+        foreach ($rs as $cohort) {
+            if (!self::is_cohort_visible($cohort)) {
+                continue;
+            }
+            $cohorts[$cohort->id] = $cohort;
+            $i++;
+            if ($i > self::MAX_RESULTS) {
+                break;
+            }
+        }
+        $rs->close();
+
+        return self::prepare_result($cohorts, $context);
     }
 
-    /**
-     * Validate user can select cohort.
-     *
-     * @param int $cohortid
-     * @param int $programid 0 means no program yet
-     * @return string|null null means ids ok, string is error
-     */
-    public static function validate_cohortid(int $cohortid, int $programid): ?string {
+    #[\Override]
+    public static function validate_value(int $value, array $args, \context $context): ?string {
         global $DB;
-        $cohort = $DB->get_record('cohort', ['id' => $cohortid]);
+        $programid = $args['programid'];
+        $cohort = $DB->get_record('cohort', ['id' => $value]);
         if (!$cohort) {
             return get_string('error');
         }
@@ -118,7 +125,7 @@ final class form_program_visibility_edit_cohortids extends \tool_mulib\external\
                 return get_string('error');
             }
         }
-        if (!self::is_cohort_visible($cohort, $context)) {
+        if (!self::is_cohort_visible($cohort)) {
             return get_string('error');
         }
         return null;
