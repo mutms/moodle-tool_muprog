@@ -299,17 +299,21 @@ final class notification_manager extends \tool_mulib\local\notification\manager 
     /**
      * Adds the frominstance autocomplete element to import form.
      *
-     * @param int $instanceid
+     * @param int $instanceid target instance
      * @param \MoodleQuickForm $mform
      * @return void
      */
     public static function add_import_frominstance_element(int $instanceid, \MoodleQuickForm $mform): void {
-        $arguments = ['id' => $instanceid];
-        \tool_muprog\external\form_notification_import_frominstance::add_form_element(
+        global $DB;
+        $program = $DB->get_record('tool_muprog_program', ['id' => $instanceid], '*', MUST_EXIST);
+        $context = \context::instance_by_id($program->contextid);
+        $args = ['id' => $instanceid];
+        \tool_muprog\external\form_autocomplete\notification_import_frominstance::add_element(
             $mform,
-            $arguments,
+            $args,
             'frominstance',
-            get_string('notification_import_from', 'tool_mulib')
+            get_string('notification_import_from', 'tool_mulib'),
+            $context
         );
         $mform->addRule('frominstance', null, 'required', null, 'client');
     }
@@ -317,23 +321,22 @@ final class notification_manager extends \tool_mulib\local\notification\manager 
     /**
      * Validates if the user can import from the specified instanceid.
      *
-     * @param int $instanceid
+     * @param int $instanceid target instance
      * @param int $frominstanceid
      * @return bool true means value ok, false means value is invalid
      */
     public static function validate_import_frominstance(int $instanceid, int $frominstanceid): bool {
         global $DB;
 
-        if (!$frominstanceid) {
-            return false;
-        }
+        $targetprogram = $DB->get_record('tool_muprog_program', ['id' => $instanceid], '*', MUST_EXIST);
+        $context = \context::instance_by_id($targetprogram->contextid);
 
-        $programcontextid = $DB->get_field('tool_muprog_program', 'contextid', ['id' => $frominstanceid]);
-        if (!$programcontextid) {
-            return false;
-        }
+        $error = \tool_muprog\external\form_autocomplete\notification_import_frominstance::validate_value(
+            $frominstanceid,
+            ['id' => $instanceid],
+            $context
+        );
 
-        $context = \context::instance_by_id($programcontextid);
-        return has_capability('tool/muprog:clone', $context);
+        return $error === null;
     }
 }

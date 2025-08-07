@@ -17,7 +17,9 @@
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 // phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace tool_muprog\phpunit\external;
+namespace tool_muprog\phpunit\external\form_autocomplete;
+
+use tool_muprog\external\form_autocomplete\item_append_trainingid;
 
 /**
  * External API for adding of training to program.
@@ -29,9 +31,9 @@ namespace tool_muprog\phpunit\external;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @covers \tool_muprog\external\form_item_append_trainingid
+ * @covers \tool_muprog\external\form_autocomplete\item_append_trainingid
  */
-final class form_item_append_trainingid_test extends \advanced_testcase {
+final class item_append_trainingid_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();
         if (!\tool_muprog\local\util::is_mutrain_available()) {
@@ -118,92 +120,92 @@ final class form_item_append_trainingid_test extends \advanced_testcase {
         role_assign($fviewerroleid, $user1->id, $syscontext->id);
 
         $this->setUser($user1);
-        $response = \tool_muprog\external\form_item_append_trainingid::execute('', $program1->id);
-        $results = \tool_muprog\external\form_item_append_trainingid::clean_returnvalue(
-            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(),
+        $response = item_append_trainingid::execute('', $program1->id);
+        $results = item_append_trainingid::clean_returnvalue(
+            item_append_trainingid::execute_returns(),
             $response
         );
-        $this->assertSame(null, $results['notice']);
+        $this->assertFalse($results['overflow']);
         $expectedlist = [
-            ['value' => $framework3->id, 'label' => $framework3->name],
-            ['value' => $framework2->id, 'label' => $framework2->name],
-            ['value' => $framework1->id, 'label' => $framework1->name],
+            ['value' => (int)$framework3->id, 'label' => $framework3->name],
+            ['value' => (int)$framework2->id, 'label' => $framework2->name],
+            ['value' => (int)$framework1->id, 'label' => $framework1->name],
         ];
         $this->assertSame($expectedlist, $results['list']);
 
-        $response = \tool_muprog\external\form_item_append_trainingid::execute('framework', $program1->id);
-        $results = \tool_muprog\external\form_item_append_trainingid::clean_returnvalue(
-            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(),
+        $response = item_append_trainingid::execute('framework', $program1->id);
+        $results = item_append_trainingid::clean_returnvalue(
+            item_append_trainingid::execute_returns(),
             $response
         );
-        $this->assertSame(null, $results['notice']);
+        $this->assertFalse($results['overflow']);
         $expectedlist = [
-            ['value' => $framework3->id, 'label' => $framework3->name],
-            ['value' => $framework2->id, 'label' => $framework2->name],
-            ['value' => $framework1->id, 'label' => $framework1->name],
+            ['value' => (int)$framework3->id, 'label' => $framework3->name],
+            ['value' => (int)$framework2->id, 'label' => $framework2->name],
+            ['value' => (int)$framework1->id, 'label' => $framework1->name],
         ];
         $this->assertSame($expectedlist, $results['list']);
 
-        $response = \tool_muprog\external\form_item_append_trainingid::execute('Another', $program1->id);
-        $results = \tool_muprog\external\form_item_append_trainingid::clean_returnvalue(
-            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(),
+        $response = item_append_trainingid::execute('Another', $program1->id);
+        $results = item_append_trainingid::clean_returnvalue(
+            item_append_trainingid::execute_returns(),
             $response
         );
-        $this->assertSame(null, $results['notice']);
+        $this->assertFalse($results['overflow']);
         $expectedlist = [
-            ['value' => $framework3->id, 'label' => $framework3->name],
+            ['value' => (int)$framework3->id, 'label' => $framework3->name],
         ];
         $this->assertSame($expectedlist, $results['list']);
 
-        $response = \tool_muprog\external\form_item_append_trainingid::execute('fr2', $program1->id);
-        $results = \tool_muprog\external\form_item_append_trainingid::clean_returnvalue(
-            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(),
+        $response = item_append_trainingid::execute('fr2', $program1->id);
+        $results = item_append_trainingid::clean_returnvalue(
+            item_append_trainingid::execute_returns(),
             $response
         );
-        $this->assertSame(null, $results['notice']);
+        $this->assertFalse($results['overflow']);
         $expectedlist = [
-            ['value' => $framework2->id, 'label' => $framework2->name],
+            ['value' => (int)$framework2->id, 'label' => $framework2->name],
         ];
         $this->assertSame($expectedlist, $results['list']);
 
-        $response = \tool_muprog\external\form_item_append_trainingid::execute('xxx', $program1->id);
-        $results = \tool_muprog\external\form_item_append_trainingid::clean_returnvalue(
-            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(),
+        $response = item_append_trainingid::execute('xxx', $program1->id);
+        $results = item_append_trainingid::clean_returnvalue(
+            item_append_trainingid::execute_returns(),
             $response
         );
-        $this->assertSame(null, $results['notice']);
+        $this->assertFalse($results['overflow']);
         $expectedlist = [];
         $this->assertSame($expectedlist, $results['list']);
 
         $this->setUser($user2);
-        $response = \tool_muprog\external\form_item_append_trainingid::execute('', $program1->id);
-        $results = \tool_muprog\external\form_item_append_trainingid::clean_returnvalue(
-            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(),
+        $response = item_append_trainingid::execute('', $program1->id);
+        $results = item_append_trainingid::clean_returnvalue(
+            item_append_trainingid::execute_returns(),
             $response
         );
-        $this->assertSame(null, $results['notice']);
+        $this->assertFalse($results['overflow']);
         $expectedlist = [
-            ['value' => $framework2->id, 'label' => $framework2->name],
-            ['value' => $framework1->id, 'label' => $framework1->name],
+            ['value' => (int)$framework2->id, 'label' => $framework2->name],
+            ['value' => (int)$framework1->id, 'label' => $framework1->name],
         ];
         $this->assertSame($expectedlist, $results['list']);
 
         $this->setUser($user3);
-        $response = \tool_muprog\external\form_item_append_trainingid::execute('', $program2->id);
-        $results = \tool_muprog\external\form_item_append_trainingid::clean_returnvalue(
-            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(),
+        $response = item_append_trainingid::execute('', $program2->id);
+        $results = item_append_trainingid::clean_returnvalue(
+            item_append_trainingid::execute_returns(),
             $response
         );
-        $this->assertSame(null, $results['notice']);
+        $this->assertFalse($results['overflow']);
         $expectedlist = [
-            ['value' => $framework2->id, 'label' => $framework2->name],
-            ['value' => $framework1->id, 'label' => $framework1->name],
+            ['value' => (int)$framework2->id, 'label' => $framework2->name],
+            ['value' => (int)$framework1->id, 'label' => $framework1->name],
         ];
         $this->assertSame($expectedlist, $results['list']);
 
         $this->setUser($user3);
         try {
-            \tool_muprog\external\form_item_append_trainingid::execute('', $program1->id);
+            item_append_trainingid::execute('', $program1->id);
             $this->fail('Exception expected');
         } catch (\moodle_exception $ex) {
             $this->assertInstanceOf(\required_capability_exception::class, $ex);
@@ -211,7 +213,7 @@ final class form_item_append_trainingid_test extends \advanced_testcase {
 
         $this->setUser($user4);
         try {
-            \tool_muprog\external\form_item_append_trainingid::execute('', $program1->id);
+            item_append_trainingid::execute('', $program1->id);
             $this->fail('Exception expected');
         } catch (\moodle_exception $ex) {
             $this->assertInstanceOf(\required_capability_exception::class, $ex);
@@ -279,53 +281,53 @@ final class form_item_append_trainingid_test extends \advanced_testcase {
         role_assign($editorroleid, $user2->id, $tenant2catcontext->id);
 
         $this->setUser($user0);
-        $response = \tool_muprog\external\form_item_append_trainingid::execute('', $program0->id);
-        $results = \tool_muprog\external\form_item_append_trainingid::clean_returnvalue(
-            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(),
+        $response = item_append_trainingid::execute('', $program0->id);
+        $results = item_append_trainingid::clean_returnvalue(
+            item_append_trainingid::execute_returns(),
             $response
         );
-        $this->assertSame(null, $results['notice']);
+        $this->assertFalse($results['overflow']);
         $expectedlist = [
-            ['value' => $framework0->id, 'label' => $framework0->name],
-            ['value' => $framework1->id, 'label' => $framework1->name],
-            ['value' => $framework2->id, 'label' => $framework2->name],
+            ['value' => (int)$framework0->id, 'label' => $framework0->name],
+            ['value' => (int)$framework1->id, 'label' => $framework1->name],
+            ['value' => (int)$framework2->id, 'label' => $framework2->name],
         ];
         $this->assertSame($expectedlist, $results['list']);
 
-        $response = \tool_muprog\external\form_item_append_trainingid::execute('', $program1->id);
-        $results = \tool_muprog\external\form_item_append_trainingid::clean_returnvalue(
-            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(),
+        $response = item_append_trainingid::execute('', $program1->id);
+        $results = item_append_trainingid::clean_returnvalue(
+            item_append_trainingid::execute_returns(),
             $response
         );
-        $this->assertSame(null, $results['notice']);
+        $this->assertFalse($results['overflow']);
         $expectedlist = [
-            ['value' => $framework0->id, 'label' => $framework0->name],
-            ['value' => $framework1->id, 'label' => $framework1->name],
+            ['value' => (int)$framework0->id, 'label' => $framework0->name],
+            ['value' => (int)$framework1->id, 'label' => $framework1->name],
         ];
         $this->assertSame($expectedlist, $results['list']);
 
-        $response = \tool_muprog\external\form_item_append_trainingid::execute('', $program2->id);
-        $results = \tool_muprog\external\form_item_append_trainingid::clean_returnvalue(
-            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(),
+        $response = item_append_trainingid::execute('', $program2->id);
+        $results = item_append_trainingid::clean_returnvalue(
+            item_append_trainingid::execute_returns(),
             $response
         );
-        $this->assertSame(null, $results['notice']);
+        $this->assertFalse($results['overflow']);
         $expectedlist = [
-            ['value' => $framework0->id, 'label' => $framework0->name],
-            ['value' => $framework2->id, 'label' => $framework2->name],
+            ['value' => (int)$framework0->id, 'label' => $framework0->name],
+            ['value' => (int)$framework2->id, 'label' => $framework2->name],
         ];
         $this->assertSame($expectedlist, $results['list']);
 
         $this->setUser($user2);
-        $response = \tool_muprog\external\form_item_append_trainingid::execute('', $program2->id);
-        $results = \tool_muprog\external\form_item_append_trainingid::clean_returnvalue(
-            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(),
+        $response = item_append_trainingid::execute('', $program2->id);
+        $results = item_append_trainingid::clean_returnvalue(
+            item_append_trainingid::execute_returns(),
             $response
         );
-        $this->assertSame(null, $results['notice']);
+        $this->assertFalse($results['overflow']);
         $expectedlist = [
-            ['value' => $framework0->id, 'label' => $framework0->name],
-            ['value' => $framework2->id, 'label' => $framework2->name],
+            ['value' => (int)$framework0->id, 'label' => $framework0->name],
+            ['value' => (int)$framework2->id, 'label' => $framework2->name],
         ];
         $this->assertSame($expectedlist, $results['list']);
     }

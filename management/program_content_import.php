@@ -63,7 +63,7 @@ $form = null;
 if (!$fromprogram) {
     $form = new \tool_muprog\local\form\program_content_import(
         null,
-        ['id' => $targetprogram->id, 'contextid' => $context->id]
+        ['targetprogram' => $targetprogram, 'context' => $context]
     );
     if ($form->is_cancelled()) {
         redirect($returnurl);

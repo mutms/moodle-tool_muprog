@@ -17,7 +17,9 @@
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 // phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace tool_muprog\phpunit\external;
+namespace tool_muprog\phpunit\external\form_autocomplete;
+
+use tool_muprog\external\form_autocomplete\export_programids;
 
 /**
  * External API for form Import allocation settings
@@ -29,9 +31,9 @@ namespace tool_muprog\phpunit\external;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @covers \tool_muprog\external\form_export_programids
+ * @covers \tool_muprog\external\form_autocomplete\export_programids
  */
-final class form_export_programids_test extends \advanced_testcase {
+final class export_programids_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
@@ -85,20 +87,21 @@ final class form_export_programids_test extends \advanced_testcase {
         role_assign($viewerroleid, $user1->id, $catcontext1->id);
 
         $this->setUser($user1->id);
-        $response = \tool_muprog\external\form_export_programids::execute('');
-        $results = \tool_muprog\external\form_export_programids::clean_returnvalue(\tool_muprog\external\form_export_programids::execute_returns(), $response);
-        $this->assertSame(null, $results['notice']);
-        $this->assertCount(1, $results['list']);
+        $response = export_programids::execute('');
+        $result = export_programids::clean_returnvalue(export_programids::execute_returns(), $response);
+        $this->assertFalse($result['overflow']);
+        $this->assertCount(1, $result['list']);
 
-        $this->assertNull(\tool_muprog\external\form_export_programids::validate_programids([$program2->id]));
-        $this->assertNotNull(\tool_muprog\external\form_export_programids::validate_programids([$program2->id, $program1->id]));
+        $this->assertNull(export_programids::validate_value($program2->id, [], $syscontext));
+        $this->assertNotNull(export_programids::validate_value($program1->id, [], $syscontext));
 
         $this->setAdminUser();
-        $response = \tool_muprog\external\form_export_programids::execute('');
-        $results = \tool_muprog\external\form_export_programids::clean_returnvalue(\tool_muprog\external\form_export_programids::execute_returns(), $response);
-        $this->assertSame(null, $results['notice']);
-        $this->assertCount(3, $results['list']);
-        $this->assertNull(\tool_muprog\external\form_export_programids::validate_programids([$program2->id]));
-        $this->assertNull(\tool_muprog\external\form_export_programids::validate_programids([$program3->id, $program2->id, $program1->id]));
+        $response = export_programids::execute('');
+        $result = export_programids::clean_returnvalue(export_programids::execute_returns(), $response);
+        $this->assertFalse($result['overflow']);
+        $this->assertCount(3, $result['list']);
+        $this->assertNull(export_programids::validate_value($program2->id, [], $syscontext));
+        $this->assertNull(export_programids::validate_value($program1->id, [], $syscontext));
+        $this->assertNull(export_programids::validate_value($program3->id, [], $syscontext));
     }
 }

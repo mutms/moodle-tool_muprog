@@ -17,7 +17,9 @@
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 // phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace tool_muprog\phpunit\external;
+namespace tool_muprog\phpunit\external\form_autocomplete;
+
+use tool_muprog\external\form_autocomplete\notification_import_frominstance;
 
 /**
  * External API for form import program notification
@@ -28,9 +30,9 @@ namespace tool_muprog\phpunit\external;
  * @author     Farhan Karmali
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @covers \tool_muprog\external\form_notification_import_frominstance
+ * @covers \tool_muprog\external\form_autocomplete\notification_import_frominstance
  */
-final class form_notification_import_frominstance_test extends \advanced_testcase {
+final class notification_import_frominstance_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
@@ -104,26 +106,26 @@ final class form_notification_import_frominstance_test extends \advanced_testcas
         role_assign($editroleid, $user1->id, $syscontext->id);
         role_assign($cloneroleid, $user1->id, $syscontext->id);
         $this->setUser($user1);
-        $response = \tool_muprog\external\form_notification_import_frominstance::execute('', $program1->id);
-        $results = \tool_muprog\external\form_notification_import_frominstance::clean_returnvalue(
-            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(),
+        $response = notification_import_frominstance::execute('', $program1->id);
+        $results = notification_import_frominstance::clean_returnvalue(
+            notification_import_frominstance::execute_returns(),
             $response
         );
-        $this->assertSame(null, $results['notice']);
+        $this->assertFalse($results['overflow']);
         $this->assertCount(2, $results['list']);
-        $this->assertSame($program2->id, $results['list'][0]['value']);
-        $this->assertSame($program3->id, $results['list'][1]['value']);
+        $this->assertSame((int)$program2->id, $results['list'][0]['value']);
+        $this->assertSame((int)$program3->id, $results['list'][1]['value']);
 
         role_assign($editroleid, $user2->id, $syscontext->id);
         role_assign($cloneroleid, $user2->id, $catcontext1->id);
         $this->setUser($user2);
-        $response = \tool_muprog\external\form_notification_import_frominstance::execute('', $program1->id);
-        $results = \tool_muprog\external\form_notification_import_frominstance::clean_returnvalue(
-            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(),
+        $response = notification_import_frominstance::execute('', $program1->id);
+        $results = notification_import_frominstance::clean_returnvalue(
+            notification_import_frominstance::execute_returns(),
             $response
         );
-        $this->assertSame(null, $results['notice']);
+        $this->assertFalse($results['overflow']);
         $this->assertCount(1, $results['list']);
-        $this->assertSame($program2->id, $results['list'][0]['value']);
+        $this->assertSame((int)$program2->id, $results['list'][0]['value']);
     }
 }

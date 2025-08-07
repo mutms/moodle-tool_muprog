@@ -17,21 +17,22 @@
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 // phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace tool_muprog\phpunit\external;
+namespace tool_muprog\phpunit\external\form_autocomplete;
+
+use tool_muprog\external\form_autocomplete\program_content_import_fromprogram;
 
 /**
- * External API for form Import allocation settings
+ * External API for form import program content
  *
  * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2023 Open LMS (https://www.openlms.net/)
- * @copyright  2025 Petr Skoda
- * @author     Petr Skoda
+ * @author     Farhan Karmali
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @covers \tool_muprog\external\form_program_allocation_import_fromprogram
+ * @covers \tool_muprog\external\form_autocomplete\program_content_import_fromprogram
  */
-final class form_program_allocation_import_fromprogram_test extends \advanced_testcase {
+final class program_content_import_fromprogram_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
@@ -82,17 +83,17 @@ final class form_program_allocation_import_fromprogram_test extends \advanced_te
         $user1 = $this->getDataGenerator()->create_user();
 
         $this->setAdminUser();
-        $response = \tool_muprog\external\form_program_allocation_import_fromprogram::execute('', $program1->id);
-        $results = \tool_muprog\external\form_program_allocation_import_fromprogram::clean_returnvalue(
-            \tool_muprog\external\form_program_allocation_import_fromprogram::execute_returns(),
+        $response = program_content_import_fromprogram::execute('', $program1->id);
+        $results = program_content_import_fromprogram::clean_returnvalue(
+            program_content_import_fromprogram::execute_returns(),
             $response
         );
-        $this->assertSame(null, $results['notice']);
+        $this->assertFalse($results['overflow']);
         $this->assertCount(2, $results['list']);
 
         $this->setUser($user1);
         try {
-            $response = \tool_muprog\external\form_program_allocation_import_fromprogram::execute('', $program1->id);
+            $response = program_content_import_fromprogram::execute('', $program1->id);
             $this->fail('Exception excepted');
         } catch (\moodle_exception $ex) {
             $this->assertInstanceOf(\required_capability_exception::class, $ex);
@@ -144,12 +145,12 @@ final class form_program_allocation_import_fromprogram_test extends \advanced_te
         role_assign($editorroleid, $user1->id, $tenant1catcontext->id);
 
         $this->setAdminUser();
-        $response = \tool_muprog\external\form_program_allocation_import_fromprogram::execute('', $program0->id);
+        $response = program_content_import_fromprogram::execute('', $program0->id);
         $this->assertCount(3, $response['list']);
 
         $this->setUser($user0);
         try {
-            $response = \tool_muprog\external\form_program_allocation_import_fromprogram::execute('', $program1->id);
+            $response = program_content_import_fromprogram::execute('', $program1->id);
             $this->fail('Exception excepted');
         } catch (\moodle_exception $ex) {
             $this->assertInstanceOf(\required_capability_exception::class, $ex);
@@ -160,7 +161,7 @@ final class form_program_allocation_import_fromprogram_test extends \advanced_te
         }
 
         $this->setUser($user1);
-        $response = \tool_muprog\external\form_program_allocation_import_fromprogram::execute('', $program1->id);
+        $response = program_content_import_fromprogram::execute('', $program1->id);
         $this->assertCount(1, $response['list']);
         $program3resp = array_pop($response['list']);
         $this->assertSame($program3->id, $program3resp['value']);
