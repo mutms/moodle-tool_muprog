@@ -40,7 +40,7 @@ jobs:
           - php: '8.3'
             moodle-branch: 'MOODLE_500_STABLE'
             database: pgsql
-          - php: '8.2'
+          - php: '8.4'
             moodle-branch: 'MOODLE_500_STABLE'
             database: mariadb
 
@@ -111,7 +111,10 @@ jobs:
 
       - name: PHPUnit tests
         if: ${{ !cancelled() }}
-        run: moodle-plugin-ci phpunit --fail-on-warning
+        run: |
+          moodle-plugin-ci phpunit --fail-on-warning
+          cd moodle
+          vendor/bin/phpunit --group=plugin_checks --filter=tool_muprog
 
       - name: Behat features
         id: behat
