@@ -7,7 +7,7 @@
             "category": "",
             "description": "<p>Test program</p>\r\n<p>at system context</p>",
             "descriptionformat": 1,
-            "publicaccess": 1,
+            "public": 1,
             "creategroups": 0,
             "allocationstart": "2023-10-30T17:57:00+00:00",
             "allocationend": "2029-10-30T17:57:00+00:00",
@@ -106,7 +106,7 @@
             "category": "Category 1",
             "description": "",
             "descriptionformat": 1,
-            "publicaccess": 0,
+            "public": 0,
             "creategroups": 1,
             "allocationstart": null,
             "allocationend": null,
@@ -152,7 +152,7 @@
             "category": "CAT2",
             "description": "",
             "descriptionformat": 1,
-            "publicaccess": 0,
+            "public": 0,
             "creategroups": 0,
             "allocationstart": null,
             "allocationend": null,
@@ -173,18 +173,6 @@
                 "completiondelay": 0,
                 "sequencetype": "allinanyorder",
                 "items": [
-                    {
-                        "itemtype": "training",
-                        "reference": "TFW1",
-                        "points": 1,
-                        "completiondelay": 0
-                    },
-                    {
-                        "itemtype": "training",
-                        "reference": "Training FW2",
-                        "points": 2,
-                        "completiondelay": 86400
-                    }
                 ]
             },
             "sources": [

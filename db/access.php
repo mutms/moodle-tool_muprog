@@ -29,7 +29,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
-    /* Access program catalogue - catalogue uses program.public, visible cohorts and own allocations. */
+    /* Access program catalogue - catalogue uses program.publicaccess, visible cohorts and own allocations. */
     'tool/muprog:viewcatalogue' => [
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,

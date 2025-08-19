@@ -47,7 +47,7 @@ final class get_program_allocations_test extends \advanced_testcase {
         $category1 = $this->getDataGenerator()->create_category([]);
         $catcontext1 = \context_coursecat::instance($category1->id);
 
-        $program1 = $generator->create_program(['fullname' => 'pokus', 'contextid' => $catcontext1->id, 'public' => 1,
+        $program1 = $generator->create_program(['fullname' => 'pokus', 'contextid' => $catcontext1->id, 'publicaccess' => 1,
             'sources' => ['manual' => [], 'selfallocation' => []]]);
         $program2 = $generator->create_program(['fullname' => 'hokus',
             'sources' => ['manual' => []]]);

@@ -141,9 +141,9 @@ final class catalogue_test extends \advanced_testcase {
         /** @var \tool_muprog_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
 
-        $program1 = $generator->create_program(['public' => 1]);
+        $program1 = $generator->create_program(['publicaccess' => 1]);
         $program2 = $generator->create_program(['idnumber' => 'pokus', 'cohorts' => [$cohort1->id, $cohort2->id]]);
-        $program3 = $generator->create_program(['public' => 1, 'archived' => 1, 'cohorts' => [$cohort1->id, $cohort2->id], 'sources' => ['manual' => []]]);
+        $program3 = $generator->create_program(['publicaccess' => 1, 'archived' => 1, 'cohorts' => [$cohort1->id, $cohort2->id], 'sources' => ['manual' => []]]);
         $source3 = $DB->get_record('tool_muprog_source', ['programid' => $program3->id, 'type' => 'manual'], '*', MUST_EXIST);
         $program4 = $generator->create_program(['contextid' => $catcontext1->id, 'cohorts' => [$cohort1->id]]);
         $program5 = $generator->create_program(['contextid' => $catcontext1->id, 'archived' => 1, 'cohorts' => [$cohort2->id]]);
@@ -209,9 +209,9 @@ final class catalogue_test extends \advanced_testcase {
         /** @var \tool_muprog_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
 
-        $program1 = $generator->create_program(['public' => 1]);
+        $program1 = $generator->create_program(['publicaccess' => 1]);
         $program2 = $generator->create_program(['idnumber' => 'pokus', 'cohorts' => [$cohort1->id, $cohort2->id]]);
-        $program3 = $generator->create_program(['public' => 1, 'archived' => 1, 'cohorts' => [$cohort1->id, $cohort2->id], 'sources' => ['manual' => []]]);
+        $program3 = $generator->create_program(['publicaccess' => 1, 'archived' => 1, 'cohorts' => [$cohort1->id, $cohort2->id], 'sources' => ['manual' => []]]);
         $program4 = $generator->create_program(['cohorts' => [$cohort1->id]]);
         $program5 = $generator->create_program(['archived' => 1, 'cohorts' => [$cohort2->id]]);
         $program6 = $generator->create_program(['sources' => ['manual' => []]]);
@@ -371,9 +371,9 @@ final class catalogue_test extends \advanced_testcase {
         /** @var \tool_muprog_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
 
-        $program1 = $generator->create_program(['fullname' => 'hokus', 'public' => 1]);
+        $program1 = $generator->create_program(['fullname' => 'hokus', 'publicaccess' => 1]);
         $program2 = $generator->create_program(['idnumber' => 'pokus', 'cohorts' => [$cohort1->id, $cohort2->id]]);
-        $program3 = $generator->create_program(['public' => 1, 'archived' => 1, 'cohorts' => [$cohort1->id, $cohort2->id], 'sources' => ['manual' => []]]);
+        $program3 = $generator->create_program(['publicaccess' => 1, 'archived' => 1, 'cohorts' => [$cohort1->id, $cohort2->id], 'sources' => ['manual' => []]]);
         $source3 = $DB->get_record('tool_muprog_source', ['programid' => $program3->id, 'type' => 'manual'], '*', MUST_EXIST);
         $program4 = $generator->create_program(['contextid' => $catcontext1->id, 'cohorts' => [$cohort1->id]]);
         $program5 = $generator->create_program(['contextid' => $catcontext1->id, 'archived' => 1, 'cohorts' => [$cohort2->id]]);
@@ -443,9 +443,9 @@ final class catalogue_test extends \advanced_testcase {
         /** @var \tool_muprog_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
 
-        $program1 = $generator->create_program(['fullname' => 'hokus', 'public' => 1]);
+        $program1 = $generator->create_program(['fullname' => 'hokus', 'publicaccess' => 1]);
         $program2 = $generator->create_program(['idnumber' => 'pokus', 'cohorts' => [$cohort1->id, $cohort2->id]]);
-        $program3 = $generator->create_program(['public' => 1, 'archived' => 1, 'cohorts' => [$cohort1->id, $cohort2->id], 'sources' => ['manual' => []]]);
+        $program3 = $generator->create_program(['publicaccess' => 1, 'archived' => 1, 'cohorts' => [$cohort1->id, $cohort2->id], 'sources' => ['manual' => []]]);
         $program4 = $generator->create_program(['cohorts' => [$cohort1->id]]);
         $program5 = $generator->create_program(['archived' => 1, 'cohorts' => [$cohort2->id]]);
         $program6 = $generator->create_program(['sources' => ['manual' => []]]);
@@ -663,9 +663,9 @@ final class catalogue_test extends \advanced_testcase {
         /** @var \tool_muprog_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
 
-        $program1 = $generator->create_program(['fullname' => 'hokus', 'public' => 1]);
+        $program1 = $generator->create_program(['fullname' => 'hokus', 'publicaccess' => 1]);
         $program2 = $generator->create_program(['idnumber' => 'pokus', 'cohorts' => [$cohort1->id, $cohort2->id]]);
-        $program3 = $generator->create_program(['public' => 1, 'archived' => 1, 'cohorts' => [$cohort1->id, $cohort2->id], 'sources' => ['manual' => []]]);
+        $program3 = $generator->create_program(['publicaccess' => 1, 'archived' => 1, 'cohorts' => [$cohort1->id, $cohort2->id], 'sources' => ['manual' => []]]);
         $source3 = $DB->get_record('tool_muprog_source', ['programid' => $program3->id, 'type' => 'manual'], '*', MUST_EXIST);
         $program4 = $generator->create_program(['contextid' => $catcontext1->id, 'cohorts' => [$cohort1->id]]);
         $program5 = $generator->create_program(['contextid' => $catcontext1->id, 'archived' => 1, 'cohorts' => [$cohort2->id]]);

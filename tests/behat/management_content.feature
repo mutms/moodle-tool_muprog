@@ -27,7 +27,7 @@ Feature: Program content management tests
       | Program viewer  | pviewer   |
       | Program manager | pmanager  |
     And the following "permission overrides" exist:
-      | capability                     | permission | role     | contextlevel | reference |
+      | capability                  | permission | role     | contextlevel | reference |
       | tool/muprog:view            | Allow      | pviewer  | System       |           |
       | tool/muprog:view            | Allow      | pmanager | System       |           |
       | tool/muprog:edit            | Allow      | pmanager | System       |           |
@@ -324,15 +324,15 @@ Feature: Program content management tests
       | name              | component   | area   | itemid |
       | Category for test | core_course | course | 0      |
     And the following "custom fields" exist:
-      | name             | category           | type     | shortname | configdata            |
+      | name             | category           | type    | shortname | configdata            |
       | Training Field 1 | Category for test  | mutrain | training1 |                       |
       | Training Field 2 | Category for test  | mutrain | training2 |                       |
       | Training Field 3 | Category for test  | mutrain | training3 |                       |
     And the following "tool_mutrain > frameworks" exist:
-      | name    | fields    | category | public | requiredtraining | restrictedcompletion |
-      | TFR 001 | training1 |          | 1      | 10               | 0                    |
-      | TFR 002 | training2 | Cat 2    | 1      | 20               | 1                    |
-      | TFR 003 | training1 |          | 0      | 30               | 0                    |
+      | name    | fields    | category | publicaccess | requiredtraining | restrictedcompletion |
+      | TFR 001 | training1 |          | 1            | 10               | 0                    |
+      | TFR 002 | training2 | Cat 2    | 1            | 20               | 1                    |
+      | TFR 003 | training1 |          | 0            | 30               | 0                    |
     And the following "courses" exist:
       | fullname | shortname | format | category | customfield_training1 | customfield_training2 |
       | Course 7 | C7        | topics | CAT2     | 7                     | 1                     |

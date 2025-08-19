@@ -4,6 +4,7 @@
 
 Release date: xx/08/2025
 
+* Fixed compatibility with unsupported MS SQL databases.
 * Fixed fatal errors when sending deallocation email and SMTP is down, you may need to wait for next cron run to resolve blocking errors for students.
 
 ## mu-5.0.2-01

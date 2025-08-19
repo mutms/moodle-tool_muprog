@@ -50,7 +50,7 @@ final class upload {
                 'description' => $rawprogram->description ?? '',
                 'descriptionformat' => $rawprogram->descriptionformat ?? FORMAT_HTML,
                 'archived' => 0,
-                'public' => $rawprogram->public ?? 0,
+                'publicaccess' => $rawprogram->publicaccess ?? 0,
                 'creategroups' => $rawprogram->creategroups ?? 0,
                 'timeallocationstart' => self::parse_date($rawprogram->allocationstart ?? null),
                 'timeallocationend' => self::parse_date($rawprogram->allocationend ?? null),
@@ -176,7 +176,7 @@ final class upload {
             'fullname',
             'category',
             'description',
-            'public',
+            'publicaccess',
             'contents',
             'creategroups',
             'allocationstart',
@@ -330,7 +330,7 @@ final class upload {
                 $fullname,
                 $cat,
                 clean_text(shorten_text($description, 30)),
-                $yesno[$program->public ?? 0],
+                $yesno[$program->publicaccess ?? 0],
                 $contents,
                 $yesno[$program->creategroups ?? 0],
                 $program->allocationstart ?? '',
@@ -634,6 +634,9 @@ final class upload {
         }
         $data = \core_text::trim_utf8_bom($data);
 
+        // BC hack to solve DB field renaming.
+        $data = str_replace('"public"', '"publicaccess"', $data);
+
         $decoded = json_decode($data, false);
 
         if (!isset($decoded->programs) || !is_array($decoded->programs) || !$decoded->programs) {
@@ -756,6 +759,10 @@ final class upload {
                 if (!isset($row[$ci])) {
                     continue;
                 }
+                if ($colname === 'public') {
+                    // BC hack to solve DB field renaming.
+                    $colname = 'publicaccess';
+                }
                 if (
                     $row[$ci] === ''
                     && !in_array($colname, ['category', 'description', 'allocationstart', 'allocationend'])
@@ -763,7 +770,7 @@ final class upload {
                     continue;
                 }
                 $value = $row[$ci];
-                if (in_array($colname, ['descriptionformat', 'public', 'creategroups'])) {
+                if (in_array($colname, ['descriptionformat', 'publicaccess', 'creategroups'])) {
                     $value = intval($value);
                 } else if (in_array($colname, ['allocationstart', 'allocationend'])) {
                     if ($value === '') {

@@ -66,11 +66,11 @@ Feature: Program approval allocations tests
       | viewer1   | pviewer       | System       |           |
       | allocator | allocator     | Category     | CAT1      |
     And the following "tool_muprog > programs" exist:
-      | fullname    | idnumber | category | cohorts  | public |
-      | Program 000 | PR0      |          | Cohort 2 |        |
-      | Program 001 | PR1      | Cat 1    |          | 1      |
-      | Program 002 | PR2      | Cat 2    |          |        |
-      | Program 003 | PR3      | Cat 3    |          |        |
+      | fullname    | idnumber | category | cohorts  | publicaccess |
+      | Program 000 | PR0      |          | Cohort 2 |              |
+      | Program 001 | PR1      | Cat 1    |          | 1            |
+      | Program 002 | PR2      | Cat 2    |          |              |
+      | Program 003 | PR3      | Cat 3    |          |              |
 
   @javascript
   Scenario: Allocator approves student allocation request for a program

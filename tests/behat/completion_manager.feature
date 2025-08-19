@@ -48,9 +48,9 @@ Feature: Program completion by managers tests
       | manager1  | pmanager      | System       |           |
       | viewer1   | pviewer       | System       |           |
     And the following "tool_muprog > programs" exist:
-      | fullname    | idnumber | category | public |
-      | Program 000 | PR0      |          | 1      |
-      | Program 001 | PR1      | Cat 1    | 1      |
+      | fullname    | idnumber | category | publicaccess |
+      | Program 000 | PR0      |          | 1            |
+      | Program 001 | PR1      | Cat 1    | 1            |
     And the following "tool_muprog > program_items" exist:
       | program     | parent     | course   | fullname   | sequencetype     | minprerequisites |
       | Program 000 |            |          | First set  | All in order     |                  |

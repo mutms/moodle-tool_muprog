@@ -23,9 +23,9 @@ Feature: Training program completion by students tests
       | Course 3 | C3        | topics | CAT3     | 1                | 1                        | 16                    | 2                      |
       | Course 4 | C4        | topics | CAT1     | 1                | 1                        |                       | 1                      |
     And the following "tool_mutrain > frameworks" exist:
-      | name        | public | requiredtraining | restrictedcompletion | fields    |
-      | Framework 1 | 1      | 5                | 0                    | training1 |
-      | Framework 2 | 1      | 5                | 1                    | training2 |
+      | name        | publicaccess | requiredtraining | restrictedcompletion | fields    |
+      | Framework 1 | 1            | 5                | 0                    | training1 |
+      | Framework 2 | 1            | 5                | 1                    | training2 |
     And the following "activity" exists:
       | activity       | page                     |
       | course         | C1                       |
@@ -81,10 +81,10 @@ Feature: Training program completion by students tests
       | manager1  | pmanager      | System       |           |
       | viewer1   | pviewer       | System       |           |
     And the following "tool_muprog > programs" exist:
-      | fullname    | idnumber | category | public |
-      | Program 000 | PR0      |          | 1      |
-      | Program 001 | PR1      | Cat 1    | 1      |
-      | Program 002 | PR2      | Cat 2    | 1      |
+      | fullname    | idnumber | category | publicaccess |
+      | Program 000 | PR0      |          | 1            |
+      | Program 001 | PR1      | Cat 1    | 1            |
+      | Program 002 | PR2      | Cat 2    | 1            |
     And the following "tool_muprog > program_items" exist:
       | program     | parent     | training    | fullname   | sequencetype     | minprerequisites |
       | Program 000 |            |             | First set  | All in order     |                  |

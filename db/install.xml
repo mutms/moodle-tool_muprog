@@ -13,7 +13,7 @@
         <FIELD NAME="description" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Program description text"/>
         <FIELD NAME="descriptionformat" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="presentationjson" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Visual presentation of program, such as image files"/>
-        <FIELD NAME="public" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" COMMENT="1 means visible to everyone, 0 means use cohorts for visibility"/>
+        <FIELD NAME="publicaccess" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" COMMENT="1 means visible to everyone, 0 means use cohorts for visibility"/>
         <FIELD NAME="archived" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Archived programs are hidden, non-mutable and mostly ignored, program must be archived before deletion"/>
         <FIELD NAME="creategroups" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Create course groups for each course in program"/>
         <FIELD NAME="timeallocationstart" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Restriction for allocations- allocations allowed from this date forward if set"/>

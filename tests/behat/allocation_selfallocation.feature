@@ -44,14 +44,14 @@ Feature: Program selfallocation tests
       | Program viewer  | pviewer   |
       | Program manager | pmanager  |
     And the following "permission overrides" exist:
-      | capability                     | permission | role     | contextlevel | reference |
+      | capability                  | permission | role     | contextlevel | reference |
       | tool/muprog:view            | Allow      | pviewer  | System       |           |
       | tool/muprog:view            | Allow      | pmanager | System       |           |
       | tool/muprog:edit            | Allow      | pmanager | System       |           |
       | tool/muprog:delete          | Allow      | pmanager | System       |           |
       | tool/muprog:addcourse       | Allow      | pmanager | System       |           |
       | tool/muprog:allocate        | Allow      | pmanager | System       |           |
-      | moodle/cohort:view             | Allow      | pmanager | System       |           |
+      | moodle/cohort:view          | Allow      | pmanager | System       |           |
     And the following "role assigns" exist:
       | user      | role          | contextlevel | reference |
       | manager1  | pmanager      | System       |           |
@@ -59,11 +59,11 @@ Feature: Program selfallocation tests
       | manager2  | pmanager      | Category     | CAT3      |
       | viewer1   | pviewer       | System       |           |
     And the following "tool_muprog > programs" exist:
-      | fullname    | idnumber | category | cohorts  | public |
-      | Program 000 | PR0      |          | Cohort 2 |        |
-      | Program 001 | PR1      | Cat 1    |          | 1      |
-      | Program 002 | PR2      | Cat 2    |          |        |
-      | Program 003 | PR3      | Cat 3    |          |        |
+      | fullname    | idnumber | category | cohorts  | publicaccess |
+      | Program 000 | PR0      |          | Cohort 2 |              |
+      | Program 001 | PR1      | Cat 1    |          | 1            |
+      | Program 002 | PR2      | Cat 2    |          |              |
+      | Program 003 | PR3      | Cat 3    |          |              |
     And the following "tool_muprog > program_items" exist:
       | program     | parent     | course   | fullname   | sequencetype     | minprerequisites |
       | Program 001 |            | Course 1 |            |                  |                  |

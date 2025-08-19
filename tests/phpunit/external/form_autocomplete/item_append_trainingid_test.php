@@ -71,13 +71,13 @@ final class item_append_trainingid_test extends \advanced_testcase {
 
         $data = (object)[
             'name' => 'Some framework',
-            'public' => 1,
+            'publicaccess' => 1,
             'fields' => [$field1->get('id')],
         ];
         $framework1 = $traininggenerator->create_framework($data);
         $data = (object)[
             'name' => 'Other framework',
-            'public' => 1,
+            'publicaccess' => 1,
             'idnumber' => 'ofr2',
             'fields' => [$field2->get('id')],
         ];
@@ -85,13 +85,13 @@ final class item_append_trainingid_test extends \advanced_testcase {
         $data = (object)[
             'name' => 'Another framework',
             'contextid' => $catcontext1->id,
-            'public' => 0,
+            'publicaccess' => 0,
             'fields' => [],
         ];
         $framework3 = $traininggenerator->create_framework($data);
         $data = (object)[
             'name' => 'Grrr framework',
-            'public' => 1,
+            'publicaccess' => 1,
             'archived' => 1,
             'fields' => [],
         ];
@@ -255,21 +255,21 @@ final class item_append_trainingid_test extends \advanced_testcase {
         $data = (object)[
             'name' => 'Framework 0',
             'contextid' => $syscontext->id,
-            'public' => 1,
+            'publicaccess' => 1,
         ];
         $framework0 = $traininggenerator->create_framework($data);
 
         $data = (object)[
             'name' => 'Framework 1',
             'contextid' => $tenant1catcontext->id,
-            'public' => 1,
+            'publicaccess' => 1,
         ];
         $framework1 = $traininggenerator->create_framework($data);
 
         $data = (object)[
             'name' => 'Framework 2',
             'contextid' => $tenant2catcontext->id,
-            'public' => 1,
+            'publicaccess' => 1,
         ];
         $framework2 = $traininggenerator->create_framework($data);
 

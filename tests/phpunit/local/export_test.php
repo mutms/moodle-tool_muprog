@@ -90,7 +90,7 @@ final class export_test extends \advanced_testcase {
         $this->assertSame('', $programs[0]->category);
         $this->assertSame($program0->description, $programs[0]->description);
         $this->assertSame((int)$program0->descriptionformat, $programs[0]->descriptionformat);
-        $this->assertSame((int)$program0->public, $programs[0]->public);
+        $this->assertSame((int)$program0->publicaccess, $programs[0]->publicaccess);
         $this->assertSame((int)$program0->creategroups, $programs[0]->creategroups);
         $this->assertSame(null, $programs[0]->allocationstart);
         $this->assertSame(null, $programs[0]->allocationend);

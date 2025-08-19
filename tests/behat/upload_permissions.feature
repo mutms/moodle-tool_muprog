@@ -45,10 +45,10 @@ Feature: Program upload permissions tests
       | usecategory | 0          |
       | contextid   | Category 2 |
     And the following should exist in the "upload_preview" table:
-      | idnumber | Status | fullname   | category   | description  | public | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |
-      | P00      | OK     | Program 00 | -          | Test program | Yes    | No           | 2023-10-30T17:57:00+00:00 | 2029-10-30T17:57:00+00:00 | Delay start after allocation - 3 days | Due after start - 1 month | End after start - 6 months |
-      | P01      | OK     | Program 01 | -          |              | No     | Yes          |                           |                           | Start immediately after allocation    | Not set                   | Not set                    |
-      | P02      | OK     | Program 02 | Category 2 |              | No     | No           |                           |                           | 2024-10-01T18:09:00+01:00             | 2024-11-01T18:09:00+00:00 | 2024-12-01T18:09:00+00:00  |
+      | idnumber | Status | fullname   | category   | description  | publicaccess | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |
+      | P00      | OK     | Program 00 | -          | Test program | Yes          | No           | 2023-10-30T17:57:00+00:00 | 2029-10-30T17:57:00+00:00 | Delay start after allocation - 3 days | Due after start - 1 month | End after start - 6 months |
+      | P01      | OK     | Program 01 | -          |              | No           | Yes          |                           |                           | Start immediately after allocation    | Not set                   | Not set                    |
+      | P02      | OK     | Program 02 | Category 2 |              | No           | No           |                           |                           | 2024-10-01T18:09:00+01:00             | 2024-11-01T18:09:00+00:00 | 2024-12-01T18:09:00+00:00  |
     And I press "Upload programs"
     Then the following should exist in the "reportbuilder-table" table:
       | Program name | Program ID | Courses | Allocations | Public |
