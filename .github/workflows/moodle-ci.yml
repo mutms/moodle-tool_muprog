@@ -114,7 +114,10 @@ jobs:
 
       - name: PHPUnit tests
         if: ${{ !cancelled() }}
-        run: moodle-plugin-ci phpunit --fail-on-warning
+        run: |
+          moodle-plugin-ci phpunit --fail-on-warning
+          cd moodle
+          vendor/bin/phpunit --group=plugin_checks --filter=tool_muprog
 
       - name: Behat features
         id: behat
