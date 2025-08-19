@@ -105,7 +105,10 @@ function tool_muprog_core_calendar_provide_event_action(
     // The event object (core_calendar\local\event\entities\event)
     // passed does not include an instance property so we need to pull the DB record.
     $event = $DB->get_record('event', ['id' => $event->id], '*', MUST_EXIST);
-    $allocation = $DB->get_record('tool_muprog_allocation', ['id' => $event->instance], '*', MUST_EXIST);
+    $allocation = $DB->get_record('tool_muprog_allocation', ['id' => $event->instance]);
+    if (!$allocation) {
+        return null;
+    }
 
     return $factory->create_instance(
         get_string('view'),
