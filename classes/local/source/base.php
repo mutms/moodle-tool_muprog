@@ -704,11 +704,6 @@ abstract class base {
 
         $trans = $DB->start_delegated_transaction();
 
-        if ($user && !$skipnotify) {
-            \tool_muprog\local\notification\deallocation::notify_now($user, $program, $source, $allocation);
-        }
-        \tool_muprog\local\notification_manager::delete_allocation_notifications($allocation);
-
         self::purge_allocation($allocation->id);
 
         \tool_muprog\event\allocation_deleted::create_from_allocation($allocation, $program)->trigger();
@@ -718,6 +713,12 @@ abstract class base {
         \tool_muprog\local\allocation::fix_allocation_sources($program->id, $allocation->userid);
         \tool_muprog\local\allocation::fix_user_enrolments($program->id, $allocation->userid);
         \tool_muprog\local\calendar::delete_allocation_events($allocation->id);
+
+        // Notification cannot be done in transaction due to MDL-86370.
+        if ($user && !$skipnotify) {
+            \tool_muprog\local\notification\deallocation::notify_now($user, $program, $source, $allocation);
+        }
+        \tool_muprog\local\notification_manager::delete_allocation_notifications($allocation);
     }
 
     /**

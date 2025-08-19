@@ -1,5 +1,11 @@
 # Changelog
 
+## mu-4.5.6-02
+
+Release date: xx/08/2025
+
+* Fixed fatal errors when sending deallocation email and SMTP is down, you may need to wait for next cron run to resolve blocking errors for students.
+
 ## mu-4.5.6-01
 
 Release date: 09/08/2025
