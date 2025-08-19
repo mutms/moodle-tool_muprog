@@ -58,7 +58,7 @@ final class generator_test extends \advanced_testcase {
         $this->assertSame('', $program->description);
         $this->assertSame('1', $program->descriptionformat);
         $this->assertSame('[]', $program->presentationjson);
-        $this->assertSame('0', $program->public);
+        $this->assertSame('0', $program->publicaccess);
         $this->assertSame('0', $program->archived);
         $this->assertSame('0', $program->creategroups);
         $this->assertSame(null, $program->timeallocationstart);
@@ -83,7 +83,7 @@ final class generator_test extends \advanced_testcase {
             'description' => 'Some desc',
             'descriptionformat' => '2',
             'presentation' => ['some' => 'test'],
-            'public' => '1',
+            'publicaccess' => '1',
             'archived' => '1',
             'creategroups' => '1',
             'timeallocationstart' => (string)(time() - 60 * 60 * 24),
@@ -101,7 +101,7 @@ final class generator_test extends \advanced_testcase {
         $this->assertSame($data->description, $program->description);
         $this->assertSame($data->descriptionformat, $program->descriptionformat);
         $this->assertSame('[]', $program->presentationjson);
-        $this->assertSame($data->public, $program->public);
+        $this->assertSame($data->publicaccess, $program->publicaccess);
         $this->assertSame($data->archived, $program->archived);
         $this->assertSame($data->creategroups, $program->creategroups);
         $this->assertSame($data->timeallocationstart, $program->timeallocationstart);

@@ -275,7 +275,7 @@ final class allocation_handler_test extends \advanced_testcase {
             'fullname' => 'Program 1',
             'idnumber' => 'p1',
             'contextid' => $catcontext->id,
-            'public' => 0,
+            'publicaccess' => 0,
         ];
         $program1 = $generator->create_program((object)$data);
         $allocation1 = $generator->create_program_allocation([

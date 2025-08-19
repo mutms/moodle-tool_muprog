@@ -238,7 +238,7 @@ final class program_handler_test extends \advanced_testcase {
             'fullname' => 'Program 1',
             'idnumber' => 'p1',
             'contextid' => $catcontext->id,
-            'public' => 0,
+            'publicaccess' => 0,
             'customfield_testfield1' => 'Test value 1',
             'customfield_testfield2' => 'Test value 2',
             'customfield_testfield3' => 'Test value 3',

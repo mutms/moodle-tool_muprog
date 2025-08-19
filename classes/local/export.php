@@ -79,7 +79,7 @@ final class export {
             $program['category'] = $cat;
             $program['description'] = $record->description;
             $program['descriptionformat'] = (int)$record->descriptionformat;
-            $program['public'] = (int)$record->public;
+            $program['publicaccess'] = (int)$record->publicaccess;
             // Cohort visibility is problematic in exports, skip it for now.
             // Do not export archived flag, it is not possible to import archived programs anyway.
             $program['creategroups'] = (int)$record->creategroups;
@@ -359,7 +359,7 @@ final class export {
             'category',
             'description',
             'descriptionformat',
-            'public',
+            'publicaccess',
             'creategroups',
             'allocationstart',
             'allocationend',

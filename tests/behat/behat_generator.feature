@@ -39,10 +39,10 @@ Feature: Programs behat generator tests
 
   Scenario: Programs Behat generator creates programs
     When the following "tool_muprog > programs" exist:
-      | fullname    | idnumber | category | public | cohorts            |
-      | Program 000 | PR0      |          | 0      | Cohort 1, Cohort 2 |
-      | Program 001 | PR1      | Cat 1    | 1      |                    |
-      | Program 002 | PR2      | Cat 2    | 0      |                    |
+      | fullname    | idnumber | category | publicaccess | cohorts            |
+      | Program 000 | PR0      |          | 0            | Cohort 1, Cohort 2 |
+      | Program 001 | PR1      | Cat 1    | 1            |                    |
+      | Program 002 | PR2      | Cat 2    | 0            |                    |
 
     And I log in as "viewer1"
     And I am on the "tool_muprog > All programs management" page
@@ -59,10 +59,10 @@ Feature: Programs behat generator tests
 
   Scenario: Programs Behat generator creates program items
     Given the following "tool_muprog > programs" exist:
-      | fullname    | idnumber | category | public | cohorts            |
-      | Program 000 | PR0      |          | 0      | Cohort 1, Cohort 2 |
-      | Program 001 | PR1      | Cat 1    | 1      |                    |
-      | Program 002 | PR2      | Cat 2    | 0      |                    |
+      | fullname    | idnumber | category | publicaccess | cohorts            |
+      | Program 000 | PR0      |          | 0            | Cohort 1, Cohort 2 |
+      | Program 001 | PR1      | Cat 1    | 1            |                    |
+      | Program 002 | PR2      | Cat 2    | 0            |                    |
 
     When the following "tool_muprog > program_items" exist:
       | program     | parent     | course   | fullname   | sequencetype     | minprerequisites |
@@ -98,10 +98,10 @@ Feature: Programs behat generator tests
 
   Scenario: Programs Behat generator creates allocations
     Given the following "tool_muprog > programs" exist:
-      | fullname    | idnumber | category | public | cohorts            |
-      | Program 000 | PR0      |          | 0      | Cohort 1, Cohort 2 |
-      | Program 001 | PR1      | Cat 1    | 1      |                    |
-      | Program 002 | PR2      | Cat 2    | 0      |                    |
+      | fullname    | idnumber | category | publicaccess | cohorts            |
+      | Program 000 | PR0      |          | 0            | Cohort 1, Cohort 2 |
+      | Program 001 | PR1      | Cat 1    | 1            |                    |
+      | Program 002 | PR2      | Cat 2    | 0            |                    |
 
     When the following "tool_muprog > program_allocations" exist:
       | program     | user     |

@@ -91,7 +91,7 @@ final class item_append_trainingid extends \tool_mulib\external\form_autocomplet
             }
         }
 
-        $sql = "SELECT f.id, f.name, f.idnumber, f.archived, f.contextid, f.public
+        $sql = "SELECT f.id, f.name, f.idnumber, f.archived, f.contextid, f.publicaccess
                   FROM {tool_mutrain_framework} f
                   JOIN {context} c ON c.id = f.contextid
                  WHERE f.archived = 0
@@ -106,7 +106,7 @@ final class item_append_trainingid extends \tool_mulib\external\form_autocomplet
                     continue;
                 }
             }
-            if (!$framework->public) {
+            if (!$framework->publicaccess) {
                 $context = \context::instance_by_id($framework->contextid);
                 if (!has_capability('tool/mutrain:viewframeworks', $context)) {
                     unset($frameworks[$id]);
@@ -127,7 +127,7 @@ final class item_append_trainingid extends \tool_mulib\external\form_autocomplet
             return get_string('error');
         }
 
-        if ($framework->public) {
+        if ($framework->publicaccess) {
             return null;
         }
 

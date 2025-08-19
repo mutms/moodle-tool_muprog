@@ -65,5 +65,17 @@ function xmldb_tool_muprog_upgrade($oldversion): bool {
         upgrade_plugin_savepoint(true, 2025052300, 'tool', 'muprog');
     }
 
+    if ($oldversion < 2025080945.01) {
+        // Rename field public on table tool_muprog_program to publicaccess.
+        $table = new xmldb_table('tool_muprog_program');
+        $field = new xmldb_field('public', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, null, 'presentationjson');
+
+        // Launch rename field public.
+        $dbman->rename_field($table, $field, 'publicaccess');
+
+        // Muprog savepoint reached.
+        upgrade_plugin_savepoint(true, 2025080945.01, 'tool', 'muprog');
+    }
+
     return true;
 }

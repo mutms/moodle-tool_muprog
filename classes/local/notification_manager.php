@@ -232,6 +232,11 @@ final class notification_manager extends \tool_mulib\local\notification\manager 
     public static function delete_allocation_notifications(\stdClass $allocation) {
         global $DB;
 
+        if (!property_exists($allocation, 'sourceid')) {
+            debugging('Invalid allocation parameter', DEBUG_DEVELOPER);
+            return;
+        }
+
         $notifications = $DB->get_records(
             'tool_mulib_notification',
             ['component' => 'tool_muprog', 'instanceid' => $allocation->programid]
@@ -254,6 +259,11 @@ final class notification_manager extends \tool_mulib\local\notification\manager 
      */
     public static function delete_program_notifications(\stdClass $program) {
         global $DB;
+
+        if (!property_exists($program, 'publicaccess')) {
+            debugging('Invalid program parameter', DEBUG_DEVELOPER);
+            return;
+        }
 
         $notifications = $DB->get_records(
             'tool_mulib_notification',

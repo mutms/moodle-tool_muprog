@@ -216,7 +216,7 @@ final class program_visibility_edit_cohortids_test extends \advanced_testcase {
         $this->assertNull(program_visibility_edit_cohortids::validate_value($cohort2->id, ['programid' => $program2->id], $catcontext1));
         $this->assertNull(program_visibility_edit_cohortids::validate_value($cohort3->id, ['programid' => $program2->id], $catcontext1));
 
-        \tool_muprog\local\program::update_visibility((object)['id' => $program1->id, 'public' => 0, 'cohortids' => [$cohort1->id]]);
+        \tool_muprog\local\program::update_visibility((object)['id' => $program1->id, 'publicaccess' => 0, 'cohortids' => [$cohort1->id]]);
         $this->assertNull(program_visibility_edit_cohortids::validate_value($cohort1->id, ['programid' => $program1->id], $syscontext));
     }
 }

@@ -60,7 +60,7 @@ final class approval_test extends \advanced_testcase {
         /** @var \tool_muprog_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
 
-        $program1 = $generator->create_program(['sources' => ['manual' => [], 'approval' => []], 'public' => 1]);
+        $program1 = $generator->create_program(['sources' => ['manual' => [], 'approval' => []], 'publicaccess' => 1]);
         $source1m = $DB->get_record('tool_muprog_source', ['programid' => $program1->id, 'type' => 'manual'], '*', MUST_EXIST);
         $source1a = $DB->get_record('tool_muprog_source', ['programid' => $program1->id, 'type' => 'approval'], '*', MUST_EXIST);
 
@@ -119,19 +119,19 @@ final class approval_test extends \advanced_testcase {
         // Must be visible.
 
         $program1 = program::update_visibility((object)['id' => $program1->id,
-            'public' => 1]);
+            'publicaccess' => 1]);
         $this->assertTrue(\tool_muprog\local\source\approval::can_user_request($program1, $source1a, $user1->id));
 
         $program1 = program::update_visibility((object)['id' => $program1->id,
-            'public' => 0, 'cohortids' => [$cohort1->id]]);
+            'publicaccess' => 0, 'cohortids' => [$cohort1->id]]);
         $this->assertTrue(\tool_muprog\local\source\approval::can_user_request($program1, $source1a, $user1->id));
 
         $program1 = program::update_visibility((object)['id' => $program1->id,
-            'public' => 0, 'cohortids' => []]);
+            'publicaccess' => 0, 'cohortids' => []]);
         $this->assertFalse(\tool_muprog\local\source\approval::can_user_request($program1, $source1a, $user1->id));
 
         $program1 = program::update_visibility((object)['id' => $program1->id,
-            'public' => 1, 'cohortids' => [$cohort1->id]]);
+            'publicaccess' => 1, 'cohortids' => [$cohort1->id]]);
         $this->assertTrue(\tool_muprog\local\source\approval::can_user_request($program1, $source1a, $user1->id));
 
         // Allocated already.
@@ -170,7 +170,7 @@ final class approval_test extends \advanced_testcase {
         /** @var \tool_muprog_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
 
-        $program1 = $generator->create_program(['sources' => ['manual' => [], 'approval' => []], 'public' => 1]);
+        $program1 = $generator->create_program(['sources' => ['manual' => [], 'approval' => []], 'publicaccess' => 1]);
         $source1m = $DB->get_record('tool_muprog_source', ['programid' => $program1->id, 'type' => 'manual'], '*', MUST_EXIST);
         $source1a = $DB->get_record('tool_muprog_source', ['programid' => $program1->id, 'type' => 'approval'], '*', MUST_EXIST);
 
@@ -196,7 +196,7 @@ final class approval_test extends \advanced_testcase {
         /** @var \tool_muprog_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
 
-        $program1 = $generator->create_program(['sources' => ['manual' => [], 'approval' => []], 'public' => 1]);
+        $program1 = $generator->create_program(['sources' => ['manual' => [], 'approval' => []], 'publicaccess' => 1]);
         $source1m = $DB->get_record('tool_muprog_source', ['programid' => $program1->id, 'type' => 'manual'], '*', MUST_EXIST);
         $source1a = $DB->get_record('tool_muprog_source', ['programid' => $program1->id, 'type' => 'approval'], '*', MUST_EXIST);
 
@@ -223,7 +223,7 @@ final class approval_test extends \advanced_testcase {
         /** @var \tool_muprog_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
 
-        $program1 = $generator->create_program(['sources' => ['manual' => [], 'approval' => []], 'public' => 1]);
+        $program1 = $generator->create_program(['sources' => ['manual' => [], 'approval' => []], 'publicaccess' => 1]);
         $source1m = $DB->get_record('tool_muprog_source', ['programid' => $program1->id, 'type' => 'manual'], '*', MUST_EXIST);
         $source1a = $DB->get_record('tool_muprog_source', ['programid' => $program1->id, 'type' => 'approval'], '*', MUST_EXIST);
 
@@ -252,7 +252,7 @@ final class approval_test extends \advanced_testcase {
         /** @var \tool_muprog_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
 
-        $program1 = $generator->create_program(['sources' => ['manual' => [], 'approval' => []], 'public' => 1]);
+        $program1 = $generator->create_program(['sources' => ['manual' => [], 'approval' => []], 'publicaccess' => 1]);
         $source1m = $DB->get_record('tool_muprog_source', ['programid' => $program1->id, 'type' => 'manual'], '*', MUST_EXIST);
         $source1a = $DB->get_record('tool_muprog_source', ['programid' => $program1->id, 'type' => 'approval'], '*', MUST_EXIST);
 

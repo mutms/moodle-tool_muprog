@@ -33,12 +33,12 @@ Feature: Programs plugin English documentation image generator
       | Motorcycle Tyre Changing                  | M3        | ME       |
       | Chain and Sprocket Maintenance            | M4        | ME       |
     And the following "tool_muprog > programs" exist:
-      | fullname                             | idnumber | category | public | archived | description                                     | image                                           | cohorts            |
-      | Basic First Aid                      | FA1      | HS       | 1      | 0        | Sample program for basic first aid training.    | admin/tool/muprog/tests/fixtures/docs/bfa.jpeg  |                    |
-      | Advanced First Aid                   | FA2      | HS       | 1      | 0        | Sample program for advanced first aid training. | admin/tool/muprog/tests/fixtures/docs/afa.jpeg  |                    |
-      | Motorcycle Maintenance for Beginners | ME       | ME       | 1      | 0        | Basics of motorcycle maintenance.               | admin/tool/muprog/tests/fixtures/docs/mm.jpeg   |                    |
-      | Motorcycle Track Days                | MTD      | WF       | 0      | 0        | Learn how to become a better track rider.       | admin/tool/muprog/tests/fixtures/docs/td.jpeg   | Petrol Heads       |
-      | Horse Riding Trips                   | HRT      | WF       | 1      | 1        | Discontinued horse riding.                      |                                                 |                    |
+      | fullname                             | idnumber | category | publicaccess | archived | description                                     | image                                           | cohorts            |
+      | Basic First Aid                      | FA1      | HS       | 1            | 0        | Sample program for basic first aid training.    | admin/tool/muprog/tests/fixtures/docs/bfa.jpeg  |                    |
+      | Advanced First Aid                   | FA2      | HS       | 1            | 0        | Sample program for advanced first aid training. | admin/tool/muprog/tests/fixtures/docs/afa.jpeg  |                    |
+      | Motorcycle Maintenance for Beginners | ME       | ME       | 1            | 0        | Basics of motorcycle maintenance.               | admin/tool/muprog/tests/fixtures/docs/mm.jpeg   |                    |
+      | Motorcycle Track Days                | MTD      | WF       | 0            | 0        | Learn how to become a better track rider.       | admin/tool/muprog/tests/fixtures/docs/td.jpeg   | Petrol Heads       |
+      | Horse Riding Trips                   | HRT      | WF       | 1            | 1        | Discontinued horse riding.                      |                                                 |                    |
     And the following "tool_muprog > program_items" exist:
       | program                              | parent            | course                                | fullname          | sequencetype     | minprerequisites |
       | Basic First Aid                      |                   |                                       | Mandatory courses | All in order     |                  |

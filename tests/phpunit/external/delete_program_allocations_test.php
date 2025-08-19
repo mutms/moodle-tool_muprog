@@ -50,7 +50,7 @@ final class delete_program_allocations_test extends \advanced_testcase {
         $cohort1 = $this->getDataGenerator()->create_cohort();
 
         $program1 = $generator->create_program(
-            ['sources' => ['manual' => [], 'selfallocation' => []], 'public' => 1]
+            ['sources' => ['manual' => [], 'selfallocation' => []], 'publicaccess' => 1]
         );
         $source1m = $DB->get_record(
             'tool_muprog_source',

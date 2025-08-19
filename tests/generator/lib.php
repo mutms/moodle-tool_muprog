@@ -131,7 +131,7 @@ class tool_muprog_generator extends component_generator_base {
                     $cohortids[] = $record->id;
                 }
             }
-            \tool_muprog\local\program::update_visibility((object)['id' => $program->id, 'public' => $program->public, 'cohortids' => $cohortids]);
+            \tool_muprog\local\program::update_visibility((object)['id' => $program->id, 'publicaccess' => $program->publicaccess, 'cohortids' => $cohortids]);
         }
 
         foreach ($sources as $source => $data) {

@@ -44,10 +44,10 @@ Feature: Program upload full tests
     And the following fields match these values:
       | usecategory | 1 |
     And the following should exist in the "upload_preview" table:
-      | idnumber | Status | fullname   | category   | description  | public | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |
-      | P00      | OK     | Program 00 | System     | Test program | Yes    | No           | 2023-10-30T17:57:00+00:00 | 2029-10-30T17:57:00+00:00 | Delay start after allocation - 3 days | Due after start - 1 month | End after start - 6 months |
-      | P01      | OK     | Program 01 | Category 1 |              | No     | Yes          |                           |                           | Start immediately after allocation    | Not set                   | Not set                    |
-      | P02      | OK     | Program 02 | Category 2 |              | No     | No           |                           |                           | 2024-10-01T18:09:00+01:00             | 2024-11-01T18:09:00+00:00 | 2024-12-01T18:09:00+00:00  |
+      | idnumber | Status | fullname   | category   | description  | publicaccess | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |
+      | P00      | OK     | Program 00 | System     | Test program | Yes          | No           | 2023-10-30T17:57:00+00:00 | 2029-10-30T17:57:00+00:00 | Delay start after allocation - 3 days | Due after start - 1 month | End after start - 6 months |
+      | P01      | OK     | Program 01 | Category 1 |              | No           | Yes          |                           |                           | Start immediately after allocation    | Not set                   | Not set                    |
+      | P02      | OK     | Program 02 | Category 2 |              | No           | No           |                           |                           | 2024-10-01T18:09:00+01:00             | 2024-11-01T18:09:00+00:00 | 2024-12-01T18:09:00+00:00  |
     And I press "Upload programs"
     Then the following should exist in the "reportbuilder-table" table:
       | Program name | Category   | Program ID | Courses | Allocations | Public |
@@ -126,10 +126,10 @@ Feature: Program upload full tests
     And the following fields match these values:
       | usecategory | 1 |
     And the following should exist in the "upload_preview" table:
-      | idnumber | Status | fullname   | category   | description  | public | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |
-      | P00      | OK     | Program 00 | System     | Test program | Yes    | No           | 2023-10-30T17:57:00+00:00 | 2029-10-30T17:57:00+00:00 | Delay start after allocation - 3 days | Due after start - 1 month | End after start - 6 months |
-      | P01      | OK     | Program 01 | Category 1 |              | No     | Yes          |                           |                           | Start immediately after allocation    | Not set                   | Not set                    |
-      | P02      | OK     | Program 02 | Category 2 |              | No     | No           |                           |                           | 2024-10-01T18:09:00+01:00             | 2024-11-01T18:09:00+00:00 | 2024-12-01T18:09:00+00:00  |
+      | idnumber | Status | fullname   | category   | description  | publicaccess | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |
+      | P00      | OK     | Program 00 | System     | Test program | Yes          | No           | 2023-10-30T17:57:00+00:00 | 2029-10-30T17:57:00+00:00 | Delay start after allocation - 3 days | Due after start - 1 month | End after start - 6 months |
+      | P01      | OK     | Program 01 | Category 1 |              | No           | Yes          |                           |                           | Start immediately after allocation    | Not set                   | Not set                    |
+      | P02      | OK     | Program 02 | Category 2 |              | No           | No           |                           |                           | 2024-10-01T18:09:00+01:00             | 2024-11-01T18:09:00+00:00 | 2024-12-01T18:09:00+00:00  |
     And I press "Upload programs"
     Then the following should exist in the "reportbuilder-table" table:
       | Program name | Category   | Program ID | Courses | Allocations | Public |
@@ -198,13 +198,36 @@ Feature: Program upload full tests
     And I should see "Active; Requests are not allowed" in the "Requests with approval" definition list item
     And I should see "Inactive" in the "Automatic cohort allocation" definition list item
 
+  @_file_upload
+  Scenario: System manager can upload all programs into original categories using normal old JSON with public
+    Given I log in as "manager1"
+    And I am on the "tool_muprog > All programs management" page
+
+    When I click on "Upload programs" action from "Programs actions" dropdown
+    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_old.json" file to "Files" filemanager
+    And I press "Continue"
+    And the following fields match these values:
+      | usecategory | 1 |
+    And the following should exist in the "upload_preview" table:
+      | idnumber | Status | fullname   | category   | description  | publicaccess | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |
+      | P00      | OK     | Program 00 | System     | Test program | Yes          | No           | 2023-10-30T17:57:00+00:00 | 2029-10-30T17:57:00+00:00 | Delay start after allocation - 3 days | Due after start - 1 month | End after start - 6 months |
+      | P01      | OK     | Program 01 | Category 1 |              | No           | Yes          |                           |                           | Start immediately after allocation    | Not set                   | Not set                    |
+      | P02      | OK     | Program 02 | Category 2 |              | No           | No           |                           |                           | 2024-10-01T18:09:00+01:00             | 2024-11-01T18:09:00+00:00 | 2024-12-01T18:09:00+00:00  |
+    And I press "Upload programs"
+    Then the following should exist in the "reportbuilder-table" table:
+      | Program name | Category   | Program ID | Courses | Allocations | Public |
+      | Program 00   | System     | P00        | 5       | 0           | Yes    |
+      | Program 01   | Category 1 | P01        | 3       | 0           | No     |
+      | Program 02   | Category 2 | P02        | 0       | 0           | No     |
+    And I follow "Program 00"
+
   @_file_upload @tool_mutrain
   Scenario: System manager can upload all programs into original categories using normal JSON with training
     Given I skip tests if "tool_mutrain" is not installed
     And the following "tool_mutrain > frameworks" exist:
-      | name         | idnumber | public | requiredtraining |
-      | Training FW1 | TFW1     | 1      | 10               |
-      | Training FW2 |          | 1      | 20               |
+      | name         | idnumber | publicaccess | requiredtraining |
+      | Training FW1 | TFW1     | 1            | 10               |
+      | Training FW2 |          | 1            | 20               |
     And I log in as "manager1"
     And I am on the "tool_muprog > All programs management" page
 
@@ -214,10 +237,10 @@ Feature: Program upload full tests
     And the following fields match these values:
       | usecategory | 1 |
     And the following should exist in the "upload_preview" table:
-      | idnumber | Status | fullname   | category   | description  | public | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |
-      | P00      | OK     | Program 00 | System     | Test program | Yes    | No           | 2023-10-30T17:57:00+00:00 | 2029-10-30T17:57:00+00:00 | Delay start after allocation - 3 days | Due after start - 1 month | End after start - 6 months |
-      | P01      | OK     | Program 01 | Category 1 |              | No     | Yes          |                           |                           | Start immediately after allocation    | Not set                   | Not set                    |
-      | P02      | OK     | Program 02 | Category 2 |              | No     | No           |                           |                           | 2024-10-01T18:09:00+01:00             | 2024-11-01T18:09:00+00:00 | 2024-12-01T18:09:00+00:00  |
+      | idnumber | Status | fullname   | category   | description  | publicaccess | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |
+      | P00      | OK     | Program 00 | System     | Test program | Yes          | No           | 2023-10-30T17:57:00+00:00 | 2029-10-30T17:57:00+00:00 | Delay start after allocation - 3 days | Due after start - 1 month | End after start - 6 months |
+      | P01      | OK     | Program 01 | Category 1 |              | No           | Yes          |                           |                           | Start immediately after allocation    | Not set                   | Not set                    |
+      | P02      | OK     | Program 02 | Category 2 |              | No           | No           |                           |                           | 2024-10-01T18:09:00+01:00             | 2024-11-01T18:09:00+00:00 | 2024-12-01T18:09:00+00:00  |
     And I press "Upload programs"
     Then the following should exist in the "reportbuilder-table" table:
       | Program name | Category   | Program ID | Courses | Allocations | Public |
@@ -300,10 +323,10 @@ Feature: Program upload full tests
     And the following fields match these values:
       | usecategory | 1 |
     And the following should exist in the "upload_preview" table:
-      | idnumber | Status | fullname   | category   | description  | public | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |
-      | P00      | OK     | Program 00 | System     | Test program | Yes    | No           | 2023-10-30T17:57:00+00:00 | 2029-10-30T17:57:00+00:00 | Delay start after allocation - 3 days | Due after start - 1 month | End after start - 6 months |
-      | P01      | OK     | Program 01 | Category 1 |              | No     | Yes          |                           |                           | Start immediately after allocation    | Not set                   | Not set                    |
-      | P02      | OK     | Program 02 | Category 2 |              | No     | No           |                           |                           | 2024-10-01T18:09:00+01:00             | 2024-11-01T18:09:00+00:00 | 2024-12-01T18:09:00+00:00  |
+      | idnumber | Status | fullname   | category   | description  | publicaccess | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |
+      | P00      | OK     | Program 00 | System     | Test program | Yes          | No           | 2023-10-30T17:57:00+00:00 | 2029-10-30T17:57:00+00:00 | Delay start after allocation - 3 days | Due after start - 1 month | End after start - 6 months |
+      | P01      | OK     | Program 01 | Category 1 |              | No           | Yes          |                           |                           | Start immediately after allocation    | Not set                   | Not set                    |
+      | P02      | OK     | Program 02 | Category 2 |              | No           | No           |                           |                           | 2024-10-01T18:09:00+01:00             | 2024-11-01T18:09:00+00:00 | 2024-12-01T18:09:00+00:00  |
     And I press "Upload programs"
     Then the following should exist in the "reportbuilder-table" table:
       | Program name | Category   | Program ID | Courses | Allocations | Public |
@@ -383,10 +406,10 @@ Feature: Program upload full tests
     And the following fields match these values:
       | usecategory | 1 |
     And the following should exist in the "upload_preview" table:
-      | idnumber | Status | fullname   | category   | description  | public | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |
-      | P00      | OK     | Program 00 | System     | Test program | Yes    | No           | 2023-10-30T17:57:00+00:00 | 2029-10-30T17:57:00+00:00 | Delay start after allocation - 3 days | Due after start - 1 month | End after start - 6 months |
-      | P01      | OK     | Program 01 | Category 1 |              | No     | Yes          |                           |                           | Start immediately after allocation    | Not set                   | Not set                    |
-      | P02      | OK     | Program 02 | Category 2 |              | No     | No           |                           |                           | 2024-10-01T18:09:00+01:00             | 2024-11-01T18:09:00+00:00 | 2024-12-01T18:09:00+00:00  |
+      | idnumber | Status | fullname   | category   | description  | publicaccess | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |
+      | P00      | OK     | Program 00 | System     | Test program | Yes          | No           | 2023-10-30T17:57:00+00:00 | 2029-10-30T17:57:00+00:00 | Delay start after allocation - 3 days | Due after start - 1 month | End after start - 6 months |
+      | P01      | OK     | Program 01 | Category 1 |              | No           | Yes          |                           |                           | Start immediately after allocation    | Not set                   | Not set                    |
+      | P02      | OK     | Program 02 | Category 2 |              | No           | No           |                           |                           | 2024-10-01T18:09:00+01:00             | 2024-11-01T18:09:00+00:00 | 2024-12-01T18:09:00+00:00  |
     And I press "Upload programs"
     Then the following should exist in the "reportbuilder-table" table:
       | Program name | Category   | Program ID | Courses | Allocations | Public |
@@ -466,10 +489,10 @@ Feature: Program upload full tests
     And the following fields match these values:
       | usecategory | 1 |
     And the following should exist in the "upload_preview" table:
-      | idnumber | Status | fullname   | category   | description  | public | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |
-      | P00      | OK     | Program 00 | System     | Test program | Yes    | No           | 2023-10-30T17:57:00+00:00 | 2029-10-30T17:57:00+00:00 | Delay start after allocation - 3 days | Due after start - 1 month | End after start - 6 months |
-      | P01      | OK     | Program 01 | Category 1 |              | No     | Yes          |                           |                           | Start immediately after allocation    | Not set                   | Not set                    |
-      | P02      | OK     | Program 02 | Category 2 |              | No     | No           |                           |                           | 2024-10-01T18:09:00+01:00             | 2024-11-01T18:09:00+00:00 | 2024-12-01T18:09:00+00:00  |
+      | idnumber | Status | fullname   | category   | description  | publicaccess | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |
+      | P00      | OK     | Program 00 | System     | Test program | Yes          | No           | 2023-10-30T17:57:00+00:00 | 2029-10-30T17:57:00+00:00 | Delay start after allocation - 3 days | Due after start - 1 month | End after start - 6 months |
+      | P01      | OK     | Program 01 | Category 1 |              | No           | Yes          |                           |                           | Start immediately after allocation    | Not set                   | Not set                    |
+      | P02      | OK     | Program 02 | Category 2 |              | No           | No           |                           |                           | 2024-10-01T18:09:00+01:00             | 2024-11-01T18:09:00+00:00 | 2024-12-01T18:09:00+00:00  |
     And I press "Upload programs"
     Then the following should exist in the "reportbuilder-table" table:
       | Program name | Category   | Program ID | Courses | Allocations | Public |
@@ -551,10 +574,10 @@ Feature: Program upload full tests
     And the following fields match these values:
       | usecategory | 1 |
     And the following should exist in the "upload_preview" table:
-      | idnumber | Status | fullname   | category   | description  | public | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |
-      | P00      | OK     | Program 00 | System     | Test program | Yes    | No           | 2023-10-30T17:57:00+00:00 | 2029-10-30T17:57:00+00:00 | Delay start after allocation - 3 days | Due after start - 1 month | End after start - 6 months |
-      | P01      | OK     | Program 01 | Category 1 |              | No     | Yes          |                           |                           | Start immediately after allocation    | Not set                   | Not set                    |
-      | P02      | OK     | Program 02 | Category 2 |              | No     | No           |                           |                           | 2024-10-01T18:09:00+01:00             | 2024-11-01T18:09:00+00:00 | 2024-12-01T18:09:00+00:00  |
+      | idnumber | Status | fullname   | category   | description  | publicaccess | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |
+      | P00      | OK     | Program 00 | System     | Test program | Yes          | No           | 2023-10-30T17:57:00+00:00 | 2029-10-30T17:57:00+00:00 | Delay start after allocation - 3 days | Due after start - 1 month | End after start - 6 months |
+      | P01      | OK     | Program 01 | Category 1 |              | No           | Yes          |                           |                           | Start immediately after allocation    | Not set                   | Not set                    |
+      | P02      | OK     | Program 02 | Category 2 |              | No           | No           |                           |                           | 2024-10-01T18:09:00+01:00             | 2024-11-01T18:09:00+00:00 | 2024-12-01T18:09:00+00:00  |
     And I press "Upload programs"
     Then the following should exist in the "reportbuilder-table" table:
       | Program name | Category   | Program ID | Courses | Allocations | Public |
@@ -623,13 +646,37 @@ Feature: Program upload full tests
     And I should see "Active; Requests are not allowed" in the "Requests with approval" definition list item
     And I should see "Inactive" in the "Automatic cohort allocation" definition list item
 
+  @_file_upload
+  Scenario: System manager can upload all programs into original categories using extracted CSV with old public
+    Given I log in as "manager1"
+    And I am on the "tool_muprog > All programs management" page
+
+    When I click on "Upload programs" action from "Programs actions" dropdown
+    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_old.csv" file to "Files" filemanager
+    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_contents.csv" file to "Files" filemanager
+    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_sources.csv" file to "Files" filemanager
+    And I press "Continue"
+    And the following fields match these values:
+      | usecategory | 1 |
+    And the following should exist in the "upload_preview" table:
+      | idnumber | Status | fullname   | category   | description  | publicaccess | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |
+      | P00      | OK     | Program 00 | System     | Test program | Yes          | No           | 2023-10-30T17:57:00+00:00 | 2029-10-30T17:57:00+00:00 | Delay start after allocation - 3 days | Due after start - 1 month | End after start - 6 months |
+      | P01      | OK     | Program 01 | Category 1 |              | No           | Yes          |                           |                           | Start immediately after allocation    | Not set                   | Not set                    |
+      | P02      | OK     | Program 02 | Category 2 |              | No           | No           |                           |                           | 2024-10-01T18:09:00+01:00             | 2024-11-01T18:09:00+00:00 | 2024-12-01T18:09:00+00:00  |
+    And I press "Upload programs"
+    Then the following should exist in the "reportbuilder-table" table:
+      | Program name | Category   | Program ID | Courses | Allocations | Public |
+      | Program 00   | System     | P00        | 5       | 0           | Yes    |
+      | Program 01   | Category 1 | P01        | 3       | 0           | No     |
+      | Program 02   | Category 2 | P02        | 0       | 0           | No     |
+
   @_file_upload @tool_mutrain
   Scenario: System manager can upload all programs into original categories using extracted CSV with training
     Given I skip tests if "tool_mutrain" is not installed
     And the following "tool_mutrain > frameworks" exist:
-      | name         | idnumber | public | requiredtraining |
-      | Training FW1 | TFW1     | 1      | 10               |
-      | Training FW2 |          | 1      | 20               |
+      | name         | idnumber | publicaccess | requiredtraining |
+      | Training FW1 | TFW1     | 1            | 10               |
+      | Training FW2 |          | 1            | 20               |
     And I log in as "manager1"
     And I am on the "tool_muprog > All programs management" page
 
@@ -641,10 +688,10 @@ Feature: Program upload full tests
     And the following fields match these values:
       | usecategory | 1 |
     And the following should exist in the "upload_preview" table:
-      | idnumber | Status | fullname   | category   | description  | public | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |
-      | P00      | OK     | Program 00 | System     | Test program | Yes    | No           | 2023-10-30T17:57:00+00:00 | 2029-10-30T17:57:00+00:00 | Delay start after allocation - 3 days | Due after start - 1 month | End after start - 6 months |
-      | P01      | OK     | Program 01 | Category 1 |              | No     | Yes          |                           |                           | Start immediately after allocation    | Not set                   | Not set                    |
-      | P02      | OK     | Program 02 | Category 2 |              | No     | No           |                           |                           | 2024-10-01T18:09:00+01:00             | 2024-11-01T18:09:00+00:00 | 2024-12-01T18:09:00+00:00  |
+      | idnumber | Status | fullname   | category   | description  | publicaccess | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |
+      | P00      | OK     | Program 00 | System     | Test program | Yes          | No           | 2023-10-30T17:57:00+00:00 | 2029-10-30T17:57:00+00:00 | Delay start after allocation - 3 days | Due after start - 1 month | End after start - 6 months |
+      | P01      | OK     | Program 01 | Category 1 |              | No           | Yes          |                           |                           | Start immediately after allocation    | Not set                   | Not set                    |
+      | P02      | OK     | Program 02 | Category 2 |              | No           | No           |                           |                           | 2024-10-01T18:09:00+01:00             | 2024-11-01T18:09:00+00:00 | 2024-12-01T18:09:00+00:00  |
     And I press "Upload programs"
     Then the following should exist in the "reportbuilder-table" table:
       | Program name | Category   | Program ID | Courses | Allocations | Public |

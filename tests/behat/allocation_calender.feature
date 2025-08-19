@@ -25,8 +25,8 @@ Feature: Program allocation calendar events tests
       | manager1  | pmanager      | System       |           |
       | viewer1   | pviewer       | System       |           |
     And the following "tool_muprog > programs" exist:
-      | fullname    | idnumber | category | public | description               |
-      | Program 000 | PR0      |          | 1      | Fancy program description |
+      | fullname    | idnumber | category | publicaccess | description               |
+      | Program 000 | PR0      |          | 1            | Fancy program description |
     And the following "tool_muprog > program_allocations" exist:
       | program     | user     |
       | Program 000 | student1 |
