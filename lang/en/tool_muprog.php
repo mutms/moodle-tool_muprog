@@ -338,7 +338,7 @@ $string['programstatus_open'] = 'Open';
 $string['programstatus_overdue'] = 'Overdue';
 $string['programurl'] = 'Program URL';
 $string['publicaccess'] = 'Public';
-$string['publiaccessc_help'] = 'Public programs are visible to all users.
+$string['publicaccess_help'] = 'Public programs are visible to all users.
 
 Visibility status does not affect already allocated programs.';
 $string['purchaseaccess'] = 'Purchase access';
