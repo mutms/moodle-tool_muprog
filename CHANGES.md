@@ -4,6 +4,7 @@
 
 Release date: xx/08/2025
 
+* Note that "public" program field was renamed to "publicaccess" which this affects web services and exports; program uploads can handle both old and new field names. 
 * Fixed compatibility with unsupported MS SQL databases.
 * Fixed fatal errors when sending deallocation email and SMTP is down, you may need to wait for next cron run to resolve blocking errors for students.
 
