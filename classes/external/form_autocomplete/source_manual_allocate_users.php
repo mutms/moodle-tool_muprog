@@ -52,7 +52,7 @@ final class source_manual_allocate_users extends \tool_mulib\external\form_autoc
      * @return array
      */
     public static function execute(string $query, int $programid): array {
-        global $DB, $CFG;
+        global $DB;
 
         ['query' => $query, 'programid' => $programid] = self::validate_parameters(
             self::execute_parameters(),
@@ -74,12 +74,8 @@ final class source_manual_allocate_users extends \tool_mulib\external\form_autoc
         $params = array_merge($searchparams, $sortparams);
         $params['programid'] = $programid;
 
-        $tenantwhere = "";
-        if (\tool_muprog\local\util::is_mutenancy_active()) {
-            $tenantwhere = \tool_mutenancy\local\tenancy::get_related_users_exists('usr.id', $context);
-        }
+        $tenantwhere = self::get_tenant_related_users_where('usr.id', $context);
 
-        $additionalfields = $fields->get_sql('usr')->selects;
         $sql = <<<SQL
             SELECT usr.*
               FROM {user} usr
@@ -110,13 +106,9 @@ SQL;
             return get_string('error');
         }
 
-        if (\tool_muprog\local\util::is_mutenancy_active()) {
-            if ($context->tenantid) {
-                $usertenantid = \tool_mutenancy\local\tenancy::get_user_tenantid($user->id);
-                if ($usertenantid && $usertenantid != $context->tenantid) {
-                    return get_string('error');
-                }
-            }
+        $error = self::validate_tenant_relation($user, $context);
+        if ($error !== null) {
+            return $error;
         }
 
         return null;
