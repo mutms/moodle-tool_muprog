@@ -570,6 +570,7 @@ abstract class base {
 
         $record = $DB->get_record('tool_muprog_allocation', ['id' => $allocation->id], '*', MUST_EXIST);
         $program = $DB->get_record('tool_muprog_program', ['id' => $record->programid], '*', MUST_EXIST);
+        $oldrecord = clone($record);
 
         unset($allocation->userid);
         unset($allocation->sourceid);
@@ -625,6 +626,14 @@ abstract class base {
         $allocation = $DB->get_record('tool_muprog_allocation', ['id' => $allocation->id], '*', MUST_EXIST);
 
         \tool_muprog\local\notification_manager::trigger_notifications($allocation->programid, $allocation->userid);
+
+        if ($oldrecord->timecompleted === null && $allocation->timecompleted !== null && !$allocation->archived && !$program->archived) {
+            $source = $DB->get_record('tool_muprog_source', ['id' => $allocation->sourceid], '*', MUST_EXIST);
+            $user = $DB->get_record('user', ['id' => $allocation->userid], '*', MUST_EXIST);
+            \tool_muprog\event\allocation_completed::create_from_allocation($allocation, $program)->trigger();
+            \tool_muprog\local\notification\completion::notify_now($user, $program, $source, $allocation);
+            \tool_muprog\local\calendar::delete_allocation_events($allocation->id);
+        }
 
         return $allocation;
     }
