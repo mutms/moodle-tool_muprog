@@ -25,10 +25,7 @@ use tool_muprog\local\source\cohort;
 use tool_muprog\local\source\manual;
 use tool_muprog\local\source\selfallocation;
 use tool_muprog\local\source\mucertify;
-use tool_muprog\local\content\course;
-use tool_muprog\local\content\top;
-use tool_muprog\local\content\set;
-use tool_muprog\local\allocation_calendar_event;
+use tool_muprog\local\source\program;
 use stdClass;
 
 /**
@@ -53,6 +50,7 @@ final class allocation {
             selfallocation::get_type() => selfallocation::class,
             approval::get_type() => approval::class,
             cohort::get_type() => cohort::class,
+            program::get_type() => program::class,
         ];
 
         if (file_exists(__DIR__ . '/../../../mucertify/version.php')) {

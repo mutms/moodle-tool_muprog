@@ -26,6 +26,7 @@ Students may be allocated to programs through the following sources:
 - **Self-allocation**: Users can self-allocate by clicking a button in the Program catalogue. An optional access key and maximum user limit may be applied.
 - **Request with approval**: Users can request allocation via the Program catalogue, subject to approval by a manager.
 - **Automatic cohort allocation**: All members of specified cohorts are automatically allocated to the program.
+- **Completed program**: All users that complete referenced program are allocated automatically.
 - **Certifications**: Allocation is managed indirectly through the Certifications plugin.
 
 During user allocation, a custom program schedule is generated for each user based on program allocation settings.
