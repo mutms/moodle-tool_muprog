@@ -4,6 +4,7 @@
 
 Release date: xx/08/2025
 
+* Added Program completion allocation source - users may get allocated to a program when they complete another program.
 * Fixed automatic cohort allocation source form.
 * Empty custom fields are not displayed anymore.
 * Triggered missing even allocation_completed event when overriding program completion.

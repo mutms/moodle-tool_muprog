@@ -65,4 +65,8 @@ $observers = [
         'eventname' => \tool_certificate\event\template_deleted::class,
         'callback' => \tool_muprog\local\certificate::class . '::template_deleted',
     ],
+    [
+        'eventname' => \tool_muprog\event\allocation_completed::class,
+        'callback' => \tool_muprog\local\source\program::class . '::observe_allocation_completed',
+    ],
 ];
