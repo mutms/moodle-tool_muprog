@@ -190,6 +190,17 @@ final class manual_test extends \advanced_testcase {
         manual::allocation_update($allocation);
         $newallocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
         $this->assertSame((array)$allocation, (array)$newallocation);
+
+        $sink = $this->redirectEvents();
+        $allocation->timecompleted = (string)$now;
+        manual::allocation_update($allocation);
+        $newallocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
+        $allocation->calendarupdated = '0';
+        $this->assertSame((array)$allocation, (array)$newallocation);
+        $events = $sink->get_events();
+        $sink->close();
+        $event = array_pop($events);
+        $this->assertInstanceOf(\tool_muprog\event\allocation_completed::class, $event);
     }
 
     public function test_allocation_archive(): void {
