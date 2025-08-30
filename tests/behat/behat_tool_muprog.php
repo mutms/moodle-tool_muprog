@@ -73,6 +73,15 @@ class behat_tool_muprog extends behat_base {
                 }
                 $context = context_coursecat::instance($category->id);
                 return new moodle_url('/admin/tool/muprog/management/index.php', ['contextid' => $context->id]);
+            case 'program':
+                $program = $DB->get_record('tool_muprog_program', ['fullname' => $identifier]);
+                if (!$program) {
+                    $program = $DB->get_record('tool_muprog_program', ['idnumber' => $identifier]);
+                }
+                if (!$program) {
+                    throw new Exception('Invalid program "' . $identifier . '."');
+                }
+                return new moodle_url('/admin/tool/muprog/management/program.php', ['id' => $program->id]);
 
             default:
                 throw new Exception('Unrecognised tool_muprog page type "' . $type . '."');

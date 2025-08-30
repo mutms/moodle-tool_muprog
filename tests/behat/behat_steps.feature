@@ -176,6 +176,18 @@ Feature: Programs navigation behat steps test
     And I should not see "Program 002"
     And I should not see "Program 003"
 
+    When I am on the "Program 000" "tool_muprog > Program" page
+    Then I should see "Program 000"
+    And I should not see "Program 001"
+    And I should not see "Program 002"
+    And I should not see "Program 003"
+
+    When I am on the "PR0" "tool_muprog > Program" page
+    Then I should see "Program 000"
+    And I should not see "Program 001"
+    And I should not see "Program 002"
+    And I should not see "Program 003"
+
   Scenario: Full viewer navigates to programs the normal way
     Given I log in as "viewer1"
 
