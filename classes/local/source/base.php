@@ -627,7 +627,7 @@ abstract class base {
 
         \tool_muprog\local\notification_manager::trigger_notifications($allocation->programid, $allocation->userid);
 
-        if ($oldrecord->timecompleted === null && $allocation->timecompleted !== null && !$allocation->archived && !$program->archived) {
+        if ($oldrecord->timecompleted === null && $allocation->timecompleted !== null) {
             $source = $DB->get_record('tool_muprog_source', ['id' => $allocation->sourceid], '*', MUST_EXIST);
             $user = $DB->get_record('user', ['id' => $allocation->userid], '*', MUST_EXIST);
             \tool_muprog\event\allocation_completed::create_from_allocation($allocation, $program)->trigger();
