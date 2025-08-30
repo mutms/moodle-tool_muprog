@@ -55,7 +55,7 @@ final class source_cohort_edit extends \tool_mulib\local\ajax_form {
             $cohorts = cohort::fetch_allocation_cohorts_menu($source->id);
             $mform->setDefault('cohortids', array_keys($cohorts));
         }
-        $mform->hideIf('cohorts', 'enable', 'eq', 0);
+        $mform->hideIf('cohortids', 'enable', 'eq', 0);
 
         $mform->addElement('hidden', 'programid');
         $mform->setType('programid', PARAM_INT);
@@ -79,7 +79,7 @@ final class source_cohort_edit extends \tool_mulib\local\ajax_form {
             foreach ($data['cohortids'] as $cohortid) {
                 $error = source_cohort_edit_cohortids::validate_value($cohortid, $args, $context);
                 if ($error !== null) {
-                    $errors['cohorts'] = $error;
+                    $errors['cohortids'] = $error;
                     break;
                 }
             }

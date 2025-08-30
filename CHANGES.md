@@ -4,6 +4,7 @@
 
 Release date: xx/08/2025
 
+* Fixed automatic cohort allocation source form.
 * Empty custom fields are not displayed anymore.
 * Triggered missing even allocation_completed event when overriding program completion.
 * Fixed validation of tenant restrictions when selecting users.
