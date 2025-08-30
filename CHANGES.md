@@ -4,6 +4,7 @@
 
 Release date: xx/08/2025
 
+* Arabic translation added for entire plugin
 * Triggered missing even allocation_completed when overriding program completion.
 * Fixed validation of tenant restrictions when selecting users.
 * Note that "public" program field was renamed to "publicaccess" which this affects web services and exports; program uploads can handle both old and new field names. 
