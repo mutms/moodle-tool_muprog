@@ -98,7 +98,11 @@ class renderer extends \plugin_renderer_base {
 
         $handler = \tool_muprog\customfield\program_handler::create();
         foreach ($handler->get_instance_data($program->id) as $data) {
-            $details->add($data->get_field()->get('name'), $data->export_value());
+            $value = $data->export_value();
+            if ($value === null || $value === '') {
+                continue;
+            }
+            $details->add($data->get_field()->get('name'), $value);
         }
 
         $result = $this->output->render($details);
