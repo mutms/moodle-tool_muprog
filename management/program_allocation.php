@@ -60,6 +60,14 @@ if (has_capability('tool/muprog:edit', $context) && !$program->archived) {
     $url = new moodle_url('/admin/tool/muprog/management/program_allocation_import.php', ['id' => $program->id]);
     $link = new \tool_mulib\output\ajax_form\link($url, get_string('importprogramallocation', 'tool_muprog'));
     $actions->get_dropdown()->add_ajax_form($link);
+
+    $externaldbsource = $DB->get_record('tool_muprog_source', ['programid' => $program->id, 'type' => 'externaldb']);
+    if ($externaldbsource) {
+        $runurl = new moodle_url('/admin/tool/muprog/management/program_externaldb_run.php', ['id' => $program->id, 'sesskey' => sesskey()]);
+        $button = new \single_button($runurl, get_string('runexternaldballocation', 'tool_muprog'), 'post');
+        $button->add_confirm_action(new \confirm_action(get_string('runexternaldballocation_confirm', 'tool_muprog')));
+        $actions->add_button($button);
+    }
 }
 
 if ($actions->has_items()) {

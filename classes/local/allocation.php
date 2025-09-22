@@ -23,6 +23,7 @@ use tool_muprog\local\source\approval;
 use tool_muprog\local\source\base;
 use tool_muprog\local\source\cohort;
 use tool_muprog\local\source\manual;
+use tool_muprog\local\source\externaldb;
 use tool_muprog\local\source\selfallocation;
 use tool_muprog\local\source\mucertify;
 use tool_muprog\local\source\program;
@@ -51,6 +52,7 @@ final class allocation {
             approval::get_type() => approval::class,
             cohort::get_type() => cohort::class,
             program::get_type() => program::class,
+            externaldb::get_type() => externaldb::class,
         ];
 
         if (file_exists(__DIR__ . '/../../../mucertify/version.php')) {

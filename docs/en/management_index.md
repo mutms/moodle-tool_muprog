@@ -6,6 +6,7 @@
 * [Program content](management_program_content.md)
 * [Catalogue visibility](management_program_visibility.md)
 * [Program allocation settings](management_program_allocation.md)
+  * [External database allocation](source_externaldb.md)
 * [Program users](management_program_users.md)
    * [User allocation](management_allocation.md)
 

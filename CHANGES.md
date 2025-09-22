@@ -5,6 +5,7 @@
 Release date: xx/09/2025
 
 * Certification allocation conflicts are now handled gracefully.
+* Added External database allocation source including manual synchronisation button.
 
 ## mu-4.5.6-02
 

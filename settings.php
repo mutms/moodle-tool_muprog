@@ -95,6 +95,84 @@ if ($ADMIN->fulltree) {
         new lang_string('source_program_allownew_desc', 'tool_muprog'),
         1
     ));
+    $settings->add(new admin_setting_configcheckbox(
+        'tool_muprog/source_externaldb_allownew',
+        new lang_string('source_externaldb_allownew', 'tool_muprog'),
+        new lang_string('source_externaldb_allownew_desc', 'tool_muprog'),
+        0
+    ));
+
+    $settings->add(new admin_setting_heading(
+        'tool_muprog_externaldb',
+        new lang_string('externaldbsettings', 'tool_muprog'),
+        new lang_string('externaldbsettings_desc', 'tool_muprog')
+    ));
+
+    $options = array('', "access", "ado_access", "ado", "ado_mssql", "borland_ibase", "csv", "db2", "fbsql", "firebird", "ibase", "informix72", "informix", "mssql", "mssql_n", "mssqlnative", "mysql", "mysqli", "mysqlt", "oci805", "oci8", "oci8po", "odbc", "odbc_mssql", "odbc_oracle", "oracle", "pdo", "postgres64", "postgres7", "postgres", "proxy", "sqlanywhere", "sybase", "vfp");
+    $options = array_combine($options, $options);
+    $settings->add(new admin_setting_configselect(
+        'tool_muprog/externaldbtype',
+        new lang_string('externaldbtype', 'tool_muprog'),
+        '',
+        '',
+        $options
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'tool_muprog/externaldbhost',
+        new lang_string('externaldbhost', 'tool_muprog'),
+        '',
+        'localhost'
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'tool_muprog/externaldbuser',
+        new lang_string('externaldbuser', 'tool_muprog'),
+        '',
+        ''
+    ));
+
+    $settings->add(new admin_setting_configpasswordunmask(
+        'tool_muprog/externaldbpass',
+        new lang_string('externaldbpass', 'tool_muprog'),
+        '',
+        ''
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'tool_muprog/externaldbname',
+        new lang_string('externaldbname', 'tool_muprog'),
+        '',
+        ''
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'tool_muprog/externaldbencoding',
+        new lang_string('externaldbencoding', 'tool_muprog'),
+        '',
+        'utf-8'
+    ));
+
+    $settings->add(new admin_setting_configtext(
+        'tool_muprog/externaldbsetupsql',
+        new lang_string('externaldbsetupsql', 'tool_muprog'),
+        '',
+        ''
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'tool_muprog/externaldbsybasequoting',
+        new lang_string('externaldbsybasequoting', 'tool_muprog'),
+        '',
+        0
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'tool_muprog/externaldbdebug',
+        new lang_string('externaldbdebug', 'tool_muprog'),
+        '',
+        0
+    ));
 }
 
 $ADMIN->add('tool_muprog', new admin_externalpage(

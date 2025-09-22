@@ -28,8 +28,12 @@ Students may be allocated to programs through the following sources:
 - **Automatic cohort allocation**: All members of specified cohorts are automatically allocated to the program.
 - **Completed program**: All users that complete referenced program are allocated automatically.
 - **Certifications**: Allocation is managed indirectly through the Certifications plugin.
+- **External database allocation**: Users are synchronised from a row-based external database table.
 
 During user allocation, a custom program schedule is generated for each user based on program allocation settings.
 This schedule includes the program start date, as well as optional program due and end dates.
+
+When the External database source is enabled the allocation settings page adds a **Run External Database Allocation**
+button, allowing administrators to start a synchronisation immediately without waiting for the scheduled cron task.
 
 ![Program allocation settings](img/program_allocation.png)
