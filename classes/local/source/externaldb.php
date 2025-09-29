@@ -28,7 +28,7 @@ use tool_muprog\local\util;
  * Program allocation via external database table.
  *
  * @package     tool_muprog
- * @copyright   2025 Open LMS
+ * @copyright   2025 e-Learning Team, Universiti Malaysia Terengganu
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class externaldb extends base {
@@ -499,6 +499,20 @@ final class externaldb extends base {
         }
         self::$configcache = (array)$config;
         return self::$configcache;
+    }
+
+    /**
+     * Reset cached configuration during automated tests.
+     *
+     * @return void
+     */
+    public static function reset_config_cache_for_tests(): void {
+        $istest = (defined('PHPUNIT_TEST') && PHPUNIT_TEST) || defined('BEHAT_SITE_RUNNING');
+        if (!$istest) {
+            throw new \coding_exception('reset_config_cache_for_tests() is intended for automated tests only');
+        }
+        self::$configcache = null;
+        self::end_debug_buffer();
     }
 
     /**

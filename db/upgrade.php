@@ -22,6 +22,7 @@
  * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
  * @copyright  2025 Petr Skoda
+ * @copyright  2025 e-Learning Team, Universiti Malaysia Terengganu
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

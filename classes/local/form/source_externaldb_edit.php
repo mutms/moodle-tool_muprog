@@ -24,7 +24,7 @@ use tool_muprog\local\source\externaldb;
  * External database allocation source editor.
  *
  * @package    tool_muprog
- * @copyright  2025 Open LMS
+ * @copyright  2025 e-Learning Team, Universiti Malaysia Terengganu
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class source_externaldb_edit extends \tool_mulib\local\ajax_form {

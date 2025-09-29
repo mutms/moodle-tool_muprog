@@ -21,7 +21,7 @@
  * Manual external database synchronisation.
  *
  * @package    tool_muprog
- * @copyright  2025 Open LMS
+ * @copyright  2025 e-Learning Team, Universiti Malaysia Terengganu
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
