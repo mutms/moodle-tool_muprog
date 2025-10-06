@@ -2,7 +2,7 @@
 
 ## mu-4.5.7-01
 
-Release date: xx/10/2025
+Release date: 06/10/2025
 
 * Fixed program tags itemtype to match database table name.
 
