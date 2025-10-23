@@ -1,5 +1,11 @@
 # Changelog
 
+## mu-4.5.7-02
+
+Release date: xx/10/2025
+
+* Improved table visuals.
+
 ## mu-4.5.7-01
 
 Release date: 06/10/2025
