@@ -1,5 +1,11 @@
 # Changelog
 
+## mu-5.0.3-02
+
+Release date: xx/10/2025
+
+* Improved table visuals.
+
 ## mu-5.0.3-01
 
 Release date: 06/10/2025
