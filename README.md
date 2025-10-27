@@ -42,7 +42,6 @@ Other recommended plugins:
 
 ## Documentation
 
-See [plugin documentation](https://github.com/mutms/moodle-tool_muprog/blob/MOODLE_405_STABLE/docs/en/index.md)
 and [Wiki pages](https://github.com/mutms/moodle-tool_muprog/wiki) for more information.
 
 ## Acknowledgement

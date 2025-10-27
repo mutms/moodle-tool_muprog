@@ -4,6 +4,7 @@
 
 Release date: xx/10/2025
 
+* Documentation was moved to https://github.com/mutms/moodle-tool_muprog/wiki
 * Improved table visuals.
 
 ## mu-5.0.3-01
