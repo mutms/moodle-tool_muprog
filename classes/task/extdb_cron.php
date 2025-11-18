@@ -16,33 +16,40 @@
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
+namespace tool_muprog\task;
+
 /**
- * Programs hook callbacks.
+ * Program external database sync cron.
  *
  * @package    tool_muprog
- * @copyright  2023 Open LMS
  * @copyright  2025 Petr Skoda
- * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+class extdb_cron extends \core\task\scheduled_task {
+    /**
+     * Name for this task.
+     *
+     * @return string
+     */
+    public function get_name() {
+        return get_string('task_extdb_cron', 'tool_muprog');
+    }
 
-defined('MOODLE_INTERNAL') || die();
+    /**
+     * Run task for all program cron stuff.
+     */
+    public function execute() {
+        global $DB;
 
-$callbacks = [
-    [
-        'hook' => \tool_mutrain\hook\framework_usage::class,
-        'callback' => [\tool_muprog\callback\tool_mutrain::class, 'framework_usage'],
-    ],
-    [
-        'hook' => \tool_mutrain\hook\completion_updated::class,
-        'callback' => [\tool_muprog\callback\tool_mutrain::class, 'completion_updated'],
-    ],
-    [
-        'hook' => \tool_mutenancy\hook\tenant_management_menu::class,
-        'callback' => [\tool_muprog\callback\tool_mutenancy::class, 'tenant_management_menu'],
-    ],
-    [
-        'hook' => \tool_mulib\hook\extdb_query_classes::class,
-        'callback' => [\tool_muprog\local\extdb\query\allocation::class, 'query_manager_callback'],
-    ],
-];
+        if (!$DB->record_exists('tool_muprog_source', ['type' => 'extdb'])) {
+            return;
+        }
+
+        $trace = new \text_progress_trace();
+
+        $trace->output('source\extdb::cron');
+        \tool_muprog\local\source\extdb::cron();
+
+        $trace->finished();
+    }
+}

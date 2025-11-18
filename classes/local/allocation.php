@@ -26,6 +26,7 @@ use tool_muprog\local\source\manual;
 use tool_muprog\local\source\selfallocation;
 use tool_muprog\local\source\mucertify;
 use tool_muprog\local\source\program;
+use tool_muprog\local\source\extdb;
 use stdClass;
 
 /**
@@ -50,6 +51,7 @@ final class allocation {
             selfallocation::get_type() => selfallocation::class,
             approval::get_type() => approval::class,
             cohort::get_type() => cohort::class,
+            extdb::get_type() => extdb::class,
             program::get_type() => program::class,
         ];
 
