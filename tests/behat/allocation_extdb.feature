@@ -22,9 +22,9 @@ Feature: External database query program allocation tests
       | name          |
       | Test server 1 |
     And the following "tool_mulib > extdb_queries" exist:
-      | name         | server        | component   | type       | contextlevel | reference | sqlquery |
-      | Test query 1 | Test server 1 | tool_muprog | allocation | Category     | CAT1      | SELECT *  FROM (VALUES ('student1'),('student2')) t1 (username) WHERE 1 = 1 |
-      | Test query 2 | Test server 1 | tool_muprog | allocation | System       |           | SELECT *  FROM (VALUES ('student1')) t1 (username) WHERE 1 = 1 |
+      | name         | server        | component   | type       | contextlevel | reference | sqlquery                                                                   |
+      | Test query 1 | Test server 1 | tool_muprog | allocation | Category     | CAT1      | SELECT id AS userid FROM {user} WHERE username IN ('student1', 'student2') |
+      | Test query 2 | Test server 1 | tool_muprog | allocation | System       |           | SELECT id AS userid FROM {user} WHERE username IN ('student1')             |
     And the following config values are set as admin:
       | source_extdb_allownew | 1 | tool_muprog |
     And I log in as "admin"
