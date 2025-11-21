@@ -70,7 +70,7 @@ final class extdb_test extends \advanced_testcase {
             'serverid' => $server->id,
             'component' => 'tool_muprog',
             'type' => 'allocation',
-            'sql' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id={$user->id}",
+            'sqlquery' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id={$user->id}",
         ]);
         $program = $programgenerator->create_program();
         $data = (object)[
@@ -110,7 +110,7 @@ final class extdb_test extends \advanced_testcase {
             'serverid' => $server->id,
             'component' => 'tool_muprog',
             'type' => 'allocation',
-            'sql' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id={$user->id}",
+            'sqlquery' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id={$user->id}",
         ]);
         $program = $programgenerator->create_program();
         $data = (object)[
@@ -125,7 +125,7 @@ final class extdb_test extends \advanced_testcase {
         extdb::sync($source);
         \tool_mulib\local\extdb\query::update((object)[
             'id' => $query->id,
-            'sql' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id=-1",
+            'sqlquery' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id=-1",
         ]);
         extdb::sync($source);
         $allocation = $DB->get_record('tool_muprog_allocation', ['sourceid' => $source->id, 'userid' => $user->id], '*', MUST_EXIST);
@@ -157,7 +157,7 @@ final class extdb_test extends \advanced_testcase {
             'serverid' => $server->id,
             'component' => 'tool_muprog',
             'type' => 'allocation',
-            'sql' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id={$user->id}",
+            'sqlquery' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id={$user->id}",
         ]);
         $program = $programgenerator->create_program();
         $data = (object)[
@@ -175,7 +175,7 @@ final class extdb_test extends \advanced_testcase {
 
         \tool_mulib\local\extdb\query::update((object)[
             'id' => $query->id,
-            'sql' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id=-1",
+            'sqlquery' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id=-1",
         ]);
         extdb::sync($source);
         $allocation = $DB->get_record('tool_muprog_allocation', ['sourceid' => $source->id, 'userid' => $user->id], '*', MUST_EXIST);
@@ -219,7 +219,7 @@ final class extdb_test extends \advanced_testcase {
             'serverid' => $server->id,
             'component' => 'tool_muprog',
             'type' => 'allocation',
-            'sql' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id={$user->id}",
+            'sqlquery' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id={$user->id}",
         ]);
         $program1 = $programgenerator->create_program();
         $source1 = \tool_muprog\local\source\base::update_source((object)[
@@ -283,7 +283,7 @@ final class extdb_test extends \advanced_testcase {
             'serverid' => $server->id,
             'component' => 'tool_muprog',
             'type' => 'allocation',
-            'sql' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id={$user->id}",
+            'sqlquery' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id={$user->id}",
         ]);
         $program1 = $programgenerator->create_program();
         $source1 = \tool_muprog\local\source\base::update_source((object)[
@@ -343,7 +343,7 @@ final class extdb_test extends \advanced_testcase {
             'serverid' => $server->id,
             'component' => 'tool_muprog',
             'type' => 'allocation',
-            'sql' => "SELECT id AS userid FROM {$CFG->prefix}user",
+            'sqlquery' => "SELECT id AS userid FROM {$CFG->prefix}user",
         ]);
         $program1 = $programgenerator->create_program();
         $source1 = \tool_muprog\local\source\base::update_source((object)[
@@ -358,7 +358,7 @@ final class extdb_test extends \advanced_testcase {
         $DB->delete_records('tool_muprog_allocation', ['sourceid' => $source1->id]);
         query::update((object)[
             'id' => $query->id,
-            'sql' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id IN ({$user1->id},{$user2->id})",
+            'sqlquery' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id IN ({$user1->id},{$user2->id})",
         ]);
         $this->assertTrue(extdb::sync($source1));
         $this->assertCount(2, $DB->get_records('tool_muprog_allocation', ['sourceid' => $source1->id]));
@@ -369,7 +369,7 @@ final class extdb_test extends \advanced_testcase {
         $DB->delete_records('tool_muprog_allocation', ['sourceid' => $source1->id]);
         query::update((object)[
             'id' => $query->id,
-            'sql' => "SELECT username FROM {$CFG->prefix}user WHERE id IN ({$user1->id},{$user2->id})",
+            'sqlquery' => "SELECT username FROM {$CFG->prefix}user WHERE id IN ({$user1->id},{$user2->id})",
         ]);
         $this->assertTrue(extdb::sync($source1));
         $this->assertCount(2, $DB->get_records('tool_muprog_allocation', ['sourceid' => $source1->id]));
@@ -380,7 +380,7 @@ final class extdb_test extends \advanced_testcase {
         $DB->delete_records('tool_muprog_allocation', ['sourceid' => $source1->id]);
         query::update((object)[
             'id' => $query->id,
-            'sql' => "SELECT email AS useremail FROM {$CFG->prefix}user WHERE id IN ({$user1->id},{$user2->id})",
+            'sqlquery' => "SELECT email AS useremail FROM {$CFG->prefix}user WHERE id IN ({$user1->id},{$user2->id})",
         ]);
         $this->assertTrue(extdb::sync($source1));
         $this->assertCount(2, $DB->get_records('tool_muprog_allocation', ['sourceid' => $source1->id]));
@@ -391,7 +391,7 @@ final class extdb_test extends \advanced_testcase {
         $DB->delete_records('tool_muprog_allocation', ['sourceid' => $source1->id]);
         query::update((object)[
             'id' => $query->id,
-            'sql' => "SELECT idnumber AS useridnumber FROM {$CFG->prefix}user WHERE id IN ({$user1->id},{$user2->id},{$user3->id})",
+            'sqlquery' => "SELECT idnumber AS useridnumber FROM {$CFG->prefix}user WHERE id IN ({$user1->id},{$user2->id},{$user3->id})",
         ]);
         $this->assertTrue(extdb::sync($source1));
         $this->assertCount(2, $DB->get_records('tool_muprog_allocation', ['sourceid' => $source1->id]));
@@ -402,7 +402,7 @@ final class extdb_test extends \advanced_testcase {
         $DB->delete_records('tool_muprog_allocation', ['sourceid' => $source1->id]);
         query::update((object)[
             'id' => $query->id,
-            'sql' => "SELECT email AS useremail FROM {$CFG->prefix}user WHERE id IN ({$user1->id},{$user2->id},{$user3->id})",
+            'sqlquery' => "SELECT email AS useremail FROM {$CFG->prefix}user WHERE id IN ({$user1->id},{$user2->id},{$user3->id})",
         ]);
         $this->assertTrue(extdb::sync($source1));
         $this->assertCount(2, $DB->get_records('tool_muprog_allocation', ['sourceid' => $source1->id]));
@@ -413,7 +413,7 @@ final class extdb_test extends \advanced_testcase {
         $DB->delete_records('tool_muprog_allocation', ['sourceid' => $source1->id]);
         query::update((object)[
             'id' => $query->id,
-            'sql' => "SELECT id FROM {$CFG->prefix}user WHERE id IN ({$user1->id},{$user2->id})",
+            'sqlquery' => "SELECT id FROM {$CFG->prefix}user WHERE id IN ({$user1->id},{$user2->id})",
         ]);
         $this->assertDebuggingNotCalled();
         $this->assertFalse(extdb::sync($source1));
@@ -424,7 +424,7 @@ final class extdb_test extends \advanced_testcase {
         $DB->delete_records('tool_muprog_allocation', ['sourceid' => $source1->id]);
         query::update((object)[
             'id' => $query->id,
-            'sql' => "SELECT id AS userid, username FROM {$CFG->prefix}user WHERE id IN ({$user1->id},{$user2->id})",
+            'sqlquery' => "SELECT id AS userid, username FROM {$CFG->prefix}user WHERE id IN ({$user1->id},{$user2->id})",
         ]);
         $this->assertDebuggingNotCalled();
         $this->assertFalse(extdb::sync($source1));
@@ -435,7 +435,7 @@ final class extdb_test extends \advanced_testcase {
         $DB->delete_records('tool_muprog_allocation', ['sourceid' => $source1->id]);
         query::update((object)[
             'id' => $query->id,
-            'sql' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id IN ({$user1->id},{$user2->id})",
+            'sqlquery' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id IN ({$user1->id},{$user2->id})",
         ]);
         $this->assertTrue(extdb::sync($source1));
         $this->assertCount(2, $DB->get_records('tool_muprog_allocation', ['sourceid' => $source1->id]));
@@ -443,7 +443,7 @@ final class extdb_test extends \advanced_testcase {
         $this->assertCount(1, $DB->get_records('tool_muprog_allocation', ['sourceid' => $source1->id, 'userid' => $user2->id, 'archived' => 0]));
         query::update((object)[
             'id' => $query->id,
-            'sql' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id IN ({$user1->id})",
+            'sqlquery' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id IN ({$user1->id})",
         ]);
         $this->assertTrue(extdb::sync($source1));
         $this->assertCount(2, $DB->get_records('tool_muprog_allocation', ['sourceid' => $source1->id]));
@@ -463,7 +463,7 @@ final class extdb_test extends \advanced_testcase {
 
         query::update((object)[
             'id' => $query->id,
-            'sql' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id IN ({$user1->id}, {$user2->id})",
+            'sqlquery' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id IN ({$user1->id}, {$user2->id})",
         ]);
         $this->assertTrue(extdb::sync($source1));
         $this->assertTrue(extdb::sync($source1));
@@ -473,7 +473,7 @@ final class extdb_test extends \advanced_testcase {
 
         query::update((object)[
             'id' => $query->id,
-            'sql' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id IS NULL",
+            'sqlquery' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id IS NULL",
         ]);
         $this->assertTrue(extdb::sync($source1));
         $this->assertCount(2, $DB->get_records('tool_muprog_allocation', ['sourceid' => $source1->id]));
@@ -508,7 +508,7 @@ final class extdb_test extends \advanced_testcase {
             'serverid' => $server->id,
             'component' => 'tool_muprog',
             'type' => 'allocation',
-            'sql' => "SELECT id AS userid FROM {$CFG->prefix}user",
+            'sqlquery' => "SELECT id AS userid FROM {$CFG->prefix}user",
         ]);
         $program1 = $programgenerator->create_program();
         $source1 = \tool_muprog\local\source\base::update_source((object)[
@@ -526,7 +526,7 @@ final class extdb_test extends \advanced_testcase {
         $DB->delete_records('tool_muprog_allocation', ['sourceid' => $source1->id]);
         query::update((object)[
             'id' => $query->id,
-            'sql' => "SELECT id AS userid, $teststart AS timestart, $testdue AS timedue, $testend AS timeend FROM {$CFG->prefix}user WHERE id IN ({$user1->id})",
+            'sqlquery' => "SELECT id AS userid, $teststart AS timestart, $testdue AS timedue, $testend AS timeend FROM {$CFG->prefix}user WHERE id IN ({$user1->id})",
         ]);
         $this->assertTrue(extdb::sync($source1));
         $allocation = $DB->get_record('tool_muprog_allocation', ['sourceid' => $source1->id, 'userid' => $user1->id], '*', MUST_EXIST);
@@ -538,7 +538,7 @@ final class extdb_test extends \advanced_testcase {
         $DB->delete_records('tool_muprog_allocation', ['sourceid' => $source1->id]);
         query::update((object)[
             'id' => $query->id,
-            'sql' => "SELECT id AS userid, '2005-08-15T15:52:01+00:00' AS timestart FROM {$CFG->prefix}user WHERE id IN ({$user1->id})",
+            'sqlquery' => "SELECT id AS userid, '2005-08-15T15:52:01+00:00' AS timestart FROM {$CFG->prefix}user WHERE id IN ({$user1->id})",
         ]);
         $this->assertTrue(extdb::sync($source1));
         $allocation = $DB->get_record('tool_muprog_allocation', ['sourceid' => $source1->id, 'userid' => $user1->id], '*', MUST_EXIST);
@@ -550,7 +550,7 @@ final class extdb_test extends \advanced_testcase {
         $DB->delete_records('tool_muprog_allocation', ['sourceid' => $source1->id]);
         query::update((object)[
             'id' => $query->id,
-            'sql' => "SELECT id AS userid, '1999-08-15T15:52:01+00:00' AS timestart FROM {$CFG->prefix}user WHERE id IN ({$user1->id})",
+            'sqlquery' => "SELECT id AS userid, '1999-08-15T15:52:01+00:00' AS timestart FROM {$CFG->prefix}user WHERE id IN ({$user1->id})",
         ]);
         $this->setCurrentTimeStart();
         $this->assertTrue(extdb::sync($source1));
@@ -563,7 +563,7 @@ final class extdb_test extends \advanced_testcase {
         $DB->delete_records('tool_muprog_allocation', ['sourceid' => $source1->id]);
         query::update((object)[
             'id' => $query->id,
-            'sql' => "SELECT id AS userid, 'never ever' AS timestart FROM {$CFG->prefix}user WHERE id IN ({$user1->id})",
+            'sqlquery' => "SELECT id AS userid, 'never ever' AS timestart FROM {$CFG->prefix}user WHERE id IN ({$user1->id})",
         ]);
         $this->setCurrentTimeStart();
         $this->assertTrue(extdb::sync($source1));
@@ -593,7 +593,7 @@ final class extdb_test extends \advanced_testcase {
             'serverid' => $server->id,
             'component' => 'tool_muprog',
             'type' => 'allocation',
-            'sql' => "SELECT id AS userid
+            'sqlquery' => "SELECT id AS userid
                         FROM {$CFG->prefix}user
                        WHERE id = {$user1->id}
                              AND $program1->id = :programid AND '{$program1->idnumber}' = :programidnumber",
