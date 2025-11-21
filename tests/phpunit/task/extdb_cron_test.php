@@ -68,7 +68,7 @@ final class extdb_cron_test extends \advanced_testcase {
             'serverid' => $server->id,
             'component' => 'tool_muprog',
             'type' => 'allocation',
-            'sql' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id IN ({$user1->id},{$user2->id})",
+            'sqlquery' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id IN ({$user1->id},{$user2->id})",
         ]);
 
         $data = (object)[

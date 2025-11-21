@@ -65,7 +65,7 @@ final class allocation_test extends \advanced_testcase {
             'serverid' => $server->id,
             'component' => 'tool_muprog',
             'type' => 'allocation',
-            'sql' => "SELECT id AS userid, 11 AS timestart FROM {$CFG->prefix}user WHERE username='admin'",
+            'sqlquery' => "SELECT id AS userid, 11 AS timestart FROM {$CFG->prefix}user WHERE username='admin'",
         ]);
         $admin = get_admin();
 
@@ -86,7 +86,7 @@ final class allocation_test extends \advanced_testcase {
             'serverid' => $server->id,
             'component' => 'tool_muprog',
             'type' => 'allocation',
-            'sql' => "SELECT id AS userid, 11 AS timestart FROM {$CFG->prefix}user WHERE username='xyz'",
+            'sqlquery' => "SELECT id AS userid, 11 AS timestart FROM {$CFG->prefix}user WHERE username='xyz'",
         ]);
         $aq = new allocation($query2->id, $program);
 

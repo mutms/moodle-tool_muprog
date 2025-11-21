@@ -49,7 +49,7 @@ final class extdb_sync_test extends \advanced_testcase {
             'serverid' => $server->id,
             'component' => 'tool_muprog',
             'type' => 'allocation',
-            'sql' => "SELECT id AS userid FROM {$CFG->prefix}user",
+            'sqlquery' => "SELECT id AS userid FROM {$CFG->prefix}user",
         ]);
         $data = (object)[
             'enable' => 1,
@@ -82,7 +82,7 @@ final class extdb_sync_test extends \advanced_testcase {
             'serverid' => $server->id,
             'component' => 'tool_muprog',
             'type' => 'allocation',
-            'sql' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id={$user1->id}",
+            'sqlquery' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id={$user1->id}",
         ]);
         $data = (object)[
             'enable' => 1,
