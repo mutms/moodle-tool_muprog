@@ -38,7 +38,6 @@ final class extdb_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
-        $this->preventResetByRollback();
     }
 
     public function test_get_type(): void {
@@ -59,6 +58,8 @@ final class extdb_test extends \advanced_testcase {
 
     public function test_is_allocation_archive_possible(): void {
         global $CFG, $DB;
+        $this->preventResetByRollback();
+
         /** @var \tool_mulib_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_mulib');
         /** @var \tool_muprog_generator $programgenerator */
@@ -99,6 +100,8 @@ final class extdb_test extends \advanced_testcase {
 
     public function test_is_allocation_restore_possible(): void {
         global $CFG, $DB;
+        $this->preventResetByRollback();
+
         /** @var \tool_mulib_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_mulib');
         /** @var \tool_muprog_generator $programgenerator */
@@ -146,6 +149,8 @@ final class extdb_test extends \advanced_testcase {
 
     public function test_is_allocation_delete_possible(): void {
         global $CFG, $DB;
+        $this->preventResetByRollback();
+
         /** @var \tool_mulib_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_mulib');
         /** @var \tool_muprog_generator $programgenerator */
@@ -208,6 +213,8 @@ final class extdb_test extends \advanced_testcase {
 
     public function test_cron(): void {
         global $CFG, $DB;
+        $this->preventResetByRollback();
+
         /** @var \tool_mulib_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_mulib');
         /** @var \tool_muprog_generator $programgenerator */
@@ -272,6 +279,8 @@ final class extdb_test extends \advanced_testcase {
 
     public function test_sync_asap(): void {
         global $CFG, $DB;
+        $this->preventResetByRollback();
+
         /** @var \tool_mulib_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_mulib');
         /** @var \tool_muprog_generator $programgenerator */
@@ -313,6 +322,8 @@ final class extdb_test extends \advanced_testcase {
 
     public function test_sync(): void {
         global $CFG, $DB;
+        $this->preventResetByRollback();
+
         /** @var \tool_mulib_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_mulib');
         /** @var \tool_muprog_generator $programgenerator */
@@ -337,6 +348,11 @@ final class extdb_test extends \advanced_testcase {
             'username' => 'user4',
             'email' => 'userx@example.com',
             'idnumber' => '',
+        ]);
+        $user5 = $this->getDataGenerator()->create_user([
+            'username' => 'user5',
+            'email' => 'user5@example.com',
+            'idnumber' => 'userid5',
         ]);
         $server = $generator->create_extdb_server([]);
         $query = $generator->create_extdb_query([
@@ -490,6 +506,39 @@ final class extdb_test extends \advanced_testcase {
         $this->assertCount(2, $DB->get_records('tool_muprog_allocation', ['sourceid' => $source1->id]));
         $this->assertCount(1, $DB->get_records('tool_muprog_allocation', ['sourceid' => $source1->id, 'userid' => $user1->id, 'archived' => 1]));
         $this->assertCount(1, $DB->get_records('tool_muprog_allocation', ['sourceid' => $source1->id, 'userid' => $user2->id, 'archived' => 1]));
+
+        // Test conflict with manual source.
+        $source1 = extdb::update_source((object)[
+            'enable' => 1,
+            'programid' => $program1->id,
+            'type' => 'extdb',
+            'auxint2' => 1,
+        ]);
+        $source2 = \tool_muprog\local\source\base::update_source((object)[
+            'enable' => 1,
+            'programid' => $program1->id,
+            'type' => 'manual',
+        ]);
+        \tool_muprog\local\source\manual::allocate_users($program1->id, $source2->id, [$user4->id, $user5->id]);
+        query::update((object)[
+            'id' => $query->id,
+            'sqlquery' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id IN ({$user4->id}, {$user5->id})",
+        ]);
+        $this->assertTrue(extdb::sync($source1));
+        $this->assertCount(4, $DB->get_records('tool_muprog_allocation', ['programid' => $program1->id]));
+        $this->assertCount(1, $DB->get_records('tool_muprog_allocation', ['sourceid' => $source1->id, 'userid' => $user1->id, 'archived' => 1]));
+        $this->assertCount(1, $DB->get_records('tool_muprog_allocation', ['sourceid' => $source1->id, 'userid' => $user2->id, 'archived' => 1]));
+        $this->assertCount(1, $DB->get_records('tool_muprog_allocation', ['sourceid' => $source2->id, 'userid' => $user4->id, 'archived' => 0]));
+        $this->assertCount(1, $DB->get_records('tool_muprog_allocation', ['sourceid' => $source2->id, 'userid' => $user5->id, 'archived' => 0]));
+        $allocation5 = $DB->get_record('tool_muprog_allocation', ['sourceid' => $source2->id, 'userid' => $user5->id, 'archived' => 0]);
+
+        \tool_muprog\local\source\manual::allocation_archive($allocation5->id);
+        $this->assertTrue(extdb::sync($source1));
+        $this->assertCount(4, $DB->get_records('tool_muprog_allocation', ['programid' => $program1->id]));
+        $this->assertCount(1, $DB->get_records('tool_muprog_allocation', ['sourceid' => $source1->id, 'userid' => $user1->id, 'archived' => 1]));
+        $this->assertCount(1, $DB->get_records('tool_muprog_allocation', ['sourceid' => $source1->id, 'userid' => $user2->id, 'archived' => 1]));
+        $this->assertCount(1, $DB->get_records('tool_muprog_allocation', ['sourceid' => $source2->id, 'userid' => $user4->id, 'archived' => 0]));
+        $this->assertCount(1, $DB->get_records('tool_muprog_allocation', ['sourceid' => $source2->id, 'userid' => $user5->id, 'archived' => 1]));
     }
 
     /**
@@ -497,6 +546,8 @@ final class extdb_test extends \advanced_testcase {
      */
     public function test_sync_dates(): void {
         global $CFG, $DB;
+        $this->preventResetByRollback();
+
         /** @var \tool_mulib_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_mulib');
         /** @var \tool_muprog_generator $programgenerator */
@@ -578,6 +629,8 @@ final class extdb_test extends \advanced_testcase {
      */
     public function test_sync_program_parameters(): void {
         global $CFG, $DB;
+        $this->preventResetByRollback();
+
         /** @var \tool_mulib_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_mulib');
         /** @var \tool_muprog_generator $programgenerator */

@@ -248,8 +248,16 @@ final class extdb extends base {
                 continue;
             }
 
-            $allocation = $DB->get_record('tool_muprog_allocation', ['sourceid' => $source->id, 'userid' => $user->id]);
+            $sql = "SELECT a.*, s.type
+                     FROM {tool_muprog_allocation} a
+                LEFT JOIN {tool_muprog_source} s ON s.id = a.sourceid
+                    WHERE a.programid = :programid AND a.userid = :userid";
+            $allocation = $DB->get_record_sql($sql, ['programid' => $program->id, 'userid' => $user->id]);
             if ($allocation) {
+                if ($allocation->type !== 'extdb') {
+                    // Ignore all other sources.
+                    continue;
+                }
                 // Check if archived.
                 if ($source->auxint2 == 1 && $allocation->archived) {
                     self::allocation_restore($allocation->id);
