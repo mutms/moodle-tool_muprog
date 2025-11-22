@@ -92,10 +92,10 @@ final class extdb_cron_test extends \advanced_testcase {
 
         $cron = new \tool_muprog\task\extdb_cron();
         ob_start();
+        $this->setCurrentTimeStart();
         $cron->execute();
         $this->assertSame("source\\extdb::cron\n", ob_get_clean());
 
-        $this->setCurrentTimeStart();
         $tasks = $DB->get_records('task_adhoc', ['component' => 'tool_muprog']);
         $this->assertCount(1, $tasks);
         $task = reset($tasks);
