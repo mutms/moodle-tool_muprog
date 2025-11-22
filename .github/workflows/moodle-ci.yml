@@ -95,8 +95,8 @@ jobs:
           moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1 --db-port=${{ matrix.dbport }}
         env:
           DB: ${{ matrix.database }}
-          MOODLE_REPO: https://github.com/mutms/moodle.git
           DBPORT: ${{ matrix.dbport }}
+          MOODLE_REPO: https://github.com/mutms/moodle.git
           MOODLE_BRANCH: ${{ matrix.moodle-branch }}
 
       - name: PHP Lint
