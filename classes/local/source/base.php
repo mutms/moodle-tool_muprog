@@ -69,6 +69,15 @@ abstract class base {
     }
 
     /**
+     * Can a new source of this type be added to programs when creating program?
+     *
+     * @return bool
+     */
+    public static function is_new_allowed_in_new(): bool {
+        return false;
+    }
+
+    /**
      * Can existing source of this type be updated or deleted to programs?
      *
      * NOTE: Existing enabled sources in programs cannot be deleted/hidden

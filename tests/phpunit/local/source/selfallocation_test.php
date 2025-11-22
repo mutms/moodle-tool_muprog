@@ -54,6 +54,10 @@ final class selfallocation_test extends \advanced_testcase {
         $this->assertFalse(\tool_muprog\local\source\selfallocation::is_new_allowed($program));
     }
 
+    public function test_is_new_allowed_in_new(): void {
+        $this->assertFalse(\tool_muprog\local\source\selfallocation::is_new_allowed_in_new());
+    }
+
     public function test_can_user_request(): void {
         global $DB;
 

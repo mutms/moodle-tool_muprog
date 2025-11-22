@@ -44,6 +44,22 @@ final class extdb_test extends \advanced_testcase {
         $this->assertSame('extdb', extdb::get_type());
     }
 
+    public function test_is_new_alloved(): void {
+        /** @var \tool_muprog_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
+        $program = $generator->create_program();
+
+        $this->assertFalse(extdb::is_new_allowed($program));
+        set_config('source_extdb_allownew', 1, 'tool_muprog');
+        $this->assertTrue(extdb::is_new_allowed($program));
+    }
+
+    public function test_is_new_allowed_in_new(): void {
+        $this->assertFalse(extdb::is_new_allowed_in_new());
+        set_config('source_extdb_allownew', 1, 'tool_muprog');
+        $this->assertFalse(extdb::is_new_allowed_in_new());
+    }
+
     public function test_get_name(): void {
         $this->assertSame('External database allocation', extdb::get_name());
     }

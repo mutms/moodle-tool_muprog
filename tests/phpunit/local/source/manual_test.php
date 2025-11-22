@@ -51,8 +51,12 @@ final class manual_test extends \advanced_testcase {
         $program = $generator->create_program();
 
         $this->assertTrue(manual::is_new_allowed($program));
-        \set_config('source_manual_allownew', 0, 'tool_muprog');
+        set_config('source_manual_allownew', 0, 'tool_muprog');
         $this->assertTrue(manual::is_new_allowed($program));
+    }
+
+    public function test_is_new_allowed_in_new(): void {
+        $this->assertTrue(manual::is_new_allowed_in_new());
     }
 
     public function test_is_allocation_possible(): void {

@@ -4,6 +4,7 @@
 
 Release date: xx/11/2025
 
+* Added option fpr enabling of Manual and Certification allocations during program creation.
 * Added source for allocation from external database.
 
 ## mu-4.5.7-02
