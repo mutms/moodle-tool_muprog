@@ -151,6 +151,7 @@ $string['management_program_users_actions'] = 'Users actions';
 $string['messageprovider:allocation_notification'] = 'Program allocation notification';
 $string['messageprovider:approval_reject_notification'] = 'Program request rejection notification';
 $string['messageprovider:approval_request_notification'] = 'Program approval request notification';
+$string['messageprovider:cc_supervisor_notification'] = 'Copy of subordinate program notifications';
 $string['messageprovider:completion_notification'] = 'Program completed notification';
 $string['messageprovider:deallocation_notification'] = 'Program deallocation notification';
 $string['messageprovider:due_notification'] = 'Program overdue notification';
@@ -189,6 +190,16 @@ you have been allocated to program "{$a->program_fullname}", the start date is {
 ';
 $string['notification_allocation_description'] = 'Notification sent to users when they are allocated to program.';
 $string['notification_allocation_subject'] = 'Program allocation notification';
+$string['notification_cc_supervisor_body'] = 'Hello {$a->supervisor_fullname},
+
+a notification was sent to the following user:
+
+* {$a->subordinate_title}: {$a->user_fullname}
+* Notification type: {$a->notification_name}
+* Related program: {$a->program_fullname}
+
+';
+$string['notification_cc_supervisor_subject'] = '{$a->supervisor_title} notification - {$a->program_fullname}';
 $string['notification_completion'] = 'Program completed';
 $string['notification_completion_body'] = 'Hello {$a->user_fullname},
 

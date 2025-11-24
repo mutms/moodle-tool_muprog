@@ -77,7 +77,7 @@ final class program_create extends \tool_mulib\local\ajax_form {
             }
         }
         if ($sources) {
-            $mform->addElement('group', 'addsources', get_string('allocationsources', 'tool_muprog'), $sources, \html_writer::div('', 'w-100 mb-2'));
+            $mform->addElement('group', 'addsources', get_string('allocationsources', 'tool_muprog'), $sources, '<div class="w-100 mb-2" />');
         }
 
         $this->add_action_buttons(true, get_string('program_create', 'tool_muprog'));
