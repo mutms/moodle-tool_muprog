@@ -4,6 +4,7 @@
 
 Release date: xx/11/2025
 
+* Updated use of sql fragments API.
 * Fixed timezones in notifications.
 * Added option to send copy of subordinate notifications to supervisors.
 * Added option for enabling of Manual and Certification allocations during program creation.
