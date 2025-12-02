@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
 
 /** @var stdClass $plugin */
 $plugin->component = 'tool_muprog';
-$plugin->version = 2025112350;
+$plugin->version = 2025112750;
 $plugin->requires = 2025041400;
 $plugin->maturity = MATURITY_BETA;
 $plugin->supported = [500, 501];
@@ -38,6 +38,6 @@ $plugin->supported = [500, 501];
 $plugin->release = 'mu-5.0.3-02+';
 
 $plugin->dependencies = [
-    'tool_mulib' => 2025112350,
+    'tool_mulib' => 2025112750,
     'enrol_muprog' => 2025110850,
 ];

@@ -86,11 +86,11 @@ final class source_extdb_edit_queryid extends \tool_mulib\external\form_autocomp
         );
 
         $search = self::get_search_query($query, ['name', 'note'], 'q');
-        $sql->replace_comment('search', $search->wrap('AND ', ''));
+        $sql = $sql->replace_comment('search', $search->wrap('AND ', ''));
 
         if (\tool_mulib\local\mulib::is_mutenancy_active()) {
             if ($context->tenantid) {
-                $sql->replace_comment('tenant', "AND (c.tenantid IS NULL OR c.tenantid = ?)", [$context->tenantid]);
+                $sql = $sql->replace_comment('tenant', "AND (c.tenantid IS NULL OR c.tenantid = ?)", [$context->tenantid]);
             }
         }
 
