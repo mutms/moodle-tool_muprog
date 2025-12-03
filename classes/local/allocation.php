@@ -28,6 +28,7 @@ use tool_muprog\local\source\mucertify;
 use tool_muprog\local\source\program;
 use tool_muprog\local\source\extdb;
 use stdClass;
+use tool_mulib\local\mulib;
 
 /**
  * Program allocation abstraction.
@@ -1235,7 +1236,7 @@ final class allocation {
         $params = ['userid' => $userid ?? $USER->id];
 
         $tenantjoin = "";
-        if (\tool_muprog\local\util::is_mutenancy_active()) {
+        if (mulib::is_mutenancy_active()) {
             // Having program allocations in different tenant is a BAD thing,
             // so let's just do the same as the catalogue for now.
             $tenantid = \tool_mutenancy\local\tenancy::get_current_tenantid();

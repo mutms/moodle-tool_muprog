@@ -15,12 +15,15 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Files.LineLength.TooLong
 
 namespace tool_muprog\external\form_autocomplete;
 
 use core_external\external_function_parameters;
 use core_external\external_value;
 use tool_mulib\local\sql;
+use tool_mulib\local\context_map;
+use tool_mulib\local\mulib;
 
 /**
  * External database sync query autocompletion.
@@ -56,18 +59,15 @@ final class source_extdb_edit_queryid extends \tool_mulib\external\form_autocomp
      * @return array
      */
     public static function execute(string $query, int $programid): array {
-        global $DB;
+        global $DB, $USER;
 
         [
             'query' => $query,
             'programid' => $programid,
-        ] = self::validate_parameters(
-            self::execute_parameters(),
-            [
-                'query' => $query,
-                'programid' => $programid,
-            ]
-        );
+        ] = self::validate_parameters(self::execute_parameters(), [
+            'query' => $query,
+            'programid' => $programid,
+        ]);
 
         $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
         $context = \context::instance_by_id($program->contextid);
@@ -77,40 +77,39 @@ final class source_extdb_edit_queryid extends \tool_mulib\external\form_autocomp
         $contextids = $context->get_parent_context_ids(true);
         $contextids = implode(',', $contextids);
 
-        $sql = new sql(
-            "SELECT q.id, q.name, q.contextid
-               FROM {tool_mulib_extdb_query} q
-               JOIN {context} c ON c.id = q.contextid
-              WHERE c.id IN ($contextids) /* search */ /* tenant */
-           ORDER BY q.name ASC"
-        );
+        $sql = (
+            new sql(
+                "SELECT q.id, q.name, q.contextid
+                   FROM {tool_mulib_extdb_query} q
+                   /* capsubquery */
+                   /* tenantjoin */
+                  WHERE q.contextid IN ($contextids) /* search */
+               ORDER BY q.name ASC"
+            )
+        )
+            ->replace_comment(
+                'capsubquery',
+                context_map::get_contexts_by_capability_query(
+                    'tool/mulib:useextdb',
+                    $USER->id,
+                    new sql("(ctx.contextlevel = ? OR ctx.contextlevel = ?)", [\context_system::LEVEL, \context_coursecat::LEVEL])
+                )->wrap("JOIN (", ")capctx ON capctx.id = q.contextid")
+            )
+            ->replace_comment(
+                'search',
+                self::get_search_query($query, ['name', 'note'], 'q')->wrap('AND ', '')
+            );
 
-        $search = self::get_search_query($query, ['name', 'note'], 'q');
-        $sql = $sql->replace_comment('search', $search->wrap('AND ', ''));
-
-        if (\tool_mulib\local\mulib::is_mutenancy_active()) {
+        if (mulib::is_mutenancy_active()) {
             if ($context->tenantid) {
-                $sql = $sql->replace_comment('tenant', "AND (c.tenantid IS NULL OR c.tenantid = ?)", [$context->tenantid]);
+                $sql = $sql->replace_comment(
+                    'tenantjoin',
+                    new sql("JOIN {context} tctx ON tctx.id = q.contextid AND (tctx.tenantid = ? OR tctx.tenantid IS NULL)", [$context->tenantid])
+                );
             }
         }
 
-        $rs = $DB->get_recordset_sql($sql->sql, $sql->params);
-
-        $queries = [];
-        $i = 0;
-        foreach ($rs as $query) {
-            $qcontext = \context::instance_by_id($query->contextid);
-            if (!has_capability('tool/mulib:useextdb', $qcontext)) {
-                continue;
-            }
-            $queries[$query->id] = $query;
-            $i++;
-            if ($i > self::MAX_RESULTS) {
-                break;
-            }
-        }
-        $rs->close();
-
+        $queries = $DB->get_records_sql($sql->sql, $sql->params);
         return self::prepare_result($queries, $context);
     }
 
@@ -131,7 +130,7 @@ final class source_extdb_edit_queryid extends \tool_mulib\external\form_autocomp
         if (!$qcontext) {
             return get_string('error');
         }
-        if (\tool_muprog\local\util::is_mutenancy_active()) {
+        if (mulib::is_mutenancy_active()) {
             $programcontext = \context::instance_by_id($program->contextid);
             if ($qcontext->tenantid && $programcontext->tenantid && $qcontext->tenantid != $programcontext->tenantid) {
                 // Do not allow queries from other tenants.
