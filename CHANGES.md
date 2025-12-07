@@ -1,8 +1,8 @@
 # Changelog
 
-## mu-4.5.7-03
+## mu-4.5.8-01
 
-Release date: xx/11/2025
+Release date: 08/12/2025
 
 * Updated use of sql fragments API.
 * Fixed timezones in notifications.
