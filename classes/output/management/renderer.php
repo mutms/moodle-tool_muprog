@@ -28,7 +28,7 @@ use tool_muprog\local\content\item,
     tool_muprog\local\content\top,
     tool_muprog\local\content\set,
     tool_muprog\local\content\course,
-    tool_muprog\local\content\training;
+    tool_muprog\local\content\credits;
 use stdClass, moodle_url, html_writer;
 
 /**
@@ -270,8 +270,9 @@ class renderer extends \plugin_renderer_base {
 
             if ($item instanceof set) {
                 $completion = $item->get_sequencetype_info();
-            } else if ($item instanceof training) {
-                $completion = get_string('trainingcompletion', 'tool_muprog', $item->get_required_training());
+            } else if ($item instanceof credits) {
+                $requiredcredits = format_float($item->get_required_credits(), 2, true, true);
+                $completion = get_string('credits_requiredcredits', 'tool_muprog', $requiredcredits);
             } else {
                 $completion = '';
             }
@@ -313,8 +314,8 @@ class renderer extends \plugin_renderer_base {
                 if ($item->is_deletable()) {
                     if ($item instanceof course) {
                         $deletestr = get_string('deletecourse', 'tool_muprog');
-                    } else if ($item instanceof training) {
-                        $deletestr = get_string('deletetraining', 'tool_muprog');
+                    } else if ($item instanceof credits) {
+                        $deletestr = get_string('deletecredits', 'tool_muprog');
                     } else {
                         $deletestr = get_string('deleteset', 'tool_muprog');
                     }
@@ -356,9 +357,9 @@ class renderer extends \plugin_renderer_base {
                     $editaction = new \tool_mulib\output\ajax_form\icon($editurl, get_string('updatecourse', 'tool_muprog'), 'i/settings');
                     $actions[] = $output->render($editaction);
                     $actions[] = $output->pix_icon('i/navigationitem', '') . ' ';
-                } else if ($item instanceof training) {
-                    $editurl = new moodle_url('/admin/tool/muprog/management/item_training_edit.php', ['id' => $id]);
-                    $editaction = new \tool_mulib\output\ajax_form\icon($editurl, get_string('updatetraining', 'tool_muprog'), 'i/settings');
+                } else if ($item instanceof credits) {
+                    $editurl = new moodle_url('/admin/tool/muprog/management/item_credits_edit.php', ['id' => $id]);
+                    $editaction = new \tool_mulib\output\ajax_form\icon($editurl, get_string('updatecredits', 'tool_muprog'), 'i/settings');
                     $actions[] = $output->render($editaction);
                     $actions[] = $output->pix_icon('i/navigationitem', '') . ' ';
                 } else {
@@ -383,8 +384,8 @@ class renderer extends \plugin_renderer_base {
                 $itemname = $output->pix_icon('itemtop', get_string('program', 'tool_muprog'), 'tool_muprog') . '&nbsp;' . $fullname;
             } else if ($item instanceof course) {
                 $itemname = $padding . $output->pix_icon('itemcourse', get_string('course'), 'tool_muprog') . $fullname;
-            } else if ($item instanceof training) {
-                $itemname = $padding . $output->pix_icon('itemtraining', get_string('training', 'tool_muprog'), 'tool_muprog') . $fullname;
+            } else if ($item instanceof credits) {
+                $itemname = $padding . $output->pix_icon('itemcredits', get_string('credits', 'tool_muprog'), 'tool_muprog') . $fullname;
             } else {
                 $itemname = $padding . $output->pix_icon('itemset', get_string('set', 'tool_muprog'), 'tool_muprog') . $fullname;
             }
@@ -670,8 +671,8 @@ class renderer extends \plugin_renderer_base {
 
             if ($item instanceof set) {
                 $completiontype = $item->get_sequencetype_info();
-            } else if ($item instanceof training) {
-                $completiontype = $item->get_training_progress($allocation);
+            } else if ($item instanceof credits) {
+                $completiontype = $item->get_current_credits($allocation);
             } else {
                 $completiontype = '';
             }
@@ -702,8 +703,8 @@ class renderer extends \plugin_renderer_base {
                 $itemname = $output->pix_icon('itemtop', get_string('program', 'tool_muprog'), 'tool_muprog') . '&nbsp;' . $fullname;
             } else if ($item instanceof course) {
                 $itemname = $padding . $output->pix_icon('itemcourse', get_string('course'), 'tool_muprog') . $fullname;
-            } else if ($item instanceof training) {
-                $itemname = $padding . $output->pix_icon('itemtraining', get_string('training', 'tool_muprog'), 'tool_muprog') . $fullname;
+            } else if ($item instanceof credits) {
+                $itemname = $padding . $output->pix_icon('itemcredits', get_string('credits', 'tool_muprog'), 'tool_muprog') . $fullname;
             } else {
                 $itemname = $padding . $output->pix_icon('itemset', get_string('set', 'tool_muprog'), 'tool_muprog') . $fullname;
             }

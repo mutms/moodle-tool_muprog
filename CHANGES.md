@@ -1,5 +1,14 @@
 # Changelog
 
+## mu-4.5.8-02
+
+Release date: xx/12/2025
+
+* Training points were renamed to Training credits.
+* Training item was renamed to Credits item.
+* Training credits use decimal values.
+* Fixed placement of custom fields in program creation form.
+
 ## mu-4.5.8-01
 
 Release date: 08/12/2025
