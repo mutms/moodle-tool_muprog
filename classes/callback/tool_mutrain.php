@@ -27,7 +27,7 @@ namespace tool_muprog\callback;
  */
 final class tool_mutrain {
     /**
-     * Callback to discover training framework usage.
+     * Callback to discover credits framework usage.
      *
      * @param \tool_mutrain\hook\framework_usage $hook
      * @return void
@@ -35,7 +35,7 @@ final class tool_mutrain {
     public static function framework_usage(\tool_mutrain\hook\framework_usage $hook): void {
         global $DB;
 
-        $count = $DB->count_records('tool_muprog_item', ['trainingid' => $hook->get_frameworkid()]);
+        $count = $DB->count_records('tool_muprog_item', ['creditframeworkid' => $hook->get_frameworkid()]);
         if ($count) {
             $hook->add_usage($count);
         }
@@ -51,7 +51,7 @@ final class tool_mutrain {
         global $DB;
 
         [$fselect, $params] = $DB->get_in_or_equal($hook->get_frameworkids(), SQL_PARAMS_NAMED);
-        $fselect = "pi.trainingid $fselect";
+        $fselect = "pi.creditframeworkid $fselect";
         $params['userid'] = $hook->get_userid();
 
         $sql = "SELECT DISTINCT pi.programid

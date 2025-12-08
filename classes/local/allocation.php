@@ -544,16 +544,16 @@ final class allocation {
                        $programselect $userselect";
         $DB->execute($sql, $params);
 
-        $select = "trainingid IS NOT NULL";
+        $select = "creditframeworkid IS NOT NULL";
         $params = [];
         if ($programid) {
             $select .= " AND programid = :programid";
             $params['programid'] = $programid;
         }
         if ($DB->record_exists_select('tool_muprog_item', $select, $params)) {
-            // Aggregate training progress unless the training framework is archived.
+            // Aggregate current credits unless the credits framework is archived.
             if ($trace) {
-                $trace->output('aggregating training progress', 1);
+                $trace->output('aggregating current credits', 1);
             }
             $params = [];
             $programselect = '';
@@ -578,19 +578,19 @@ final class allocation {
                       FROM {tool_muprog_allocation} pa
                       JOIN {tool_muprog_program} p ON p.id = pa.programid
                       JOIN {tool_muprog_item} pi ON pi.programid = pa.programid
-                      JOIN {tool_mutrain_framework} tfr ON tfr.id = pi.trainingid
+                      JOIN {tool_mutrain_framework} tfr ON tfr.id = pi.creditframeworkid
                  LEFT JOIN {tool_muprog_completion} pc ON pc.allocationid = pa.id AND pc.itemid = pi.id
                      WHERE pc.id IS NULL
                            AND EXISTS (
 
-                               SELECT SUM(cd.intvalue)
+                               SELECT SUM(cd.decvalue)
                                  FROM {tool_mutrain_completion} ctc
                                  JOIN {customfield_field} cf ON cf.id = ctc.fieldid
                                  JOIN {customfield_data} cd ON cd.fieldid = cf.id AND cd.instanceid = ctc.instanceid
                                  JOIN {tool_mutrain_field} tf ON tf.fieldid = cf.id
-                                WHERE tf.frameworkid = tfr.id AND ctc.userid = pa.userid AND cd.intvalue IS NOT NULL
+                                WHERE tf.frameworkid = tfr.id AND ctc.userid = pa.userid AND cd.decvalue IS NOT NULL
                                       AND (tfr.restrictedcompletion = 0 OR ctc.timecompleted >= pa.timestart)
-                               HAVING SUM(cd.intvalue) >= tfr.requiredtraining
+                               HAVING SUM(cd.decvalue) >= tfr.requiredcredits
 
                            )
                            AND p.archived = 0 AND pa.archived = 0 AND tfr.archived = 0
