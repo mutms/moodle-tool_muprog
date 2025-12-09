@@ -42,35 +42,32 @@ final class tool_mutrain {
     }
 
     /**
-     * Callback to announce new completions relevant to framework and user.
+     * Event announcing framework required framework credits were accumulated by user.
      *
-     * @param \tool_mutrain\hook\completion_updated $hook
+     * @param \tool_mutrain\event\required_credits_reached $event
      * @return void
      */
-    public static function completion_updated(\tool_mutrain\hook\completion_updated $hook): void {
+    public static function required_credits_reached(\tool_mutrain\event\required_credits_reached $event): void {
         global $DB;
-
-        [$fselect, $params] = $DB->get_in_or_equal($hook->get_frameworkids(), SQL_PARAMS_NAMED);
-        $fselect = "pi.creditframeworkid $fselect";
-        $params['userid'] = $hook->get_userid();
 
         $sql = "SELECT DISTINCT pi.programid
                   FROM {tool_muprog_item} pi
                   JOIN {tool_muprog_allocation} pa ON pa.programid = pi.programid
                   JOIN {tool_muprog_program} p ON p.id = pa.programid
-                 WHERE pa.userid = :userid AND $fselect
+                 WHERE pa.userid = :userid AND pi.creditframeworkid = :frameworkid
                        AND p.archived = 0 AND pa.archived = 0
               ORDER BY pi.programid";
+        $params = ['userid' => $event->relateduserid, 'frameworkid' => $event->other['frameworkid']];
         $programids = $DB->get_fieldset_sql($sql, $params);
 
         if (!$programids) {
             return;
         }
         if (count($programids) > 1) {
-            \tool_muprog\local\allocation::fix_user_enrolments(null, $hook->get_userid());
+            \tool_muprog\local\allocation::fix_user_enrolments(null, $params['userid']);
         } else {
             $programid = reset($programids);
-            \tool_muprog\local\allocation::fix_user_enrolments($programid, $hook->get_userid());
+            \tool_muprog\local\allocation::fix_user_enrolments($programid, $params['userid']);
         }
     }
 }

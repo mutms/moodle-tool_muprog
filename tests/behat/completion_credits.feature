@@ -14,8 +14,8 @@ Feature: Credits program completion by students tests
       | Category for test | core_course | course | 0      |
     And the following "custom fields" exist:
       | name        | category          | type    | shortname | description | configdata            |
-      | CreditsF 1 | Category for test  | mutrain | credits1 | tf1         |                       |
-      | CreditsF 2 | Category for test  | mutrain | credits2 | tf2         |                       |
+      | CreditsF 1 | Category for test  | mutrain | credits1  | tf1         |                       |
+      | CreditsF 2 | Category for test  | mutrain | credits2  | tf2         |                       |
     And the following "courses" exist:
       | fullname | shortname | format | category | enablecompletion | showcompletionconditions | customfield_credits1  |  customfield_credits2  |
       | Course 1 | C1        | topics | CAT1     | 1                | 1                        | 4                     | 8                      |
@@ -23,9 +23,9 @@ Feature: Credits program completion by students tests
       | Course 3 | C3        | topics | CAT3     | 1                | 1                        | 16                    | 2                      |
       | Course 4 | C4        | topics | CAT1     | 1                | 1                        |                       | 1                      |
     And the following "tool_mutrain > frameworks" exist:
-      | name        | publicaccess | requiredcredits  | restrictedcompletion | fields   |
-      | Framework 1 | 1            | 5                | 0                    | credits1 |
-      | Framework 2 | 1            | 5                | 1                    | credits2 |
+      | name        | publicaccess | requiredcredits  | restrictcontext | fields   | contextlevel | reference |
+      | Framework 1 | 1            | 5                | 0               | credits1 | System       |           |
+      | Framework 2 | 1            | 5                | 1               | credits1 | Category     | CAT2      |
     And the following "activity" exists:
       | activity       | page                     |
       | course         | C1                       |
@@ -83,8 +83,7 @@ Feature: Credits program completion by students tests
     And the following "tool_muprog > programs" exist:
       | fullname    | idnumber | category | publicaccess |
       | Program 000 | PR0      |          | 1            |
-      | Program 001 | PR1      | Cat 1    | 1            |
-      | Program 002 | PR2      | Cat 2    | 1            |
+      | Program 001 | PR1      |          | 1            |
     And the following "tool_muprog > program_items" exist:
       | program     | parent     | credits     | fullname   | sequencetype     | minprerequisites |
       | Program 000 |            |             | First set  | All in order     |                  |
@@ -94,17 +93,13 @@ Feature: Credits program completion by students tests
     And the following "tool_muprog > program_allocations" exist:
       | program     | user     |
       | Program 000 | student1 |
-      | Program 000 | student3 |
+      | Program 001 | student1 |
     And the following "course enrolments" exist:
       | user     | course | role    |
       | student1 | C1     | student |
       | student1 | C2     | student |
       | student1 | C3     | student |
       | student1 | C4     | student |
-      | student2 | C1     | student |
-      | student2 | C2     | student |
-      | student2 | C3     | student |
-      | student2 | C4     | student |
 
     And I log in as "admin"
     And I am on "Course 1" course homepage
@@ -134,7 +129,7 @@ Feature: Credits program completion by students tests
     And I log out
 
   @javascript
-  Scenario: Student may complete a credits program without restricted completion
+  Scenario: Student may complete a credits program without completion restrictions
     Given I log in as "student1"
 
     When I am on the "tool_muprog > My programs" page
@@ -144,10 +139,6 @@ Feature: Credits program completion by students tests
 
     When I am on "Course 1" course homepage
     And I follow "Sample page"
-    # The cron job has to be executed twice with a pause.
-    And I run the "core\task\completion_regular_task" task
-    And I wait "1" seconds
-    And I run the "core\task\completion_regular_task" task
     And I am on the "tool_muprog > My programs" page
     And I follow "Program 000"
     Then I should see "Open" in the "Program status" definition list item
@@ -156,55 +147,37 @@ Feature: Credits program completion by students tests
     And I am on the "tool_muprog > My programs" page
     And I am on "Course 2" course homepage
     And I follow "Sample page"
-    # The cron job has to be executed twice with a pause.
-    And I run the "core\task\completion_regular_task" task
-    And I wait "1" seconds
-    And I run the "core\task\completion_regular_task" task
-
     And I am on the "tool_muprog > My programs" page
     And I follow "Program 000"
     Then I should see "Completed" in the "Program status" definition list item
     And I should see "Current credits: 12/5"
 
   @javascript
-  Scenario: Student may complete a credits program with restricted completion
-    Given I log in as "student2"
-    And I am on "Course 1" course homepage
-    And I follow "Sample page"
-    # The cron job has to be executed twice with a pause.
-    And I run the "core\task\completion_regular_task" task
-    And I wait "1" seconds
-    And I run the "core\task\completion_regular_task" task
-    And I wait "1" seconds
+  Scenario: Student may complete a credits program with category restricted completion
+    Given I log in as "student1"
 
-    When the following "tool_muprog > program_allocations" exist:
-      | program     | user     |
-      | Program 001 | student2 |
+    When I am on the "tool_muprog > My programs" page
+    And I follow "Program 001"
+    Then I should see "Open" in the "Program status" definition list item
+    And I should see "Current credits: 0/5"
+
+    When I am on "Course 1" course homepage
+    And I follow "Sample page"
     And I am on the "tool_muprog > My programs" page
     And I follow "Program 001"
     Then I should see "Open" in the "Program status" definition list item
     And I should see "Current credits: 0/5"
 
-    When I am on the "tool_muprog > My programs" page
-    And I am on "Course 2" course homepage
+    When I am on "Course 2" course homepage
     And I follow "Sample page"
-    # The cron job has to be executed twice with a pause.
-    And I run the "core\task\completion_regular_task" task
-    And I wait "1" seconds
-    And I run the "core\task\completion_regular_task" task
-    And I am on the "tool_muprog > My programs" page
-    And I follow "Program 001"
-    Then I should see "Open" in the "Program status" definition list item
-    And I should see "Current credits: 4/5"
-
-    When I am on the "tool_muprog > My programs" page
-    And I am on "Course 3" course homepage
-    And I follow "Sample page"
-    # The cron job has to be executed twice with a pause.
-    And I run the "core\task\completion_regular_task" task
-    And I wait "1" seconds
-    And I run the "core\task\completion_regular_task" task
     And I am on the "tool_muprog > My programs" page
     And I follow "Program 001"
     Then I should see "Completed" in the "Program status" definition list item
-    And I should see "Current credits: 6/5"
+    And I should see "Current credits: 8/5"
+
+    When I am on "Course 3" course homepage
+    And I follow "Sample page"
+    And I am on the "tool_muprog > My programs" page
+    And I follow "Program 001"
+    Then I should see "Completed" in the "Program status" definition list item
+    And I should see "Current credits: 24/5"

@@ -7,6 +7,7 @@ Release date: xx/12/2025
 * Training points were renamed to Training credits.
 * Training item was renamed to Credits item.
 * Training credits use decimal values.
+* Credits aggregation is now instant, it does not depend on cron any more.
 * Fixed placement of custom fields in program creation form.
 
 ## mu-4.5.8-01

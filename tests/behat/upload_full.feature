@@ -24,7 +24,7 @@ Feature: Program upload full tests
       | Program viewer  | pviewer   |
       | Program manager | pmanager  |
     And the following "permission overrides" exist:
-      | capability                     | permission | role     | contextlevel | reference |
+      | capability                  | permission | role     | contextlevel | reference |
       | tool/muprog:view            | Allow      | pmanager | System       |           |
       | tool/muprog:upload          | Allow      | pmanager | System       |           |
     And the following "role assigns" exist:
@@ -225,7 +225,7 @@ Feature: Program upload full tests
   Scenario: System manager can upload all programs into original categories using normal JSON with credits
     Given I skip tests if "tool_mutrain" is not installed
     And the following "tool_mutrain > frameworks" exist:
-      | name         | idnumber | publicaccess | requiredcredits  |
+      | name        | idnumber | publicaccess | requiredcredits  |
       | Credits FW1 | TFW1     | 1            | 10               |
       | Credits FW2 |          | 1            | 20               |
     And I log in as "manager1"
@@ -674,7 +674,7 @@ Feature: Program upload full tests
   Scenario: System manager can upload all programs into original categories using extracted CSV with credits
     Given I skip tests if "tool_mutrain" is not installed
     And the following "tool_mutrain > frameworks" exist:
-      | name         | idnumber | publicaccess | requiredcredits  |
+      | name        | idnumber | publicaccess | requiredcredits  |
       | Credits FW1 | TFW1     | 1            | 10               |
       | Credits FW2 |          | 1            | 20               |
     And I log in as "manager1"

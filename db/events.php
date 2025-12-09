@@ -69,4 +69,8 @@ $observers = [
         'eventname' => \tool_muprog\event\allocation_completed::class,
         'callback' => \tool_muprog\local\source\program::class . '::observe_allocation_completed',
     ],
+    [
+        'eventname' => \tool_mutrain\event\required_credits_reached::class,
+        'callback' => \tool_muprog\callback\tool_mutrain::class . '::required_credits_reached',
+    ],
 ];
