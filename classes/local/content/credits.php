@@ -63,25 +63,17 @@ final class credits extends item {
 
     /**
      * What is the current sum of completed credits?
+     *
      * @param stdClass $allocation
      * @return int
      */
     public function get_completed_credits(stdClass $allocation): int {
         global $DB;
-        $sql = "SELECT SUM(cd.decvalue) AS completed
-                  FROM {tool_mutrain_completion} ctc
-                  JOIN {customfield_field} cf ON cf.id = ctc.fieldid
-                  JOIN {customfield_data} cd ON cd.fieldid = cf.id AND cd.instanceid = ctc.instanceid
-                  JOIN {tool_mutrain_field} tf ON tf.fieldid = cf.id
-                  JOIN {tool_mutrain_framework} tfr ON tfr.id = tf.frameworkid
-                 WHERE tfr.id = :creditframeworkid AND ctc.userid = :userid AND cd.decvalue IS NOT NULL
-                       AND (tfr.restrictedcompletion = 0 OR ctc.timecompleted >= :timestart)";
-        $params = [
-            'creditframeworkid' => $this->creditframeworkid,
+
+        return (int)$DB->get_field('tool_mutrain_credit', 'credits', [
+            'frameworkid' => $this->creditframeworkid,
             'userid' => $allocation->userid,
-            'timestart' => $allocation->timestart,
-        ];
-        return (int)$DB->get_field_sql($sql, $params);
+        ]);
     }
 
     /**

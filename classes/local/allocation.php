@@ -579,20 +579,9 @@ final class allocation {
                       JOIN {tool_muprog_program} p ON p.id = pa.programid
                       JOIN {tool_muprog_item} pi ON pi.programid = pa.programid
                       JOIN {tool_mutrain_framework} tfr ON tfr.id = pi.creditframeworkid
+                      JOIN {tool_mutrain_credit} mcr ON mcr.frameworkid = pi.creditframeworkid AND mcr.userid = pa.userid AND tfr.requiredcredits <= mcr.credits
                  LEFT JOIN {tool_muprog_completion} pc ON pc.allocationid = pa.id AND pc.itemid = pi.id
                      WHERE pc.id IS NULL
-                           AND EXISTS (
-
-                               SELECT SUM(cd.decvalue)
-                                 FROM {tool_mutrain_completion} ctc
-                                 JOIN {customfield_field} cf ON cf.id = ctc.fieldid
-                                 JOIN {customfield_data} cd ON cd.fieldid = cf.id AND cd.instanceid = ctc.instanceid
-                                 JOIN {tool_mutrain_field} tf ON tf.fieldid = cf.id
-                                WHERE tf.frameworkid = tfr.id AND ctc.userid = pa.userid AND cd.decvalue IS NOT NULL
-                                      AND (tfr.restrictedcompletion = 0 OR ctc.timecompleted >= pa.timestart)
-                               HAVING SUM(cd.decvalue) >= tfr.requiredcredits
-
-                           )
                            AND p.archived = 0 AND pa.archived = 0 AND tfr.archived = 0
                            AND (pa.timestart <= :now1)
                            AND (pa.timeend IS NULL OR pa.timeend > :now2)

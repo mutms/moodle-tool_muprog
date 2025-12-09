@@ -129,7 +129,7 @@ function tool_muprog_core_calendar_provide_event_action(
 function tool_muprog_myprofile_navigation(core_user\output\myprofile\tree $tree, $user, $iscurrentuser, $course) {
     global $USER;
 
-    if (!\tool_muprog\local\util::is_muprog_active()) {
+    if (!\tool_mulib\local\mulib::is_muprog_active()) {
         return;
     }
 

@@ -48,8 +48,8 @@ final class item_append_creditframeworkid extends \tool_mulib\external\form_auto
     #[\Override]
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'query' => new external_value(\PARAM_RAW, 'The search query', \VALUE_REQUIRED),
-            'programid' => new external_value(\PARAM_INT, 'Program id', \VALUE_REQUIRED),
+            'query' => new external_value(PARAM_RAW, 'The search query', VALUE_REQUIRED),
+            'programid' => new external_value(PARAM_INT, 'Program id', VALUE_REQUIRED),
         ]);
     }
 
