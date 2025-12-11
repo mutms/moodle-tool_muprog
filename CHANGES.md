@@ -4,6 +4,7 @@
 
 Release date: xx/12/2025
 
+* Added program progress as percentage of completed non-set items.
 * Training points were renamed to Training credits.
 * Training item was renamed to Credits item.
 * Training credits use decimal values.

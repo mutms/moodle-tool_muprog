@@ -136,7 +136,7 @@ function tool_muprog_myprofile_navigation(core_user\output\myprofile\tree $tree,
     if ($USER->id == $user->id) {
         $link = get_string('myprograms', 'tool_muprog');
         $url = new moodle_url('/admin/tool/muprog/my/index.php');
-        $node = new core_user\output\myprofile\node('miscellaneous', 'enrolprograms_programs', $link, null, $url);
+        $node = new core_user\output\myprofile\node('miscellaneous', 'muprog_programs', $link, null, $url);
         $tree->add_node($node);
     }
 }

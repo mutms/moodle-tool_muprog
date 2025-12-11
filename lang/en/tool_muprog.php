@@ -336,6 +336,7 @@ $string['programend_help'] = 'Users cannot enter program courses after program e
 $string['programidnumber'] = 'Program ID';
 $string['programimage'] = 'Program image';
 $string['programname'] = 'Program name';
+$string['programprogress'] = 'Progress';
 $string['programs'] = 'Programs';
 $string['programstart'] = 'Program start';
 $string['programstart_allocation'] = 'Start immediately after allocation';

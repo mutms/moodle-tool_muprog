@@ -16,6 +16,8 @@
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 // phpcs:disable moodle.Files.LineLength.TooLong
+// phpcs:disable moodle.Commenting.ValidTags.Invalid
+// phpcs:disable moodle.Commenting.InlineComment.DocBlock
 
 namespace tool_muprog\local;
 
@@ -29,6 +31,7 @@ use tool_muprog\local\source\program;
 use tool_muprog\local\source\extdb;
 use stdClass;
 use tool_mulib\local\mulib;
+use tool_mulib\local\sql;
 
 /**
  * Program allocation abstraction.
@@ -910,6 +913,94 @@ final class allocation {
             groups_add_member($cm->groupid, $cm->userid, 'tool_muprog', $cm->programid);
         }
         $rs->close();
+
+        if ($DB->get_dbfamily() === 'mysql') {
+            $sql = new sql(/** @lang=MySQL */
+                "UPDATE {tool_muprog_allocation} a, (
+
+                            SELECT a.id AS allocationid, COUNT(c.id) AS ic
+                              FROM {tool_muprog_allocation} a
+                              JOIN {tool_muprog_item} i ON i.programid = a.programid
+                         LEFT JOIN {tool_muprog_completion} c ON c.allocationid = a.id AND c.itemid = i.id AND c.timecompleted IS NOT NULL
+                             WHERE (i.courseid IS NOT NULL OR i.creditframeworkid IS NOT NULL)
+                                   /* programselect1 */ /* userselect1 */
+                          GROUP BY a.id
+
+                        ) c
+                    SET a.itemscompleted = c.ic
+                  WHERE a.id = c.allocationid
+                        AND a.itemscompleted <> c.ic
+                        /* programselect2 */ /* userselect2 */"
+            );
+            if ($programid) {
+                $sql = $sql->replace_comment(
+                    'programselect1',
+                    "AND a.programid = :programid",
+                    ['programid' => $programid]
+                );
+                $sql = $sql->replace_comment(
+                    'programselect2',
+                    "AND a.programid = :programid",
+                    ['programid' => $programid]
+                );
+            }
+            if ($userid) {
+                $sql = $sql->replace_comment(
+                    'userselect1',
+                    " AND a.userid = :userid",
+                    ['userid' => $userid]
+                );
+                $sql = $sql->replace_comment(
+                    'userselect2',
+                    " AND a.userid = :userid",
+                    ['userid' => $userid]
+                );
+            }
+        } else {
+            $sql = new sql(
+                "UPDATE {tool_muprog_allocation}
+                    SET itemscompleted = c.ic
+                   FROM (
+
+                            SELECT a.id AS allocationid, COUNT(c.id) AS ic
+                              FROM {tool_muprog_allocation} a
+                              JOIN {tool_muprog_item} i ON i.programid = a.programid
+                         LEFT JOIN {tool_muprog_completion} c ON c.allocationid = a.id AND c.itemid = i.id AND c.timecompleted IS NOT NULL
+                             WHERE (i.courseid IS NOT NULL OR i.creditframeworkid IS NOT NULL)
+                                   /* programselect1 */ /* userselect1 */
+                          GROUP BY a.id
+
+                        ) c
+                  WHERE {tool_muprog_allocation}.id = c.allocationid
+                        AND {tool_muprog_allocation}.itemscompleted <> c.ic
+                        /* programselect2 */ /* userselect2 */"
+            );
+            if ($programid) {
+                $sql = $sql->replace_comment(
+                    'programselect1',
+                    "AND a.programid = :programid",
+                    ['programid' => $programid]
+                );
+                $sql = $sql->replace_comment(
+                    'programselect2',
+                    "AND {tool_muprog_allocation}.programid = :programid",
+                    ['programid' => $programid]
+                );
+            }
+            if ($userid) {
+                $sql = $sql->replace_comment(
+                    'userselect1',
+                    " AND a.userid = :userid",
+                    ['userid' => $userid]
+                );
+                $sql = $sql->replace_comment(
+                    'userselect2',
+                    " AND {tool_muprog_allocation}.userid = :userid",
+                    ['userid' => $userid]
+                );
+            }
+        }
+        $DB->execute($sql->sql, $sql->params);
     }
 
     /**
@@ -994,6 +1085,8 @@ final class allocation {
 
         notification\reset::notify_now($user, $program, $source, $allocation);
 
+        $allocation = $DB->get_record('tool_muprog_allocation', ['id' => $record->id], '*', MUST_EXIST);
+
         return $allocation;
     }
 
@@ -1032,6 +1125,9 @@ final class allocation {
         $trans->allow_commit();
 
         self::fix_user_enrolments($allocation->programid, $allocation->userid);
+
+        $allocation = $DB->get_record('tool_muprog_allocation', ['id' => $data->allocationid], '*', MUST_EXIST);
+
         calendar::fix_allocation_events($allocation, $program);
     }
 
@@ -1188,6 +1284,20 @@ final class allocation {
         }
 
         return implode(' ', $result);
+    }
+
+    /**
+     * Returns program progress as percentage of completed items.
+     *
+     * @param stdClass $program
+     * @param stdClass $allocation
+     * @return string
+     */
+    public static function get_progress_percentage(stdClass $program, stdClass $allocation): string {
+        if (!$program->itemscount) {
+            return '';
+        }
+        return (round(100.0 * $allocation->itemscompleted / $program->itemscount)) . ' %';
     }
 
     /**

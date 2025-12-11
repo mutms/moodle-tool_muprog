@@ -17,7 +17,7 @@
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
 /**
- * Program enrolment plugin events.
+ * Programs plugin events.
  *
  * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)

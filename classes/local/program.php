@@ -406,6 +406,8 @@ final class program {
             }
         }
 
+        self::fix_itemscount($program->id);
+
         if ($invalidatecalendarevents) {
             calendar::invalidate_program_events($program->id);
         }
@@ -507,6 +509,9 @@ final class program {
         $trans = $DB->start_delegated_transaction();
 
         $DB->set_field('tool_muprog_program', 'archived', '0', ['id' => $program->id]);
+
+        self::fix_itemscount($program->id);
+
         $program = $DB->get_record('tool_muprog_program', ['id' => $program->id], '*', MUST_EXIST);
 
         \tool_muprog\event\program_restored::create_from_program($program)->trigger();
@@ -568,6 +573,8 @@ final class program {
             }
         }
 
+        self::fix_itemscount($data->id);
+
         $program = $DB->get_record('tool_muprog_program', ['id' => $data->id], '*', MUST_EXIST);
 
         \tool_muprog\event\program_updated::create_from_program($program)->trigger();
@@ -579,6 +586,27 @@ final class program {
         allocation::fix_user_enrolments($program->id, null);
 
         return $program;
+    }
+
+    /**
+     * Fixed cached count of items in program record.
+     *
+     * @param int $programid record may be updated
+     * @return void
+     */
+    public static function fix_itemscount(int $programid): void {
+        global $DB;
+
+        $sql = "SELECT COUNT('x')
+                  FROM {tool_muprog_item} i
+                 WHERE i.programid = :programid
+                       AND (i.courseid IS NOT NULL OR i.creditframeworkid IS NOT NULL)";
+        $count = $DB->count_records_sql($sql, ['programid' => $programid]);
+
+        $sql = "UPDATE {tool_muprog_program}
+                   SET itemscount = :count1
+                 WHERE id = :programid AND itemscount <> :count2";
+        $DB->execute($sql, ['programid' => $programid, 'count1' => $count, 'count2' => $count]);
     }
 
     /**

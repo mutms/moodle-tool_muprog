@@ -262,7 +262,7 @@ class renderer extends \plugin_renderer_base {
             &$output,
             &$movetargetsfor,
             $movetargetsforname
-): void {
+        ): void {
             $fullname = $item->get_fullname();
             $id = $item->get_id();
             $padding = str_repeat('&nbsp;', $itemdepth * 6);
@@ -562,6 +562,10 @@ class renderer extends \plugin_renderer_base {
         $details->add(
             get_string('programstatus', 'tool_muprog'),
             allocation::get_completion_status_html($program, $allocation)
+        );
+        $details->add(
+            get_string('programprogress', 'tool_muprog'),
+            allocation::get_progress_percentage($program, $allocation)
         );
         $details->add(
             get_string('source', 'tool_muprog'),
