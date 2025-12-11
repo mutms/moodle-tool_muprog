@@ -937,6 +937,8 @@ final class top extends set {
         foreach ($prerequisites as $prerequisite) {
             $DB->delete_records('tool_muprog_prerequisite', ['id' => $prerequisite->id]);
         }
+
+        program::fix_itemscount($this->programid);
     }
 
     /**

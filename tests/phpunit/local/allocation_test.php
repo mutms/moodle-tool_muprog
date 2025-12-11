@@ -411,6 +411,112 @@ final class allocation_test extends \advanced_testcase {
         // NOTE: we should add lots more tests here, for now we will rely on behat.
     }
 
+    public function test_fix_user_enrolments_itemscompleted(): void {
+        global $DB;
+
+        /** @var \tool_muprog_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
+
+        $course1 = $this->getDataGenerator()->create_course();
+        $course2 = $this->getDataGenerator()->create_course();
+        $course3 = $this->getDataGenerator()->create_course();
+        $course4 = $this->getDataGenerator()->create_course();
+
+        $program1 = $generator->create_program(['fullname' => 'hokus', 'sources' => ['manual' => []]]);
+        $source1 = $DB->get_record('tool_muprog_source', ['programid' => $program1->id, 'type' => 'manual'], '*', MUST_EXIST);
+        $program2 = $generator->create_program(['idnumber' => 'pokus', 'sources' => ['manual' => []]]);
+        $source2 = $DB->get_record('tool_muprog_source', ['programid' => $program2->id, 'type' => 'manual'], '*', MUST_EXIST);
+
+        $top1 = \tool_muprog\local\program::load_content($program1->id);
+        $item1x1 = $top1->append_course($top1, $course1->id);
+        $item1x2 = $top1->append_course($top1, $course2->id);
+        $item1x3 = $top1->append_course($top1, $course3->id);
+
+        $top2 = \tool_muprog\local\program::load_content($program2->id);
+        $item2x1 = $top2->append_course($top2, $course1->id);
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $user3 = $this->getDataGenerator()->create_user();
+
+        manual::allocate_users($program1->id, $source1->id, [$user1->id, $user2->id]);
+        manual::allocate_users($program2->id, $source2->id, [$user3->id]);
+
+        $allocation1 = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
+        $allocation2 = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user2->id], '*', MUST_EXIST);
+        $allocation3 = $DB->get_record('tool_muprog_allocation', ['programid' => $program2->id, 'userid' => $user3->id], '*', MUST_EXIST);
+        $this->assertSame('0', $allocation1->itemscompleted);
+        $this->assertSame('0', $allocation2->itemscompleted);
+        $this->assertSame('0', $allocation3->itemscompleted);
+
+        $ccompletion = new \completion_completion(['course' => $course1->id, 'userid' => $user1->id]);
+        $ccompletion->mark_complete();
+        $allocation1 = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
+        $allocation2 = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user2->id], '*', MUST_EXIST);
+        $allocation3 = $DB->get_record('tool_muprog_allocation', ['programid' => $program2->id, 'userid' => $user3->id], '*', MUST_EXIST);
+        $this->assertSame('1', $allocation1->itemscompleted);
+        $this->assertSame('0', $allocation2->itemscompleted);
+        $this->assertSame('0', $allocation3->itemscompleted);
+
+        $ccompletion = new \completion_completion(['course' => $course2->id, 'userid' => $user1->id]);
+        $ccompletion->mark_complete();
+        $ccompletion = new \completion_completion(['course' => $course3->id, 'userid' => $user1->id]);
+        $ccompletion->mark_complete();
+        $allocation1 = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
+        $allocation2 = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user2->id], '*', MUST_EXIST);
+        $allocation3 = $DB->get_record('tool_muprog_allocation', ['programid' => $program2->id, 'userid' => $user3->id], '*', MUST_EXIST);
+        $this->assertSame('3', $allocation1->itemscompleted);
+        $this->assertSame('0', $allocation2->itemscompleted);
+        $this->assertSame('0', $allocation3->itemscompleted);
+
+        $ccompletion = new \completion_completion(['course' => $course1->id, 'userid' => $user2->id]);
+        $ccompletion->mark_complete();
+        $allocation1 = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
+        $allocation2 = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user2->id], '*', MUST_EXIST);
+        $allocation3 = $DB->get_record('tool_muprog_allocation', ['programid' => $program2->id, 'userid' => $user3->id], '*', MUST_EXIST);
+        $this->assertSame('3', $allocation1->itemscompleted);
+        $this->assertSame('1', $allocation2->itemscompleted);
+        $this->assertSame('0', $allocation3->itemscompleted);
+
+        $DB->delete_records('course_completions', ['userid' => $user1->id, 'course' => $course1->id]);
+        allocation::fix_user_enrolments(null, null);
+        $allocation1 = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
+        $allocation2 = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user2->id], '*', MUST_EXIST);
+        $allocation3 = $DB->get_record('tool_muprog_allocation', ['programid' => $program2->id, 'userid' => $user3->id], '*', MUST_EXIST);
+        $this->assertSame('3', $allocation1->itemscompleted);
+        $this->assertSame('1', $allocation2->itemscompleted);
+        $this->assertSame('0', $allocation3->itemscompleted);
+
+        $data = (object)[
+            'allocationid' => $allocation1->id,
+            'timecompleted' => 0,
+            'itemid' => $item1x1->get_id(),
+        ];
+        \tool_muprog\local\allocation::update_item_completion($data);
+        allocation::fix_user_enrolments(null, null);
+        $allocation1 = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
+        $allocation2 = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user2->id], '*', MUST_EXIST);
+        $allocation3 = $DB->get_record('tool_muprog_allocation', ['programid' => $program2->id, 'userid' => $user3->id], '*', MUST_EXIST);
+        $this->assertSame('2', $allocation1->itemscompleted);
+        $this->assertSame('1', $allocation2->itemscompleted);
+        $this->assertSame('0', $allocation3->itemscompleted);
+
+        $DB->delete_records('course_completions', ['userid' => $user2->id, 'course' => $course1->id]);
+        $data = (object)[
+            'allocationid' => $allocation2->id,
+            'timecompleted' => 0,
+            'itemid' => $item1x1->get_id(),
+        ];
+        \tool_muprog\local\allocation::update_item_completion($data);
+        allocation::fix_user_enrolments(null, null);
+        $allocation1 = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
+        $allocation2 = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user2->id], '*', MUST_EXIST);
+        $allocation3 = $DB->get_record('tool_muprog_allocation', ['programid' => $program2->id, 'userid' => $user3->id], '*', MUST_EXIST);
+        $this->assertSame('2', $allocation1->itemscompleted);
+        $this->assertSame('0', $allocation2->itemscompleted);
+        $this->assertSame('0', $allocation3->itemscompleted);
+    }
+
     public function test_fix_enrolments(): void {
         global $DB;
 
@@ -557,6 +663,7 @@ final class allocation_test extends \advanced_testcase {
             'resettype' => \tool_muprog\local\course_reset::RESETTYPE_FULL,
         ];
         $allocation1x = \tool_muprog\local\allocation::reset($data);
+        $this->assertCount(0, $DB->get_records('tool_muprog_completion', ['allocationid' => $allocation1->id]));
         $this->assertSame((array)$allocation1, (array)$allocation1x);
 
         $ccompletion = new \completion_completion(['course' => $course1->id, 'userid' => $user1->id]);
@@ -1111,6 +1218,59 @@ final class allocation_test extends \advanced_testcase {
         $program1 = program::archive($program1->id);
         $allocation = \tool_muprog\local\source\base::allocation_restore($allocation->id);
         $this->assertStringContainsString('Archived completed', allocation::get_completion_status_html($program1, $allocation));
+    }
+
+    public function test_get_progress_percentage(): void {
+        global $DB;
+
+        /** @var \tool_muprog_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
+
+        $course1 = $this->getDataGenerator()->create_course();
+        $course2 = $this->getDataGenerator()->create_course();
+        $course3 = $this->getDataGenerator()->create_course();
+        $course4 = $this->getDataGenerator()->create_course();
+
+        $program1 = $generator->create_program(['fullname' => 'hokus', 'sources' => ['manual' => []]]);
+        $source1 = $DB->get_record('tool_muprog_source', ['programid' => $program1->id, 'type' => 'manual'], '*', MUST_EXIST);
+        $program2 = $generator->create_program(['idnumber' => 'pokus', 'sources' => ['manual' => []]]);
+        $source2 = $DB->get_record('tool_muprog_source', ['programid' => $program2->id, 'type' => 'manual'], '*', MUST_EXIST);
+
+        $top1 = \tool_muprog\local\program::load_content($program1->id);
+        $item1x1 = $top1->append_course($top1, $course1->id);
+        $item1x2 = $top1->append_course($top1, $course2->id);
+        $item1x3 = $top1->append_course($top1, $course3->id);
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $user3 = $this->getDataGenerator()->create_user();
+
+        manual::allocate_users($program1->id, $source1->id, [$user1->id, $user2->id, $user3->id]);
+        manual::allocate_users($program2->id, $source2->id, [$user1->id]);
+
+        $ccompletion = new \completion_completion(['course' => $course1->id, 'userid' => $user1->id]);
+        $ccompletion->mark_complete();
+        $ccompletion = new \completion_completion(['course' => $course2->id, 'userid' => $user1->id]);
+        $ccompletion->mark_complete();
+        $ccompletion = new \completion_completion(['course' => $course3->id, 'userid' => $user1->id]);
+        $ccompletion->mark_complete();
+        $ccompletion = new \completion_completion(['course' => $course1->id, 'userid' => $user2->id]);
+        $ccompletion->mark_complete();
+        $allocation1 = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user1->id], '*', MUST_EXIST);
+        $allocation2 = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user2->id], '*', MUST_EXIST);
+        $allocation3 = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user3->id], '*', MUST_EXIST);
+        $allocation4 = $DB->get_record('tool_muprog_allocation', ['programid' => $program2->id, 'userid' => $user1->id], '*', MUST_EXIST);
+        $program1 = $DB->get_record('tool_muprog_program', ['id' => $program1->id]);
+        $program2 = $DB->get_record('tool_muprog_program', ['id' => $program2->id]);
+
+        $this->assertSame('3', $allocation1->itemscompleted);
+        $this->assertSame('1', $allocation2->itemscompleted);
+        $this->assertSame('0', $allocation3->itemscompleted);
+
+        $this->assertSame('100 %', allocation::get_progress_percentage($program1, $allocation1));
+        $this->assertSame('33 %', allocation::get_progress_percentage($program1, $allocation2));
+        $this->assertSame('0 %', allocation::get_progress_percentage($program1, $allocation3));
+        $this->assertSame('', allocation::get_progress_percentage($program2, $allocation4));
     }
 
     public function test_deleted_user_cleanup(): void {

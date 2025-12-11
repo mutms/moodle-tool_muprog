@@ -108,6 +108,10 @@ class renderer extends \plugin_renderer_base {
             allocation::get_completion_status_html($program, $allocation)
         );
         $details->add(
+            get_string('programprogress', 'tool_muprog'),
+            allocation::get_progress_percentage($program, $allocation)
+        );
+        $details->add(
             get_string('source', 'tool_muprog'),
             $sourceclass::render_allocation_source($program, $source, $allocation)
         );
@@ -273,21 +277,28 @@ class renderer extends \plugin_renderer_base {
             $fullname = \html_writer::link($detailurl, $fullname);
             $row[] = $fullname;
 
-            $row[] = \tool_muprog\local\allocation::get_completion_status_html($program, $allocation);
-
             $row[] = userdate($allocation->timestart, $dateformat);
 
             $row[] = (isset($allocation->timedue) ? userdate($allocation->timedue, $dateformat) : $strnotset);
 
             $row[] = (isset($allocation->timeend) ? userdate($allocation->timeend, $dateformat) : $strnotset);
 
+            $row[] = \tool_muprog\local\allocation::get_progress_percentage($program, $allocation);
+
+            $row[] = \tool_muprog\local\allocation::get_completion_status_html($program, $allocation);
+
             $data[] = $row;
         }
 
         $table = new \html_table();
-        $table->head = [get_string('programname', 'tool_muprog'), get_string('programstatus', 'tool_muprog'),
-            get_string('programstart', 'tool_muprog'), get_string('programdue', 'tool_muprog'),
-            get_string('programend', 'tool_muprog')];
+        $table->head = [
+            get_string('programname', 'tool_muprog'),
+            get_string('programstart', 'tool_muprog'),
+            get_string('programdue', 'tool_muprog'),
+            get_string('programend', 'tool_muprog'),
+            get_string('programprogress', 'tool_muprog'),
+            get_string('programstatus', 'tool_muprog'),
+        ];
         $table->attributes['class'] = 'table table-striped';
         $table->data = $data;
         return \html_writer::table($table);
