@@ -318,6 +318,8 @@ final class program {
                 \core_tag_tag::set_item_tags('tool_muprog', 'tool_muprog_program', $data->id, $oldcontext, null);
             }
             $record->contextid = $context->id;
+            // Fix favourites.
+            $DB->set_field('favourite', 'contextid', $context->id, ['component' => 'tool_muprog', 'itemtype' => 'programs', 'itemid' => $record->id]);
         } else {
             $record->contextid = $oldprogram->contextid;
             $context = \context::instance_by_id($record->contextid);
@@ -964,6 +966,9 @@ final class program {
 
         $program = $DB->get_record('tool_muprog_program', ['id' => $id], '*', MUST_EXIST);
         $context = \context::instance_by_id($program->contextid);
+
+        $favservice = \core_favourites\service_factory::get_service_for_component('tool_muprog');
+        $favservice->delete_favourites_by_type_and_item('programs', $program->id);
 
         $pgs = $DB->get_records('tool_muprog_group', ['programid' => $program->id]);
         foreach ($pgs as $pg) {

@@ -1221,6 +1221,36 @@ final class allocation {
     }
 
     /**
+     * Returns completion status as array of status text plus NS badge type.
+     *
+     * @param stdClass $program
+     * @param stdClass $allocation
+     * @return string
+     */
+    public static function get_completion_status(stdClass $program, stdClass $allocation): array {
+        $now = time();
+
+        if ($program->archived || $allocation->archived) {
+            if ($allocation->timecompleted) {
+                return [get_string('programstatus_archivedcompleted', 'tool_muprog'), 'badge-success'];
+            } else {
+                return [get_string('programstatus_archived', 'tool_muprog'), 'badge-dark'];
+            }
+        } else if ($allocation->timecompleted) {
+            return [get_string('programstatus_completed', 'tool_muprog'), 'badge-success'];
+        } else if ($allocation->timestart > $now) {
+            return [get_string('programstatus_future', 'tool_muprog'), 'badge-light'];
+        } else if ($allocation->timeend && $allocation->timeend < $now) {
+            return [get_string('programstatus_failed', 'tool_muprog'), 'badge-danger'];
+        } else if ($allocation->timedue && $allocation->timedue < $now) {
+            return [get_string('programstatus_overdue', 'tool_muprog'), 'badge-warning'];
+        } else {
+            // We need something different from tags that use 'badge-info'.
+            return [get_string('programstatus_open', 'tool_muprog'), 'badge-primary'];
+        }
+    }
+
+    /**
      * Returns completion status as plain text.
      *
      * @param stdClass $program
@@ -1228,28 +1258,8 @@ final class allocation {
      * @return string
      */
     public static function get_completion_status_plain(stdClass $program, stdClass $allocation): string {
-        $now = time();
-
-        if ($program->archived || $allocation->archived) {
-            if ($allocation->timecompleted) {
-                return get_string('programstatus_archivedcompleted', 'tool_muprog');
-            } else {
-                return get_string('programstatus_archived', 'tool_muprog');
-            }
-        }
-
-        if ($allocation->timecompleted) {
-            return get_string('programstatus_completed', 'tool_muprog');
-        } else if ($allocation->timestart > $now) {
-            return get_string('programstatus_future', 'tool_muprog');
-        } else if ($allocation->timeend && $allocation->timeend < $now) {
-            return get_string('programstatus_failed', 'tool_muprog');
-        } else if ($allocation->timedue && $allocation->timedue < $now) {
-            return get_string('programstatus_overdue', 'tool_muprog');
-        } else {
-            // We need something different from tags that use 'badge-info'.
-            return get_string('programstatus_open', 'tool_muprog');
-        }
+        [$status, $badge] = self::get_completion_status($program, $allocation);
+        return $status;
     }
 
     /**
@@ -1260,30 +1270,22 @@ final class allocation {
      * @return string
      */
     public static function get_completion_status_html(stdClass $program, stdClass $allocation): string {
-        $result = [];
+        [$status, $class] = self::get_completion_status($program, $allocation);
+        return '<span class="badge ' . $class . '">' . $status . '</span>';
+    }
 
-        $now = time();
-
-        if ($program->archived || $allocation->archived) {
-            if ($allocation->timecompleted) {
-                $result[] = '<span class="badge badge-success">' . get_string('programstatus_archivedcompleted', 'tool_muprog') . '</span>';
-            } else {
-                $result[] = '<span class="badge badge-dark">' . get_string('programstatus_archived', 'tool_muprog') . '</span>';
-            }
-        } else if ($allocation->timecompleted) {
-            $result[] = '<div class="badge badge-success">' . get_string('programstatus_completed', 'tool_muprog') . '</div>';
-        } else if ($allocation->timestart > $now) {
-            $result[] = '<div class="badge badge-light">' . get_string('programstatus_future', 'tool_muprog') . '</div>';
-        } else if ($allocation->timeend && $allocation->timeend < $now) {
-            $result[] = '<div class="badge badge-danger">' . get_string('programstatus_failed', 'tool_muprog') . '</div>';
-        } else if ($allocation->timedue && $allocation->timedue < $now) {
-            $result[] = '<div class="badge badge-warning">' . get_string('programstatus_overdue', 'tool_muprog') . '</div>';
-        } else {
-            // We need something different from tags that use 'badge-info'.
-            $result[] = '<div class="badge badge-primary">' . get_string('programstatus_open', 'tool_muprog') . '</div>';
+    /**
+     * Returns program progress as integer of completed items where 100 is 100 %.
+     *
+     * @param stdClass $program
+     * @param stdClass $allocation
+     * @return int|null
+     */
+    public static function get_progress_integer(stdClass $program, stdClass $allocation): ?int {
+        if (!$program->itemscount) {
+            return null;
         }
-
-        return implode(' ', $result);
+        return (round(100.0 * $allocation->itemscompleted / $program->itemscount));
     }
 
     /**

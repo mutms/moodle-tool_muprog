@@ -126,6 +126,7 @@ $string['exportformat'] = 'File format';
 $string['exportformat_csv'] = 'CSV';
 $string['exportformat_json'] = 'JSON';
 $string['extdb_query_allocation'] = 'Program allocation';
+$string['favourite'] = 'Starred program';
 $string['fixeddate'] = 'At a fixed date';
 $string['importallocationend'] = 'Allocation end ({$a})';
 $string['importallocationstart'] = 'Allocation start ({$a})';
@@ -323,6 +324,7 @@ It is however recommended to verify all program settings and allocated users aft
 $string['program_update'] = 'Update program';
 $string['programallocations'] = 'Program allocations';
 $string['programautofix'] = 'Auto repair program';
+$string['programcategory'] = 'Program category';
 $string['programcompletion'] = 'Program completion date';
 $string['programcompletionoverride'] = 'Override program completion';
 $string['programdue'] = 'Program due';
