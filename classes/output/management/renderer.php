@@ -52,15 +52,11 @@ class renderer extends \plugin_renderer_base {
 
         $context = \context::instance_by_id($program->contextid);
 
-        $programimage = '';
-        $presentation = (array)json_decode($program->presentationjson);
-        if (!empty($presentation['image'])) {
-            $imageurl = moodle_url::make_file_url(
-                "$CFG->wwwroot/pluginfile.php",
-                '/' . $context->id . '/tool_muprog/image/' . $program->id . '/' . $presentation['image'],
-                false
-            );
-            $programimage = '<div class="programimage">' . html_writer::img($imageurl, '') . '</div>';
+        $imageuri = program::get_image_uri($program, false);
+        if ($imageuri) {
+            $programimage = \html_writer::img($imageuri, '', ['class' => 'programimage float-end']);
+        } else {
+            $programimage = '';
         }
 
         $details = new \tool_mulib\output\entity_details();
@@ -107,11 +103,7 @@ class renderer extends \plugin_renderer_base {
 
         $result = $this->output->render($details);
 
-        if (!$programimage) {
-            return $result;
-        }
-
-        return "<div class='d-flex'><div class='w-100'>$result</div><div class='flex-shrink-1'>$programimage</div></div>";
+        return $programimage . $result;
     }
 
     /**
