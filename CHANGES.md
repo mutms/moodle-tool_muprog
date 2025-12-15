@@ -2,7 +2,7 @@
 
 ## mu-5.0.4-02
 
-Release date: xx/12/2025
+Release date: 16/12/2025
 
 * Added program progress as percentage of completed non-set items.
 * Training points were renamed to Training credits.
