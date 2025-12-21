@@ -22,6 +22,7 @@ efficient way to manage both small-scale and large-scale learning initiatives an
 * easy-to-use _Program management_ interface
 * _Program catalogue_ where students may browse available programs and related courses
 * dedicated _My programs profile page_
+* _My programs overview page_ similar to "My programs" page; it offers card, list and details view on a dedicated page accessible directly from the main menu
 * _My programs dashboard block_ for quick access to details
 * allocation based on external database data
 * supervisors may receive copy of notifications sent to subordinates
@@ -32,10 +33,11 @@ This plugin requires following plugins:
 
 * [Additional tools library plugin](https://github.com/mutms/moodle-tool_mulib)
 * [Program enrolment plugin](https://github.com/mutms/moodle-enrol_muprog)
+* [My programs block](https://github.com/mutms/moodle-block_muprog_my)
+* [My programs overview page](https://github.com/mutms/moodle-block_muprogmyoverview)
 
 Other recommended plugins:
 
-* [My programs block](https://github.com/mutms/moodle-block_muprog_my)
 * [Supervisors and teams plugin](https://github.com/mutms/moodle-tool_murelation)
 * [Training credits plugin](https://github.com/mutms/moodle-tool_mutrain)
 * [Training credits custom field](https://github.com/mutms/moodle-customfield_mutrain)

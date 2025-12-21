@@ -38,6 +38,8 @@ $plugin->incompatible = 500;
 $plugin->release = 'mu-4.5.8-02+';
 
 $plugin->dependencies = [
-    'tool_mulib' => 2025121645,
+    'tool_mulib' => 2025121645.02,
     'enrol_muprog' => 2025121645,
+    'block_muprog_my' => 2025121645,
+    'block_muprogmyoverview' => 2025121645,
 ];
