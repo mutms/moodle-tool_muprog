@@ -10,6 +10,7 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 
 - Switched to new change log format
 - Reversed block dependencies to simplify Programs installation and upgrades
+- Improved performance of Programs management page on sites with large number of contexts
 
 ## [mu-5.0.4-02] - 2025-12-16
 
