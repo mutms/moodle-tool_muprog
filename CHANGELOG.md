@@ -6,11 +6,16 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 
 ## [Unreleased]
 
+### Added
+
+- Added setting to control if programs from sub-contexts are included in category export
+
 ### Changed
 
 - Switched to new change log format
 - Reversed block dependencies to simplify Programs installation and upgrades
 - Improved performance of Programs management page on sites with large number of contexts
+- Fixed category selection autocomplete element in program editing and export forms
 
 ## [mu-4.5.8-02] - 2025-12-16
 

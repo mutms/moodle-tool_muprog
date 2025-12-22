@@ -19,6 +19,8 @@
 
 namespace tool_muprog\local\form;
 
+use tool_muprog\external\form_autocomplete\program_contextid;
+
 /**
  * Update program.
  *
@@ -39,6 +41,7 @@ final class program_update extends \tool_mulib\local\ajax_form {
         $mform = $this->_form;
         $editoroptions = $this->_customdata['editoroptions'];
         $data = $this->_customdata['data'];
+        $context = $this->_customdata['context'];
 
         $mform->addElement('text', 'fullname', get_string('programname', 'tool_muprog'), 'maxlength="254" size="50"');
         $mform->addRule('fullname', get_string('required'), 'required', null, 'client');
@@ -48,9 +51,7 @@ final class program_update extends \tool_mulib\local\ajax_form {
         $mform->addRule('idnumber', get_string('required'), 'required', null, 'client');
         $mform->setType('idnumber', PARAM_RAW); // Idnumbers are plain text.
 
-        $options = $this->get_category_options($data->contextid);
-        $mform->addElement('autocomplete', 'contextid', get_string('context', 'role'), $options);
-        $mform->addRule('contextid', null, 'required', null, 'client');
+        program_contextid::add_element($mform, [], 'contextid', get_string('category'), $context);
 
         $mform->addElement('select', 'creategroups', get_string('creategroups', 'tool_muprog'), [0 => get_string('no'), 1 => get_string('yes')]);
         $mform->addHelpButton('creategroups', 'creategroups', 'tool_muprog');
@@ -94,6 +95,7 @@ final class program_update extends \tool_mulib\local\ajax_form {
     #[\Override]
     public function validation($data, $files) {
         global $DB;
+        $context = $this->_customdata['context'];
 
         $olddata = $this->_customdata['data'];
 
@@ -117,44 +119,14 @@ final class program_update extends \tool_mulib\local\ajax_form {
             }
         }
 
-        $context = \context::instance_by_id($data['contextid'], IGNORE_MISSING);
-        if (!$context) {
-            $errors['contextid'] = get_string('required');
-        } else if ($olddata->contextid != $data['contextid']) {
-            if ($context->contextlevel != CONTEXT_SYSTEM && $context->contextlevel != CONTEXT_COURSECAT) {
-                $errors['contextid'] = get_string('error');
-            } else if (!has_capability('tool/muprog:edit', $context)) {
-                $errors['contextid'] = get_string('error');
-            }
+        $error = program_contextid::validate_value($data['contextid'], [], $context);
+        if ($error !== null) {
+            $errors['contextid'] = $error;
         }
 
         // Add the custom fields validation.
         $errors = array_merge($errors, $this->handler->instance_form_validation($data, $files));
 
         return $errors;
-    }
-
-    /**
-     * Returns categories.
-     *
-     * @param int $currentcontextid
-     * @return array
-     */
-    protected function get_category_options(int $currentcontextid): array {
-        $displaylist = \core_course_category::make_categories_list('tool/muprog:edit');
-        $options = [];
-        $syscontext = \context_system::instance();
-        if (has_capability('tool/muprog:edit', $syscontext)) {
-            $options[$syscontext->id] = $syscontext->get_context_name();
-        }
-        foreach ($displaylist as $cid => $name) {
-            $context = \context_coursecat::instance($cid);
-            $options[$context->id] = $name;
-        }
-        if (!isset($options[$currentcontextid])) {
-            $context = \context::instance_by_id($currentcontextid, MUST_EXIST);
-            $options[$context->id] = $syscontext->get_context_name();
-        }
-        return $options;
     }
 }
