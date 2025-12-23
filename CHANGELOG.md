@@ -16,6 +16,7 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 - Reversed block dependencies to simplify Programs installation and upgrades
 - Improved performance of Programs management page on sites with large number of contexts
 - Fixed category selection autocomplete element in program editing and export forms
+- Standardised program idnumber to be case-insensitively unique
 
 ## [mu-5.0.4-02] - 2025-12-16
 
