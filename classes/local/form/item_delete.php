@@ -36,10 +36,9 @@ final class item_delete extends \tool_mulib\local\ajax_form {
         $mform = $this->_form;
         $item = $this->_customdata['item'];
 
-        $mform->addElement('text', 'fullname', get_string('fullname'), 'maxlength="254" size="50"');
-        $mform->setType('fullname', PARAM_TEXT);
-        $mform->setDefault('fullname', format_string($item->get_fullname()));
-        $mform->freeze('fullname');
+        $mform->addElement('static', 'statictype', get_string('item_type', 'tool_muprog'), $item::get_type_name());
+
+        $mform->addElement('static', 'staticfullname', get_string('fullname'), format_string($item->get_fullname()));
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);

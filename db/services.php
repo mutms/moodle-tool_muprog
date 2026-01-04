@@ -86,9 +86,16 @@ $functions = [
         'ajax' => true,
         'loginrequired' => true,
     ],
-    'tool_muprog_form_autocomplete_item_append_creditframeworkid' => [
-        'classname' => \tool_muprog\external\form_autocomplete\item_append_creditframeworkid::class,
+    'tool_muprog_form_autocomplete_item_create_credits_creditframeworkid' => [
+        'classname' => \tool_muprog\external\form_autocomplete\item_create_credits_creditframeworkid::class,
         'description' => 'Return list of framework candidates for adding of items.',
+        'type' => 'read',
+        'ajax' => true,
+        'loginrequired' => true,
+    ],
+    'tool_muprog_form_autocomplete_item_create_course_courseids' => [
+        'classname' => \tool_muprog\external\form_autocomplete\item_create_course_courseids::class,
+        'description' => 'Return list of course candidates for adding of items.',
         'type' => 'read',
         'ajax' => true,
         'loginrequired' => true,

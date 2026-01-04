@@ -52,6 +52,16 @@ class set extends item {
     /** @var ?int how many points from children are required to complete this item */
     protected $minpoints;
 
+    #[\Override]
+    public static function get_type(): string {
+        return 'set';
+    }
+
+    #[\Override]
+    public static function get_type_name(): string {
+        return get_string('set', 'tool_muprog');
+    }
+
     /**
      * Returns all known set sequence types.
      * @return array
@@ -115,16 +125,8 @@ class set extends item {
         return get_string('sequencetype_' . $this->sequencetype, 'tool_muprog', $a);
     }
 
-    /**
-     * Factory method.
-     *
-     * @param \stdClass $record
-     * @param item|null $previous
-     * @param array $unusedrecords
-     * @param array $prerequisites
-     * @return set
-     */
-    protected static function init_from_record(\stdClass $record, ?item $previous, array &$unusedrecords, array &$prerequisites): item {
+    #[\Override]
+    protected static function init_from_record(\stdClass $record, ?item $previous, array &$unusedrecords, array &$prerequisites): static {
         if ($record->courseid !== null || $record->creditframeworkid !== null) {
             throw new \coding_exception('Invalid set item');
         }
@@ -229,12 +231,7 @@ class set extends item {
         return $item;
     }
 
-    /**
-     * Set previous item to new value.
-     *
-     * @param item|null $previous new previous item
-     * @return void
-     */
+    #[\Override]
     protected function fix_previous(?item $previous): void {
         foreach ($this->children as $child) {
             $inorder = ($this->sequencetype === self::SEQUENCE_TYPE_ALLINORDER);
@@ -245,12 +242,7 @@ class set extends item {
         }
     }
 
-    /**
-     * Fix item prerequisites if necessary.
-     *
-     * @param array $prerequisites
-     * @return bool true if fix applied
-     */
+    #[\Override]
     protected function fix_prerequisites(array &$prerequisites): bool {
         global $DB;
 
@@ -280,11 +272,7 @@ class set extends item {
         return $updated;
     }
 
-    /**
-     * Returns set children.
-     *
-     * @return item[]
-     */
+    #[\Override]
     public function get_children(): array {
         return $this->children;
     }
@@ -306,10 +294,7 @@ class set extends item {
         return false;
     }
 
-    /**
-     * Get expected item record data.
-     * @return array
-     */
+    #[\Override]
     protected function get_record(): array {
         $sequence = [
             'children' => [],

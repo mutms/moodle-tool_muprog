@@ -19,7 +19,7 @@
 // phpcs:disable moodle.Commenting.DocblockDescription.Missing
 // phpcs:disable moodle.NamingConventions.ValidFunctionName.LowercaseMethod
 
-namespace tool_muprog\phpunit\local;
+namespace tool_muprog\phpunit\local\content;
 
 use tool_muprog\local\content\course;
 use tool_muprog\local\content\item;
@@ -41,9 +41,8 @@ use tool_mulib\local\mulib;
  * @covers \tool_muprog\local\content\top
  * @covers \tool_muprog\local\content\course
  * @covers \tool_muprog\local\content\set
- * @covers \tool_muprog\local\content\item
  */
-final class content_test extends \advanced_testcase {
+final class top_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
@@ -671,6 +670,17 @@ final class content_test extends \advanced_testcase {
         $this->assertDebuggingCalled('Cannot find new parent of item');
     }
 
+    public function test_is_deletable(): void {
+        /** @var \tool_muprog_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
+
+        $program1 = $generator->create_program(['fullname' => 'hokus']);
+        $program2 = $generator->create_program(['fullname' => 'pokus']);
+
+        $top = top::load($program1->id);
+        $this->assertFalse($top->is_deletable());
+    }
+
     public function test_delete_item(): void {
         /** @var \tool_muprog_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
@@ -685,7 +695,6 @@ final class content_test extends \advanced_testcase {
         $course5 = $this->getDataGenerator()->create_course();
 
         $top = top::load($program1->id);
-        $this->assertFalse($top->is_deletable());
 
         $top->append_course($top, $course1->id);
         /** @var course $courseitem1 */
@@ -715,11 +724,6 @@ final class content_test extends \advanced_testcase {
         /** @var course $courseitem5 */
         $courseitem5 = $setitem4->get_children()[0];
         $this->assertSame(false, $top->is_problem_detected());
-
-        $this->assertFalse($setitem4->is_deletable());
-        $this->assertTrue($setitem3->is_deletable());
-        $this->assertTrue($courseitem5->is_deletable());
-        $this->assertTrue($setitem5->is_deletable());
 
         $this->assertFalse($top->delete_item($setitem4->get_id()));
         $this->assertTrue($top->delete_item($courseitem5->get_id()));
