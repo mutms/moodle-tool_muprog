@@ -29,7 +29,7 @@ use tool_muprog\local\content\item,
     tool_muprog\local\content\set,
     tool_muprog\local\content\course,
     tool_muprog\local\content\credits;
-use stdClass, moodle_url, html_writer;
+use stdClass, html_writer, core\url;
 
 /**
  * Program management renderer.
@@ -63,7 +63,7 @@ class renderer extends \plugin_renderer_base {
 
         $details->add(get_string('programname', 'tool_muprog'), format_string($program->fullname));
         $details->add(get_string('programidnumber', 'tool_muprog'), s($program->idnumber));
-        $url = new moodle_url('/admin/tool/muprog/management/index.php', ['contextid' => $context->id]);
+        $url = new url('/admin/tool/muprog/management/index.php', ['contextid' => $context->id]);
         $details->add(get_string('category'), html_writer::link($url, $context->get_context_name(false)));
         $details->add(get_string('creategroups', 'tool_muprog'), ($program->creategroups ? get_string('yes') : get_string('no')));
         if ($CFG->usetags) {
@@ -81,10 +81,10 @@ class renderer extends \plugin_renderer_base {
         $archived = $program->archived ? get_string('yes') : get_string('no');
         if (has_capability('tool/muprog:edit', $context)) {
             if ($program->archived) {
-                $url = new moodle_url('/admin/tool/muprog/management/program_restore.php', ['id' => $program->id]);
+                $url = new url('/admin/tool/muprog/management/program_restore.php', ['id' => $program->id]);
                 $action = new \tool_mulib\output\ajax_form\icon($url, get_string('program_restore', 'tool_muprog'), 'i/settings');
             } else {
-                $url = new moodle_url('/admin/tool/muprog/management/program_archive.php', ['id' => $program->id]);
+                $url = new url('/admin/tool/muprog/management/program_archive.php', ['id' => $program->id]);
                 $action = new \tool_mulib\output\ajax_form\icon($url, get_string('program_archive', 'tool_muprog'), 'i/settings');
             }
             $action->set_form_size('sm');
@@ -219,7 +219,7 @@ class renderer extends \plugin_renderer_base {
         if ($top->is_problem_detected()) {
             $result .= $this->output->notification(get_string('errorcontentproblem', 'tool_muprog'), \core\output\notification::NOTIFY_ERROR);
             if (has_capability('tool/muprog:admin', $context)) {
-                $fixurl = new moodle_url('/admin/tool/muprog/management/program_content.php', ['id' => $program->id, 'autofix' => 1, 'sesskey' => sesskey()]);
+                $fixurl = new url('/admin/tool/muprog/management/program_content.php', ['id' => $program->id, 'autofix' => 1, 'sesskey' => sesskey()]);
                 $result .= '<div class="buttons mb-3">';
                 $result .= $this->output->single_button($fixurl, get_string('programautofix', 'tool_muprog'));
                 $result .= '</div>';
@@ -262,6 +262,8 @@ class renderer extends \plugin_renderer_base {
 
             if ($item instanceof set) {
                 $completion = $item->get_sequencetype_info();
+            } else if ($item instanceof course) {
+                $completion = get_string('coursecompletion');
             } else if ($item instanceof credits) {
                 $requiredcredits = format_float($item->get_required_credits(), 2, true, true);
                 $completion = get_string('credits_requiredcredits', 'tool_muprog', $requiredcredits);
@@ -287,11 +289,11 @@ class renderer extends \plugin_renderer_base {
             if ($canedit) {
                 $importurl = null;
                 if ($item instanceof set) {
-                    $appendurl = new moodle_url('/admin/tool/muprog/management/item_append.php', ['parentitemid' => $id]);
+                    $appendurl = new url('/admin/tool/muprog/management/item_create.php', ['parentid' => $id]);
                     $appendaction = new \tool_mulib\output\ajax_form\icon($appendurl, get_string('appenditem', 'tool_muprog'), 'appenditem', 'tool_muprog');
                     $actions[] = $output->render($appendaction);
                     if ($item instanceof top) {
-                        $importurl = new moodle_url('/admin/tool/muprog/management/program_content_import.php', ['id' => $item->get_programid()]);
+                        $importurl = new url('/admin/tool/muprog/management/program_content_import.php', ['id' => $item->get_programid()]);
                         $importaction = new \tool_mulib\output\ajax_form\icon(
                             $importurl,
                             get_string('importprogramcontent', 'tool_muprog'),
@@ -311,7 +313,7 @@ class renderer extends \plugin_renderer_base {
                     } else {
                         $deletestr = get_string('deleteset', 'tool_muprog');
                     }
-                    $deleteurl = new moodle_url('/admin/tool/muprog/management/item_delete.php', ['id' => $id]);
+                    $deleteurl = new url('/admin/tool/muprog/management/item_delete.php', ['id' => $id]);
                     $deleteaction = new \tool_mulib\output\ajax_form\icon($deleteurl, $deletestr, 'deleteitem', 'tool_muprog');
                     $actions[] = $output->render($deleteaction);
                 } else {
@@ -335,22 +337,22 @@ class renderer extends \plugin_renderer_base {
                         }
                     }
                 } else {
-                    $moveurl = new moodle_url('/admin/tool/muprog/management/program_content.php', ['id' => $item->get_programid(), 'movetargetsfor' => $item->get_id()]);
+                    $moveurl = new url('/admin/tool/muprog/management/program_content.php', ['id' => $item->get_programid(), 'movetargetsfor' => $item->get_id()]);
                     $moveicon = $output->pix_icon('move', get_string('moveitem', 'tool_muprog'), 'tool_muprog');
                     $actions[] = \html_writer::link($moveurl, $moveicon, ['title' => get_string('moveitem', 'tool_muprog')]);
                 }
 
                 if ($item instanceof set) {
-                    $editurl = new moodle_url('/admin/tool/muprog/management/item_set_edit.php', ['id' => $id]);
+                    $editurl = new url('/admin/tool/muprog/management/item_update.php', ['id' => $id]);
                     $editaction = new \tool_mulib\output\ajax_form\icon($editurl, get_string('updateset', 'tool_muprog'), 'i/settings');
                     $actions[] = $output->render($editaction);
                 } else if ($item instanceof course) {
-                    $editurl = new moodle_url('/admin/tool/muprog/management/item_course_edit.php', ['id' => $id]);
+                    $editurl = new url('/admin/tool/muprog/management/item_update.php', ['id' => $id]);
                     $editaction = new \tool_mulib\output\ajax_form\icon($editurl, get_string('updatecourse', 'tool_muprog'), 'i/settings');
                     $actions[] = $output->render($editaction);
                     $actions[] = $output->pix_icon('i/navigationitem', '') . ' ';
                 } else if ($item instanceof credits) {
-                    $editurl = new moodle_url('/admin/tool/muprog/management/item_credits_edit.php', ['id' => $id]);
+                    $editurl = new url('/admin/tool/muprog/management/item_update.php', ['id' => $id]);
                     $editaction = new \tool_mulib\output\ajax_form\icon($editurl, get_string('updatecredits', 'tool_muprog'), 'i/settings');
                     $actions[] = $output->render($editaction);
                     $actions[] = $output->pix_icon('i/navigationitem', '') . ' ';
@@ -364,7 +366,7 @@ class renderer extends \plugin_renderer_base {
                 $coursecontext = \context_course::instance($courseid, IGNORE_MISSING);
                 if ($coursecontext) {
                     if (has_capability('moodle/course:view', $coursecontext) && !$movetargetsfor) {
-                        $detailurl = new moodle_url('/course/view.php', ['id' => $courseid]);
+                        $detailurl = new url('/course/view.php', ['id' => $courseid]);
                         $fullname = \html_writer::link($detailurl, $fullname);
                     }
                 } else {
@@ -386,7 +388,7 @@ class renderer extends \plugin_renderer_base {
             }
 
             if ($canedit && $targetpre) {
-                $turl = new moodle_url(
+                $turl = new url(
                     '/admin/tool/muprog/management/program_content.php',
                     ['id' => $item->get_programid(), 'moveitem' => $movetargetsfor, 'movetoparent' => $parent->get_id(), 'moveposition' => $position, 'sesskey' => sesskey()]
                 );
@@ -412,7 +414,7 @@ class renderer extends \plugin_renderer_base {
                     $i++;
                 }
             } else if ($showtargets && ($item instanceof set)) {
-                $turl = new moodle_url(
+                $turl = new url(
                     '/admin/tool/muprog/management/program_content.php',
                     ['id' => $item->get_programid(), 'moveitem' => $movetargetsfor, 'movetoparent' => $item->get_id(), 'moveposition' => 0, 'sesskey' => sesskey()]
                 );
@@ -423,7 +425,7 @@ class renderer extends \plugin_renderer_base {
             }
 
             if ($canedit && $targetpost) {
-                $turl = new moodle_url(
+                $turl = new url(
                     '/admin/tool/muprog/management/program_content.php',
                     ['id' => $item->get_programid(), 'moveitem' => $movetargetsfor, 'movetoparent' => $parent->get_id(), 'moveposition' => $position + 1, 'sesskey' => sesskey()]
                 );
@@ -500,7 +502,7 @@ class renderer extends \plugin_renderer_base {
 
             $actions = [];
             $deletestr = get_string('deleteset', 'tool_muprog');
-            $deleteurl = new moodle_url('/admin/tool/muprog/management/item_delete.php', ['id' => $set->get_id()]);
+            $deleteurl = new url('/admin/tool/muprog/management/item_delete.php', ['id' => $set->get_id()]);
             $deleteimg = $this->output->pix_icon('deleteitem', $deletestr, 'tool_muprog');
             $actions[] = \html_writer::link($deleteurl, $deleteimg, ['title' => $deletestr]);
 
@@ -512,7 +514,7 @@ class renderer extends \plugin_renderer_base {
 
             $actions = [];
             $deletestr = get_string('deletecourse', 'tool_muprog');
-            $deleteurl = new moodle_url('/admin/tool/muprog/management/item_delete.php', ['id' => $course->get_id()]);
+            $deleteurl = new url('/admin/tool/muprog/management/item_delete.php', ['id' => $course->get_id()]);
             $deleteimg = $this->output->pix_icon('deleteitem', $deletestr, 'tool_muprog');
             $actions[] = \html_writer::link($deleteurl, $deleteimg, ['title' => $deletestr]);
 
@@ -687,7 +689,7 @@ class renderer extends \plugin_renderer_base {
                         }
                     }
                     if ($canaccesscourse) {
-                        $detailurl = new \moodle_url('/course/view.php', ['id' => $courseid]);
+                        $detailurl = new url('/course/view.php', ['id' => $courseid]);
                         $fullname = \html_writer::link($detailurl, $fullname);
                     }
                 } else {
@@ -718,7 +720,7 @@ class renderer extends \plugin_renderer_base {
                 $completioninfo = userdate($completion->timecompleted, $dateformat);
             }
             if ($canadmin) {
-                $editurl = new moodle_url('/admin/tool/muprog/management/item_completion_override.php', ['allocationid' => $allocation->id, 'itemid' => $item->get_id()]);
+                $editurl = new url('/admin/tool/muprog/management/item_completion_override.php', ['allocationid' => $allocation->id, 'itemid' => $item->get_id()]);
                 $editaction = new \tool_mulib\output\ajax_form\icon($editurl, get_string('completionoverride', 'tool_muprog'), 'i/settings');
                 $completioninfo .= ' ' . $output->render($editaction);
             }
@@ -730,7 +732,7 @@ class renderer extends \plugin_renderer_base {
                 $evidenceinfo .= format_text($jsondata->details, FORMAT_PLAIN, ['para' => false]);
             }
             if ($canevidence && !$program->archived && !$allocation->archived) {
-                $editurl = new moodle_url('/admin/tool/muprog/management/item_evidence_edit.php', ['allocationid' => $allocation->id, 'itemid' => $item->get_id()]);
+                $editurl = new url('/admin/tool/muprog/management/item_evidence_edit.php', ['allocationid' => $allocation->id, 'itemid' => $item->get_id()]);
                 if ($evidence) {
                     $editaction = new \tool_mulib\output\ajax_form\icon($editurl, get_string('evidenceupdate', 'tool_muprog'), 'i/edit');
                 } else {

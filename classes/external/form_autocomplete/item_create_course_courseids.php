@@ -26,21 +26,21 @@ use tool_mulib\local\context_map;
 use tool_mulib\local\mulib;
 
 /**
- * Provides list of programs where user can allocate users - as source for allocation after completion.
+ * Provides list of candidates for adding courses to program.
  *
  * @package     tool_muprog
- * @copyright   2025 Petr Skoda
+ * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class source_program_edit_programid extends \tool_mulib\external\form_autocomplete\base {
-    /** @var string|null program table */
-    protected const ITEM_TABLE = 'tool_muprog_program';
+final class item_create_course_courseids extends \tool_mulib\external\form_autocomplete\base {
+    /** @var string|null course table */
+    protected const ITEM_TABLE = 'course';
     /** @var string|null field used for item name */
     protected const ITEM_FIELD = 'fullname';
 
     #[\Override]
     public static function get_multiple(): bool {
-        return false;
+        return true;
     }
 
     #[\Override]
@@ -52,10 +52,10 @@ final class source_program_edit_programid extends \tool_mulib\external\form_auto
     }
 
     /**
-     * Gets list of available programs.
+     * Finds candidates for adding courses to program.
      *
      * @param string $query The search request.
-     * @param int $programid The Program to which the program has to be imported, we will exclude this program.
+     * @param int $programid The program.
      * @return array
      */
     public static function execute(string $query, int $programid): array {
@@ -69,69 +69,73 @@ final class source_program_edit_programid extends \tool_mulib\external\form_auto
             'programid' => $programid,
         ]);
 
-        $targetprogram = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
-        $context = \context::instance_by_id($targetprogram->contextid);
+        $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
 
+        // Validate context.
+        $context = \context::instance_by_id($program->contextid);
         self::validate_context($context);
         require_capability('tool/muprog:edit', $context);
 
+        $capjoin = context_map::get_contexts_by_capability_join('tool/muprog:addcourse', $USER->id, 'ctx');
+
         $sql = (
             new sql(
-                "SELECT p.id, p.fullname
-                   FROM {tool_muprog_program} p
-                   /* capsubquery */
-                   /* tenantjoin */
-                  WHERE p.id <> :programid /* searchsql */
-               ORDER BY p.fullname ASC",
-                ['programid' => $programid]
+                "SELECT c.id, c.fullname
+                   FROM {course} c
+                   JOIN {context} ctx ON ctx.contextlevel = :courselevel AND ctx.instanceid = c.id
+                   /* capjoin */
+              LEFT JOIN {tool_muprog_item} pi ON pi.programid = :programid AND pi.courseid = c.id
+                  WHERE c.category <> 0 AND pi.id IS NULL
+                        /* capwhere */ /* searchsql */ /* tenantwhere */
+               GROUP BY c.id, c.fullname
+               ORDER BY c.fullname ASC",
+                ['courselevel' => \context_course::LEVEL, 'programid' => $program->id]
             )
         )
-            ->replace_comment(
-                'capsubquery',
-                context_map::get_contexts_by_capability_query(
-                    'tool/muprog:allocate',
-                    $USER->id,
-                    new sql("(ctx.contextlevel = ? OR ctx.contextlevel = ?)", [\context_system::LEVEL, \context_coursecat::LEVEL])
-                )->wrap("JOIN (", ")capctx ON capctx.id = p.contextid")
-            )
+            ->replace_comment('capjoin', $capjoin['join'])
+            ->replace_comment('capwhere', $capjoin['where']->wrap("AND ", ""))
             ->replace_comment(
                 'searchsql',
-                \tool_muprog\local\management::get_program_search_query(null, $query, 'p')->wrap('AND ', '')
+                self::get_search_query($query, ['fullname', 'shortname', 'idnumber'], 'c')->wrap("AND ", "")
             );
 
         if (mulib::is_mutenancy_active()) {
             if ($context->tenantid) {
                 $sql = $sql->replace_comment(
-                    'tenantjoin',
-                    new sql("JOIN {context} tctx ON tctx.id = p.contextid AND tctx.tenantid = ?", [$context->tenantid])
-                );
-            } else {
-                $sql = $sql->replace_comment(
-                    'tenantjoin',
-                    new sql("JOIN {context} tctx ON tctx.id = p.contextid AND tctx.tenantid IS NULL")
+                    'tenantwhere',
+                    new sql("AND (ctx.tenantid = ? OR ctx.tenantid IS NULL)", [$context->tenantid])
                 );
             }
         }
 
-        $programs = $DB->get_records_sql($sql->sql, $sql->params, 0, self::MAX_RESULTS + 1);
-        return self::prepare_result($programs, $context);
+        $courses = $DB->get_records_sql($sql->sql, $sql->params, 0, self::MAX_RESULTS + 1);
+        return self::prepare_result($courses, $context);
     }
 
     #[\Override]
     public static function validate_value(int $value, array $args, \context $context): ?string {
         global $DB;
 
-        if ($value == $args['programid']) {
+        $course = $DB->get_record('course', ['id' => $value]);
+        if (!$course || !$course->category) {
             return get_string('error');
         }
 
-        $program = $DB->get_record('tool_muprog_program', ['id' => $value]);
-        if (!$program) {
+        if ($DB->record_exists('tool_muprog_item', ['programid' => $args['programid'], 'courseid' => $course->id])) {
             return get_string('error');
         }
-        $programcontext = \context::instance_by_id($program->contextid);
-        if (!has_capability('tool/muprog:allocate', $programcontext)) {
+
+        $coursecontext = \context_course::instance($course->id);
+        if (!has_capability('tool/muprog:addcourse', $coursecontext)) {
             return get_string('error');
+        }
+
+        if (mulib::is_mutenancy_active()) {
+            if ($context->tenantid) {
+                if ($coursecontext->tenantid && $coursecontext->tenantid != $context->tenantid) {
+                    return get_string('errordifferenttenant', 'tool_muprog');
+                }
+            }
         }
 
         return null;

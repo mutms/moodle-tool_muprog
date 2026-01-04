@@ -43,6 +43,16 @@ final class top extends set {
     /** @var set[] list of orphaned sets in program */
     protected $orphanedsets = [];
 
+    #[\Override]
+    public static function get_type(): string {
+        return 'top';
+    }
+
+    #[\Override]
+    public static function get_type_name(): string {
+        return get_string('program', 'tool_muprog');
+    }
+
     /**
      * Is this item deletable?
      *

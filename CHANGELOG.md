@@ -6,7 +6,14 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 
 ## [Unreleased]
 
-- No changes
+### Changed
+
+- "Course set" is now called "Set" because programs may contain other item types
+- Reworked adding of program items to allow addition of new item types
+
+### Fixed
+
+- Fixed result overflow detection in ajax autocomplete form fields
 
 ## [mu-4.5.8-03] - 2025-12-31
 

@@ -28,7 +28,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['addset'] = 'Add new set';
 $string['allocation'] = 'Allocation';
 $string['allocation_archive'] = 'Archive allocation';
 $string['allocation_reset'] = 'Reset program progress';
@@ -144,6 +143,10 @@ $string['includesubcontexts'] = 'Include sub-contexts';
 $string['invalidallocationdates'] = 'Invalid program allocation dates';
 $string['invalidcompletiondate'] = 'Invalid program completion date';
 $string['item'] = 'Item';
+$string['item_create_course'] = 'Add courses';
+$string['item_create_credits'] = 'Add credits';
+$string['item_create_set'] = 'Add set';
+$string['item_type'] = 'Item type';
 $string['itemcompletion'] = 'Program item completion';
 $string['itempoints'] = 'Points';
 $string['itemrecalculate'] = 'Recalculate item completion';
@@ -372,7 +375,7 @@ $string['sequencetype_allinanyorder'] = 'All in any order';
 $string['sequencetype_allinorder'] = 'All in order';
 $string['sequencetype_atleast'] = 'At least {$a->min}';
 $string['sequencetype_minpoints'] = 'Minimum {$a->minpoints} points';
-$string['set'] = 'Course set';
+$string['set'] = 'Set';
 $string['settings'] = 'Program settings';
 $string['source'] = 'Source';
 $string['source_approval'] = 'Requests with approval';

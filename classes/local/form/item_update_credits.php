@@ -15,14 +15,13 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
-// phpcs:disable moodle.Files.LineLength.TooLong
 
 namespace tool_muprog\local\form;
 
-use tool_muprog\local\content\course;
+use tool_muprog\local\content\credits;
 
 /**
- * Edit program course item.
+ * Edit program credits item.
  *
  * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
@@ -30,18 +29,16 @@ use tool_muprog\local\content\course;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class item_course_edit extends \tool_mulib\local\ajax_form {
+final class item_update_credits extends \tool_mulib\local\ajax_form {
     #[\Override]
     protected function definition() {
         $mform = $this->_form;
-        /** @var course $course */
-        $course = $this->_customdata['course'];
+        /** @var credits $credits */
+        $credits = $this->_customdata['credits'];
 
-        $mform->addElement('static', 'staticfullname', get_string('fullname'), format_string($course->get_fullname()));
+        $mform->addElement('static', 'statictype', get_string('item_type', 'tool_muprog'), $credits::get_type_name());
 
-        $mform->addElement('text', 'points', get_string('itempoints', 'tool_muprog'));
-        $mform->setType('points', PARAM_INT);
-        $mform->setDefault('points', $course->get_points());
+        $mform->addElement('static', 'staticfullname', get_string('fullname'), format_string($credits->get_fullname()));
 
         $mform->addElement(
             'duration',
@@ -49,13 +46,17 @@ final class item_course_edit extends \tool_mulib\local\ajax_form {
             get_string('completiondelay', 'tool_muprog'),
             ['optional' => true, 'defaultunit' => DAYSECS]
         );
-        $mform->setDefault('completiondelay', $course->get_completiondelay());
+        $mform->setDefault('completiondelay', $credits->get_completiondelay());
+
+        $mform->addElement('text', 'points', get_string('itempoints', 'tool_muprog'));
+        $mform->setType('points', PARAM_INT);
+        $mform->setDefault('points', $credits->get_points());
 
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
-        $mform->setDefault('id', $course->get_id());
+        $mform->setDefault('id', $credits->get_id());
 
-        $this->add_action_buttons(true, get_string('updatecourse', 'tool_muprog'));
+        $this->add_action_buttons(true, get_string('updatecredits', 'tool_muprog'));
     }
 
     #[\Override]
