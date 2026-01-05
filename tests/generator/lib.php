@@ -17,6 +17,8 @@
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 // phpcs:disable moodle.Files.LineLength.TooLong
 
+use core\exception\coding_exception;
+
 /**
  * Program generator.
  *
@@ -197,6 +199,11 @@ class tool_muprog_generator extends component_generator_base {
         }
 
         if (!empty($record->courseid) || !empty($record->course)) {
+            if (!isset($record->type) || $record->type === '') {
+                $record->type = 'course';
+            } else if ($record->type !== 'course') {
+                throw new coding_exception("Invalid item type $record->type");
+            }
             if (!empty($record->courseid)) {
                 $course = $DB->get_record('course', ['id' => $record->courseid], '*', MUST_EXIST);
             } else {
@@ -204,6 +211,11 @@ class tool_muprog_generator extends component_generator_base {
             }
             return $top->append_course($parent, $course->id);
         } else if (!empty($record->creditframeworkid) || !empty($record->credits)) {
+            if (!isset($record->type) || $record->type === '') {
+                $record->type = 'credits';
+            } else if ($record->type !== 'credits') {
+                throw new coding_exception("Invalid item type $record->type");
+            }
             if (!empty($record->creditframeworkid)) {
                 $framework = $DB->get_record('tool_mutrain_framework', ['id' => $record->creditframeworkid], '*', MUST_EXIST);
             } else {
@@ -211,6 +223,11 @@ class tool_muprog_generator extends component_generator_base {
             }
             return $top->append_credits($parent, $framework->id);
         } else {
+            if (!isset($record->type) || $record->type === '') {
+                $record->type = 'set';
+            } else if ($record->type !== 'set') {
+                throw new coding_exception("Invalid item type $record->type");
+            }
             if (!empty($record->sequencetype)) {
                 $types = \tool_muprog\local\content\set::get_sequencetype_types();
                 if (isset($types[$record->sequencetype])) {

@@ -231,6 +231,7 @@ final class program {
 
         $item = new \stdClass();
         $item->programid = $data->id;
+        $item->type = 'top';
         $item->topitem = 1;
         $item->courseid = null;
         $item->fullname = $data->fullname;

@@ -114,8 +114,8 @@ final class credits extends item {
     }
 
     #[\Override]
-    protected static function init_from_record(\stdClass $record, ?item $previous, array &$unusedrecords, array &$prerequisites): static {
-        if ($record->topitem || $record->courseid !== null || !$record->creditframeworkid) {
+    protected static function init_from_record(\stdClass $record, ?item $previous, array &$unusedrecords, array &$prerequisites): item {
+        if ($record->type !== 'credits' || $record->topitem || $record->courseid !== null || !$record->creditframeworkid) {
             throw new \core\exception\coding_exception('Invalid credits item');
         }
         return parent::init_from_record($record, $previous, $unusedrecords, $prerequisites);

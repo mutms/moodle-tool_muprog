@@ -160,5 +160,39 @@ function xmldb_tool_muprog_upgrade($oldversion): bool {
         upgrade_plugin_savepoint(true, 2025121145, 'tool', 'muprog');
     }
 
+    if ($oldversion < 2026010545) {
+        $table = new xmldb_table('tool_muprog_item');
+        $field = new xmldb_field('type', XMLDB_TYPE_CHAR, '50', null, null, null, null, 'programid');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $sql = "UPDATE {tool_muprog_item}
+                   SET type = 'top'
+                 WHERE topitem = 1 AND type IS NULL";
+        $DB->execute($sql);
+
+        $sql = "UPDATE {tool_muprog_item}
+                   SET type = 'course'
+                 WHERE courseid IS NOT NULL AND type IS NULL";
+        $DB->execute($sql);
+
+        $sql = "UPDATE {tool_muprog_item}
+                   SET type = 'credits'
+                 WHERE creditframeworkid IS NOT NULL AND type IS NULL";
+        $DB->execute($sql);
+
+        $sql = "UPDATE {tool_muprog_item}
+                   SET type = 'set'
+                 WHERE courseid IS NULL AND creditframeworkid IS NULL AND type IS NULL";
+        $DB->execute($sql);
+
+        $table = new xmldb_table('tool_muprog_item');
+        $field = new xmldb_field('type', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null, 'programid');
+        $dbman->change_field_notnull($table, $field);
+
+        upgrade_plugin_savepoint(true, 2026010545, 'tool', 'muprog');
+    }
+
     return true;
 }

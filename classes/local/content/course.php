@@ -49,8 +49,8 @@ final class course extends item {
     }
 
     #[\Override]
-    protected static function init_from_record(\stdClass $record, ?item $previous, array &$unusedrecords, array &$prerequisites): static {
-        if ($record->topitem || !$record->courseid || $record->creditframeworkid !== null) {
+    protected static function init_from_record(\stdClass $record, ?item $previous, array &$unusedrecords, array &$prerequisites): item {
+        if ($record->type !== 'course' || $record->topitem || !$record->courseid || $record->creditframeworkid !== null) {
             throw new \core\exception\coding_exception('Invalid course item');
         }
         return parent::init_from_record($record, $previous, $unusedrecords, $prerequisites);

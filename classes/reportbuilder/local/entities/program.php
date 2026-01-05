@@ -235,7 +235,7 @@ final class program extends base {
             ->set_type(column::TYPE_INTEGER)
             ->add_field('(' . "SELECT COUNT('x')
                                  FROM {tool_muprog_item} i
-                                WHERE i.courseid IS NOT NULL AND i.programid = {$programalias}.id" . ')', 'coursecount')
+                                WHERE i.type = 'course' AND i.programid = {$programalias}.id" . ')', 'coursecount')
             ->add_field("{$programalias}.id")
             ->add_field("{$programalias}.contextid")
             ->set_is_sortable(true)
@@ -252,7 +252,7 @@ final class program extends base {
                     $sql = "SELECT COUNT(DISTINCT pi.courseid)
                               FROM {tool_muprog_item} pi
                          LEFT JOIN {course} c ON c.id = pi.courseid
-                             WHERE pi.courseid IS NOT NULL AND c.id IS NULL AND pi.programid = :programid";
+                             WHERE pi.type = 'course' AND c.id IS NULL AND pi.programid = :programid";
                     $params = ['programid' => $row->id];
                     $missingcount = $DB->count_records_sql($sql, $params);
                     if ($missingcount) {

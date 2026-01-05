@@ -10,6 +10,7 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 
 - "Course set" is now called "Set" because programs may contain other item types
 - Reworked adding of program items to allow addition of new item types
+- New column "type" was added to "tool_muprog_item" database table
 
 ### Fixed
 

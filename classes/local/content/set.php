@@ -126,17 +126,24 @@ class set extends item {
     }
 
     #[\Override]
-    protected static function init_from_record(\stdClass $record, ?item $previous, array &$unusedrecords, array &$prerequisites): static {
+    protected static function init_from_record(\stdClass $record, ?item $previous, array &$unusedrecords, array &$prerequisites): item {
         if ($record->courseid !== null || $record->creditframeworkid !== null) {
             throw new \coding_exception('Invalid set item');
         }
         if ($record->topitem) {
+            if ($record->type !== 'top') {
+                throw new \coding_exception('Invalid top item');
+            }
             $item = new top();
         } else {
+            if ($record->type !== 'set') {
+                throw new \coding_exception('Invalid set item');
+            }
             $item = new set();
         }
         $item->id = $record->id;
         $item->programid = $record->programid;
+        $item->type = $record->type;
         $item->fullname = $record->fullname;
         $item->points = $record->points;
 
@@ -157,12 +164,14 @@ class set extends item {
                     throw new \coding_exception('Invalid records contains invalid programid');
                 }
                 unset($unusedrecords[$childitemid]);
-                if ($childrecord->courseid !== null) {
+                if ($childrecord->type === 'course') {
                     $child = course::init_from_record($childrecord, $previous, $unusedrecords, $prerequisites);
-                } else if ($childrecord->creditframeworkid !== null) {
+                } else if ($childrecord->type === 'credits') {
                     $child = credits::init_from_record($childrecord, $previous, $unusedrecords, $prerequisites);
-                } else {
+                } else if ($childrecord->type === 'set') {
                     $child = self::init_from_record($childrecord, $previous, $unusedrecords, $prerequisites);
+                } else {
+                    debugging("Unknown child type $childrecord->type");
                 }
                 if ($inorder) {
                     $previous = $child;
@@ -307,6 +316,7 @@ class set extends item {
         return [
             'id' => (empty($this->id) ? null : (string)$this->id),
             'programid' => (string)$this->programid,
+            'type' => 'set',
             'topitem' => null,
             'courseid' => null,
             'creditframeworkid' => null,
