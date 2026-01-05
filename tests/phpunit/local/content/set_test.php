@@ -21,7 +21,6 @@
 
 namespace tool_muprog\phpunit\local\content;
 
-use tool_muprog\local\content\course;
 use tool_muprog\local\content\set;
 use tool_muprog\local\content\top;
 

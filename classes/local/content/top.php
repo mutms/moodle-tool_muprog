@@ -73,6 +73,7 @@ final class top extends set {
         $program = $DB->get_record('tool_muprog_program', ['id' => $this->programid], '*', MUST_EXIST);
 
         $record = parent::get_record();
+        $record['type'] = 'top';
         $record['topitem'] = '1';
         $record['fullname'] = $program->fullname;
 
@@ -106,16 +107,15 @@ final class top extends set {
         if (!$toprecord) {
             throw new \coding_exception('Missing top program item');
         }
-        /** @var top $top */
-        $top = set::init_from_record($toprecord, null, $records, $prerequisites);
+        $top = self::init_from_record($toprecord, null, $records, $prerequisites);
 
         if ($records) {
             // Deal with orphans.
             foreach ($records as $record) {
-                if ($record->topitem) {
+                if ($record->topitem || $record->type === 'top') {
                     throw new \coding_exception('only one item can be topitem');
                 }
-                if ($record->courseid !== null) {
+                if ($record->type === 'course') {
                     $fakerecords = [];
                     // Prevent course access by requiring program completion.
                     $orphan = course::init_from_record($record, $top, $fakerecords, $prerequisites);
@@ -123,14 +123,14 @@ final class top extends set {
                         $top->problemdetected = true;
                     }
                     $top->orphanedcourses[$orphan->id] = $orphan;
-                } else if ($record->creditframeworkid !== null) {
+                } else if ($record->type === 'credits') {
                     $fakerecords = [];
                     $orphan = credits::init_from_record($record, $top, $fakerecords, $prerequisites);
                     if ($orphan->problemdetected) {
                         $top->problemdetected = true;
                     }
                     $top->orphanedcredits[$orphan->id] = $orphan;
-                } else {
+                } else if ($record->type === 'set') {
                     $record = clone($record);
                     $fakerecords = [];  // We do not want to load any children for orphaned sets.
                     $orphan = set::init_from_record($record, null, $fakerecords, $prerequisites);
@@ -138,6 +138,8 @@ final class top extends set {
                         $top->problemdetected = true;
                     }
                     $top->orphanedsets[$orphan->id] = $orphan;
+                } else {
+                    debugging("Unknown program item type detected $record->type", DEBUG_DEVELOPER);
                 }
             }
         }
@@ -251,6 +253,7 @@ final class top extends set {
         $record = [
             'id' => null,
             'programid' => (string)$this->programid,
+            'type' => 'course',
             'topitem' => null,
             'courseid' => (string)$course->id,
             'creditframeworkid' => null,
@@ -327,6 +330,7 @@ final class top extends set {
         $record = [
             'id' => null,
             'programid' => (string)$this->programid,
+            'type' => 'credits',
             'topitem' => null,
             'courseid' => null,
             'creditframeworkid' => (string)$framework->id,
@@ -429,6 +433,7 @@ final class top extends set {
         $record = [
             'id' => null,
             'programid' => (string)$this->programid,
+            'type' => 'set',
             'topitem' => null,
             'courseid' => null,
             'creditframeworkid' => null,

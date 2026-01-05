@@ -35,6 +35,8 @@ abstract class item {
     protected $id = null;
     /** @var int */
     protected $programid;
+    /** @var string */
+    protected $type;
     /** @var int */
     protected $courseid;
     /** @var int */
@@ -96,9 +98,9 @@ abstract class item {
      * @param item|null $previous
      * @param array $unusedrecords
      * @param array $prerequisites
-     * @return static
+     * @return item
      */
-    protected static function init_from_record(\stdClass $record, ?item $previous, array &$unusedrecords, array &$prerequisites): static {
+    protected static function init_from_record(\stdClass $record, ?item $previous, array &$unusedrecords, array &$prerequisites): item {
         if ($record->topitem) {
             throw new \core\exception\coding_exception('Invalid item');
         }
@@ -106,6 +108,7 @@ abstract class item {
         $item = new static();
         $item->id = $record->id;
         $item->programid = $record->programid;
+        $item->type = $record->type;
         if (isset($record->courseid)) {
             $item->courseid = $record->courseid;
         }
@@ -331,6 +334,7 @@ abstract class item {
         return [
             'id' => ($this->id ? (string)$this->id : null),
             'programid' => (string)$this->programid,
+            'type' => $this->type,
             'topitem' => null,
             'courseid' => ($this->courseid ? (string)$this->courseid : null),
             'creditframeworkid' => ($this->creditframeworkid ? (string)$this->creditframeworkid : null),
