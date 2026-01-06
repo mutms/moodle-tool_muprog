@@ -104,6 +104,11 @@ if ($type === 'set') {
         null,
         ['currentdata' => $currentdata, 'types' => $types, 'parent' => $parent, 'context' => $context]
     );
+} else if ($type === 'attendance') {
+    $form = new tool_muprog\local\form\item_create_attendance(
+        null,
+        ['currentdata' => $currentdata, 'types' => $types, 'parent' => $parent, 'context' => $context]
+    );
 } else if ($type === 'credits') {
     $form = new tool_muprog\local\form\item_create_credits(
         null,
@@ -127,6 +132,8 @@ if ($data = $form->get_data()) {
             $coursecontext = context_course::instance($courseid);
             $top->append_course($parent, $courseid, (array)$data);
         }
+    } else if ($type === 'attendance') {
+        $top->append_attendance($parent, (array)$data);
     } else if ($type === 'credits') {
         $top->append_credits($parent, $data->creditframeworkid, (array)$data);
     }

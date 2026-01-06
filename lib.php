@@ -154,6 +154,7 @@ function tool_muprog_get_fontawesome_icon_map() {
         'tool_muprog:itemset' => 'fa-list',
         'tool_muprog:itemtop' => 'fa-cubes',
         'tool_muprog:itemcredits' => 'fa-solid fa-grip',
+        'tool_muprog:itemattendance' => 'fa-solid fa-user-check',
         'tool_muprog:move' => 'fa-arrows',
         'tool_muprog:program' => 'fa-cubes',
         'tool_muprog:myprograms' => 'fa-cubes',

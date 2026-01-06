@@ -28,6 +28,7 @@ use tool_muprog\local\content\item,
     tool_muprog\local\content\top,
     tool_muprog\local\content\set,
     tool_muprog\local\content\course,
+    tool_muprog\local\content\attendance,
     tool_muprog\local\content\credits;
 use stdClass, html_writer, core\url;
 
@@ -264,6 +265,8 @@ class renderer extends \plugin_renderer_base {
                 $completion = $item->get_sequencetype_info();
             } else if ($item instanceof course) {
                 $completion = get_string('coursecompletion');
+            } else if ($item instanceof attendance) {
+                $completion = get_string('attendance', 'tool_muprog');
             } else if ($item instanceof credits) {
                 $requiredcredits = format_float($item->get_required_credits(), 2, true, true);
                 $completion = get_string('credits_requiredcredits', 'tool_muprog', $requiredcredits);
@@ -308,6 +311,8 @@ class renderer extends \plugin_renderer_base {
                 if ($item->is_deletable()) {
                     if ($item instanceof course) {
                         $deletestr = get_string('deletecourse', 'tool_muprog');
+                    } else if ($item instanceof attendance) {
+                        $deletestr = get_string('deleteattendance', 'tool_muprog');
                     } else if ($item instanceof credits) {
                         $deletestr = get_string('deletecredits', 'tool_muprog');
                     } else {
@@ -351,6 +356,11 @@ class renderer extends \plugin_renderer_base {
                     $editaction = new \tool_mulib\output\ajax_form\icon($editurl, get_string('updatecourse', 'tool_muprog'), 'i/settings');
                     $actions[] = $output->render($editaction);
                     $actions[] = $output->pix_icon('i/navigationitem', '') . ' ';
+                } else if ($item instanceof attendance) {
+                    $editurl = new url('/admin/tool/muprog/management/item_update.php', ['id' => $id]);
+                    $editaction = new \tool_mulib\output\ajax_form\icon($editurl, get_string('updateattendance', 'tool_muprog'), 'i/settings');
+                    $actions[] = $output->render($editaction);
+                    $actions[] = $output->pix_icon('i/navigationitem', '') . ' ';
                 } else if ($item instanceof credits) {
                     $editurl = new url('/admin/tool/muprog/management/item_update.php', ['id' => $id]);
                     $editaction = new \tool_mulib\output\ajax_form\icon($editurl, get_string('updatecredits', 'tool_muprog'), 'i/settings');
@@ -378,6 +388,8 @@ class renderer extends \plugin_renderer_base {
                 $itemname = $output->pix_icon('itemtop', get_string('program', 'tool_muprog'), 'tool_muprog') . '&nbsp;' . $fullname;
             } else if ($item instanceof course) {
                 $itemname = $padding . $output->pix_icon('itemcourse', get_string('course'), 'tool_muprog') . $fullname;
+            } else if ($item instanceof attendance) {
+                $itemname = $padding . $output->pix_icon('itemattendance', get_string('attendance', 'tool_muprog'), 'tool_muprog') . $fullname;
             } else if ($item instanceof credits) {
                 $itemname = $padding . $output->pix_icon('itemcredits', get_string('credits', 'tool_muprog'), 'tool_muprog') . $fullname;
             } else {
@@ -640,6 +652,7 @@ class renderer extends \plugin_renderer_base {
 
         $context = \context::instance_by_id($program->contextid);
         $canevidence = has_capability('tool/muprog:manageevidence', $context);
+        $canteakeattendance = has_capability('tool/muprog:takeattendance', $context);
         $canadmin = has_capability('tool/muprog:admin', $context);
         $dateformat = get_string('strftimedatetimeshort');
 
@@ -660,6 +673,7 @@ class renderer extends \plugin_renderer_base {
             &$context,
             $dateformat,
             $canevidence,
+            $canteakeattendance,
             $canadmin
 ): void {
 
@@ -669,10 +683,29 @@ class renderer extends \plugin_renderer_base {
 
             if ($item instanceof set) {
                 $completiontype = $item->get_sequencetype_info();
+            } else if ($item instanceof course) {
+                $completiontype = get_string('coursecompletion');
+            } else if ($item instanceof attendance) {
+                $completiontype = get_string('attendance', 'tool_muprog');
+                $attendance = $DB->get_record('tool_muprog_attendance', ['itemid' => $item->get_id(), 'userid' => $allocation->userid]);
+                if ($attendance && $attendance->status) {
+                    $completiontype .= ': ' . attendance::get_statuses()[$attendance->status];
+                }
+                if ($canteakeattendance && !$program->archived && !$allocation->archived) {
+                    $editurl = new url('/admin/tool/muprog/management/item_attendance_take.php', ['itemid' => $item->get_id(), 'userid' => $allocation->userid]);
+                    $editaction = new \tool_mulib\output\ajax_form\icon($editurl, get_string('attendance_take', 'tool_muprog'), 'i/checked');
+                    $completiontype .= ' ' . $output->render($editaction);
+                }
             } else if ($item instanceof credits) {
                 $completiontype = $item->get_current_credits($allocation);
             } else {
                 $completiontype = '';
+            }
+            if ($completiondelay = $item->get_completiondelay()) {
+                if ($completiontype !== '') {
+                    $completiontype .= '<br />';
+                }
+                $completiontype .= '<small>' . get_string('completiondelay', 'tool_muprog') . ': ' . util::format_duration($completiondelay) . '</small>';
             }
 
             if ($item instanceof course) {
@@ -701,6 +734,8 @@ class renderer extends \plugin_renderer_base {
                 $itemname = $output->pix_icon('itemtop', get_string('program', 'tool_muprog'), 'tool_muprog') . '&nbsp;' . $fullname;
             } else if ($item instanceof course) {
                 $itemname = $padding . $output->pix_icon('itemcourse', get_string('course'), 'tool_muprog') . $fullname;
+            } else if ($item instanceof attendance) {
+                $itemname = $padding . $output->pix_icon('itemattendance', get_string('attendance', 'tool_muprog'), 'tool_muprog') . $fullname;
             } else if ($item instanceof credits) {
                 $itemname = $padding . $output->pix_icon('itemcredits', get_string('credits', 'tool_muprog'), 'tool_muprog') . $fullname;
             } else {

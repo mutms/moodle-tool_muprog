@@ -22,6 +22,7 @@
 namespace tool_muprog\phpunit\local\content;
 
 use tool_muprog\local\content\course;
+use tool_muprog\local\content\attendance;
 use tool_muprog\local\content\item;
 use tool_muprog\local\content\set;
 use tool_muprog\local\content\top;
@@ -750,7 +751,7 @@ final class top_test extends \advanced_testcase {
             self::assertSame($source->get_creditframeworkid(), $target->get_creditframeworkid());
         } else if ($source instanceof set) {
             self::assertSame($source->get_sequencetype_info(), $target->get_sequencetype_info());
-        } else {
+        } else if (!$source instanceof attendance) {
             throw new \coding_exception('Unexpected class');
         }
 

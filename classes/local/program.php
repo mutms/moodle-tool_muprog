@@ -640,7 +640,7 @@ final class program {
         $sql = "SELECT COUNT('x')
                   FROM {tool_muprog_item} i
                  WHERE i.programid = :programid
-                       AND (i.courseid IS NOT NULL OR i.creditframeworkid IS NOT NULL)";
+                       AND i.type <> 'set' AND i.type <> 'top'";
         $count = $DB->count_records_sql($sql, ['programid' => $programid]);
 
         $sql = "UPDATE {tool_muprog_program}
@@ -981,6 +981,7 @@ final class program {
 
         $items = $DB->get_records('tool_muprog_item', ['programid' => $program->id]);
         foreach ($items as $item) {
+            $DB->delete_records('tool_muprog_attendance', ['itemid' => $item->id]);
             $DB->delete_records('tool_muprog_evidence', ['itemid' => $item->id]);
             $DB->delete_records('tool_muprog_completion', ['itemid' => $item->id]);
             $DB->delete_records('tool_muprog_prerequisite', ['itemid' => $item->id]);

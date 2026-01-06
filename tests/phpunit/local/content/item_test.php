@@ -44,6 +44,7 @@ final class item_test extends \advanced_testcase {
             'top' => 'Program',
             'set' => 'Set',
             'course' => 'Course',
+            'attendance' => 'Offline attendance',
             'credits' => 'Credits',
         ], item::get_types());
     }
