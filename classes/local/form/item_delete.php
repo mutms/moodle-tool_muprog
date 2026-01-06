@@ -19,6 +19,7 @@
 namespace tool_muprog\local\form;
 
 use tool_muprog\local\content\course;
+use tool_muprog\local\content\attendance;
 use tool_muprog\local\content\credits;
 
 /**
@@ -46,6 +47,8 @@ final class item_delete extends \tool_mulib\local\ajax_form {
 
         if ($item instanceof course) {
             $deletestr = get_string('deletecourse', 'tool_muprog');
+        } else if ($item instanceof attendance) {
+            $deletestr = get_string('deleteattendance', 'tool_muprog');
         } else if ($item instanceof credits) {
             $deletestr = get_string('deletecredits', 'tool_muprog');
         } else {

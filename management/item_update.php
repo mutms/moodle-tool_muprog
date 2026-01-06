@@ -32,6 +32,7 @@ use tool_muprog\local\program;
 use core\url;
 use tool_muprog\local\content\set;
 use tool_muprog\local\content\course;
+use tool_muprog\local\content\attendance;
 use tool_muprog\local\content\credits;
 
 define('AJAX_SCRIPT', true);
@@ -57,7 +58,7 @@ $PAGE->set_url('/admin/tool/muprog/management/item_update.php', ['id' => $record
 $returnurl = new url('/admin/tool/muprog/management/program_content.php', ['id' => $program->id]);
 
 $top = program::load_content($program->id);
-/** @var set|course|credits $item */
+/** @var set|course|attendance|credits $item */
 $item = $top->find_item($record->id);
 
 $type = $item::get_type();
@@ -65,6 +66,8 @@ if ($type === 'set' || $type === 'top') {
     $form = new tool_muprog\local\form\item_update_set(null, ['set' => $item, 'context' => $context]);
 } else if ($type === 'course') {
     $form = new tool_muprog\local\form\item_update_course(null, ['course' => $item, 'context' => $context]);
+} else if ($type === 'attendance') {
+    $form = new tool_muprog\local\form\item_update_attendance(null, ['attendance' => $item, 'context' => $context]);
 } else if ($type === 'credits') {
     $form = new tool_muprog\local\form\item_update_credits(null, ['credits' => $item, 'context' => $context]);
 } else {
@@ -80,6 +83,8 @@ if ($data = $form->get_data()) {
         $top->update_set($item, (array)$data);
     } else if ($type === 'course') {
         $top->update_course($item, (array)$data);
+    } else if ($type === 'attendance') {
+        $top->update_attendance($item, (array)$data);
     } else if ($type === 'credits') {
         $top->update_credits($item, (array)$data);
     }

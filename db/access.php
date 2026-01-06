@@ -124,6 +124,16 @@ $capabilities = [
         ],
     ],
 
+    /* Take offline attendance. */
+    'tool/muprog:takeattendance' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSECAT,
+        'archetypes' => [
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+        ],
+    ],
+
     /* Add, update and delete other evidence of completion. */
     'tool/muprog:manageevidence' => [
         'captype' => 'write',

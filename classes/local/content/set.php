@@ -166,6 +166,8 @@ class set extends item {
                 unset($unusedrecords[$childitemid]);
                 if ($childrecord->type === 'course') {
                     $child = course::init_from_record($childrecord, $previous, $unusedrecords, $prerequisites);
+                } else if ($childrecord->type === 'attendance') {
+                    $child = attendance::init_from_record($childrecord, $previous, $unusedrecords, $prerequisites);
                 } else if ($childrecord->type === 'credits') {
                     $child = credits::init_from_record($childrecord, $previous, $unusedrecords, $prerequisites);
                 } else if ($childrecord->type === 'set') {

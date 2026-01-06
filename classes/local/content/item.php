@@ -87,6 +87,7 @@ abstract class item {
             top::get_type() => top::get_type_name(),
             set::get_type() => set::get_type_name(),
             course::get_type() => course::get_type_name(),
+            attendance::get_type() => attendance::get_type_name(),
             credits::get_type() => credits::get_type_name(),
         ];
     }
@@ -242,8 +243,17 @@ abstract class item {
      *
      * @return bool
      */
+    final public function is_attendance(): bool {
+        return ($this instanceof attendance);
+    }
+
+    /**
+     * Is this a credits item?
+     *
+     * @return bool
+     */
     final public function is_set(): bool {
-        return ($this instanceof set || $this instanceof top);
+        return ($this instanceof set);
     }
 
     /**

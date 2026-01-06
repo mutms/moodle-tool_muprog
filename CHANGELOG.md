@@ -6,6 +6,11 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 
 ## [Unreleased]
 
+### Added
+
+- New "Offline attendance" program item type
+- Added "Course completion" into "Completion type" column in program progress tables
+
 ### Changed
 
 - "Course set" is now called "Set" because programs may contain other item types
@@ -14,7 +19,10 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 
 ### Fixed
 
+- Fixed filtering by program name in reports
+- Added missing indication of delayed completions
 - Fixed result overflow detection in ajax autocomplete form fields
+- Fixed program item behat generators
 
 ## [mu-5.0.4-03] - 2025-12-31
 

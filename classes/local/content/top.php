@@ -37,6 +37,9 @@ final class top extends set {
     /** @var course[] list of orphaned courses in program */
     protected $orphanedcourses = [];
 
+    /** @var attendance[] list of orphaned attendances in program */
+    protected $orphanedattendances = [];
+
     /** @var credits[] list of orphaned credits in program */
     protected $orphanedcredits = [];
 
@@ -107,6 +110,7 @@ final class top extends set {
         if (!$toprecord) {
             throw new \coding_exception('Missing top program item');
         }
+        /** @var top $top */
         $top = self::init_from_record($toprecord, null, $records, $prerequisites);
 
         if ($records) {
@@ -123,6 +127,13 @@ final class top extends set {
                         $top->problemdetected = true;
                     }
                     $top->orphanedcourses[$orphan->id] = $orphan;
+                } else if ($record->type === 'attendance') {
+                    $fakerecords = [];
+                    $orphan = attendance::init_from_record($record, $top, $fakerecords, $prerequisites);
+                    if ($orphan->problemdetected) {
+                        $top->problemdetected = true;
+                    }
+                    $top->orphanedattendances[$orphan->id] = $orphan;
                 } else if ($record->type === 'credits') {
                     $fakerecords = [];
                     $orphan = credits::init_from_record($record, $top, $fakerecords, $prerequisites);
@@ -162,6 +173,15 @@ final class top extends set {
     }
 
     /**
+     * Returns list of program attendances that are not correctly linked to any valid set.
+     *
+     * @return credits[]
+     */
+    public function get_orphaned_attendances(): array {
+        return $this->orphanedattendances;
+    }
+
+    /**
      * Returns list of program credits that are not correctly linked to any valid set.
      *
      * @return credits[]
@@ -188,6 +208,9 @@ final class top extends set {
     public function find_orphaned_item(int $itemid): ?item {
         if (isset($this->orphanedcourses[$itemid])) {
             return $this->orphanedcourses[$itemid];
+        }
+        if (isset($this->orphanedattendances[$itemid])) {
+            return $this->orphanedattendances[$itemid];
         }
         if (isset($this->orphanedcredits[$itemid])) {
             return $this->orphanedcredits[$itemid];
@@ -269,6 +292,81 @@ final class top extends set {
         $fakeprerequisites = [];
         /** @var course $item */
         $item = course::init_from_record((object)$record, null, $fakerecords, $fakeprerequisites);
+
+        $trans = $DB->start_delegated_transaction();
+        $item->id = (string)$DB->insert_record('tool_muprog_item', (object)$item->get_record());
+        $parent->add_child($item);
+        $DB->update_record('tool_muprog_item', (object)$parent->get_record());
+
+        $this->fix_content();
+
+        \tool_muprog\event\program_updated::create_from_program($program, 'item_append', $item->id)->trigger();
+
+        $trans->allow_commit();
+
+        // Do not use transactions for enrolments, we can always fix them later.
+        allocation::fix_enrol_instances($this->programid);
+        allocation::fix_user_enrolments($this->programid, null);
+
+        return $item;
+    }
+
+    /**
+     * Add new attendance item to given parent set.
+     *
+     * @param set $parent
+     * @param array $data
+     * @return attendance
+     */
+    public function append_attendance(set $parent, array $data = []): attendance {
+        global $DB;
+
+        if ($parent->programid != $this->programid) {
+            throw new \coding_exception('invalid programid');
+        }
+        $program = $DB->get_record('tool_muprog_program', ['id' => $this->programid], '*', MUST_EXIST);
+        if (isset($this->orphanedsets[$parent->id])) {
+            throw new \coding_exception('orphaned set cannot be modified');
+        }
+
+        $fullname = $data['fullname'] ?? '';
+        if (trim($fullname) === '') {
+            throw new \invalid_parameter_exception('Fullname is required');
+        }
+
+        if (array_key_exists('points', $data)) {
+            if ($data['points'] < 0) {
+                throw new \invalid_parameter_exception('Points cannot be negative');
+            }
+            $points = (string)(int)$data['points'];
+        } else {
+            $points = '1';
+        }
+
+        $completiondelay = $data['completiondelay'] ?? 0;
+        if ($completiondelay < 0) {
+            throw new \invalid_parameter_exception('Completion delay cannot be negative');
+        }
+
+        $record = [
+            'id' => null,
+            'programid' => (string)$this->programid,
+            'type' => 'attendance',
+            'topitem' => null,
+            'courseid' => null,
+            'creditframeworkid' => null,
+            'previtemid' => null,
+            'fullname' => $fullname,
+            'sequencejson' => util::json_encode([]),
+            'minprerequisites' => null,
+            'points' => $points,
+            'minpoints' => null,
+            'completiondelay' => (string)$completiondelay,
+        ];
+        $fakerecords = [];
+        $fakeprerequisites = [];
+        /** @var attendance $item */
+        $item = attendance::init_from_record((object)$record, null, $fakerecords, $fakeprerequisites);
 
         $trans = $DB->start_delegated_transaction();
         $item->id = (string)$DB->insert_record('tool_muprog_item', (object)$item->get_record());
@@ -600,6 +698,60 @@ final class top extends set {
     }
 
     /**
+     * Update attendance item.
+     *
+     * @param attendance $attendance
+     * @param array $data
+     * @return attendance
+     */
+    public function update_attendance(attendance $attendance, array $data): attendance {
+        global $DB;
+
+        if ($attendance->programid != $this->programid) {
+            throw new \coding_exception('invalid programid');
+        }
+        $program = $DB->get_record('tool_muprog_program', ['id' => $this->programid], '*', MUST_EXIST);
+
+        if (array_key_exists('fullname', $data)) {
+            if ($attendance->get_id() != $this->id) {
+                $attendance->fullname = $data['fullname'];
+            }
+        }
+
+        if (!array_key_exists('points', $data)) {
+            return $attendance;
+        }
+
+        if ($data['points'] < 0) {
+            throw new \invalid_parameter_exception('Points cannot be negative');
+        }
+
+        $attendance->points = (string)(int)$data['points'];
+
+        if (array_key_exists('completiondelay', $data)) {
+            if ($data['completiondelay'] < 0) {
+                throw new \invalid_parameter_exception('Completion delay cannot be negative');
+            }
+            $attendance->completiondelay = (int)$data['completiondelay'];
+        }
+
+        $trans = $DB->start_delegated_transaction();
+        $DB->update_record('tool_muprog_item', (object)$attendance->get_record());
+
+        $this->fix_content();
+
+        \tool_muprog\event\program_updated::create_from_program($program, 'item_update', $attendance->id)->trigger();
+
+        $trans->allow_commit();
+
+        // Do not use transactions for enrolments, we can always fix them later.
+        allocation::fix_enrol_instances($this->programid);
+        allocation::fix_user_enrolments($this->programid, null);
+
+        return $attendance;
+    }
+
+    /**
      * Update credits item.
      *
      * @param credits $credits
@@ -794,6 +946,8 @@ final class top extends set {
             $parent = null;
             if ($item instanceof course) {
                 unset($this->orphanedcourses[$item->get_id()]);
+            } else if ($item instanceof attendance) {
+                unset($this->orphanedattendances[$item->get_id()]);
             } else if ($item instanceof credits) {
                 unset($this->orphanedcredits[$item->get_id()]);
             } else {
@@ -816,6 +970,7 @@ final class top extends set {
             $parent->remove_chid($itemid);
             $DB->update_record('tool_muprog_item', (object)$parent->get_record());
         }
+        $DB->delete_records('tool_muprog_attendance', ['itemid' => $itemid]);
         $DB->delete_records('tool_muprog_evidence', ['itemid' => $itemid]);
         $DB->delete_records('tool_muprog_completion', ['itemid' => $itemid]);
         $DB->delete_records('tool_muprog_item', ['id' => $itemid]);
@@ -874,6 +1029,12 @@ final class top extends set {
                     }
                 }
                 $top->append_course($newparent, $item->get_courseid(), [
+                    'points' => $item->get_points(),
+                    'completiondelay' => $item->get_completiondelay(),
+                ]);
+            } else if ($item instanceof attendance) {
+                $top->append_attendance($newparent, [
+                    'fullname' => $item->get_fullname(),
                     'points' => $item->get_points(),
                     'completiondelay' => $item->get_completiondelay(),
                 ]);
@@ -937,6 +1098,9 @@ final class top extends set {
         $saveclosure($this);
 
         foreach ($this->get_orphaned_courses() as $item) {
+            $saveclosure($item);
+        }
+        foreach ($this->get_orphaned_attendances() as $item) {
             $saveclosure($item);
         }
         foreach ($this->get_orphaned_credits() as $item) {

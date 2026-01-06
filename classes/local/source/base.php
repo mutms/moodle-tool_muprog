@@ -765,6 +765,7 @@ abstract class base {
 
         $items = $DB->get_records('tool_muprog_item', ['programid' => $allocation->programid]);
         foreach ($items as $item) {
+            $DB->delete_records('tool_muprog_attendance', ['itemid' => $item->id, 'userid' => $allocation->userid]);
             $DB->delete_records('tool_muprog_evidence', ['itemid' => $item->id, 'userid' => $allocation->userid]);
             $DB->delete_records('tool_muprog_completion', ['itemid' => $item->id, 'allocationid' => $allocation->id]);
         }

@@ -26,6 +26,7 @@ use tool_muprog\local\content\item,
     tool_muprog\local\content\top,
     tool_muprog\local\content\set,
     tool_muprog\local\content\course,
+    tool_muprog\local\content\attendance,
     tool_muprog\local\content\credits;
 use stdClass, moodle_url;
 
@@ -165,6 +166,14 @@ class renderer extends \plugin_renderer_base {
 
             if ($item instanceof set) {
                 $completiontype = $item->get_sequencetype_info();
+            } else if ($item instanceof course) {
+                $completiontype = get_string('coursecompletion');
+            } else if ($item instanceof attendance) {
+                $completiontype = get_string('attendance', 'tool_muprog');
+                $attendance = $DB->get_record('tool_muprog_attendance', ['itemid' => $item->get_id(), 'userid' => $allocation->userid]);
+                if ($attendance && $attendance->status) {
+                    $completiontype .= ': ' . attendance::get_statuses()[$attendance->status];
+                }
             } else if ($item instanceof credits) {
                 $completiontype = $item->get_current_credits($allocation);
             } else {
@@ -203,6 +212,8 @@ class renderer extends \plugin_renderer_base {
                 $itemname = $this->output->pix_icon('itemtop', get_string('program', 'tool_muprog'), 'tool_muprog') . '&nbsp;' . $fullname;
             } else if ($item instanceof course) {
                 $itemname = $padding . $this->output->pix_icon('itemcourse', get_string('course'), 'tool_muprog') . $fullname;
+            } else if ($item instanceof attendance) {
+                $itemname = $padding . $this->output->pix_icon('itemattendance', get_string('attendance', 'tool_muprog'), 'tool_muprog') . $fullname;
             } else if ($item instanceof credits) {
                 $itemname = $padding . $this->output->pix_icon('itemcredits', get_string('credits', 'tool_muprog'), 'tool_muprog') . $fullname;
             } else {
