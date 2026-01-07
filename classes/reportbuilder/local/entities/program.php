@@ -278,7 +278,7 @@ final class program extends base {
             'fullname',
             new lang_string('programname', 'tool_muprog'),
             $this->get_entity_name(),
-            "{$programalias}.name"
+            "{$programalias}.fullname"
         ))
             ->add_joins($this->get_joins());
 
