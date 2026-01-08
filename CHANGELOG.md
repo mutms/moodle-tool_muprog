@@ -10,12 +10,15 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 
 - New "Offline attendance" program item type
 - Added "Course completion" into "Completion type" column in program progress tables
+- Added web service for archiving and restoring of program allocations
 
 ### Changed
 
 - "Course set" is now called "Set" because programs may contain other item types
 - Reworked adding of program items to allow addition of new item types
 - New column "type" was added to "tool_muprog_item" database table
+- Changed web services results to use "deletepossible" and "editpossible" property names
+- Other backwards compatible web services API and implementation tidy-up
 
 ### Fixed
 
@@ -23,6 +26,9 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 - Added missing indication of delayed completions
 - Fixed result overflow detection in ajax autocomplete form fields
 - Fixed program item behat generators
+- Internal allocation source data was removed from web services
+- Web service delete_program_allocations was fixed to use tool/muprog:deallocate capability
+- Fixed incorrect is_allocation_archive_possible() and is_allocation_restore_possible() methods in allocation sources
 
 ## [mu-4.5.8-03] - 2025-12-31
 

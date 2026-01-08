@@ -89,18 +89,6 @@ final class manual extends base {
     }
 
     /**
-     * Is it possible to manually archive and unarchive user allocation?
-     *
-     * @param stdClass $program
-     * @param stdClass $source
-     * @param stdClass $allocation
-     * @return bool
-     */
-    public static function is_allocation_archive_possible(stdClass $program, stdClass $source, stdClass $allocation): bool {
-        return true;
-    }
-
-    /**
      * Is it possible to manually delete user allocation?
      *
      * @param stdClass $program

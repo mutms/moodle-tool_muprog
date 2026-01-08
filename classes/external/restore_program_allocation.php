@@ -27,15 +27,13 @@ use core_external\external_single_structure;
 use core\exception\invalid_parameter_exception;
 
 /**
- * Updates the allocation for the given userid and program id.
+ * Restores the allocation for the given userid and program id.
  *
  * @package     tool_muprog
- * @copyright   2023 Open LMS (https://www.openlms.net/)
- * @copyright   2025 Petr Skoda
- * @author      Farhan Karmali
+ * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class update_program_allocation extends external_api {
+final class restore_program_allocation extends external_api {
     /**
      * Describes the external function arguments.
      *
@@ -45,32 +43,24 @@ final class update_program_allocation extends external_api {
         return new external_function_parameters([
             'programid' => new external_value(PARAM_INT, 'Program id'),
             'userid' => new external_value(PARAM_INT, 'User id'),
-            'allocationdates' => new external_single_structure([
-                'timestart' => new external_value(PARAM_INT, 'time start', VALUE_OPTIONAL),
-                'timedue' => new external_value(PARAM_INT, 'time due', VALUE_OPTIONAL),
-                'timeend' => new external_value(PARAM_INT, 'time start', VALUE_OPTIONAL),
-            ], 'Array of updates for timestart, timedue, timeend can be passed as unix timestamps', VALUE_DEFAULT, []),
         ]);
     }
 
     /**
-     * Updates the allocation for the given userid and programid.
+     * Restores the allocation for the given userid and programid.
      *
      * @param int $programid Program id.
      * @param int $userid User id.
-     * @param array $allocationdates optional allocation dates.
      * @return \stdClass
      */
-    public static function execute(int $programid, int $userid, array $allocationdates = []): \stdClass {
+    public static function execute(int $programid, int $userid): \stdClass {
         global $DB;
         [
             'programid' => $programid,
             'userid' => $userid,
-            'allocationdates' => $allocationdates,
         ] = self::validate_parameters(self::execute_parameters(), [
             'programid' => $programid,
             'userid' => $userid,
-            'allocationdates' => $allocationdates,
         ]);
 
         $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
@@ -79,7 +69,7 @@ final class update_program_allocation extends external_api {
         // Validate context.
         $context = \context::instance_by_id($program->contextid);
         self::validate_context($context);
-        require_capability('tool/muprog:admin', $context);
+        require_capability('tool/muprog:allocate', $context);
 
         $allocation = $DB->get_record(
             'tool_muprog_allocation',
@@ -94,26 +84,11 @@ final class update_program_allocation extends external_api {
             throw new invalid_parameter_exception('Invalid allocation data');
         }
 
-        if (!$sourceclass::is_allocation_update_possible($program, $source, $allocation)) {
-            throw new invalid_parameter_exception('Allocation data cannot be updated');
+        if (!$sourceclass::is_allocation_restore_possible($program, $source, $allocation)) {
+            throw new invalid_parameter_exception('Allocation cannot be restored');
         }
 
-        foreach ($allocationdates as $name => $value) {
-            if ($name !== 'timestart' && $name !== 'timedue' && $name !== 'timeend') {
-                throw new invalid_parameter_exception('Invalid date type');
-            }
-            $allocation->$name = $value;
-        }
-        $errors = allocation::validate_allocation_dates(
-            $allocation->timestart,
-            $allocation->timedue,
-            $allocation->timeend
-        );
-        if ($errors) {
-            throw new invalid_parameter_exception('Allocation dates are invalid:' . implode($errors));
-        }
-
-        $allocation = \tool_muprog\local\source\base::allocation_update($allocation);
+        $allocation = \tool_muprog\local\source\base::allocation_restore($allocation->id);
 
         $allocation->sourcetype = $source->type;
         $allocation->deletepossible = $sourceclass::is_allocation_delete_possible($program, $source, $allocation);
@@ -133,24 +108,6 @@ final class update_program_allocation extends external_api {
      * @return external_single_structure
      */
     public static function execute_returns(): external_single_structure {
-        // NOTE: This is reused from all other methods that return allocation info.
-        return new external_single_structure([
-            'id' => new external_value(PARAM_INT, 'Program allocation id'),
-            'programid' => new external_value(PARAM_INT, 'Program id'),
-            'userid' => new external_value(PARAM_INT, 'User id'),
-            'sourceid' => new external_value(PARAM_INT, 'Allocation source id'),
-            'sourcetype' => new external_value(PARAM_ALPHANUMEXT, 'Internal source name'),
-            'archived' => new external_value(PARAM_BOOL, 'Indicates allocation is archived'),
-            'timeallocated' => new external_value(PARAM_INT, 'Allocation date'),
-            'timestart' => new external_value(PARAM_INT, 'Allocation start date'),
-            'timedue' => new external_value(PARAM_INT, 'Allocation due date'),
-            'timeend' => new external_value(PARAM_INT, 'Allocation end date'),
-            'timecompleted' => new external_value(PARAM_INT, 'Allocation completed date'),
-            'timecreated' => new external_value(PARAM_INT, 'Allocation created date'),
-            'deletepossible' => new external_value(PARAM_BOOL, 'Flag to indicate if delete is supported'),
-            'archivepossible' => new external_value(PARAM_BOOL, 'Flag to indicate if archiving is possible'),
-            'restorepossible' => new external_value(PARAM_BOOL, 'Flag to indicate if restoring is possible'),
-            'editpossible' => new external_value(PARAM_BOOL, 'Flag to indicate if edit is supported'),
-        ], 'Details of the program allocation');
+        return update_program_allocation::execute_returns();
     }
 }
