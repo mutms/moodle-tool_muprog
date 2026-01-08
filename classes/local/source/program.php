@@ -84,16 +84,6 @@ final class program extends base {
         return $result;
     }
 
-    #[\Override]
-    public static function is_allocation_archive_possible(stdClass $program, stdClass $source, stdClass $allocation): bool {
-        return true;
-    }
-
-    #[\Override]
-    public static function is_allocation_restore_possible(stdClass $program, stdClass $source, stdClass $allocation): bool {
-        return true;
-    }
-
     /**
      * Is it possible to manually delete user allocation?
      *
