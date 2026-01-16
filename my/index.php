@@ -40,20 +40,20 @@ $usercontext = context_user::instance($USER->id);
 $PAGE->set_context($usercontext);
 
 if (!\tool_mulib\local\mulib::is_muprog_active()) {
-    redirect(new moodle_url('/'));
+    redirect(new core\url('/'));
 }
 if (isguestuser()) {
-    redirect(new moodle_url('/admin/tool/muprog/catalogue/index.php'));
+    redirect(new core\url('/admin/tool/muprog/catalogue/index.php'));
 }
 
-$currenturl = new moodle_url('/admin/tool/muprog/my/index.php');
+$currenturl = new core\url('/admin/tool/muprog/my/index.php');
 
 $title = get_string('myprograms', 'tool_muprog');
 $PAGE->navigation->extend_for_user($USER);
 $PAGE->set_title($title);
 $PAGE->set_url($currenturl);
 $PAGE->set_pagelayout('report');
-$PAGE->navbar->add(get_string('profile'), new moodle_url('/user/profile.php', ['id' => $USER->id]));
+$PAGE->navbar->add(get_string('profile'), new core\url('/user/profile.php', ['id' => $USER->id]));
 $PAGE->navbar->add($title);
 
 $actions = new \tool_mulib\output\header_actions(get_string('program_actions', 'tool_muprog'));

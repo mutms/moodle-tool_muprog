@@ -170,7 +170,7 @@ final class selfallocation extends base {
             }
         }
 
-        $url = new \moodle_url('/admin/tool/muprog/catalogue/source_selfallocation.php', ['sourceid' => $source->id]);
+        $url = new \core\url('/admin/tool/muprog/catalogue/source_selfallocation.php', ['sourceid' => $source->id]);
         $button = new \tool_mulib\output\ajax_form\button($url, get_string('source_selfallocation_allocate', 'tool_muprog'));
 
         $button = $OUTPUT->render($button);

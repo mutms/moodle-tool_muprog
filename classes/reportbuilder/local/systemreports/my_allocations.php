@@ -27,7 +27,6 @@ use core_reportbuilder\system_report;
 use core_reportbuilder\local\helpers\database;
 use core_reportbuilder\local\helpers\user_profile_fields;
 use lang_string;
-use moodle_url;
 
 /**
  * Embedded My programs report.
@@ -111,7 +110,7 @@ final class my_allocations extends system_report {
                     return '';
                 }
                 $value = format_string($value);
-                $url = new \moodle_url('/admin/tool/muprog/my/program.php', ['id' => $row->id]);
+                $url = new \core\url('/admin/tool/muprog/my/program.php', ['id' => $row->id]);
                 return \html_writer::link($url, $value);
             });
         $this->add_column($column);

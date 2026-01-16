@@ -630,12 +630,12 @@ final class catalogue_test extends \advanced_testcase {
 
         $program2 = $generator->create_program(['archived' => 0]);
         $this->setUser(get_admin());
-        $expected = new \moodle_url('/admin/tool/muprog/catalogue/index.php');
+        $expected = new \core\url('/admin/tool/muprog/catalogue/index.php');
         $this->assertSame((string)$expected, (string)\tool_muprog\local\catalogue::get_catalogue_url());
 
         $viewer = $this->getDataGenerator()->create_user();
         $this->setUser($viewer);
-        $expected = new \moodle_url('/admin/tool/muprog/catalogue/index.php');
+        $expected = new \core\url('/admin/tool/muprog/catalogue/index.php');
         $this->assertSame((string)$expected, (string)\tool_muprog\local\catalogue::get_catalogue_url());
 
         $syscontext = \context_system::instance();

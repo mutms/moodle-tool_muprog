@@ -51,7 +51,7 @@ $user = $DB->get_record('user', ['id' => $allocation->userid, 'deleted' => 0], '
 $PAGE->set_context($context);
 $PAGE->set_url('/admin/tool/muprog/management/item_attendance_take.php', ['itemid' => $item->id, 'userid' => $user->id]);
 
-$returnurl = new moodle_url('/admin/tool/muprog/management/allocation.php', ['id' => $allocation->id]);
+$returnurl = new core\url('/admin/tool/muprog/management/allocation.php', ['id' => $allocation->id]);
 
 if ($program->archived || $allocation->archived) {
     redirect($returnurl);
