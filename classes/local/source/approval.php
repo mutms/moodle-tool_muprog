@@ -135,7 +135,7 @@ final class approval extends base {
             }
         }
 
-        $url = new \moodle_url('/admin/tool/muprog/catalogue/source_approval_request.php', ['sourceid' => $source->id]);
+        $url = new \core\url('/admin/tool/muprog/catalogue/source_approval_request.php', ['sourceid' => $source->id]);
         $button = new \tool_mulib\output\ajax_form\button($url, get_string('source_approval_makerequest', 'tool_muprog'));
 
         $button = $OUTPUT->render($button);
@@ -156,7 +156,7 @@ final class approval extends base {
         global $DB;
 
         if ($DB->record_exists('tool_muprog_source', ['programid' => $program->id, 'type' => 'approval'])) {
-            $url = new \moodle_url('/admin/tool/muprog/management/source_approval_requests.php', ['id' => $program->id]);
+            $url = new \core\url('/admin/tool/muprog/management/source_approval_requests.php', ['id' => $program->id]);
             $secondary->add(get_string('source_approval_requests', 'tool_muprog'), $url, \navigation_node::TYPE_SETTING, null, 'program_approval_requests');
         }
     }
@@ -246,8 +246,8 @@ final class approval extends base {
             $a->user_lastname = s($user->lastname);
             $a->program_fullname = format_string($program->fullname);
             $a->program_idnumber = s($program->idnumber);
-            $a->program_url = (new \moodle_url('/admin/tool/muprog/catalogue/program.php', ['id' => $program->id]))->out(false);
-            $a->requests_url = (new \moodle_url('/admin/tool/muprog/management/source_approval_requests.php', ['id' => $program->id]))->out(false);
+            $a->program_url = (new \core\url('/admin/tool/muprog/catalogue/program.php', ['id' => $program->id]))->out(false);
+            $a->requests_url = (new \core\url('/admin/tool/muprog/management/source_approval_requests.php', ['id' => $program->id]))->out(false);
 
             $subject = get_string('source_approval_notification_approval_request_subject', 'tool_muprog', $a);
             $body = get_string('source_approval_notification_approval_request_body', 'tool_muprog', $a);
@@ -353,7 +353,7 @@ final class approval extends base {
         $a->user_lastname = s($user->lastname);
         $a->program_fullname = format_string($program->fullname);
         $a->program_idnumber = s($program->idnumber);
-        $a->program_url = (new \moodle_url('/admin/tool/muprog/catalogue/program.php', ['id' => $program->id]))->out(false);
+        $a->program_url = (new \core\url('/admin/tool/muprog/catalogue/program.php', ['id' => $program->id]))->out(false);
         $a->reason = $reason;
 
         $subject = get_string('source_approval_notification_approval_reject_subject', 'tool_muprog', $a);

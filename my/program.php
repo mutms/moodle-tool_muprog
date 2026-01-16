@@ -44,13 +44,13 @@ require_login();
 
 $usercontext = context_user::instance($USER->id);
 $PAGE->set_context($usercontext);
-$PAGE->set_url(new moodle_url('/admin/tool/muprog/my/program.php', ['id' => $id]));
+$PAGE->set_url(new core\url('/admin/tool/muprog/my/program.php', ['id' => $id]));
 
 if (!\tool_mulib\local\mulib::is_muprog_active()) {
-    redirect(new moodle_url('/'));
+    redirect(new core\url('/'));
 }
 if (isguestuser()) {
-    redirect(new moodle_url('/admin/tool/muprog/catalogue/program.php', ['id' => $id]));
+    redirect(new core\url('/admin/tool/muprog/catalogue/program.php', ['id' => $id]));
 }
 
 $program = $DB->get_record('tool_muprog_program', ['id' => $id]);
@@ -62,12 +62,12 @@ if (!$program || $program->archived) {
     }
     if (has_capability('tool/muprog:view', $context)) {
         if ($program) {
-            redirect(new moodle_url('/admin/tool/muprog/management/program.php', ['id' => $program->id]));
+            redirect(new core\url('/admin/tool/muprog/management/program.php', ['id' => $program->id]));
         } else {
-            redirect(new moodle_url('/admin/tool/muprog/management/index.php'));
+            redirect(new core\url('/admin/tool/muprog/management/index.php'));
         }
     } else {
-        redirect(new moodle_url('/admin/tool/muprog/catalogue/index.php'));
+        redirect(new core\url('/admin/tool/muprog/catalogue/index.php'));
     }
 }
 $programcontext = context::instance_by_id($program->contextid);
@@ -82,12 +82,12 @@ if ($allocation && !$allocation->archived) {
 }
 if (!$allocation || $allocation->archived) {
     if (\tool_muprog\local\catalogue::is_program_visible($program)) {
-        redirect(new moodle_url('/admin/tool/muprog/catalogue/program.php', ['id' => $id]));
+        redirect(new core\url('/admin/tool/muprog/catalogue/program.php', ['id' => $id]));
     } else {
         if (has_capability('tool/muprog:view', $programcontext)) {
-            redirect(new moodle_url('/admin/tool/muprog/management/program.php', ['id' => $program->id]));
+            redirect(new core\url('/admin/tool/muprog/management/program.php', ['id' => $program->id]));
         } else {
-            redirect(new moodle_url('/admin/tool/muprog/catalogue/index.php'));
+            redirect(new core\url('/admin/tool/muprog/catalogue/index.php'));
         }
     }
 }
@@ -97,14 +97,14 @@ $title = get_string('myprograms', 'tool_muprog');
 $PAGE->navigation->extend_for_user($USER);
 $PAGE->set_title($title);
 $PAGE->set_pagelayout('report');
-$PAGE->navbar->add(get_string('profile'), new moodle_url('/user/profile.php', ['id' => $USER->id]));
-$PAGE->navbar->add($title, new moodle_url('/admin/tool/muprog/my/index.php'));
+$PAGE->navbar->add(get_string('profile'), new core\url('/user/profile.php', ['id' => $USER->id]));
+$PAGE->navbar->add($title, new core\url('/admin/tool/muprog/my/index.php'));
 $PAGE->navbar->add(format_string($program->fullname));
 
 $actions = new \tool_mulib\output\header_actions(get_string('program_actions', 'tool_muprog'));
 
 if (has_capability('tool/muprog:view', $programcontext)) {
-    $manageurl = new moodle_url('/admin/tool/muprog/management/program.php', ['id' => $program->id]);
+    $manageurl = new core\url('/admin/tool/muprog/management/program.php', ['id' => $program->id]);
     $actions->get_dropdown()->add_item(get_string('management', 'tool_muprog'), $manageurl);
 }
 

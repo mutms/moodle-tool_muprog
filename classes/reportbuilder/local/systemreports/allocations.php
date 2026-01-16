@@ -27,7 +27,7 @@ use core_reportbuilder\system_report;
 use core_reportbuilder\local\helpers\database;
 use core_reportbuilder\local\helpers\user_profile_fields;
 use lang_string;
-use moodle_url;
+use core\url;
 
 /**
  * Embedded program allocations report.
@@ -108,7 +108,7 @@ final class allocations extends system_report {
         $column
             ->add_fields("$allocationalias.id")
             ->add_callback(static function (string $fullname, \stdClass $row): string {
-                $url = new \moodle_url('/admin/tool/muprog/management/allocation.php', ['id' => $row->id]);
+                $url = new \core\url('/admin/tool/muprog/management/allocation.php', ['id' => $row->id]);
                 return \html_writer::link($url, $fullname);
             });
         $this->add_column($column);
@@ -181,7 +181,7 @@ final class allocations extends system_report {
 
         $program = $this->program;
 
-        $url = new moodle_url('/admin/tool/muprog/management/allocation_update.php', ['id' => ':id']);
+        $url = new url('/admin/tool/muprog/management/allocation_update.php', ['id' => ':id']);
         $link = new \tool_mulib\output\ajax_form\link($url, new lang_string('allocation_update', 'tool_muprog'), 'i/settings');
         $this->add_action($link->create_report_action()
             ->add_callback(static function (\stdclass $row) use ($program): bool {
@@ -207,7 +207,7 @@ final class allocations extends system_report {
                 return $sourceclass::is_allocation_update_possible($program, $source, $allocation);
             }));
 
-        $url = new moodle_url('/admin/tool/muprog/management/allocation_delete.php', ['id' => ':id']);
+        $url = new url('/admin/tool/muprog/management/allocation_delete.php', ['id' => ':id']);
         $link = new \tool_mulib\output\ajax_form\link($url, new lang_string('deleteallocation', 'tool_muprog'), 'i/delete');
         $this->add_action($link->create_report_action(['class' => 'text-danger'])
             ->add_callback(static function (\stdclass $row) use ($program): bool {

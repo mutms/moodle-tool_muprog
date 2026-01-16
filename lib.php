@@ -112,7 +112,7 @@ function tool_muprog_core_calendar_provide_event_action(
 
     return $factory->create_instance(
         get_string('view'),
-        new \moodle_url('/admin/tool/muprog/my/program.php', ['id' => $allocation->programid]),
+        new core\url('/admin/tool/muprog/my/program.php', ['id' => $allocation->programid]),
         1,
         true
     );
@@ -135,7 +135,7 @@ function tool_muprog_myprofile_navigation(core_user\output\myprofile\tree $tree,
 
     if ($USER->id == $user->id) {
         $link = get_string('myprograms', 'tool_muprog');
-        $url = new moodle_url('/admin/tool/muprog/my/index.php');
+        $url = new core\url('/admin/tool/muprog/my/index.php');
         $node = new core_user\output\myprofile\node('miscellaneous', 'muprog_programs', $link, null, $url);
         $tree->add_node($node);
     }
@@ -215,7 +215,7 @@ function tool_muprog_extend_navigation_category_settings($navigation, $coursecat
     // NOTE: catnav is added to unbreak breadcrums on management pages.
     $settingsnode = navigation_node::create(
         get_string('programs', 'tool_muprog'),
-        new moodle_url('/admin/tool/muprog/management/index.php', ['contextid' => $coursecategorycontext->id, 'catnav' => 1]),
+        new core\url('/admin/tool/muprog/management/index.php', ['contextid' => $coursecategorycontext->id, 'catnav' => 1]),
         navigation_node::TYPE_CUSTOM,
         null,
         'tool_muprog_programs'

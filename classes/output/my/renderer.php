@@ -28,7 +28,7 @@ use tool_muprog\local\content\item,
     tool_muprog\local\content\course,
     tool_muprog\local\content\attendance,
     tool_muprog\local\content\credits;
-use stdClass, moodle_url;
+use stdClass, core\url;
 
 /**
  * Program catalogue renderer.
@@ -200,7 +200,7 @@ class renderer extends \plugin_renderer_base {
                         }
                     }
                     if ($canaccesscourse) {
-                        $detailurl = new \moodle_url('/course/view.php', ['id' => $courseid]);
+                        $detailurl = new \core\url('/course/view.php', ['id' => $courseid]);
                         $fullname = \html_writer::link($detailurl, $fullname);
                     }
                 } else {
@@ -281,7 +281,7 @@ class renderer extends \plugin_renderer_base {
 
             $program = $DB->get_record('tool_muprog_program', ['id' => $allocation->programid]);
             $fullname = $programicon . format_string($program->fullname);
-            $detailurl = new moodle_url('/admin/tool/muprog/catalogue/program.php', ['id' => $program->id]);
+            $detailurl = new url('/admin/tool/muprog/catalogue/program.php', ['id' => $program->id]);
             $fullname = \html_writer::link($detailurl, $fullname);
             $row[] = $fullname;
 

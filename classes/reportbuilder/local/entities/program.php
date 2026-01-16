@@ -116,7 +116,7 @@ final class program extends base {
                 $context = \context::instance_by_id($row->contextid);
                 $name = format_string($row->fullname);
                 if (has_capability('tool/muprog:view', $context)) {
-                    $url = new \moodle_url('/admin/tool/muprog/management/program.php', ['id' => $row->id]);
+                    $url = new \core\url('/admin/tool/muprog/management/program.php', ['id' => $row->id]);
                     $name = \html_writer::link($url, $name);
                 }
                 return $name;
@@ -150,7 +150,7 @@ final class program extends base {
                 if (!has_capability('tool/muprog:view', $context)) {
                     return $value;
                 }
-                $url = new \moodle_url('/admin/tool/muprog/management/program_visibility.php', ['id' => $row->id]);
+                $url = new \core\url('/admin/tool/muprog/management/program_visibility.php', ['id' => $row->id]);
                 $value = \html_writer::link($url, $value);
                 return $value;
             });
@@ -197,7 +197,7 @@ final class program extends base {
                 if (!has_capability('tool/muprog:view', $context)) {
                     return $name;
                 }
-                $url = new \moodle_url('/admin/tool/muprog/management/index.php', ['contextid' => $context->id]);
+                $url = new \core\url('/admin/tool/muprog/management/index.php', ['contextid' => $context->id]);
                 $name = \html_writer::link($url, $name);
                 return $name;
             });
@@ -220,7 +220,7 @@ final class program extends base {
                 $count = $row->allocationcount;
                 $context = \context::instance_by_id($row->contextid);
                 if (has_capability('tool/muprog:view', $context)) {
-                    $url = new \moodle_url('/admin/tool/muprog/management/program_allocation.php', ['id' => $row->id]);
+                    $url = new \core\url('/admin/tool/muprog/management/program_allocation.php', ['id' => $row->id]);
                     $count = \html_writer::link($url, $count);
                 }
                 return $count;
@@ -245,7 +245,7 @@ final class program extends base {
                 $count = $row->coursecount;
                 $context = \context::instance_by_id($row->contextid);
                 if (has_capability('tool/muprog:view', $context)) {
-                    $url = new \moodle_url('/admin/tool/muprog/management/program_content.php', ['id' => $row->id]);
+                    $url = new \core\url('/admin/tool/muprog/management/program_content.php', ['id' => $row->id]);
                     $count = \html_writer::link($url, $count);
                 }
                 if ($row->coursecount) {

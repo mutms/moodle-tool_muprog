@@ -29,6 +29,7 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 - Internal allocation source data was removed from web services
 - Web service delete_program_allocations was fixed to use tool/muprog:deallocate capability
 - Fixed incorrect is_allocation_archive_possible() and is_allocation_restore_possible() methods in allocation sources
+- Fixed usage of legacy moodle_url class
 
 ## [mu-4.5.8-03] - 2025-12-31
 
