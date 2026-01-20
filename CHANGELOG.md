@@ -30,6 +30,7 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 - Web service delete_program_allocations was fixed to use tool/muprog:deallocate capability
 - Fixed incorrect is_allocation_archive_possible() and is_allocation_restore_possible() methods in allocation sources
 - Fixed usage of legacy moodle_url class
+- Improved navigation to start with "Programs" instead of "System"
 
 ## [mu-5.0.4-03] - 2025-12-31
 
