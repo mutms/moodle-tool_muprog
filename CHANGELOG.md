@@ -14,6 +14,7 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 
 ### Changed
 
+- Added separate "Move program" action for moving of pages into different contexts to match other MuTMS plugins
 - "Course set" is now called "Set" because programs may contain other item types
 - Reworked adding of program items to allow addition of new item types
 - New column "type" was added to "tool_muprog_item" database table
@@ -31,6 +32,7 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 - Fixed incorrect is_allocation_archive_possible() and is_allocation_restore_possible() methods in allocation sources
 - Fixed usage of legacy moodle_url class
 - Improved navigation to start with "Programs" instead of "System"
+- Programs from deleted categories will be automatically marked as archived when moved to parent context
 
 ## [mu-4.5.8-03] - 2025-12-31
 

@@ -336,6 +336,7 @@ Archiving is a required step before program can be deleted.';
 $string['program_create'] = 'Add program';
 $string['program_delete'] = 'Delete program';
 $string['program_delete_info'] = 'During program deletion all program data is deleted and users are unenrolled from program courses.';
+$string['program_move'] = 'Move program';
 $string['program_restore'] = 'Restore program';
 $string['program_restore_info'] = 'Restoring of program reverts changes done during program archiving.
 

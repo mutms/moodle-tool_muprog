@@ -21,6 +21,8 @@
 namespace tool_muprog\phpunit\local;
 
 use tool_muprog\local\program;
+use core\exception\invalid_parameter_exception;
+use core\exception\moodle_exception;
 
 /**
  * Program helper test.
@@ -150,19 +152,19 @@ final class program_test extends \advanced_testcase {
         global $DB;
 
         $syscontext = \context_system::instance();
-        $data = (object)[
-            'fullname' => 'Some program',
-            'idnumber' => 'SP1',
-            'contextid' => $syscontext->id,
-        ];
-
-        $this->setCurrentTimeStart();
-        $oldprogram = program::create($data);
-
         $category = $this->getDataGenerator()->create_category([]);
         $cohort1 = $this->getDataGenerator()->create_cohort();
         $cohort2 = $this->getDataGenerator()->create_cohort();
         $catcontext = \context_coursecat::instance($category->id);
+
+        $data = (object)[
+            'fullname' => 'Some program',
+            'idnumber' => 'SP1',
+            'contextid' => $catcontext->id,
+        ];
+
+        $oldprogram = program::create($data);
+
         $data = (object)[
             'id' => $oldprogram->id,
             'fullname' => 'Some other program',
@@ -207,6 +209,37 @@ final class program_test extends \advanced_testcase {
         $program = program::update_general($data);
         $this->assertDebuggingCalled('Use program::archive() and program::restore() to change archived flag');
         $this->assertSame('0', $program->archived);
+        $this->assertSame((string)$catcontext->id, $program->contextid);
+    }
+
+    public function test_move(): void {
+        $syscontext = \context_system::instance();
+        $category = $this->getDataGenerator()->create_category([]);
+        $catcontext = \context_coursecat::instance($category->id);
+        $course = $this->getDataGenerator()->create_course();
+        $coursecontext = \context_course::instance($course->id);
+
+        $data = (object)[
+            'fullname' => 'Some program',
+            'idnumber' => 'SP1',
+            'contextid' => $syscontext->id,
+        ];
+        $program = program::create($data);
+        $this->assertSame((string)$syscontext->id, $program->contextid);
+
+        $program = program::move($program->id, $catcontext->id);
+        $this->assertSame((string)$catcontext->id, $program->contextid);
+
+        $program = program::move($program->id, $syscontext->id);
+        $this->assertSame((string)$syscontext->id, $program->contextid);
+
+        try {
+            program::move($program->id, $coursecontext->id);
+            $this->fail('Exception expected');
+        } catch (moodle_exception $ex) {
+            $this->assertInstanceOf(invalid_parameter_exception::class, $ex);
+            $this->assertSame('Invalid parameter value detected (System or category context expected)', $ex->getMessage());
+        }
     }
 
     public function test_update_image(): void {
