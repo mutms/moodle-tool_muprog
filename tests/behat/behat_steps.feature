@@ -207,7 +207,7 @@ Feature: Programs navigation behat steps test
     And I should not see "Program 003"
     And I should not see "Program 003"
 
-    When I follow "System"
+    When I follow "Programs"
     Then I should see "Programs"
     And I should see "Program 000"
     And I should see "Program 001"

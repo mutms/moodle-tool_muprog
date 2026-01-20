@@ -137,29 +137,24 @@ final class management {
         $PAGE->set_pagelayout('admin');
         $PAGE->set_context($context);
         $PAGE->set_url($pageurl);
-        $PAGE->set_title(get_string('programs', 'tool_muprog'));
+        $PAGE->set_title(get_string('management', 'tool_muprog'));
         $PAGE->set_heading(get_string('programs', 'tool_muprog'));
         $PAGE->set_secondary_navigation(false);
 
-        $contexts = [];
-        while (true) {
-            $contexts[] = $context;
-            $parent = $context->get_parent_context();
-            if (!$parent) {
-                break;
+        $parentcontextids = $context->get_parent_context_ids(true);
+        $parentcontextids = array_reverse($parentcontextids);
+        foreach ($parentcontextids as $parentcontextid) {
+            $parentcontext = \context::instance_by_id($parentcontextid);
+            if ($parentcontext instanceof \context_system) {
+                $name = get_string('programs', 'tool_muprog');
+            } else {
+                $name = $parentcontext->get_context_name(false);
             }
-            $context = $parent;
-        }
-
-        $contexts = array_reverse($contexts);
-
-        /** @var \context $context */
-        foreach ($contexts as $context) {
             $url = null;
-            if (has_capability('tool/muprog:view', $context)) {
-                $url = new url('/admin/tool/muprog/management/index.php', ['contextid' => $context->id]);
+            if (has_capability('tool/muprog:view', $parentcontext)) {
+                $url = new url('/admin/tool/muprog/management/index.php', ['contextid' => $parentcontext->id]);
             }
-            $PAGE->navbar->add($context->get_context_name(false), $url);
+            $PAGE->navbar->add($name, $url);
         }
     }
 
@@ -178,34 +173,33 @@ final class management {
         $PAGE->set_pagelayout('admin');
         $PAGE->set_context($context);
         $PAGE->set_url($pageurl);
-        $PAGE->set_title(get_string('programs', 'tool_muprog'));
-        $PAGE->set_heading(format_string($program->fullname));
+
+        $programname = format_string($program->fullname);
+
+        $PAGE->set_title($programname . \moodle_page::TITLE_SEPARATOR . get_string('management', 'tool_muprog'));
+        $PAGE->set_heading($programname);
 
         $secondarynav = new \tool_muprog\navigation\views\program_secondary($PAGE, $program);
         $PAGE->set_secondarynav($secondarynav);
         $PAGE->set_secondary_active_tab($secondarytab);
         $secondarynav->initialise();
 
-        $contexts = [];
-        while (true) {
-            $contexts[] = $context;
-            $parent = $context->get_parent_context();
-            if (!$parent) {
-                break;
+        $parentcontextids = $context->get_parent_context_ids(true);
+        $parentcontextids = array_reverse($parentcontextids);
+        foreach ($parentcontextids as $parentcontextid) {
+            $parentcontext = \context::instance_by_id($parentcontextid);
+            if ($parentcontext instanceof \context_system) {
+                $name = get_string('programs', 'tool_muprog');
+            } else {
+                $name = $parentcontext->get_context_name(false);
             }
-            $context = $parent;
-        }
-
-        $contexts = array_reverse($contexts);
-
-        /** @var \context $context */
-        foreach ($contexts as $context) {
             $url = null;
-            if (has_capability('tool/muprog:view', $context)) {
-                $url = new url('/admin/tool/muprog/management/index.php', ['contextid' => $context->id]);
+            if (has_capability('tool/muprog:view', $parentcontext)) {
+                $url = new url('/admin/tool/muprog/management/index.php', ['contextid' => $parentcontext->id]);
             }
-            $PAGE->navbar->add($context->get_context_name(false), $url);
+            $PAGE->navbar->add($name, $url);
         }
-        $PAGE->navbar->add(format_string($program->fullname));
+
+        $PAGE->navbar->add($programname);
     }
 }
