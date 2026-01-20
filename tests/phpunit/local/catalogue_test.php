@@ -259,18 +259,12 @@ final class catalogue_test extends \advanced_testcase {
         $this->assertSame([(int)$program1->id, (int)$program2->id, (int)$program4->id, (int)$program6->id], array_keys($programs));
         $this->assertSame(4, $catalogue->count_programs());
 
-        $program1->contextid = $catcontext1->id;
-        $program1 = \tool_muprog\local\program::update_general($program1);
-        $program2->contextid = $catcontext1->id;
-        $program2 = \tool_muprog\local\program::update_general($program2);
-        $program3->contextid = $catcontext1->id;
-        $program3 = \tool_muprog\local\program::update_general($program3);
-        $program4->contextid = $catcontext1->id;
-        $program4 = \tool_muprog\local\program::update_general($program4);
-        $program5->contextid = $catcontext1->id;
-        $program5 = \tool_muprog\local\program::update_general($program5);
-        $program6->contextid = $catcontext1->id;
-        $program6 = \tool_muprog\local\program::update_general($program6);
+        $program1 = \tool_muprog\local\program::move($program1->id, $catcontext1->id);
+        $program2 = \tool_muprog\local\program::move($program2->id, $catcontext1->id);
+        $program3 = \tool_muprog\local\program::move($program3->id, $catcontext1->id);
+        $program4 = \tool_muprog\local\program::move($program4->id, $catcontext1->id);
+        $program5 = \tool_muprog\local\program::move($program5->id, $catcontext1->id);
+        $program6 = \tool_muprog\local\program::move($program6->id, $catcontext1->id);
 
         $this->setUser($user1);
         $catalogue = new \tool_muprog\local\catalogue([]);
@@ -306,18 +300,12 @@ final class catalogue_test extends \advanced_testcase {
         $this->assertSame([(int)$program1->id, (int)$program2->id, (int)$program4->id, (int)$program6->id], array_keys($programs));
         $this->assertSame(4, $catalogue->count_programs());
 
-        $program1->contextid = $catcontext2->id;
-        $program1 = \tool_muprog\local\program::update_general($program1);
-        $program2->contextid = $catcontext2->id;
-        $program2 = \tool_muprog\local\program::update_general($program2);
-        $program3->contextid = $catcontext2->id;
-        $program3 = \tool_muprog\local\program::update_general($program3);
-        $program4->contextid = $catcontext2->id;
-        $program4 = \tool_muprog\local\program::update_general($program4);
-        $program5->contextid = $catcontext2->id;
-        $program5 = \tool_muprog\local\program::update_general($program5);
-        $program6->contextid = $catcontext2->id;
-        $program6 = \tool_muprog\local\program::update_general($program6);
+        $program1 = \tool_muprog\local\program::move($program1->id, $catcontext2->id);
+        $program2 = \tool_muprog\local\program::move($program2->id, $catcontext2->id);
+        $program3 = \tool_muprog\local\program::move($program3->id, $catcontext2->id);
+        $program4 = \tool_muprog\local\program::move($program4->id, $catcontext2->id);
+        $program5 = \tool_muprog\local\program::move($program5->id, $catcontext2->id);
+        $program6 = \tool_muprog\local\program::move($program6->id, $catcontext2->id);
 
         $this->setUser($user1);
         $catalogue = new \tool_muprog\local\catalogue([]);
@@ -500,18 +488,12 @@ final class catalogue_test extends \advanced_testcase {
         $this->assertFalse(\tool_muprog\local\catalogue::is_program_visible($program5, $user3->id));
         $this->assertTrue(\tool_muprog\local\catalogue::is_program_visible($program6, $user3->id));
 
-        $program1->contextid = $catcontext1->id;
-        $program1 = \tool_muprog\local\program::update_general($program1);
-        $program2->contextid = $catcontext1->id;
-        $program2 = \tool_muprog\local\program::update_general($program2);
-        $program3->contextid = $catcontext1->id;
-        $program3 = \tool_muprog\local\program::update_general($program3);
-        $program4->contextid = $catcontext1->id;
-        $program4 = \tool_muprog\local\program::update_general($program4);
-        $program5->contextid = $catcontext1->id;
-        $program5 = \tool_muprog\local\program::update_general($program5);
-        $program6->contextid = $catcontext1->id;
-        $program6 = \tool_muprog\local\program::update_general($program6);
+        $program1 = \tool_muprog\local\program::move($program1->id, $catcontext1->id);
+        $program2 = \tool_muprog\local\program::move($program2->id, $catcontext1->id);
+        $program3 = \tool_muprog\local\program::move($program3->id, $catcontext1->id);
+        $program4 = \tool_muprog\local\program::move($program4->id, $catcontext1->id);
+        $program5 = \tool_muprog\local\program::move($program5->id, $catcontext1->id);
+        $program6 = \tool_muprog\local\program::move($program6->id, $catcontext1->id);
 
         $this->setUser($user1);
         $this->assertTrue(\tool_muprog\local\catalogue::is_program_visible($program1, $user1->id));
@@ -555,18 +537,12 @@ final class catalogue_test extends \advanced_testcase {
         $this->assertFalse(\tool_muprog\local\catalogue::is_program_visible($program5, $user3->id));
         $this->assertTrue(\tool_muprog\local\catalogue::is_program_visible($program6, $user3->id));
 
-        $program1->contextid = $catcontext2->id;
-        $program1 = \tool_muprog\local\program::update_general($program1);
-        $program2->contextid = $catcontext2->id;
-        $program2 = \tool_muprog\local\program::update_general($program2);
-        $program3->contextid = $catcontext2->id;
-        $program3 = \tool_muprog\local\program::update_general($program3);
-        $program4->contextid = $catcontext2->id;
-        $program4 = \tool_muprog\local\program::update_general($program4);
-        $program5->contextid = $catcontext2->id;
-        $program5 = \tool_muprog\local\program::update_general($program5);
-        $program6->contextid = $catcontext2->id;
-        $program6 = \tool_muprog\local\program::update_general($program6);
+        $program1 = \tool_muprog\local\program::move($program1->id, $catcontext2->id);
+        $program2 = \tool_muprog\local\program::move($program2->id, $catcontext2->id);
+        $program3 = \tool_muprog\local\program::move($program3->id, $catcontext2->id);
+        $program4 = \tool_muprog\local\program::move($program4->id, $catcontext2->id);
+        $program5 = \tool_muprog\local\program::move($program5->id, $catcontext2->id);
+        $program6 = \tool_muprog\local\program::move($program6->id, $catcontext2->id);
 
         $this->setUser($user1);
         $this->assertFalse(\tool_muprog\local\catalogue::is_program_visible($program1, $user1->id));

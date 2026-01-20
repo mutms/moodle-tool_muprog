@@ -18,12 +18,10 @@
 // phpcs:disable moodle.Files.LineLength.TooLong
 
 /**
- * Update program.
+ * Move program to a different context.
  *
  * @package    tool_muprog
- * @copyright  2022 Open LMS (https://www.openlms.net/)
- * @copyright  2025 Petr Skoda
- * @author     Petr Skoda
+ * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -44,27 +42,11 @@ $program = $DB->get_record('tool_muprog_program', ['id' => $id], '*', MUST_EXIST
 $context = context::instance_by_id($program->contextid);
 require_capability('tool/muprog:edit', $context);
 
-$currenturl = new core\url('/admin/tool/muprog/management/program_update.php', ['id' => $program->id]);
+$currenturl = new core\url('/admin/tool/muprog/management/program_move.php', ['id' => $program->id]);
 $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
 
-$editoroptions = program::get_description_editor_options($context->id);
-$program = file_prepare_standard_editor(
-    $program,
-    'description',
-    $editoroptions,
-    $context,
-    'tool_muprog',
-    'description',
-    $program->id
-);
-$program->tags = core_tag_tag::get_item_tags_array('tool_muprog', 'tool_muprog_program', $program->id);
-
-$program->image = file_get_submitted_draft_itemid('image');
-file_prepare_draft_area($program->image, $context->id, 'tool_muprog', 'image', $program->id, ['subdirs' => 0]);
-
-$form = new \tool_muprog\local\form\program_update(null, ['data' => $program, 'editoroptions' => $editoroptions, 'context' => $context]);
-
+$form = new \tool_muprog\local\form\program_move(null, ['program' => $program, 'context' => $context]);
 $returnurl = new core\url('/admin/tool/muprog/management/program.php', ['id' => $program->id]);
 
 if ($form->is_cancelled()) {
@@ -72,7 +54,7 @@ if ($form->is_cancelled()) {
 }
 
 if ($data = $form->get_data()) {
-    $program = program::update_general($data);
+    program::move($data->id, $data->contextid);
     $form->ajax_form_submitted($returnurl);
 }
 
