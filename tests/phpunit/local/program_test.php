@@ -240,6 +240,79 @@ final class program_test extends \advanced_testcase {
             $this->assertInstanceOf(invalid_parameter_exception::class, $ex);
             $this->assertSame('Invalid parameter value detected (System or category context expected)', $ex->getMessage());
         }
+
+        // Test tags are moved.
+
+        $data = [
+            'fullname' => 'Program 2',
+            'idnumber' => 'c2',
+            'contextid' => $catcontext->id,
+            'tags' => ['hokus', 'pokus'],
+        ];
+        $program2 = program::create((object)$data);
+        $this->assertEqualsCanonicalizing(
+            ['hokus', 'pokus'],
+            \core_tag_tag::get_item_tags_array('tool_muprog', 'tool_muprog_program', $program2->id)
+        );
+        $tags = \core_tag_tag::get_item_tags('tool_muprog', 'tool_muprog_program', $program2->id);
+        foreach ($tags as $tag) {
+            $this->assertEquals($catcontext->id, $tag->taginstancecontextid);
+        }
+
+        $program2 = program::move($program2->id, $syscontext->id);
+        $this->assertEqualsCanonicalizing(
+            ['hokus', 'pokus'],
+            \core_tag_tag::get_item_tags_array('tool_muprog', 'tool_muprog_program', $program2->id)
+        );
+        $tags = \core_tag_tag::get_item_tags('tool_muprog', 'tool_muprog_program', $program2->id);
+        foreach ($tags as $tag) {
+            $this->assertEquals($syscontext->id, $tag->taginstancecontextid);
+        }
+
+        // Test images are moved.
+
+        $admin = get_admin();
+        $this->setUser($admin);
+        $fs = get_file_storage();
+        $context = \context_user::instance($admin->id);
+
+        $draftid1 = \file_get_unused_draft_itemid();
+        $record = [
+            'contextid' => $context->id,
+            'component' => 'user',
+            'filearea' => 'draft',
+            'itemid' => $draftid1,
+            'filepath' => '/',
+            'filename' => 'someimage.jpg',
+        ];
+        $fs->create_file_from_string($record, 'content is irrelevant');
+        $draftid2 = \file_get_unused_draft_itemid();
+        $record = [
+            'contextid' => $context->id,
+            'component' => 'user',
+            'filearea' => 'draft',
+            'itemid' => $draftid2,
+            'filepath' => '/',
+            'filename' => 'otherimage.jpg',
+        ];
+        $fs->create_file_from_string($record, 'content is irrelevant');
+
+        $data = [
+            'fullname' => 'Program 3',
+            'idnumber' => 'c3',
+            'contextid' => $catcontext->id,
+            'description_editor' => ['text' => 'xx', 'format' => FORMAT_HTML, 'itemid' => $draftid1],
+            'image' => $draftid2,
+        ];
+        $program3 = program::create((object)$data);
+        $this->assertTrue($fs->file_exists($catcontext->id, 'tool_muprog', 'description', $program3->id, '/', 'someimage.jpg'));
+        $this->assertTrue($fs->file_exists($catcontext->id, 'tool_muprog', 'image', $program3->id, '/', 'otherimage.jpg'));
+
+        $program3 = program::move($program3->id, $syscontext->id);
+        $this->assertFalse($fs->file_exists($catcontext->id, 'tool_muprog', 'description', $program3->id, '/', 'someimage.jpg'));
+        $this->assertFalse($fs->file_exists($catcontext->id, 'tool_muprog', 'image', $program3->id, '/', 'otherimage.jpg'));
+        $this->assertTrue($fs->file_exists($syscontext->id, 'tool_muprog', 'description', $program3->id, '/', 'someimage.jpg'));
+        $this->assertTrue($fs->file_exists($syscontext->id, 'tool_muprog', 'image', $program3->id, '/', 'otherimage.jpg'));
     }
 
     public function test_update_image(): void {
