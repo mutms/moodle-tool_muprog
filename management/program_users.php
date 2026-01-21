@@ -70,7 +70,7 @@ $canmanageevidence = has_capability('tool/muprog:manageevidence', $context);
 $totalcount = $DB->count_records('tool_muprog_allocation', ['programid' => $program->id]);
 if ($totalcount && !$program->archived && $canmanageevidence) {
     $url = new \core\url('/admin/tool/muprog/management/program_evidence_upload.php', ['programid' => $id]);
-    $link = new \tool_mulib\output\ajax_form\link($url, get_string('evidenceupload', 'tool_muprog'));
+    $link = new \tool_mulib\output\ajax_form\link($url, get_string('evidenceupload', 'tool_muprog'), 'i/upload');
     $actions->get_dropdown()->add_ajax_form($link);
 }
 if ($actions->has_items()) {

@@ -58,7 +58,7 @@ $actions = new header_actions(get_string('management_program_allocation_actions'
 
 if (has_capability('tool/muprog:edit', $context) && !$program->archived) {
     $url = new core\url('/admin/tool/muprog/management/program_allocation_import.php', ['id' => $program->id]);
-    $link = new \tool_mulib\output\ajax_form\link($url, get_string('importprogramallocation', 'tool_muprog'));
+    $link = new \tool_mulib\output\ajax_form\link($url, get_string('importprogramallocation', 'tool_muprog'), 'i/import');
     $actions->get_dropdown()->add_ajax_form($link);
 }
 
