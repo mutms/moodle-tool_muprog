@@ -20,6 +20,7 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 - New column "type" was added to "tool_muprog_item" database table
 - Changed web services results to use "deletepossible" and "editpossible" property names
 - Other backwards compatible web services API and implementation tidy-up
+- Used red colour for "Delete program" action
 
 ### Fixed
 
