@@ -59,6 +59,7 @@ $actions = new header_actions(get_string('management_program_general_actions', '
 if ($program->archived && has_capability('tool/muprog:delete', $context)) {
     $url = new core\url('/admin/tool/muprog/management/program_delete.php', ['id' => $program->id]);
     $link = new tool_mulib\output\ajax_form\link($url, get_string('program_delete', 'tool_muprog'));
+    $link->add_class('text-danger');
     $link->set_form_size('sm');
     $link->set_submitted_action($link::SUBMITTED_ACTION_REDIRECT);
     $actions->get_dropdown()->add_ajax_form($link);
