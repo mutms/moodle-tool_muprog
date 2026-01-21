@@ -433,21 +433,25 @@ final class program {
 
         $trans = $DB->start_delegated_transaction();
 
-        // The category pre-delete hook should be called before the category delete,
-        // so the $oldcontext should be still here.
-        $oldcontext = \context::instance_by_id($program->contextid, IGNORE_MISSING);
-        if ($oldcontext) {
-            get_file_storage()->move_area_files_to_new_context(
-                $program->contextid,
-                $context->id,
-                'tool_muprog',
-                'description',
-                $program->id
-            );
-            // Delete tags even if they are not enabled before move,
-            // tags API is not designed to deal with this,
-            // we cannot create instance of deleted context.
-            \core_tag_tag::set_item_tags('tool_muprog', 'tool_muprog_program', $program->id, $oldcontext, null);
+        get_file_storage()->move_area_files_to_new_context(
+            $program->contextid,
+            $context->id,
+            'tool_muprog',
+            'image',
+            $program->id
+        );
+        get_file_storage()->move_area_files_to_new_context(
+            $program->contextid,
+            $context->id,
+            'tool_muprog',
+            'description',
+            $program->id
+        );
+
+        // Do not check if tags enabled here.
+        $tags = \core_tag_tag::get_item_tags_array('tool_muprog', 'tool_muprog_program', $program->id);
+        if ($tags) {
+            \core_tag_tag::set_item_tags('tool_muprog', 'tool_muprog_program', $program->id, $context, $tags);
         }
 
         // Fix favourites.

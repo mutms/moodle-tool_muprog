@@ -34,6 +34,7 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 - Fixed usage of legacy moodle_url class
 - Improved navigation to start with "Programs" instead of "System"
 - Programs from deleted categories will be automatically marked as archived when moved to parent context
+- Fixed missing program image when moving program to a different context
 
 ## [mu-5.0.4-03] - 2025-12-31
 
