@@ -56,17 +56,17 @@ $PAGE->set_docs_path('https://github.com/mutms/moodle-tool_muprog/wiki/Program-s
 $managementoutput = $PAGE->get_renderer('tool_muprog', 'management');
 
 $actions = new header_actions(get_string('management_program_general_actions', 'tool_muprog'));
+if (has_capability('tool/muprog:export', $context)) {
+    $url = new core\url('/admin/tool/muprog/management/export.php', ['id' => $program->id]);
+    $actions->get_dropdown()->add_item(get_string('export', 'tool_muprog'), $url, new \core\output\pix_icon('i/export', ''));
+}
 if ($program->archived && has_capability('tool/muprog:delete', $context)) {
     $url = new core\url('/admin/tool/muprog/management/program_delete.php', ['id' => $program->id]);
-    $link = new tool_mulib\output\ajax_form\link($url, get_string('program_delete', 'tool_muprog'));
+    $link = new tool_mulib\output\ajax_form\link($url, get_string('program_delete', 'tool_muprog'), 'i/delete');
     $link->add_class('text-danger');
     $link->set_form_size('sm');
     $link->set_submitted_action($link::SUBMITTED_ACTION_REDIRECT);
     $actions->get_dropdown()->add_ajax_form($link);
-}
-if (has_capability('tool/muprog:export', $context)) {
-    $url = new core\url('/admin/tool/muprog/management/export.php', ['id' => $program->id]);
-    $actions->get_dropdown()->add_item(get_string('export', 'tool_muprog'), $url);
 }
 if ($actions->has_items()) {
     $PAGE->add_header_action($OUTPUT->render($actions));

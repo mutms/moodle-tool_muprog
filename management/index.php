@@ -72,11 +72,11 @@ if (has_capability('tool/muprog:edit', $context)) {
 }
 if (has_capability('tool/muprog:export', $context)) {
     $url = new core\url('/admin/tool/muprog/management/export.php', ['contextid' => $contextid]);
-    $actions->get_dropdown()->add_item(get_string('export', 'tool_muprog'), $url);
+    $actions->get_dropdown()->add_item(get_string('export', 'tool_muprog'), $url, new \core\output\pix_icon('i/export', ''));
 }
 if (has_capability('tool/muprog:upload', $context)) {
     $url = new core\url('/admin/tool/muprog/management/upload.php', ['contextid' => $contextid]);
-    $actions->get_dropdown()->add_item(get_string('upload', 'tool_muprog'), $url);
+    $actions->get_dropdown()->add_item(get_string('upload', 'tool_muprog'), $url, new \core\output\pix_icon('i/upload', ''));
 }
 
 if ($actions->has_items()) {
