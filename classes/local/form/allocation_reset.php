@@ -47,10 +47,12 @@ final class allocation_reset extends \tool_mulib\local\ajax_form {
         $mform->addElement('static', 'userfullname', get_string('user'), fullname($user));
 
         $options = [
+            '' => get_string('choosedots'),
             course_reset::RESETTYPE_STANDARD => new \lang_string('resettype_standard', 'tool_muprog'),
             course_reset::RESETTYPE_FULL => new \lang_string('resettype_full', 'tool_muprog'),
         ];
         $mform->addElement('select', 'resettype', get_string('resettype', 'tool_muprog'), $options);
+        $mform->addRule('resettype', null, 'required', null, 'client');
 
         $sourceclass = allocation::get_source_classname($source->type);
         if ($sourceclass && $sourceclass::is_allocation_update_possible($program, $source, $allocation)) {
