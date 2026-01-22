@@ -12,6 +12,7 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 - Added "Course completion" into "Completion type" column in program progress tables
 - Added web service for archiving and restoring of program allocations
 - Icons added to dropdown actions
+- Allocations can be archived/restore directly from the list of all program users
 
 ### Changed
 
@@ -22,6 +23,10 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 - Changed web services results to use "deletepossible" and "editpossible" property names
 - Other backwards compatible web services API and implementation tidy-up
 - Used red colour for "Delete program" action
+- Archived status is shown in allocation details
+- Icon for program completion overriding is shown in allocation details
+- Icon for program reset is shown in allocation details
+- Button for updating of allocation is shown in allocation details
 
 ### Fixed
 
@@ -36,6 +41,7 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 - Improved navigation to start with "Programs" instead of "System"
 - Programs from deleted categories will be automatically marked as archived when moved to parent context
 - Fixed missing program image when moving program to a different context
+- To prevent data loss users have to explicitly select "Reset type" option in "Reset program progress" dialog
 
 ## [mu-5.0.4-03] - 2025-12-31
 

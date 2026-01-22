@@ -567,20 +567,31 @@ class renderer extends \plugin_renderer_base {
 
         $strnotset = get_string('notset', 'tool_muprog');
         $sourceclasses = allocation::get_source_classes();
+        $context = \context::instance_by_id($program->contextid);
         $source = $DB->get_record('tool_muprog_source', ['id' => $allocation->sourceid], '*', MUST_EXIST);
         /** @var \tool_muprog\local\source\base $sourceclass */
         $sourceclass = $sourceclasses[$source->type];
 
+        $buttons = [];
         $details = new \tool_mulib\output\entity_details();
 
         $details->add(
             get_string('programstatus', 'tool_muprog'),
             allocation::get_completion_status_html($program, $allocation)
         );
-        $details->add(
-            get_string('programprogress', 'tool_muprog'),
-            allocation::get_progress_percentage($program, $allocation)
-        );
+
+        $progress = allocation::get_progress_percentage($program, $allocation);
+        if ($progress === '') {
+            $progress = '-';
+        } else {
+            if (!$program->archived && !$allocation->archived && has_capability('tool/muprog:reset', $context)) {
+                $url = new url('/admin/tool/muprog/management/allocation_reset.php', ['id' => $allocation->id]);
+                $action = new \tool_mulib\output\ajax_form\icon($url, get_string('allocation_reset', 'tool_muprog'), 't/reset');
+                $progress .= $this->output->render($action);
+            }
+        }
+        $details->add(get_string('programprogress', 'tool_muprog'), $progress);
+
         $details->add(
             get_string('source', 'tool_muprog'),
             $sourceclass::render_allocation_source($program, $source, $allocation)
@@ -601,10 +612,37 @@ class renderer extends \plugin_renderer_base {
             get_string('programend', 'tool_muprog'),
             (isset($allocation->timeend) ? userdate($allocation->timeend) : $strnotset)
         );
-        $details->add(
-            get_string('programcompletion', 'tool_muprog'),
-            (isset($allocation->timecompleted) ? userdate($allocation->timecompleted) : $strnotset)
-        );
+
+        $programcompletion = (isset($allocation->timecompleted) ? userdate($allocation->timecompleted) : $strnotset);
+        if (has_capability('tool/muprog:admin', $context)) {
+            $url = new url('/admin/tool/muprog/management/program_completion_override.php', ['id' => $allocation->id]);
+            $action = new \tool_mulib\output\ajax_form\icon($url, get_string('programcompletionoverride', 'tool_muprog'), 'i/edit');
+            $programcompletion .= $this->output->render($action);
+        }
+        $details->add(get_string('programcompletion', 'tool_muprog'), $programcompletion);
+
+        if ($program->archived) {
+            $archived = get_string('yes');
+        } else {
+            $archived = $allocation->archived ? get_string('yes') : get_string('no');
+            if ($allocation->archived && has_capability('tool/muprog:allocate', $context)) {
+                if ($sourceclass::is_allocation_restore_possible($program, $source, $allocation)) {
+                    $url = new url('/admin/tool/muprog/management/allocation_restore.php', ['id' => $allocation->id]);
+                    $action = new \tool_mulib\output\ajax_form\icon($url, get_string('allocation_restore', 'tool_muprog'), 'i/settings');
+                    $action->set_form_size('sm');
+                    $archived .= $this->output->render($action);
+                }
+            }
+            if (!$allocation->archived && has_capability('tool/muprog:deallocate', $context)) {
+                if ($sourceclass::is_allocation_archive_possible($program, $source, $allocation)) {
+                    $url = new url('/admin/tool/muprog/management/allocation_archive.php', ['id' => $allocation->id]);
+                    $action = new \tool_mulib\output\ajax_form\icon($url, get_string('allocation_archive', 'tool_muprog'), 'i/settings');
+                    $action->set_form_size('sm');
+                    $archived .= $this->output->render($action);
+                }
+            }
+        }
+        $details->add(get_string('archived', 'tool_muprog'), $archived);
 
         $handler = \tool_muprog\customfield\allocation_handler::create();
         foreach ($handler->get_instance_data($allocation->id) as $data) {
@@ -615,7 +653,34 @@ class renderer extends \plugin_renderer_base {
             $details->add($data->get_field()->get('name'), $value);
         }
 
-        return $this->output->render($details);
+        if (has_capability('tool/muprog:manageallocation', $context)) {
+            if (
+                $sourceclass::is_allocation_update_possible($program, $source, $allocation)
+                && !$program->archived && !$allocation->archived
+            ) {
+                $url = new url('/admin/tool/muprog/management/allocation_update.php', ['id' => $allocation->id]);
+                $button = new \tool_mulib\output\ajax_form\button($url, get_string('allocation_update', 'tool_muprog'));
+                $buttons[] = $this->output->render($button);
+            }
+        }
+        if (has_capability('tool/muprog:deallocate', $context)) {
+            if ($sourceclass::is_allocation_delete_possible($program, $source, $allocation)) {
+                $url = new url('/admin/tool/muprog/management/allocation_delete.php', ['id' => $allocation->id]);
+                $button = new \tool_mulib\output\ajax_form\button($url, get_string('deleteallocation', 'tool_muprog'));
+                $button->set_submitted_action($button::SUBMITTED_ACTION_REDIRECT);
+                $buttons[] = $this->output->render($button);
+            }
+        }
+
+        $result = $this->output->render($details);
+
+        if ($buttons) {
+            $result .= '<div class="buttons mb-5">';
+            $result .= implode(' ', $buttons);
+            $result .= '</div>';
+        }
+
+        return $result;
     }
 
     /**
@@ -764,7 +829,7 @@ class renderer extends \plugin_renderer_base {
             }
             if ($canadmin) {
                 $editurl = new url('/admin/tool/muprog/management/item_completion_override.php', ['allocationid' => $allocation->id, 'itemid' => $item->get_id()]);
-                $editaction = new \tool_mulib\output\ajax_form\icon($editurl, get_string('completionoverride', 'tool_muprog'), 'i/settings');
+                $editaction = new \tool_mulib\output\ajax_form\icon($editurl, get_string('completionoverride', 'tool_muprog'), 'i/edit');
                 $completioninfo .= ' ' . $output->render($editaction);
             }
 

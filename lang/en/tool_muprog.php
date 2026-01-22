@@ -161,7 +161,6 @@ $string['itemcompletion'] = 'Program item completion';
 $string['itempoints'] = 'Points';
 $string['itemrecalculate'] = 'Recalculate item completion';
 $string['management'] = 'Program management';
-$string['management_allocation_actions'] = 'Allocation actions';
 $string['management_index_actions'] = 'Programs actions';
 $string['management_program_allocation_actions'] = 'Allocation settings actions';
 $string['management_program_general_actions'] = 'Program actions';
