@@ -188,6 +188,7 @@ final class program extends base {
             ->add_fields("{$programalias}.contextid")
             ->set_is_sortable(false)
             ->set_callback(static function (?int $value, \stdClass $row): string {
+                global $PAGE;
                 if (!$row->contextid) {
                     return '';
                 }
@@ -198,6 +199,9 @@ final class program extends base {
                     return $name;
                 }
                 $url = new \core\url('/admin/tool/muprog/management/index.php', ['contextid' => $context->id]);
+                if ($url->compare($PAGE->url)) {
+                    return $name;
+                }
                 $name = \html_writer::link($url, $name);
                 return $name;
             });
