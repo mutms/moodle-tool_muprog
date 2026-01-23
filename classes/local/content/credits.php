@@ -87,7 +87,7 @@ final class credits extends item {
      * @return string
      */
     public function get_current_credits(stdClass $allocation): string {
-        global $DB;
+        global $DB, $USER;
 
         $now = time();
 
@@ -95,6 +95,9 @@ final class credits extends item {
         if (!$framework) {
             return get_string('error');
         }
+
+        $frameworkcontext = \context::instance_by_id($framework->contextid);
+        $usercontext = \context_user::instance($allocation->userid);
 
         $requiredcredits = format_float($framework->requiredcredits, 2, true, true);
 
@@ -105,12 +108,24 @@ final class credits extends item {
             return get_string('credits_requiredcredits', 'tool_muprog', $requiredcredits);
         }
 
+        $currentcredits = self::get_completed_credits($allocation);
         $data = [
-            'current' => self::get_completed_credits($allocation),
+            'current' => $currentcredits,
             'total' => $requiredcredits,
         ];
 
-        return get_string('credits_progress', 'tool_muprog', $data);
+        $result = get_string('credits_progress', 'tool_muprog', $data);
+
+        if ($currentcredits) {
+            if ($USER->id == $allocation->userid || has_capability('tool/mutrain:viewusercredits', $usercontext)) {
+                if ($framework->publicaccess || has_capability('tool/mutrain:viewframeworks', $frameworkcontext)) {
+                    $url = new \core\url('/admin/tool/mutrain/my/completions.php', ['frameworkid' => $framework->id, 'userid' => $allocation->userid]);
+                    $result = \html_writer::link($url, $result);
+                }
+            }
+        }
+
+        return $result;
     }
 
     #[\Override]

@@ -8,6 +8,7 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 
 ### Added
 
+- Added link to detailed report with completion credits
 - New "Offline attendance" program item type
 - Added "Course completion" into "Completion type" column in program progress tables
 - Added web service for archiving and restoring of program allocations
