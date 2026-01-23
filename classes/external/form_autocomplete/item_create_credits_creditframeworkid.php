@@ -88,8 +88,11 @@ final class item_create_credits_creditframeworkid extends \tool_mulib\external\f
                    FROM {tool_mutrain_framework} f
                    /* capsubquery */
                    /* tenantjoin */
+              LEFT JOIN {tool_muprog_item} pi ON pi.creditframeworkid = f.id AND pi.type = 'credits' AND pi.programid = :programid
                   WHERE f.archived = 0 /* capwhere */ /* searchsql */
-               ORDER BY f.name ASC"
+                        AND pi.id IS NULL
+               ORDER BY f.name ASC",
+                ['programid' => $program->id]
             )
         )
             ->replace_comment(
