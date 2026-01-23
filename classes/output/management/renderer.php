@@ -65,8 +65,7 @@ class renderer extends \plugin_renderer_base {
         $details->add(get_string('programname', 'tool_muprog'), format_string($program->fullname));
         $details->add(get_string('programidnumber', 'tool_muprog'), s($program->idnumber));
 
-        $url = new url('/admin/tool/muprog/management/index.php', ['contextid' => $context->id]);
-        $category = html_writer::link($url, $context->get_context_name(false));
+        $category = $context->get_context_name(false);
         if (has_capability('tool/muprog:edit', $context)) {
             $url = new url('/admin/tool/muprog/management/program_move.php', ['id' => $program->id]);
             $action = new \tool_mulib\output\ajax_form\icon($url, get_string('program_move', 'tool_muprog'), 'i/edit');
