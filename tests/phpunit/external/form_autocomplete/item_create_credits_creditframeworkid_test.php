@@ -204,6 +204,26 @@ final class item_create_credits_creditframeworkid_test extends \advanced_testcas
         ];
         $this->assertSame($expectedlist, $results['list']);
 
+        $this->setUser($user1);
+
+        $record = [
+            'programid' => $program1->id,
+            'creditframeworkid' => $framework1->id,
+        ];
+        $item = $generator->create_program_item($record);
+
+        $response = item_create_credits_creditframeworkid::execute('', $program1->id);
+        $results = item_create_credits_creditframeworkid::clean_returnvalue(
+            item_create_credits_creditframeworkid::execute_returns(),
+            $response
+        );
+        $this->assertFalse($results['overflow']);
+        $expectedlist = [
+            ['value' => (int)$framework3->id, 'label' => $framework3->name],
+            ['value' => (int)$framework2->id, 'label' => $framework2->name],
+        ];
+        $this->assertSame($expectedlist, $results['list']);
+
         $this->setUser($user3);
         try {
             item_create_credits_creditframeworkid::execute('', $program1->id);

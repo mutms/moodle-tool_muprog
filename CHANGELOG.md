@@ -42,6 +42,7 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 - Programs from deleted categories will be automatically marked as archived when moved to parent context
 - Fixed missing program image when moving program to a different context
 - To prevent data loss users have to explicitly select "Reset type" option in "Reset program progress" dialog
+- Prevented duplicate credit frameworks in programs
 
 ## [mu-5.0.4-03] - 2025-12-31
 
