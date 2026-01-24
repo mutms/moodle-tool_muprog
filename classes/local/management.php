@@ -200,6 +200,7 @@ final class management {
             $PAGE->navbar->add($name, $url);
         }
 
-        $PAGE->navbar->add($programname);
+        $url = new url('/admin/tool/muprog/management/program.php', ['id' => $program->id]);
+        $PAGE->navbar->add($programname, $url);
     }
 }
