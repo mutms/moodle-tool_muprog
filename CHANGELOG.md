@@ -14,6 +14,8 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 - Added web service for archiving and restoring of program allocations
 - Icons added to dropdown actions
 - Allocations can be archived/restore directly from the list of all program users
+- Added "Program allocation viewed" event, replacing incorrect use of "Program viewed" event in user profiles
+- Added new capability "View other users programs" to allow viewing of other users programs via profile pages
 
 ### Changed
 
@@ -28,6 +30,7 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 - Icon for program completion overriding is shown in allocation details
 - Icon for program reset is shown in allocation details
 - Button for updating of allocation is shown in allocation details
+- Improved navigation on allocated users management page
 
 ### Fixed
 

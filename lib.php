@@ -133,9 +133,16 @@ function tool_muprog_myprofile_navigation(core_user\output\myprofile\tree $tree,
         return;
     }
 
-    if ($USER->id == $user->id) {
-        $link = get_string('myprograms', 'tool_muprog');
+    $usercontext = context_user::instance($user->id);
+
+    if ($USER->id == $user->id || has_capability('tool/muprog:viewuserprograms', $usercontext)) {
         $url = new core\url('/admin/tool/muprog/my/index.php');
+        if ($USER->id == $user->id) {
+            $link = get_string('myprograms', 'tool_muprog');
+        } else {
+            $link = get_string('programs', 'tool_muprog');
+            $url->param('userid', $user->id);
+        }
         $node = new core_user\output\myprofile\node('miscellaneous', 'muprog_programs', $link, null, $url);
         $tree->add_node($node);
     }

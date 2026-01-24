@@ -55,6 +55,11 @@ $user = $DB->get_record('user', ['id' => $allocation->userid], '*', MUST_EXIST);
 $currenturl = new \core\url('/admin/tool/muprog/management/allocation.php', ['id' => $allocation->id]);
 
 management::setup_program_page($currenturl, $context, $program, 'program_users');
+
+$url = new core\url('/admin/tool/muprog/management/program_users.php', ['id' => $program->id]);
+$PAGE->navbar->add(get_string('tabusers', 'tool_muprog'), $url);
+$PAGE->navbar->add(fullname($user));
+
 $PAGE->set_docs_path('https://github.com/mutms/moodle-tool_muprog/wiki/Program-users');
 
 $sourceclasses = allocation::get_source_classes();
@@ -67,6 +72,8 @@ $managementoutput = $PAGE->get_renderer('tool_muprog', 'management');
 // Refresh allocation data just in case.
 allocation::fix_user_enrolments($program->id, $allocation->userid);
 $allocation = $DB->get_record('tool_muprog_allocation', ['id' => $allocation->id], '*', MUST_EXIST);
+
+\tool_muprog\event\allocation_viewed::create_from_allocation($allocation, $program)->trigger();
 
 echo $OUTPUT->header();
 

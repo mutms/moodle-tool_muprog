@@ -38,6 +38,16 @@ $capabilities = [
         ],
     ],
 
+    /* View programs in profile of other users */
+    'tool/muprog:viewuserprograms' => [
+        'captype' => 'read',
+        'riskbitmask' => RISK_PERSONAL,
+        'contextlevel' => CONTEXT_USER,
+        'archetypes' => [
+            'manager' => CAP_ALLOW,
+        ],
+    ],
+
     /*
      * Access the programs management UI - needed for programs management capabilities
      * this allows sidestepping of regular program visibility rules.
