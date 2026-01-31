@@ -6,7 +6,9 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 
 ## [Unreleased]
 
-- No changes
+### Fixed
+
+- Added missing required icon when selecting new program item type
 
 ## [mu-4.5.8-04] - 2026-01-25
 
