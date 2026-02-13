@@ -4,6 +4,10 @@ Plugin versioning is derived from Moodle releases, it does not comply with the s
 
 The format of this change log follows the advice given at [Keep a CHANGELOG](https://keepachangelog.com).
 
+## [Unreleased]
+
+- No changes
+
 ## [v5.0.6.01] - 2026-02-12
 
 ### Changed
