@@ -4,23 +4,23 @@ Plugin versioning is derived from Moodle releases, it does not comply with the s
 
 The format of this change log follows the advice given at [Keep a CHANGELOG](https://keepachangelog.com).
 
-## [Unreleased]
+## [Unreleased](https://github.com/mutms/moodle-tool_muprog/compare/v4.5.10.01...HEAD)
 
 - No changes
 
-## [v4.5.10.01] - 2026-02-12
+## [v4.5.10.01](https://github.com/mutms/moodle-tool_muprog/compare/mu-4.5.9-01...v4.5.10.01) - 2026-02-12
 
 ### Changed
 
 - Switched to new release number format to prepare for composer support
 
-## [mu-4.5.9-01] - 2026-02-08
+## [mu-4.5.9-01](https://github.com/mutms/moodle-tool_muprog/compare/mu-4.5.8-04...mu-4.5.9-01) - 2026-02-08
 
 ### Fixed
 
 - Added missing required icon when selecting new program item type
 
-## [mu-4.5.8-04] - 2026-01-25
+## [mu-4.5.8-04](https://github.com/mutms/moodle-tool_muprog/compare/mu-4.5.8-03...mu-4.5.8-04) - 2026-01-25
 
 ### Added
 
@@ -64,7 +64,7 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 - To prevent data loss users have to explicitly select "Reset type" option in "Reset program progress" dialog
 - Prevented duplicate credit frameworks in programs
 
-## [mu-4.5.8-03] - 2025-12-31
+## [mu-4.5.8-03](https://github.com/mutms/moodle-tool_muprog/compare/mu-4.5.8-02...mu-4.5.8-03) - 2025-12-31
 
 ### Added
 
@@ -78,7 +78,7 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 - Fixed category selection autocomplete element in program editing and export forms
 - Standardised program idnumber to be case-insensitively unique
 
-## [mu-4.5.8-02] - 2025-12-16
+## [mu-4.5.8-02](https://github.com/mutms/moodle-tool_muprog/compare/mu-4.5.8-01...mu-4.5.8-02) - 2025-12-16
 
 - Added program progress as percentage of completed non-set items.
 - Training points were renamed to Training credits.
@@ -88,7 +88,7 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 - Fixed placement of custom fields in program creation form.
 - Added support for generated program images.
 
-## [mu-4.5.8-01] - 2025-12-08
+## [mu-4.5.8-01](https://github.com/mutms/moodle-tool_muprog/compare/mu-4.5.7-02...mu-4.5.8-01) - 2025-12-08
 
 - Updated use of SQL fragments API.
 - Fixed timezones in notifications.
@@ -96,21 +96,21 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 - Added option for enabling of Manual and Certification allocations during program creation.
 - Added source for allocation from external database.
 
-## [mu-4.5.7-02] - 2025-11-08
+## [mu-4.5.7-02](https://github.com/mutms/moodle-tool_muprog/compare/mu-4.5.7-01...mu-4.5.7-02) - 2025-11-08
 
 - Improved training item icon - grid icon is used instead of ellipsis.
 - Documentation was moved to https://github.com/mutms/moodle-tool_muprog/wiki
 - Improved table visuals.
 
-## [mu-4.5.7-01] - 2025-10-06
+## [mu-4.5.7-01](https://github.com/mutms/moodle-tool_muprog/compare/mu-4.5.6-03...mu-4.5.7-01) - 2025-10-06
 
 - Fixed program tags itemtype to match database table name.
 
-## [mu-4.5.6-03] - 2025-09-24
+## [mu-4.5.6-03](https://github.com/mutms/moodle-tool_muprog/compare/mu-4.5.6-02...mu-4.5.6-03) - 2025-09-24
 
 - Certification allocation conflicts are now handled gracefully.
 
-## [mu-4.5.6-02] - 2025-08-31
+## [mu-4.5.6-02](https://github.com/mutms/moodle-tool_muprog/compare/mu-4.5.6-01...mu-4.5.6-02) - 2025-08-31
 
 - Added Program completion allocation source - users may get allocated to a program when they complete another program.
 - Fixed automatic cohort allocation source form.
@@ -121,16 +121,16 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 - Fixed compatibility with unsupported MS SQL databases.
 - Fixed fatal errors when sending deallocation email and SMTP is down, you may need to wait for next cron run to resolve blocking errors for students.
 
-## [mu-4.5.6-01] - 2025-08-09
+## [mu-4.5.6-01](https://github.com/mutms/moodle-tool_muprog/compare/mu-4.5.5-02...mu-4.5.6-01) - 2025-08-09
 
 - Internal refactoring.
 - Moodle 4.5.6 support.
 
-## [mu-4.5.5-02] - 2025-06-30
+## [mu-4.5.5-02](https://github.com/mutms/moodle-tool_muprog/compare/mu-4.5.5-01...mu-4.5.5-02) - 2025-06-30
 
 - New plugin versioning.
 
-## [mu-4.5.5-01] - 2025-06-09
+## [mu-4.5.5-01](https://github.com/mutms/moodle-tool_muprog/tree/mu-4.5.5-01) - 2025-06-09
 
 - Added custom fields for program allocations.
 - Improved docs and added acknowledgements.
