@@ -89,8 +89,7 @@ final class program {
         global $DB, $CFG;
         $data = clone($data);
 
-        $trans = $DB->start_delegated_transaction();
-
+        $syscontext = \context_system::instance();
         $context = \context::instance_by_id($data->contextid);
         if (!($context instanceof \context_system) && !($context instanceof \context_coursecat)) {
             throw new \coding_exception('program contextid must be a system or course category');
@@ -103,6 +102,8 @@ final class program {
         if (strlen($data->idnumber) === 0) {
             throw new \coding_exception('program idnumber is required');
         }
+
+        $trans = $DB->start_delegated_transaction();
 
         $editorused = false;
         if (isset($data->description_editor)) {
@@ -205,7 +206,7 @@ final class program {
         $program = self::update_image($data);
 
         if ($CFG->usetags && isset($data->tags)) {
-            \core_tag_tag::set_item_tags('tool_muprog', 'tool_muprog_program', $data->id, $context, $data->tags);
+            \core_tag_tag::set_item_tags('tool_muprog', 'tool_muprog_program', $data->id, $syscontext, $data->tags);
         }
 
         if ($editorused) {
@@ -291,6 +292,7 @@ final class program {
 
         $oldprogram = $DB->get_record('tool_muprog_program', ['id' => $data->id], '*', MUST_EXIST);
         $context = \context::instance_by_id($oldprogram->contextid);
+        $syscontext = \context_system::instance();
 
         $record = new stdClass();
         $record->id = $oldprogram->id;
@@ -356,7 +358,7 @@ final class program {
         }
 
         if ($CFG->usetags && isset($data->tags)) {
-            \core_tag_tag::set_item_tags('tool_muprog', 'tool_muprog_program', $data->id, $context, $data->tags);
+            \core_tag_tag::set_item_tags('tool_muprog', 'tool_muprog_program', $data->id, $syscontext, $data->tags);
         }
 
         $program = self::update_image($data);
@@ -432,12 +434,6 @@ final class program {
         }
 
         $trans = $DB->start_delegated_transaction();
-
-        // Do not check if tags enabled here.
-        $tags = \core_tag_tag::get_item_tags_array('tool_muprog', 'tool_muprog_program', $program->id);
-        if ($tags) {
-            \core_tag_tag::set_item_tags('tool_muprog', 'tool_muprog_program', $program->id, $context, $tags);
-        }
 
         // Fix favourites.
         $DB->set_field('favourite', 'contextid', $context->id, ['component' => 'tool_muprog', 'itemtype' => 'programs', 'itemid' => $program->id]);
