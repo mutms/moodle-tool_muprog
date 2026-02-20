@@ -433,23 +433,11 @@ final class program {
             return $program;
         }
 
-        $trans = $DB->start_delegated_transaction();
-
-        // Fix favourites.
-        $DB->set_field('favourite', 'contextid', $context->id, ['component' => 'tool_muprog', 'itemtype' => 'programs', 'itemid' => $program->id]);
-
-        $record = (object)[
-            'id' => $program->id,
-            'contextid' => $context->id,
-        ];
-
-        $DB->update_record('tool_muprog_program', $record);
+        $DB->set_field('tool_muprog_program', 'contextid', $context->id, ['id' => $program->id]);
 
         $program = $DB->get_record('tool_muprog_program', ['id' => $program->id], '*', MUST_EXIST);
 
         \tool_muprog\event\program_updated::create_from_program($program)->trigger();
-
-        $trans->allow_commit();
 
         return $program;
     }
