@@ -269,7 +269,7 @@ final class program_test extends \advanced_testcase {
             $this->assertEquals($syscontext->id, $tag->taginstancecontextid);
         }
 
-        // Test images are moved.
+        // Test images do not move.
 
         $admin = get_admin();
         $this->setUser($admin);
@@ -305,12 +305,10 @@ final class program_test extends \advanced_testcase {
             'image' => $draftid2,
         ];
         $program3 = program::create((object)$data);
-        $this->assertTrue($fs->file_exists($catcontext->id, 'tool_muprog', 'description', $program3->id, '/', 'someimage.jpg'));
-        $this->assertTrue($fs->file_exists($catcontext->id, 'tool_muprog', 'image', $program3->id, '/', 'otherimage.jpg'));
+        $this->assertTrue($fs->file_exists($syscontext->id, 'tool_muprog', 'description', $program3->id, '/', 'someimage.jpg'));
+        $this->assertTrue($fs->file_exists($syscontext->id, 'tool_muprog', 'image', $program3->id, '/', 'otherimage.jpg'));
 
         $program3 = program::move($program3->id, $syscontext->id);
-        $this->assertFalse($fs->file_exists($catcontext->id, 'tool_muprog', 'description', $program3->id, '/', 'someimage.jpg'));
-        $this->assertFalse($fs->file_exists($catcontext->id, 'tool_muprog', 'image', $program3->id, '/', 'otherimage.jpg'));
         $this->assertTrue($fs->file_exists($syscontext->id, 'tool_muprog', 'description', $program3->id, '/', 'someimage.jpg'));
         $this->assertTrue($fs->file_exists($syscontext->id, 'tool_muprog', 'image', $program3->id, '/', 'otherimage.jpg'));
     }

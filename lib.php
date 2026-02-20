@@ -41,6 +41,10 @@
 function tool_muprog_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = []) {
     global $DB;
 
+    if ($context->contextlevel != CONTEXT_SYSTEM) {
+        send_file_not_found();
+    }
+
     if ($filearea !== 'description' && $filearea !== 'image') {
         send_file_not_found();
     }
@@ -55,11 +59,12 @@ function tool_muprog_pluginfile($course, $cm, $context, $filearea, $args, $force
     }
 
     $program = $DB->get_record('tool_muprog_program', ['id' => $programid]);
-    if (!$program || $context->id != $program->contextid) {
+    if (!$program) {
         send_file_not_found();
     }
+    $programcontext = context::instance_by_id($program->contextid);
     if (
-        !has_capability('tool/muprog:view', $context)
+        !has_capability('tool/muprog:view', $programcontext)
         && !\tool_muprog\local\catalogue::is_program_visible($program)
     ) {
         send_file_not_found();
