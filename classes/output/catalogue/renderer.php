@@ -49,11 +49,11 @@ class renderer extends \plugin_renderer_base {
 
         $strnotset = get_string('notset', 'tool_muprog');
 
-        $context = \context::instance_by_id($program->contextid);
+        $syscontext = \context_system::instance();
         $fullname = format_string($program->fullname);
 
-        $description = file_rewrite_pluginfile_urls($program->description, 'pluginfile.php', $context->id, 'tool_muprog', 'description', $program->id);
-        $description = format_text($description, $program->descriptionformat, ['context' => $context]);
+        $description = file_rewrite_pluginfile_urls($program->description, 'pluginfile.php', $syscontext->id, 'tool_muprog', 'description', $program->id);
+        $description = format_text($description, $program->descriptionformat, ['context' => $syscontext]);
 
         $tagsdiv = '';
         if ($CFG->usetags) {
