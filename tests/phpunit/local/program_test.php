@@ -241,7 +241,7 @@ final class program_test extends \advanced_testcase {
             $this->assertSame('Invalid parameter value detected (System or category context expected)', $ex->getMessage());
         }
 
-        // Test tags are moved.
+        // Test tags are not moved.
 
         $data = [
             'fullname' => 'Program 2',
@@ -256,7 +256,7 @@ final class program_test extends \advanced_testcase {
         );
         $tags = \core_tag_tag::get_item_tags('tool_muprog', 'tool_muprog_program', $program2->id);
         foreach ($tags as $tag) {
-            $this->assertEquals($catcontext->id, $tag->taginstancecontextid);
+            $this->assertEquals($syscontext->id, $tag->taginstancecontextid);
         }
 
         $program2 = program::move($program2->id, $syscontext->id);

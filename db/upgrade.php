@@ -235,5 +235,12 @@ function xmldb_tool_muprog_upgrade($oldversion): bool {
         upgrade_plugin_savepoint(true, 2026022045, 'tool', 'muprog');
     }
 
+    if ($oldversion < 2026022045.02) {
+        $syscontext = context_system::instance();
+        $DB->set_field('tag_instance', 'contextid', $syscontext->id, ['component' => 'tool_muprog']);
+
+        upgrade_plugin_savepoint(true, 2026022045.02, 'tool', 'muprog');
+    }
+
     return true;
 }
