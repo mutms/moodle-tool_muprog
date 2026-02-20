@@ -41,18 +41,21 @@
 function tool_muprog_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = []) {
     global $DB;
 
-    if ($context->contextlevel != CONTEXT_SYSTEM && $context->contextlevel != CONTEXT_COURSECAT) {
-        send_file_not_found();
-    }
-
     if ($filearea !== 'description' && $filearea !== 'image') {
         send_file_not_found();
     }
 
     $programid = (int)array_shift($args);
+    $filename = array_pop($args);
+    $filepath = implode('/', $args) . '/';
+
+    if ($context->contextlevel == CONTEXT_SYSTEM && $filename === 'geopattern.svg' && $filepath === '/') {
+        $geopattern = \tool_muprog\local\program::get_image_geopattern($programid);
+        send_file($geopattern->toSVG(), $filename, 60 * 60 * 24 * 7, 0, true, false);
+    }
 
     $program = $DB->get_record('tool_muprog_program', ['id' => $programid]);
-    if (!$program) {
+    if (!$program || $context->id != $program->contextid) {
         send_file_not_found();
     }
     if (
@@ -61,9 +64,6 @@ function tool_muprog_pluginfile($course, $cm, $context, $filearea, $args, $force
     ) {
         send_file_not_found();
     }
-
-    $filename = array_pop($args);
-    $filepath = implode('/', $args) . '/';
 
     $fs = get_file_storage();
     $file = $fs->get_file($context->id, 'tool_muprog', $filearea, $programid, $filepath, $filename);
