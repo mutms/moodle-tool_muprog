@@ -8,7 +8,8 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 
 ### Changes
 
-- Geopattern generated program images are served via standard pluginfile.php 
+- Geopattern generated program images are served via standard pluginfile.php
+- All images were moved to system context, program context will be used only for management access control and tenant separation
 
 ## [v5.0.6.01](https://github.com/mutms/moodle-tool_muprog/compare/mu-5.0.5-01...v5.0.6.01) - 2026-02-12
 
