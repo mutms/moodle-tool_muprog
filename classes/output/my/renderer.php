@@ -63,9 +63,9 @@ class renderer extends \plugin_renderer_base {
             }
         }
 
-        $imageuri = program::get_image_uri($program, false);
-        if ($imageuri) {
-            $programimage = \html_writer::img($imageuri, '', ['class' => 'programimage float-end']);
+        $imageurl = program::get_image_url($program, false);
+        if ($imageurl) {
+            $programimage = \html_writer::img($imageurl, '', ['class' => 'programimage float-end']);
         } else {
             $programimage = '';
         }

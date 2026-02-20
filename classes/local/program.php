@@ -21,6 +21,7 @@ namespace tool_muprog\local;
 
 use stdClass;
 use core\exception\invalid_parameter_exception;
+use core\url;
 
 /**
  * Program helper.
@@ -507,36 +508,50 @@ final class program {
      *
      * @param stdClass $program must include id, contextid and presentationjson property.
      * @param bool $generateifmissing
-     * @return string|null
+     * @return url|null
      */
-    public static function get_image_uri(stdClass $program, bool $generateifmissing): ?string {
+    public static function get_image_url(stdClass $program, bool $generateifmissing): ?url {
         global $CFG;
 
         $presentation = (array)json_decode($program->presentationjson);
         if (!empty($presentation['image'])) {
             $context = \context::instance_by_id($program->contextid);
-            $imageurl = \core\url::make_file_url(
+            return url::make_file_url(
                 "$CFG->wwwroot/pluginfile.php",
                 '/' . $context->id . '/tool_muprog/image/' . $program->id . '/' . $presentation['image']
             );
-            return $imageurl->out(false);
         }
 
         if (!$generateifmissing) {
             return null;
         }
 
+        $syscontext = \context_system::instance();
+        return url::make_file_url(
+            "$CFG->wwwroot/pluginfile.php",
+            '/' . $syscontext->id . '/tool_muprog/image/' . $program->id . '/geopattern.svg'
+        );
+    }
+
+    /**
+     * Create program image using geopattern.
+     *
+     * @param int $programid
+     * @return \core_geopattern
+     */
+    public static function get_image_geopattern(int $programid): \core_geopattern {
         $colornumbers = range(1, 10);
         $basecolors = [];
         foreach ($colornumbers as $number) {
             $basecolors[] = get_config('core_admin', 'coursecolor' . $number);
         }
-        $color = $basecolors[($program->id + 5) % 10]; // Do not start with the same colour as courses.
+        $color = $basecolors[($programid + 5) % 10]; // Do not start with the same colour as courses.
 
         $pattern = new \core_geopattern();
         $pattern->setColor($color);
-        $pattern->patternbyid('program_' . $program->id);
-        return $pattern->datauri();
+        $pattern->patternbyid('program_' . $programid);
+
+        return $pattern;
     }
 
     /**

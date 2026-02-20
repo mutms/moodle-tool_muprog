@@ -347,7 +347,7 @@ final class program_test extends \advanced_testcase {
         $this->assertSame('{"image":"image.png"}', $program->presentationjson);
     }
 
-    public function test_get_image_uri(): void {
+    public function test_get_image_url(): void {
         $syscontext = \context_system::instance();
 
         $admin = get_admin();
@@ -383,20 +383,28 @@ final class program_test extends \advanced_testcase {
 
         $this->assertSame(
             "https://www.example.com/moodle/pluginfile.php/{$syscontext->id}/tool_muprog/image/{$program1->id}/image.png",
-            program::get_image_uri($program1, false)
+            program::get_image_url($program1, false)->out(false)
         );
         $this->assertSame(
             "https://www.example.com/moodle/pluginfile.php/{$syscontext->id}/tool_muprog/image/{$program1->id}/image.png",
-            program::get_image_uri($program1, true)
+            program::get_image_url($program1, true)->out(false)
         );
 
         $this->assertSame(
             null,
-            program::get_image_uri($program2, false)
+            program::get_image_url($program2, false)
         );
+        $this->assertSame(
+            "https://www.example.com/moodle/pluginfile.php/{$syscontext->id}/tool_muprog/image/{$program2->id}/geopattern.svg",
+            program::get_image_url($program2, true)->out(false)
+        );
+    }
+
+    public function test_get_image_geopattern(): void {
+        $geopattern = program::get_image_geopattern(77);
         $this->assertStringStartsWith(
-            'data:image/svg+xml;base64',
-            program::get_image_uri($program2, true)
+            '<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg" width="72" height="83"><rect x="0" y="0" width="100%" height="100%"',
+            $geopattern->toSVG()
         );
     }
 
