@@ -6,7 +6,9 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 
 ## [Unreleased](https://github.com/mutms/moodle-tool_muprog/compare/v5.0.6.03...MOODLE_500_STABLE)
 
-- No changes
+### Added
+
+- Added Moodle 5.2 compatibility
 
 ## [v5.0.6.03](https://github.com/mutms/moodle-tool_muprog/compare/v5.0.6.02...v5.0.6.03) - 2026-03-26
 
