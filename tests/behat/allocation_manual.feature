@@ -384,6 +384,7 @@ Feature: Manual program allocation tests
   @javascript
   Scenario: Manager may enable Manual allocation when creating program
     Given I log in as "manager1"
+    And I change window size to "large"
     And I am on the "tool_muprog > All programs management" page
 
     When I click on "Add program" "button"
