@@ -5,7 +5,11 @@
   "homepage": "https://github.com/mutms/moodle-tool_muprog",
   "license": "GPL-3.0-or-later",
   "require": {
-    "composer/installers": "*"
+    "composer/installers": "*",
+    "mutms/moodle-tool_mulib": "4.5.*",
+    "mutms/moodle-enrol_muprog": "4.5.*",
+    "mutms/moodle-block_muprog_my": "4.5.*",
+    "mutms/moodle-block_muprogmyoverview": "4.5.*"
   },
   "extra": {
     "installer-name": "muprog"
