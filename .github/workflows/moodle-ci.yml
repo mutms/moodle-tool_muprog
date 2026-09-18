@@ -4,6 +4,12 @@ on:
   push:
     branches:
       - '**'
+  workflow_dispatch:
+
+# A newer push to the same branch supersedes a run still going.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
@@ -28,7 +34,7 @@ jobs:
           MYSQL_COLLATION_SERVER: "utf8mb4_unicode_ci"
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 3
+        options: --health-cmd="healthcheck.sh --connect --innodb_initialized" --health-interval 10s --health-timeout 5s --health-retries 3
 
       mysqli:
         image: ${{ matrix.db == 'mysqli' && format('mysql:{0}', matrix.dbversion) || '' }}
@@ -39,7 +45,7 @@ jobs:
           MYSQL_COLLATION_SERVER: "utf8mb4_unicode_ci"
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 3
+        options: --health-cmd="healthcheck.sh --connect --innodb_initialized" --health-interval 10s --health-timeout 5s --health-retries 3
 
     strategy:
       fail-fast: false
