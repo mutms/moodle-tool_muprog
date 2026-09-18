@@ -6,7 +6,7 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 
 ## [v4.5.14.03](https://github.com/mutms/moodle-tool_muprog/compare/v4.5.14.02...v4.5.14.03) - 2026-09-19
 
-- No changes
+- version pinned to 20260919xx
 
 ## [v4.5.14.02](https://github.com/mutms/moodle-tool_muprog/compare/v4.5.14.01...v4.5.14.02) - 2026-09-18
 
