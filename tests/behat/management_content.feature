@@ -53,7 +53,7 @@ Feature: Program content management tests
     Given I log in as "manager1"
     And I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
-    And I click on "Content" "link" in the ".nav-tabs" "css_element"
+    And I click on "Content" "link" in the ".secondary-navigation" "css_element"
     And I should see "All in any order" in the "Program 000" "table_row"
 
     # Add courses and sets
@@ -336,7 +336,7 @@ Feature: Program content management tests
     When I log in as "manager1"
     And I am on the "tool_muprog > All programs management" page
     And I follow "Program 001"
-    And I click on "Content" "link" in the ".nav-tabs" "css_element"
+    And I click on "Content" "link" in the ".secondary-navigation" "css_element"
     Then I should see "Course is missing" in the "Course 1" "table_row"
     And I should not see "Course is missing" in the "Course 2" "table_row"
     And I should not see "Course is missing" in the "Course 3" "table_row"
@@ -371,7 +371,7 @@ Feature: Program content management tests
     And I log in as "manager1"
     And I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
-    And I click on "Content" "link" in the ".nav-tabs" "css_element"
+    And I click on "Content" "link" in the ".secondary-navigation" "css_element"
 
     When I click on "Append item" "link" in the "Program 000" "table_row"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:

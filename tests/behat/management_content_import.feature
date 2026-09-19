@@ -56,7 +56,7 @@ Feature: Import program content
     # Add courses and sets
     And I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
-    And I click on "Content" "link" in the ".nav-tabs" "css_element"
+    And I click on "Content" "link" in the ".secondary-navigation" "css_element"
     And I should see "All in any order" in the "Program 000" "table_row"
     And I click on "Append item" "link" in the "Program 000" "table_row"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
@@ -118,7 +118,7 @@ Feature: Import program content
 
     And I am on the "tool_muprog > All programs management" page
     And I follow "Program 002"
-    And I click on "Content" "link" in the ".nav-tabs" "css_element"
+    And I click on "Content" "link" in the ".secondary-navigation" "css_element"
     And I click on "Append item" "link" in the "Program 002" "table_row"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | Course | 1 |
@@ -129,7 +129,7 @@ Feature: Import program content
 
     And I am on the "tool_muprog > All programs management" page
     And I follow "Program 001"
-    And I click on "Content" "link" in the ".nav-tabs" "css_element"
+    And I click on "Content" "link" in the ".secondary-navigation" "css_element"
 
     When I click on "Import program content" "link" in the "Program 001" "table_row"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
@@ -170,7 +170,7 @@ Feature: Import program content
     And I log in as "manager1"
     And I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
-    And I click on "Content" "link" in the ".nav-tabs" "css_element"
+    And I click on "Content" "link" in the ".secondary-navigation" "css_element"
 
     When I click on "Import program content" "link" in the "Program 000" "table_row"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:

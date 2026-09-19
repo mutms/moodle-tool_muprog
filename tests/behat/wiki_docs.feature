@@ -115,7 +115,7 @@ Feature: Programs plugin English wiki documentation image generator
     Given I log in as "manager"
     And I am on the "tool_muprog > All programs management" page
     And I follow "Basic First Aid"
-    And I click on "Content" "link" in the ".nav-tabs" "css_element"
+    And I click on "Content" "link" in the ".secondary-navigation" "css_element"
 
     Then I make documentation screenshot "img_program_content.png" for "tool_muprog" plugin
     And site is restored after documentation screenshots
@@ -124,7 +124,7 @@ Feature: Programs plugin English wiki documentation image generator
     Given I log in as "manager"
     And I am on the "tool_muprog > All programs management" page
     And I follow "Motorcycle Track Days"
-    And I click on "Catalogue visibility" "link" in the ".nav-tabs" "css_element"
+    And I click on "Catalogue visibility" "link" in the ".secondary-navigation" "css_element"
 
     Then I make documentation screenshot "img_program_visibility.png" for "tool_muprog" plugin
     And site is restored after documentation screenshots
@@ -133,7 +133,7 @@ Feature: Programs plugin English wiki documentation image generator
     Given I log in as "manager"
     And I am on the "tool_muprog > All programs management" page
     And I follow "Basic First Aid"
-    And I click on "Allocation settings" "link" in the ".nav-tabs" "css_element"
+    And I click on "Allocation settings" "link" in the ".secondary-navigation" "css_element"
     And I click on "Update allocations" "link"
     And I set the following fields in the ".modal-dialog" "css_element" to these values:
       | timeallocationstart[enabled] | 1    |
@@ -158,7 +158,7 @@ Feature: Programs plugin English wiki documentation image generator
     Given I log in as "manager"
     And I am on the "tool_muprog > All programs management" page
     And I follow "Basic First Aid"
-    And I click on "Users" "link" in the ".nav-tabs" "css_element"
+    And I click on "Users" "link" in the ".secondary-navigation" "css_element"
 
     Then I make documentation screenshot "img_program_users.png" for "tool_muprog" plugin
     And site is restored after documentation screenshots
@@ -167,7 +167,7 @@ Feature: Programs plugin English wiki documentation image generator
     Given I log in as "manager"
     And I am on the "tool_muprog > All programs management" page
     And I follow "Basic First Aid"
-    And I click on "Users" "link" in the ".nav-tabs" "css_element"
+    And I click on "Users" "link" in the ".secondary-navigation" "css_element"
     And I follow "User B"
     And I change window size to "1208x1100"
 
