@@ -17,9 +17,9 @@
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 // phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace tool_muprog\phpunit\external\form_autocomplete;
+namespace tool_muprog\phpunit\muform\autocomplete;
 
-use tool_muprog\external\form_autocomplete\notification_import_frominstance;
+use tool_muprog\muform\autocomplete\notification_import_frominstance;
 
 /**
  * External API for form import program notification
@@ -30,7 +30,7 @@ use tool_muprog\external\form_autocomplete\notification_import_frominstance;
  * @author     Farhan Karmali
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @covers \tool_muprog\external\form_autocomplete\notification_import_frominstance
+ * @covers \tool_muprog\muform\autocomplete\notification_import_frominstance
  */
 final class notification_import_frominstance_test extends \advanced_testcase {
     public function setUp(): void {
@@ -38,7 +38,7 @@ final class notification_import_frominstance_test extends \advanced_testcase {
         $this->resetAfterTest();
     }
 
-    public function test_execute(): void {
+    public function test_source(): void {
         /** @var \tool_muprog_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
 
@@ -106,26 +106,28 @@ final class notification_import_frominstance_test extends \advanced_testcase {
         role_assign($editroleid, $user1->id, $syscontext->id);
         role_assign($cloneroleid, $user1->id, $syscontext->id);
         $this->setUser($user1);
-        $response = notification_import_frominstance::execute('', $program1->id);
-        $results = notification_import_frominstance::clean_returnvalue(
-            notification_import_frominstance::execute_returns(),
-            $response
-        );
-        $this->assertFalse($results['overflow']);
-        $this->assertCount(2, $results['list']);
-        $this->assertSame((int)$program2->id, $results['list'][0]['value']);
-        $this->assertSame((int)$program3->id, $results['list'][1]['value']);
+        $source = new notification_import_frominstance($program1->id);
+        $this->assertSame([(int)$program1->id], $source->get_args());
+        $this->assertSame([(string)$program2->id => 'Pokus', (string)$program3->id => 'Prog3'], $source->search('', 50));
+        $this->assertSame([(string)$program3->id => 'Prog3'], $source->search('Prog3', 50));
+        $this->assertNull($source->search('', 1));
+        $this->assertSame('Pokus', $source->label((string)$program2->id));
+        $this->assertNull($source->label((string)$program1->id));
+        $this->assertNull($source->label('999999'));
+        $this->assertTrue(\tool_muprog\local\notification_manager::validate_import_frominstance($program1->id, $program2->id));
+        $this->assertFalse(\tool_muprog\local\notification_manager::validate_import_frominstance($program1->id, $program1->id));
+        $this->assertFalse(\tool_muprog\local\notification_manager::validate_import_frominstance($program1->id, 0));
 
         role_assign($editroleid, $user2->id, $syscontext->id);
         role_assign($cloneroleid, $user2->id, $catcontext1->id);
         $this->setUser($user2);
-        $response = notification_import_frominstance::execute('', $program1->id);
-        $results = notification_import_frominstance::clean_returnvalue(
-            notification_import_frominstance::execute_returns(),
-            $response
-        );
-        $this->assertFalse($results['overflow']);
-        $this->assertCount(1, $results['list']);
-        $this->assertSame((int)$program2->id, $results['list'][0]['value']);
+        $source = new notification_import_frominstance($program1->id);
+        $this->assertSame([(string)$program2->id => 'Pokus'], $source->search('', 50));
+        $this->assertNull($source->label((string)$program3->id));
+        $this->assertFalse(\tool_muprog\local\notification_manager::validate_import_frominstance($program1->id, $program3->id));
+
+        $this->setUser($user3);
+        $this->expectException(\core\exception\required_capability_exception::class);
+        new notification_import_frominstance($program1->id);
     }
 }

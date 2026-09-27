@@ -72,13 +72,6 @@ $functions = [
         'ajax' => true,
         'loginrequired' => true,
     ],
-    'tool_muprog_form_autocomplete_notification_import_frominstance' => [
-        'classname' => tool_muprog\external\form_autocomplete\notification_import_frominstance::class,
-         'description' => 'Return list of programs that can be used as source for importing of notifications.',
-         'type' => 'read',
-         'ajax' => true,
-         'loginrequired' => true,
-    ],
     'tool_muprog_form_autocomplete_program_allocation_import_fromprogram' => [
         'classname' => tool_muprog\external\form_autocomplete\program_allocation_import_fromprogram::class,
         'description' => 'Return list of programs that can be used as source for importing program allocation.',

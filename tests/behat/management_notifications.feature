@@ -53,18 +53,10 @@ Feature: Program notifications management tests
     And I click on "Add program" "button" in the ".modal-dialog" "css_element"
     And I follow "Notifications"
     When I click on "Add notification" "link"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Enabled                 | 1 |
-      | User allocated          | 1 |
-      | Program started         | 1 |
-      | Program completed       | 1 |
-      | Program due date soon   | 1 |
-      | Program overdue         | 1 |
-      | Program end date soon   | 1 |
-      | Completed program ended | 1 |
-      | Failed program ended    | 1 |
-      | User deallocated        | 1 |
-    And I click on "Add notification" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | enabled | 1 |
+      | types   | User allocated, Program started, Program completed, Program due date soon, Program overdue, Program end date soon, Completed program ended, Failed program ended, User deallocated |
+    And I click on "Add notification" "button" in the "dialog[open]" "css_element"
     Then the following should exist in the "tool_muprog_notifications" table:
       | Notification            | Customised | Enabled |
       | User allocated          | No         | Yes     |
@@ -114,12 +106,11 @@ Feature: Program notifications management tests
     And I follow "Notifications"
 
     When I click on "Add notification" "link"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Enabled                 | 1                    |
-      | User allocated          | 1                    |
-      | User deallocated        | 1                    |
-      | Send copy to supervisor | Ucitel (Framework 1) |
-    And I click on "Add notification" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | types                 | User allocated, User deallocated |
+      | enabled               | 1 |
+      | supervisorframeworkid | Ucitel (Framework 1) |
+    And I click on "Add notification" "button" in the "dialog[open]" "css_element"
     Then the following should exist in the "tool_muprog_notifications" table:
       | Notification            | Send copy to supervisor | Customised | Enabled |
       | User allocated          | Ucitel (Framework 1)    | No         | Yes     |
@@ -127,15 +118,15 @@ Feature: Program notifications management tests
     And I follow "User allocated"
 
     When I press "Update notification"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Send copy to supervisor | Velitel (Framework 2) |
-    And I click on "Update notification" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | supervisorframeworkid | Velitel (Framework 2) |
+    And I click on "Update notification" "button" in the "dialog[open]" "css_element"
     Then I should see "Velitel (Framework 2)" in the "Send copy to supervisor" definition list item
 
     When I press "Update notification"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Send copy to supervisor | No |
-    And I click on "Update notification" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | supervisorframeworkid | No |
+    And I click on "Update notification" "button" in the "dialog[open]" "css_element"
     Then I should see "No" in the "Send copy to supervisor" definition list item
 
     When I press "Back"
@@ -158,52 +149,43 @@ Feature: Program notifications management tests
     And I follow "Program 000"
     And I follow "Notifications"
     And I follow "Add notification"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | User allocated         | 1   |
-      | Program started        | 1   |
-      | Program due date soon  | 1   |
-      | Program overdue        | 1   |
-      | Program end date soon  | 1   |
-      | Program completed      | 1   |
-      | Failed program ended   | 1   |
-    And I click on "Add notification" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | types | User allocated, Program started, Program due date soon, Program overdue, Program end date soon, Program completed, Failed program ended |
+    And I click on "Add notification" "button" in the "dialog[open]" "css_element"
     And I click on "Update notification" "link" in the "User allocated" "table_row"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Enabled                | 1   |
-      | Customised             | 1   |
-    And I click on "Update notification" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | enabled | 1 |
+      | custom  | 1 |
+    And I click on "Update notification" "button" in the "dialog[open]" "css_element"
     And I click on "Update notification" "link" in the "Failed program ended" "table_row"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Enabled                | 0   |
-    And I click on "Update notification" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | enabled | 0 |
+    And I click on "Update notification" "button" in the "dialog[open]" "css_element"
     And I am on the "tool_muprog > All programs management" page
     And I follow "Program 001"
     And I follow "Notifications"
     And I follow "Add notification"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | User allocated        | 1   |
-      | Program overdue       | 1   |
-      | Program completed     | 1   |
-    And I click on "Add notification" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | types | User allocated, Program overdue, Program completed |
+    And I click on "Add notification" "button" in the "dialog[open]" "css_element"
     And I click on "Update notification" "link" in the "User allocated" "table_row"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Enabled                | 0   |
-    And I click on "Update notification" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | enabled | 0 |
+    And I click on "Update notification" "button" in the "dialog[open]" "css_element"
     And I click on "Update notification" "link" in the "Program completed" "table_row"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Enabled                | 1   |
-      | Customised             | 1   |
-    And I click on "Update notification" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | enabled | 1 |
+      | custom  | 1 |
+    And I click on "Update notification" "button" in the "dialog[open]" "css_element"
 
     When I click on "Import notifications" action from "Notification actions" dropdown
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Import from           | Program 000   |
-    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | frominstance | Program 000 |
+    And I click on "Continue" "button" in the "dialog[open]" "css_element"
     And I should not see "Failed program ended"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | User allocated        | 1   |
-      | Program due date soon | 1   |
-    And I click on "Import notifications" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | notificationids | User allocated, Program due date soon |
+    And I click on "Import notifications" "button" in the "dialog[open]" "css_element"
     Then the following should exist in the "tool_muprog_notifications" table:
       | Notification            | Customised | Enabled |
       | Program completed       | Yes        | Yes     |

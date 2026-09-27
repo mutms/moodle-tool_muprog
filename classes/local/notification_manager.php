@@ -304,25 +304,14 @@ final class notification_manager extends \tool_mulib\local\notification\manager 
     }
 
     /**
-     * Adds the frominstance autocomplete element to import form.
+     * Autocomplete source of programs that notifications can be imported from.
      *
-     * @param int $instanceid target instance
-     * @param \MoodleQuickForm $mform
-     * @return void
+     * @param int $instanceid target program
+     * @return \tool_mulib\muform\autocomplete\base
      */
-    public static function add_import_frominstance_element(int $instanceid, \MoodleQuickForm $mform): void {
-        global $DB;
-        $program = $DB->get_record('tool_muprog_program', ['id' => $instanceid], '*', MUST_EXIST);
-        $context = \context::instance_by_id($program->contextid);
-        $args = ['id' => $instanceid];
-        \tool_muprog\external\form_autocomplete\notification_import_frominstance::add_element(
-            $mform,
-            $args,
-            'frominstance',
-            get_string('notification_import_from', 'tool_mulib'),
-            $context
-        );
-        $mform->addRule('frominstance', null, 'required', null, 'client');
+    #[\Override]
+    public static function get_import_frominstance_source(int $instanceid): \tool_mulib\muform\autocomplete\base {
+        return new \tool_muprog\muform\autocomplete\notification_import_frominstance($instanceid);
     }
 
     /**
@@ -335,15 +324,10 @@ final class notification_manager extends \tool_mulib\local\notification\manager 
     public static function validate_import_frominstance(int $instanceid, int $frominstanceid): bool {
         global $DB;
 
-        $targetprogram = $DB->get_record('tool_muprog_program', ['id' => $instanceid], '*', MUST_EXIST);
-        $context = \context::instance_by_id($targetprogram->contextid);
-
-        $error = \tool_muprog\external\form_autocomplete\notification_import_frominstance::validate_value(
-            $frominstanceid,
-            ['id' => $instanceid],
-            $context
-        );
-
-        return $error === null;
+        if ($frominstanceid <= 0) {
+            return false;
+        }
+        $source = new \tool_muprog\muform\autocomplete\notification_import_frominstance($instanceid);
+        return $source->label((string)$frominstanceid) !== null;
     }
 }
