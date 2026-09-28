@@ -212,6 +212,40 @@ final class program_test extends \advanced_testcase {
         $this->assertSame((string)$catcontext->id, $program->contextid);
     }
 
+    public function test_move_customfields(): void {
+        global $DB;
+
+        $syscontext = \context_system::instance();
+        $category = $this->getDataGenerator()->create_category([]);
+        $catcontext = \context_coursecat::instance($category->id);
+        /** @var \tool_muprog_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
+        /** @var \core_customfield_generator $cfgenerator */
+        $cfgenerator = $this->getDataGenerator()->get_plugin_generator('core_customfield');
+
+        $pcategory = $cfgenerator->create_category(['component' => 'tool_muprog', 'area' => 'program']);
+        $pfield = $cfgenerator->create_field(['categoryid' => $pcategory->get('id'), 'shortname' => 'pf', 'type' => 'text']);
+        $acategory = $cfgenerator->create_category(['component' => 'tool_muprog', 'area' => 'allocation']);
+        $afield = $cfgenerator->create_field(['categoryid' => $acategory->get('id'), 'shortname' => 'af', 'type' => 'text']);
+
+        $program1 = $generator->create_program(['contextid' => $syscontext->id, 'sources' => ['manual' => []]]);
+        $program2 = $generator->create_program(['contextid' => $syscontext->id, 'sources' => ['manual' => []]]);
+        $user = $this->getDataGenerator()->create_user();
+        $allocation1 = $generator->create_program_allocation(['programid' => $program1->id, 'userid' => $user->id]);
+        $allocation2 = $generator->create_program_allocation(['programid' => $program2->id, 'userid' => $user->id]);
+        $cfgenerator->add_instance_data($pfield, $program1->id, 'p1');
+        $cfgenerator->add_instance_data($pfield, $program2->id, 'p2');
+        $cfgenerator->add_instance_data($afield, $allocation1->id, 'a1');
+        $cfgenerator->add_instance_data($afield, $allocation2->id, 'a2');
+
+        program::move($program1->id, $catcontext->id);
+
+        $this->assertEquals($catcontext->id, $DB->get_field('customfield_data', 'contextid', ['fieldid' => $pfield->get('id'), 'instanceid' => $program1->id]));
+        $this->assertEquals($catcontext->id, $DB->get_field('customfield_data', 'contextid', ['fieldid' => $afield->get('id'), 'instanceid' => $allocation1->id]));
+        $this->assertEquals($syscontext->id, $DB->get_field('customfield_data', 'contextid', ['fieldid' => $pfield->get('id'), 'instanceid' => $program2->id]));
+        $this->assertEquals($syscontext->id, $DB->get_field('customfield_data', 'contextid', ['fieldid' => $afield->get('id'), 'instanceid' => $allocation2->id]));
+    }
+
     public function test_move(): void {
         $syscontext = \context_system::instance();
         $category = $this->getDataGenerator()->create_category([]);

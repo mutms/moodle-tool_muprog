@@ -22,6 +22,8 @@ namespace tool_muprog\local;
 use stdClass;
 use core\exception\invalid_parameter_exception;
 use core\url;
+use tool_mulib\local\customfield_util;
+use tool_mulib\local\sql;
 
 /**
  * Program helper.
@@ -433,11 +435,31 @@ final class program {
             return $program;
         }
 
+        $trans = $DB->start_delegated_transaction();
+
         $DB->set_field('tool_muprog_program', 'contextid', $context->id, ['id' => $program->id]);
+
+        // Custom field data is stored in the program context.
+        customfield_util::change_instances_context(
+            'tool_muprog',
+            'program',
+            0,
+            new sql(":programid1", ['programid1' => $program->id]),
+            $context
+        );
+        customfield_util::change_instances_context(
+            'tool_muprog',
+            'allocation',
+            0,
+            new sql("SELECT a.id FROM {tool_muprog_allocation} a WHERE a.programid = :programid2", ['programid2' => $program->id]),
+            $context
+        );
 
         $program = $DB->get_record('tool_muprog_program', ['id' => $program->id], '*', MUST_EXIST);
 
         \tool_muprog\event\program_updated::create_from_program($program)->trigger();
+
+        $trans->allow_commit();
 
         return $program;
     }

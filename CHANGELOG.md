@@ -9,3 +9,7 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 ### Changed
 
 - migration to new forms library
+
+### Fixed
+
+- custom field data context not updated when moving programs
