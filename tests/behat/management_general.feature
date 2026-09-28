@@ -60,15 +60,15 @@ Feature: General programs management tests
 
     When I am on the "tool_muprog > All programs management" page
     And I click on "Add program" "button"
-    And the following fields in the ".modal-dialog" "css_element" match these values:
-      | Program name  |             |
-      | Program ID    |             |
-      | Course groups | No          |
-      | Description   |             |
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Program name  | Program 001 |
-      | Program ID    | PR01        |
-    And I click on "Add program" "button" in the ".modal-dialog" "css_element"
+    And the following muform fields in the "dialog[open]" "css_element" match:
+      | Program name  |    |
+      | Program ID    |    |
+      | Course groups | No |
+      | Description   |    |
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program name | Program 001 |
+      | Program ID   | PR01        |
+    And I click on "Add program" "button" in the "dialog[open]" "css_element"
     Then I should see "Program 001" in the "Program name" definition list item
     And I should see "PR01" in the "Program ID" definition list item
     And I should see "System" in the "Category" definition list item
@@ -77,11 +77,11 @@ Feature: General programs management tests
 
     When I am on the "tool_muprog > All programs management" page
     And I click on "Add program" "button"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Program name  | Program 002 |
-      | Program ID    | PR02        |
-      | Category      | Cat 2       |
-    And I click on "Add program" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program name | Program 002 |
+      | Program ID   | PR02        |
+      | Category     | Cat 2       |
+    And I click on "Add program" "button" in the "dialog[open]" "css_element"
     Then I should see "Program 002" in the "Program name" definition list item
     And I should see "PR02" in the "Program ID" definition list item
     And I should see "Cat 2" in the "Category" definition list item
@@ -94,20 +94,21 @@ Feature: General programs management tests
     And I am on the "tool_muprog > All programs management" page
 
     When I click on "Add program" "button"
-    And the following fields in the ".modal-dialog" "css_element" match these values:
-      | Program name  |             |
-      | Program ID    |             |
-      | Course groups | No          |
-      | Description   |             |
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
+    And the following muform fields in the "dialog[open]" "css_element" match:
+      | Program name  |    |
+      | Program ID    |    |
+      | Course groups | No |
+      | Description   |    |
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Program name  | Program 001 |
       | Program ID    | PR01        |
       | Course groups | Yes         |
       | Description   | Nice desc   |
-    And I upload "admin/tool/muprog/tests/fixtures/badge.png" file to "Program image" filemanager
-    And I set the field "Category" to "Cat 2"
-    And I set the field "Tags" to "Mathematics, Algebra"
-    And I click on "Add program" "button" in the ".modal-dialog" "css_element"
+    And I upload "admin/tool/muprog/tests/fixtures/badge.png" file to "image" muform filemanager
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Category | Cat 2                |
+      | Tags     | Mathematics, Algebra |
+    And I click on "Add program" "button" in the "dialog[open]" "css_element"
     Then I should see "Program 001" in the "Program name" definition list item
     And I should see "PR01" in the "Program ID" definition list item
     And I should see "Cat 2" in the "Category" definition list item
@@ -126,16 +127,16 @@ Feature: General programs management tests
     Given I log in as "manager1"
     And I am on the "tool_muprog > All programs management" page
     And I click on "Add program" "button"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Program name  | Program 001 |
-      | Program ID    | PR01        |
-    And I click on "Add program" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program name | Program 001 |
+      | Program ID   | PR01        |
+    And I click on "Add program" "button" in the "dialog[open]" "css_element"
 
     When I press "Edit"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Program name  | Program 002 |
-      | Program ID    | PR02        |
-    And I click on "Update program" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program name | Program 002 |
+      | Program ID   | PR02        |
+    And I click on "Update program" "button" in the "dialog[open]" "css_element"
     Then I should see "Program 002" in the "Program name" definition list item
     And I should see "PR02" in the "Program ID" definition list item
     And I should see "System" in the "Category" definition list item
@@ -147,23 +148,23 @@ Feature: General programs management tests
     Given I log in as "manager1"
     And I am on the "tool_muprog > All programs management" page
     And I click on "Add program" "button"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Program name  | Program 001 |
-      | Category      | System      |
-      | Program ID    | PR01        |
-    And I click on "Add program" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program name | Program 001 |
+      | Category     | System      |
+      | Program ID   | PR01        |
+    And I click on "Add program" "button" in the "dialog[open]" "css_element"
     And I should see "System" in the "Category" definition list item
 
     When I click on "Move program" "link"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Category      | Cat 1      |
-    And I click on "Move program" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Category | Cat 1 |
+    And I click on "Move program" "button" in the "dialog[open]" "css_element"
     Then I should see "Cat 1" in the "Category" definition list item
 
     When I click on "Move program" "link"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Category      | System      |
-    And I click on "Move program" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Category | System |
+    And I click on "Move program" "button" in the "dialog[open]" "css_element"
     Then I should see "System" in the "Category" definition list item
 
   @javascript
@@ -171,17 +172,17 @@ Feature: General programs management tests
     Given I log in as "manager1"
     And I am on the "tool_muprog > All programs management" page
     And I click on "Add program" "button"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Program name  | Program 001 |
-      | Program ID    | PR01        |
-    And I click on "Add program" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program name | Program 001 |
+      | Program ID   | PR01        |
+    And I click on "Add program" "button" in the "dialog[open]" "css_element"
 
     When I click on "Archive program" "link"
-    And I click on "Archive program" "button" in the ".modal-dialog" "css_element"
+    And I click on "Archive program" "button" in the "dialog[open]" "css_element"
     Then I should see "Yes" in the "Archived" definition list item
 
     When I click on "Restore program" "link"
-    And I click on "Restore program" "button" in the ".modal-dialog" "css_element"
+    And I click on "Restore program" "button" in the "dialog[open]" "css_element"
     Then I should see "No" in the "Archived" definition list item
 
   @javascript
@@ -189,16 +190,16 @@ Feature: General programs management tests
     Given I log in as "manager1"
     And I am on the "tool_muprog > All programs management" page
     And I click on "Add program" "button"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Program name  | Program 001 |
-      | Program ID    | PR01        |
-    And I click on "Add program" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program name | Program 001 |
+      | Program ID   | PR01        |
+    And I click on "Add program" "button" in the "dialog[open]" "css_element"
     And I click on "Archive program" "link"
-    And I click on "Archive program" "button" in the ".modal-dialog" "css_element"
+    And I click on "Archive program" "button" in the "dialog[open]" "css_element"
     And I should see "Yes" in the "Archived" definition list item
 
     When I click on "Delete program" action from "Program actions" dropdown
-    And I click on "Delete program" "button" in the ".modal-dialog" "css_element"
+    And I click on "Delete program" "button" in the "dialog[open]" "css_element"
     Then I should see "No programs found"
 
   @javascript @_file_upload
@@ -206,22 +207,24 @@ Feature: General programs management tests
     Given I log in as "manager1"
     And I am on the "tool_muprog > All programs management" page
     And I click on "Add program" "button"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Program name  | Program 002 |
-      | Program ID    | PR02        |
-    And I set the field "Category" to "Cat 1"
-    And I set the field "Tags" to "Logic"
-    And I click on "Add program" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program name | Program 002 |
+      | Program ID   | PR02        |
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Category | Cat 1 |
+      | Tags     | Logic |
+    And I click on "Add program" "button" in the "dialog[open]" "css_element"
 
     When I press "Edit"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Program name  | Program 001 |
       | Program ID    | PR01        |
       | Course groups | Yes         |
       | Description   | Nice desc   |
-    And I upload "admin/tool/muprog/tests/fixtures/badge.png" file to "Program image" filemanager
-    And I set the field "Tags" to "Mathematics, Algebra"
-    And I click on "Update program" "button" in the ".modal-dialog" "css_element"
+    And I upload "admin/tool/muprog/tests/fixtures/badge.png" file to "image" muform filemanager
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Tags | Mathematics, Algebra |
+    And I click on "Update program" "button" in the "dialog[open]" "css_element"
     Then I should see "Program 001" in the "Program name" definition list item
     And I should see "PR01" in the "Program ID" definition list item
     And I should see "Cat 1" in the "Category" definition list item
@@ -247,12 +250,11 @@ Feature: General programs management tests
     When I log in as "editor1"
     And I am on the "tool_muprog > All programs management" page
     And I click on "Add program" "button"
-    And I expand all fieldsets
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Program name       | Program 007       |
-      | Program ID         | P007              |
-      | Test field         | Test value        |
-    And I click on "Add program" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program name | Program 007 |
+      | Program ID   | P007        |
+      | Test field   | Test value  |
+    And I click on "Add program" "button" in the "dialog[open]" "css_element"
 
   @javascript
   Scenario: Manager may see there are deleted courses in program in list of programs

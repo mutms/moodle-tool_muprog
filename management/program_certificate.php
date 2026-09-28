@@ -63,13 +63,13 @@ echo $OUTPUT->header();
 $buttons = [];
 if (has_capability('tool/muprog:edit', $context)) {
     $editurl = new core\url('/admin/tool/muprog/management/program_certificate_edit.php', ['id' => $program->id]);
-    $editbutton = new tool_mulib\output\ajax_form\button($editurl, get_string('edit'));
+    $editbutton = new tool_mulib\output\muform\dialog\button($editurl, get_string('edit'));
     $editbutton->set_modal_title(get_string('certificate', 'tool_certificate'));
     $buttons[] = $OUTPUT->render($editbutton);
 
     if ($cert) {
         $deleteurl = new core\url('/admin/tool/muprog/management/program_certificate_delete.php', ['id' => $program->id]);
-        $deletebutton = new tool_mulib\output\ajax_form\button($deleteurl, get_string('delete'));
+        $deletebutton = new tool_mulib\output\muform\dialog\button($deleteurl, get_string('delete'));
         $deletebutton->set_modal_title(get_string('certificate', 'tool_certificate'));
         $buttons[] = $OUTPUT->render($deletebutton);
     }

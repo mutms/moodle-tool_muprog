@@ -18,6 +18,13 @@
 
 namespace tool_muprog\local\form;
 
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\checkbox;
+use tool_mulib\muform\element\inforawhtml;
+use tool_mulib\muform\element\section;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\form;
 use tool_muprog\local\program;
 use tool_muprog\local\util;
 
@@ -29,18 +36,16 @@ use tool_muprog\local\util;
  * @author     Farhan Karmali
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class program_allocation_import_confirmation extends \tool_mulib\local\ajax_form {
+final class program_allocation_import_confirmation extends form {
     #[\Override]
-    protected function definition() {
+    protected function definition(): void {
         global $DB, $PAGE;
-        $mform = $this->_form;
+
+        $targetprogram = $this->get_extra_data()['targetprogram'];
+        $fromprogram = $this->get_extra_data()['fromprogram'];
+        $fromcontext = \context::instance_by_id($fromprogram->contextid);
 
         $renderer = $PAGE->get_renderer('core', null, RENDERER_TARGET_GENERAL);
-
-        $targetprogram = $DB->get_record('tool_muprog_program', ['id' => $this->_customdata['id']], '*', MUST_EXIST);
-        $fromprogram = $DB->get_record('tool_muprog_program', ['id' => $this->_customdata['fromprogram']], '*', MUST_EXIST);
-
-        $fromcontext = \context::instance_by_id($fromprogram->contextid);
 
         $a = new \stdClass();
         $a->fullname = format_string($fromprogram->fullname);
@@ -49,57 +54,35 @@ final class program_allocation_import_confirmation extends \tool_mulib\local\aja
         $message = get_string('importprogramallocationconfirmation', 'tool_muprog', $a);
         $message = markdown_to_html($message);
         $message = $renderer->notification($message, \core\notification::INFO);
-        $mform->addElement('html', $message);
+        $this->add(new inforawhtml('confirmation', '', $message));
 
-        $mform->addElement('header', 'allocationheading', get_string('allocations', 'tool_muprog'));
-        $mform->setExpanded('allocationheading', true, true);
+        $this->add(new section('allocationheading', get_string('allocations', 'tool_muprog')));
         $a = $fromprogram->timeallocationstart ? userdate($fromprogram->timeallocationstart) : get_string('notset', 'tool_muprog');
-        $mform->addElement('advcheckbox', 'importallocationstart', get_string('importallocationstart', 'tool_muprog', $a));
+        $importallocationstart = new checkbox('importallocationstart', get_string('importallocationstart', 'tool_muprog', $a));
+        $this->add($importallocationstart, 'allocationheading');
         $a = $fromprogram->timeallocationend ? userdate($fromprogram->timeallocationend) : get_string('notset', 'tool_muprog');
-        $mform->addElement('advcheckbox', 'importallocationend', get_string('importallocationend', 'tool_muprog', $a));
+        $importallocationend = new checkbox('importallocationend', get_string('importallocationend', 'tool_muprog', $a));
+        $this->add($importallocationend, 'allocationheading');
 
-        $mform->addElement('header', 'schedulingheading', get_string('scheduling', 'tool_muprog'));
-        $mform->setExpanded('schedulingheading', true, true);
-
-        $start = (object)json_decode($fromprogram->startdatejson);
-        $types = program::get_program_startdate_types();
-
-        if ($start->type === 'date') {
-            $startdate = userdate($start->date);
-        } else if ($start->type === 'delay') {
-            $startdate = $types[$start->type] . ' - ' . util::format_delay($start->delay);
-        } else {
-            $startdate = $types[$start->type];
+        $this->add(new section('schedulingheading', get_string('scheduling', 'tool_muprog')));
+        $dates = [
+            'importprogramstart' => [$fromprogram->startdatejson, program::get_program_startdate_types()],
+            'importprogramdue' => [$fromprogram->duedatejson, program::get_program_duedate_types()],
+            'importprogramend' => [$fromprogram->enddatejson, program::get_program_enddate_types()],
+        ];
+        foreach ($dates as $name => [$json, $types]) {
+            $date = (object)json_decode($json);
+            if ($date->type === 'date') {
+                $text = userdate($date->date);
+            } else if ($date->type === 'delay') {
+                $text = $types[$date->type] . ' - ' . util::format_delay($date->delay);
+            } else {
+                $text = $types[$date->type];
+            }
+            $this->add(new checkbox($name, get_string($name, 'tool_muprog', (string)$text)), 'schedulingheading');
         }
-        $mform->addElement('advcheckbox', 'importprogramstart', get_string('importprogramstart', 'tool_muprog', $startdate));
 
-        $due = (object)json_decode($fromprogram->duedatejson);
-        $types = program::get_program_duedate_types();
-
-        if ($due->type === 'date') {
-            $duedate = userdate($due->date);
-        } else if ($due->type === 'delay') {
-            $duedate = $types[$due->type] . ' - ' . util::format_delay($due->delay);
-        } else {
-            $duedate = $types[$due->type];
-        }
-        $mform->addElement('advcheckbox', 'importprogramdue', get_string('importprogramdue', 'tool_muprog', $duedate));
-
-        $end = (object)json_decode($fromprogram->enddatejson);
-        $types = program::get_program_enddate_types();
-
-        if ($end->type === 'date') {
-            $enddate = userdate($end->date);
-        } else if ($end->type === 'delay') {
-            $enddate = $types[$end->type] . ' - ' . util::format_delay($end->delay);
-        } else {
-            $enddate = $types[$end->type];
-        }
-        $mform->addElement('advcheckbox', 'importprogramend', get_string('importprogramend', 'tool_muprog', $enddate));
-
-        $mform->addElement('header', 'sourcesheading', get_string('allocationsources', 'tool_muprog'));
-        $mform->setExpanded('sourcesheading', true, true);
-
+        $this->add(new section('sourcesheading', get_string('allocationsources', 'tool_muprog')));
         /** @var \tool_muprog\local\source\base[] $sourceclasses */
         $sourceclasses = \tool_muprog\local\allocation::get_source_classes();
         foreach ($sourceclasses as $sourcetype => $sourceclass) {
@@ -112,34 +95,21 @@ final class program_allocation_import_confirmation extends \tool_mulib\local\aja
                 $source = null;
             }
 
-            $status = $sourceclass::render_status_details($fromprogram, $source);
-            $mform->addElement('advcheckbox', 'importsource' . $sourcetype, $sourceclass::get_name() . ' (' . $status . ')');
+            // Status details are HTML, labels are plain text.
+            $status = trim(html_to_text($sourceclass::render_status_details($fromprogram, $source), 0, false));
+            $label = $sourceclass::get_name() . ' (' . $status . ')';
+            $this->add(new checkbox('importsource' . $sourcetype, $label), 'sourcesheading');
         }
 
-        $mform->addElement('hidden', 'fromprogram');
-        $mform->setType('fromprogram', PARAM_INT);
-        $mform->setDefault('fromprogram', $fromprogram->id);
-
-        $mform->addElement('hidden', 'id');
-        $mform->setType('id', PARAM_INT);
-        $mform->setDefault('id', $targetprogram->id);
-
-        $this->add_action_buttons(true, get_string('importprogramallocation', 'tool_muprog'));
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', get_string('importprogramallocation', 'tool_muprog')), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 
     #[\Override]
-    public function validation($data, $files) {
-        global $DB;
-        $errors = parent::validation($data, $files);
-
-        $targetprogram = $DB->get_record('tool_muprog_program', ['id' => $this->_customdata['id']], '*', MUST_EXIST);
-        $fromprogram = $DB->get_record('tool_muprog_program', ['id' => $this->_customdata['fromprogram']], '*', MUST_EXIST);
-
-        // Check if the user has capability to copy the selected program.
-        $context = \context::instance_by_id($fromprogram->contextid);
-        if (!has_capability('tool/muprog:clone', $context)) {
-            $errors['fromprogram'] = get_string('error');
-        }
+    protected function validation(array $data, array &$allerrors): void {
+        $targetprogram = clone($this->get_extra_data()['targetprogram']);
+        $fromprogram = $this->get_extra_data()['fromprogram'];
 
         // Make sure the new start and end dates are valid.
         if ($data['importallocationstart']) {
@@ -153,13 +123,11 @@ final class program_allocation_import_confirmation extends \tool_mulib\local\aja
             && $targetprogram->timeallocationstart >= $targetprogram->timeallocationend
         ) {
             if ($data['importallocationstart']) {
-                $errors['timeallocationstart'] = get_string('error');
+                $allerrors['importallocationstart'][] = get_string('error');
             }
             if ($data['importallocationend']) {
-                $errors['timeallocationend'] = get_string('error');
+                $allerrors['importallocationend'][] = get_string('error');
             }
         }
-
-        return $errors;
     }
 }

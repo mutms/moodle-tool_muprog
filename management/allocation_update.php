@@ -28,14 +28,13 @@
  */
 
 use tool_muprog\local\allocation;
+use tool_mulib\muform\handler;
 
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
 /** @var core_renderer $OUTPUT */
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
-
-define('AJAX_SCRIPT', true);
 
 require('../../../../config.php');
 
@@ -53,6 +52,9 @@ require_capability('tool/muprog:manageallocation', $context);
 $currenturl = new core\url('/admin/tool/muprog/management/allocation_update.php', ['id' => $allocation->id]);
 $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
+$title = get_string('allocation_update', 'tool_muprog');
+$PAGE->set_title($title);
+$PAGE->set_heading($title);
 
 $returnurl = new core\url('/admin/tool/muprog/management/allocation.php', ['id' => $allocation->id]);
 
@@ -63,15 +65,24 @@ if (!$sourceclass || !$sourceclass::is_allocation_update_possible($program, $sou
     redirect($returnurl);
 }
 
-$form = new \tool_muprog\local\form\allocation_update(null, ['allocation' => $allocation, 'user' => $user, 'context' => $context]);
+$handler = handler::from_request();
+
+$current = (array)$allocation;
+$current['userfullname'] = fullname($user);
+$form = new \tool_muprog\local\form\allocation_update($currenturl, $current, ['allocation' => $allocation]);
 
 if ($form->is_cancelled()) {
-    $form->ajax_form_cancelled($returnurl);
+    $handler->cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
-    $sourceclass::allocation_update($data);
-    $form->ajax_form_submitted($returnurl);
+    // Custom fields are saved by the form element.
+    $record = (object)array_filter((array)$data, fn($key) => !str_starts_with($key, 'customfield_'), ARRAY_FILTER_USE_KEY);
+    $record->id = $allocation->id;
+    unset($record->timeallocated);
+    $sourceclass::allocation_update($record);
+    $form->get_element('customfields')->save($allocation->id);
+    $handler->submitted($returnurl);
 }
 
-$form->ajax_form_render();
+$handler->render($form);

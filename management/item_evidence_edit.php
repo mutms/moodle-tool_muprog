@@ -28,14 +28,13 @@
  */
 
 use tool_muprog\local\allocation;
+use tool_mulib\muform\handler;
 
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
 /** @var core_renderer $OUTPUT */
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
-
-define('AJAX_SCRIPT', true);
 
 require('../../../../config.php');
 
@@ -58,6 +57,9 @@ require_capability('tool/muprog:manageevidence', $context);
 $currenturl = new core\url('/admin/tool/muprog/management/item_evidence_edit.php', ['allocationid' => $allocation->id, 'itemid' => $item->id]);
 $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
+$title = get_string('evidenceupdate', 'tool_muprog');
+$PAGE->set_title($title);
+$PAGE->set_heading($title);
 
 $returnurl = new core\url('/admin/tool/muprog/management/allocation.php', ['id' => $allocation->id]);
 
@@ -65,18 +67,33 @@ if ($program->archived || $allocation->archived) {
     redirect($returnurl);
 }
 
-$form = new \tool_muprog\local\form\item_evidence_edit(null, [
-    'allocation' => $allocation, 'item' => $item, 'user' => $user,
-    'completion' => $completion, 'evidence' => $evidence, 'context' => $context,
-]);
+$handler = handler::from_request();
+
+$current = [
+    'itemfullname' => $item->fullname,
+    'completiondate' => ($completion && $completion->timecompleted) ? userdate($completion->timecompleted) : get_string('notset', 'tool_muprog'),
+    'evidencetimecompleted' => $evidence ? $evidence->timecompleted : null,
+    'evidencedetails' => '',
+    'itemrecalculate' => 0,
+];
+if ($evidence && $evidence->evidencejson) {
+    $evidencedata = (object)json_decode($evidence->evidencejson);
+    $current['evidencedetails'] = (string)($evidencedata->details ?? '');
+}
+if (!$item->topitem && $evidence && $completion && $evidence->timecompleted == $completion->timecompleted) {
+    $current['itemrecalculate'] = 1;
+}
+$form = new \tool_muprog\local\form\item_evidence_edit($currenturl, $current);
 
 if ($form->is_cancelled()) {
-    $form->ajax_form_cancelled($returnurl);
+    $handler->cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
+    $data->allocationid = $allocation->id;
+    $data->itemid = $item->id;
     allocation::update_item_evidence($data);
-    $form->ajax_form_submitted($returnurl);
+    $handler->submitted($returnurl);
 }
 
-$form->ajax_form_render();
+$handler->render($form);

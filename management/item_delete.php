@@ -29,14 +29,16 @@
 
 use tool_muprog\local\program;
 use tool_muprog\local\content\set;
+use tool_muprog\local\content\course;
+use tool_muprog\local\content\attendance;
+use tool_muprog\local\content\credits;
+use tool_mulib\muform\handler;
 
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
 /** @var core_renderer $OUTPUT */
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
-
-define('AJAX_SCRIPT', true);
 
 require('../../../../config.php');
 
@@ -68,15 +70,30 @@ if (!$item || !$item->is_deletable()) {
     redirect($returnurl);
 }
 
-$form = new \tool_muprog\local\form\item_delete(null, ['item' => $item, 'context' => $context]);
+if ($item instanceof course) {
+    $title = get_string('deletecourse', 'tool_muprog');
+} else if ($item instanceof attendance) {
+    $title = get_string('deleteattendance', 'tool_muprog');
+} else if ($item instanceof credits) {
+    $title = get_string('deletecredits', 'tool_muprog');
+} else {
+    $title = get_string('deleteset', 'tool_muprog');
+}
+$PAGE->set_title($title);
+$PAGE->set_heading($title);
+
+$handler = handler::from_request();
+
+$current = ['typename' => $item::get_type_name(), 'fullname' => $itemrecord->fullname];
+$form = new \tool_muprog\local\form\item_delete($currenturl, $current, ['item' => $item]);
 
 if ($form->is_cancelled()) {
-    $form->ajax_form_cancelled($returnurl);
+    $handler->cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
     $top->delete_item($item->get_id());
-    $form->ajax_form_submitted($returnurl);
+    $handler->submitted($returnurl);
 }
 
-$form->ajax_form_render();
+$handler->render($form);

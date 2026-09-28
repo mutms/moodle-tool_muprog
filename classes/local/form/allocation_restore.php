@@ -18,6 +18,12 @@
 
 namespace tool_muprog\local\form;
 
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\info;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\form;
+
 /**
  * Un-archive user allocation.
  *
@@ -27,22 +33,13 @@ namespace tool_muprog\local\form;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class allocation_restore extends \tool_mulib\local\ajax_form {
+final class allocation_restore extends form {
     #[\Override]
-    protected function definition() {
-        $mform = $this->_form;
-        $allocation = $this->_customdata['allocation'];
-        $user = $this->_customdata['user'];
-        $context = $this->_customdata['context'];
+    protected function definition(): void {
+        $this->add(new info('userfullname', get_string('user')));
 
-        $mform->addElement('static', 'userfullname', get_string('user'), fullname($user));
-
-        $mform->addElement('hidden', 'id');
-        $mform->setType('id', PARAM_INT);
-        $mform->setDefault('id', $allocation->id);
-
-        $this->add_action_buttons(true, get_string('allocation_restore', 'tool_muprog'));
-
-        $this->set_data($allocation);
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', get_string('allocation_restore', 'tool_muprog')), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 }

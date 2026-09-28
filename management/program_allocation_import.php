@@ -26,7 +26,11 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use tool_muprog\local\form\program_allocation_import;
+use tool_muprog\local\form\program_allocation_import_confirmation;
 use tool_muprog\local\program;
+use tool_muprog\muform\autocomplete\program_allocation_import_fromprogram;
+use tool_mulib\muform\handler;
 
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
@@ -34,12 +38,10 @@ use tool_muprog\local\program;
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
 
-define('AJAX_SCRIPT', true);
-
 require('../../../../config.php');
 
 $id = required_param('id', PARAM_INT);
-$fromprogram = optional_param('fromprogram', 0, PARAM_INT);
+$fromprogramid = optional_param('fromprogram', 0, PARAM_INT);
 
 require_login();
 
@@ -47,9 +49,12 @@ $targetprogram = $DB->get_record('tool_muprog_program', ['id' => $id], '*', MUST
 $context = context::instance_by_id($targetprogram->contextid);
 require_capability('tool/muprog:edit', $context);
 
-$currenturl = new core\url('/admin/tool/muprog/management/program_allocation_import.php', ['id' => $targetprogram->id, 'fromprogram' => $fromprogram]);
+$currenturl = new core\url('/admin/tool/muprog/management/program_allocation_import.php', ['id' => $targetprogram->id]);
 $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
+$title = get_string('importprogramallocation', 'tool_muprog');
+$PAGE->set_title($title);
+$PAGE->set_heading($title);
 
 $returnurl = new core\url('/admin/tool/muprog/management/program_allocation.php', ['id' => $targetprogram->id]);
 
@@ -57,34 +62,44 @@ if ($targetprogram->archived) {
     redirect($returnurl);
 }
 
-$form = null;
+$handler = handler::from_request();
+
+// The program selected in the first step must be one the user may import from.
+$fromprogram = null;
+if ($fromprogramid && (new program_allocation_import_fromprogram($targetprogram->id))->label((string)$fromprogramid) !== null) {
+    $fromprogram = $DB->get_record('tool_muprog_program', ['id' => $fromprogramid], '*', MUST_EXIST);
+}
+
 if (!$fromprogram) {
-    $form = new \tool_muprog\local\form\program_allocation_import(
-        null,
-        ['targetprogram' => $targetprogram, 'context' => $context]
-    );
+    $form = new program_allocation_import($currenturl, [], ['targetprogram' => $targetprogram]);
     if ($form->is_cancelled()) {
-        $form->ajax_form_cancelled($returnurl);
-    } else if ($data = $form->get_data()) {
-        $fromprogram = $data->fromprogram;
-        unset($data);
-        $form = null;
+        $handler->cancelled($returnurl);
     }
+    if ($data = $form->get_data()) {
+        $nexturl = new core\url($currenturl, ['fromprogram' => $data->fromprogram]);
+        if ($handler->is_dialog()) {
+            // The dialog continues with the second step, the page gets it from the next URL.
+            $fromprogram = $DB->get_record('tool_muprog_program', ['id' => $data->fromprogram], '*', MUST_EXIST);
+            $extra = ['targetprogram' => $targetprogram, 'fromprogram' => $fromprogram];
+            $handler->render(new program_allocation_import_confirmation($nexturl, [], $extra));
+        }
+        redirect($nexturl);
+    }
+    $handler->render($form);
 }
 
-if (!$form) {
-    $form = new \tool_muprog\local\form\program_allocation_import_confirmation(
-        null,
-        ['context' => $context, 'id' => $targetprogram->id, 'fromprogram' => $fromprogram]
-    );
+$PAGE->set_url(new core\url($currenturl, ['fromprogram' => $fromprogram->id]));
+$form = new program_allocation_import_confirmation($PAGE->url, [], ['targetprogram' => $targetprogram, 'fromprogram' => $fromprogram]);
 
-    if ($form->is_cancelled()) {
-        $form->ajax_form_cancelled($returnurl);
-    } else if ($data = $form->get_data()) {
-        $from = $DB->get_record('tool_muprog_program', ['id' => $data->fromprogram], '*', MUST_EXIST);
-        program::import_allocation($data);
-        $form->ajax_form_submitted($returnurl);
-    }
+if ($form->is_cancelled()) {
+    $handler->cancelled($returnurl);
 }
 
-$form->ajax_form_render();
+if ($data = $form->get_data()) {
+    $data->id = $targetprogram->id;
+    $data->fromprogram = $fromprogram->id;
+    program::import_allocation($data);
+    $handler->submitted($returnurl);
+}
+
+$handler->render($form);

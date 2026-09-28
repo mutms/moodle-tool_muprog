@@ -76,29 +76,29 @@ Feature: Program visibility management tests
     When I follow "Program 000"
     And I follow "Catalogue visibility"
     And I press "Edit"
-    And the following fields in the ".modal-dialog" "css_element" match these values:
-      | Public             | No             |
-      | Visible to cohorts |                |
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Public             | Yes            |
-    And I click on "Update program" "button" in the ".modal-dialog" "css_element"
+    And the following muform fields in the "dialog[open]" "css_element" match:
+      | Public             | No |
+      | Visible to cohorts |    |
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Public | Yes |
+    And I click on "Update program" "button" in the "dialog[open]" "css_element"
     Then I press "Edit"
-    And the following fields in the ".modal-dialog" "css_element" match these values:
-      | Public             | Yes            |
-    And I click on "Cancel" "button" in the ".modal-dialog" "css_element"
+    And the following muform fields in the "dialog[open]" "css_element" match:
+      | Public | Yes |
+    And I click on "Cancel" "button" in the "dialog[open]" "css_element"
     And I am on the "tool_muprog > All programs management" page
     And "Program 000" row "Public" column of "reportbuilder-table" table should contain "Yes"
 
     When I click on "No" "link" in the "Program 001" "table_row"
     And I press "Edit"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Visible to cohorts | Cohort 1 |
-    And I click on "Update program" "button" in the ".modal-dialog" "css_element"
+    And I click on "Update program" "button" in the "dialog[open]" "css_element"
     Then I should see "Cohort 1"
     And I press "Edit"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Visible to cohorts | Cohort 2 |
-    And I click on "Update program" "button" in the ".modal-dialog" "css_element"
+    And I click on "Update program" "button" in the "dialog[open]" "css_element"
     And I should see "Cohort 2"
     And I am on the "tool_muprog > All programs management" page
     And "Program 001" row "Public" column of "reportbuilder-table" table should contain "No"
@@ -106,9 +106,9 @@ Feature: Program visibility management tests
     When I follow "Program 002"
     And I follow "Catalogue visibility"
     And I press "Edit"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Visible to cohorts | Cohort 2, Cohort 1 |
-    And I click on "Update program" "button" in the ".modal-dialog" "css_element"
+    And I click on "Update program" "button" in the "dialog[open]" "css_element"
     Then I should see "Cohort 1"
     And I should see "Cohort 2"
 

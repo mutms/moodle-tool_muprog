@@ -18,8 +18,16 @@
 
 namespace tool_muprog\local\form;
 
-use tool_muprog\external\form_autocomplete\export_programids;
-use tool_muprog\external\form_autocomplete\export_contextid;
+use tool_mulib\muform\element\autocomplete;
+use tool_mulib\muform\element\autocompletemany;
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\checkbox;
+use tool_mulib\muform\element\download;
+use tool_mulib\muform\element\select;
+use tool_mulib\muform\form;
+use tool_muprog\muform\autocomplete\export_contextid;
+use tool_muprog\muform\autocompletemany\export_programids;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -36,94 +44,68 @@ require_once($CFG->dirroot . '/lib/csvlib.class.php');
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class export extends \moodleform {
+final class export extends form {
     #[\Override]
-    protected function definition() {
-        $mform = $this->_form;
-        $program = $this->_customdata['program'];
-        $contextid = $this->_customdata['contextid'];
-        $context = $this->_customdata['context'];
-        $archived = $this->_customdata['archived'];
+    protected function definition(): void {
+        $program = $this->get_extra_data()['program'];
+        $context = $this->get_extra_data()['context'];
 
         if ($program) {
             // Export was started from a program details page, let them add other programs.
-            export_programids::add_element(
-                $mform,
-                ['query' => ''],
-                'programids',
-                get_string('programs', 'tool_muprog'),
-                $context
-            );
-            $mform->addRule('programids', null, 'required', null, 'client');
-            $mform->setDefault('programids', [$program->id]);
-
-            $mform->addElement('hidden', 'id');
-            $mform->setType('id', PARAM_INT);
-            $mform->setDefault('id', $program->id);
+            $source = new export_programids($context->id);
+            $programids = new autocompletemany('programids', get_string('programs', 'tool_muprog'), $source);
+            $programids->set_required(true);
+            $this->add($programids);
         } else {
             // Export started from category, let them select other categories or system.
-            export_contextid::add_element($mform, [], 'contextid', get_string('category'), $context);
-            $mform->setDefault('contextid', $contextid);
+            $contextid = new autocomplete('contextid', get_string('category'), new export_contextid($context->id));
+            $contextid->set_required(true);
+            $this->add($contextid);
 
-            $mform->addElement('advcheckbox', 'includesubcontexts', get_string('includesubcontexts', 'tool_muprog'));
+            $this->add(new checkbox('includesubcontexts', get_string('includesubcontexts', 'tool_muprog')));
 
-            $mform->addElement('advcheckbox', 'archived', get_string('archived', 'tool_muprog'), '&nbsp;');
-            $mform->setDefault('archived', $archived);
+            $this->add(new checkbox('archived', get_string('archived', 'tool_muprog')));
         }
 
         $choices = [
             'json' => get_string('exportformat_json', 'tool_muprog'),
             'csv' => get_string('exportformat_csv', 'tool_muprog'),
         ];
-        $mform->addElement('select', 'format', get_string('exportformat', 'tool_muprog'), $choices);
+        $format = new select('format', get_string('exportformat', 'tool_muprog'), $choices);
+        $format->set_required(true);
+        $this->add($format);
 
         $choices = \csv_import_reader::get_delimiter_list();
         unset($choices['colon']); // This collides with formatted dates, better not use it at all.
-        $mform->addElement('select', 'delimiter_name', get_string('csvdelimiter', 'tool_uploaduser'), $choices);
-        if (array_key_exists('cfg', $choices)) {
-            $mform->setDefault('delimiter_name', 'cfg');
-        } else if (get_string('listsep', 'langconfig') === ';') {
-            $mform->setDefault('delimiter_name', 'semicolon');
-        } else {
-            $mform->setDefault('delimiter_name', 'comma');
-        }
-        $mform->hideIf('delimiter_name', 'format', 'noteq', 'csv');
+        $delimiter = new select('delimiter_name', get_string('csvdelimiter', 'tool_uploaduser'), $choices);
+        $delimiter->set_required(true);
+        $this->add($delimiter);
+        $this->get_display_manager()->hide_if('delimiter_name', 'format', 'neq', 'csv');
 
-        $choices = \core_text::get_encodings();
-        $mform->addElement('select', 'encoding', get_string('encoding', 'tool_uploaduser'), $choices);
-        $mform->setDefault('encoding', 'UTF-8');
-        $mform->hideIf('encoding', 'format', 'noteq', 'csv');
+        $encoding = new select('encoding', get_string('encoding', 'tool_uploaduser'), \core_text::get_encodings());
+        $encoding->set_required(true);
+        $this->add($encoding);
+        $this->get_display_manager()->hide_if('encoding', 'format', 'neq', 'csv');
 
-        // We cannot redirect after file is downloaded, so let them click "Back" button instead.
-        $buttonarray = [
-            $mform->createElement('submit', 'exportbutton', get_string('export', 'tool_muprog')),
-            $mform->createElement('cancel', 'cancel', get_string('back')),
-        ];
-        $grp = $mform->addGroup($buttonarray, 'buttonar', get_string('formactions', 'core_form'), [' '], false);
-        $grp->setHiddenLabel(true);
-        $mform->closeHeaderBefore('buttonar');
+        // The file is downloaded in a new window, the form stays open, "Back" returns to the programs.
+        $this->add(new buttons('buttons'));
+        $this->add(new download('submit', get_string('export', 'tool_muprog')), 'buttons');
+        $this->add(new cancel('cancel', get_string('back')), 'buttons');
     }
 
-    #[\Override]
-    public function validation($data, $files) {
-        $errors = parent::validation($data, $files);
-        $context = $this->_customdata['context'];
-        $program = $this->_customdata['program'];
-
-        if ($program) {
-            if (!$data['programids']) {
-                $errors['programids'] = get_string('required');
-            } else {
-                foreach ($data['programids'] as $programid) {
-                    $error = export_programids::validate_value($programid, [], $context);
-                    if ($error !== null) {
-                        $errors['programids'] = $error;
-                        break;
-                    }
-                }
-            }
+    /**
+     * Default delimiter for CSV exports.
+     *
+     * @return string
+     */
+    public static function get_default_delimiter(): string {
+        $choices = \csv_import_reader::get_delimiter_list();
+        if (array_key_exists('cfg', $choices)) {
+            return 'cfg';
+        } else if (get_string('listsep', 'langconfig') === ';') {
+            return 'semicolon';
+        } else {
+            return 'comma';
         }
-
-        return $errors;
     }
 }

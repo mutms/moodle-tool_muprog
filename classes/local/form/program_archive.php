@@ -19,6 +19,13 @@
 
 namespace tool_muprog\local\form;
 
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\info;
+use tool_mulib\muform\element\inforawhtml;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\form;
+
 /**
  * Archive program.
  *
@@ -26,23 +33,18 @@ namespace tool_muprog\local\form;
  * @copyright  2025 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class program_archive extends \tool_mulib\local\ajax_form {
+final class program_archive extends form {
     #[\Override]
-    protected function definition() {
-        $mform = $this->_form;
-        $program = $this->_customdata['program'];
-
+    protected function definition(): void {
         $info = '<div class="alert alert-warning">' . markdown_to_html(get_string('program_archive_info', 'tool_muprog')) . '</div>';
-        $mform->addElement('html', $info);
+        $this->add(new inforawhtml('info', '', $info));
 
-        $mform->addElement('static', 'fullname', get_string('programname', 'tool_muprog'), format_string($program->fullname));
+        $this->add(new info('fullname', get_string('programname', 'tool_muprog')));
 
-        $mform->addElement('static', 'idnumber', get_string('idnumber'), format_string($program->idnumber));
+        $this->add(new info('idnumber', get_string('idnumber'), null, info::PLAIN));
 
-        $mform->addElement('hidden', 'id');
-        $mform->setType('id', PARAM_INT);
-        $mform->setDefault('id', $program->id);
-
-        $this->add_action_buttons(true, get_string('program_archive', 'tool_muprog'));
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', get_string('program_archive', 'tool_muprog')), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 }

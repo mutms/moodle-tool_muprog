@@ -28,14 +28,13 @@
  */
 
 use tool_muprog\local\source\manual;
+use tool_mulib\muform\handler;
 
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
 /** @var core_renderer $OUTPUT */
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
-
-define('AJAX_SCRIPT', true);
 
 require('../../../../config.php');
 
@@ -51,6 +50,9 @@ require_capability('tool/muprog:allocate', $context);
 $currenturl = new core\url('/admin/tool/muprog/management/source_manual_allocate.php', ['sourceid' => $source->id]);
 $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
+$title = get_string('source_manual_allocateusers', 'tool_muprog');
+$PAGE->set_title($title);
+$PAGE->set_heading($title);
 
 $returnurl = new core\url('/admin/tool/muprog/management/program_users.php', ['id' => $program->id]);
 
@@ -58,10 +60,12 @@ if (!manual::is_allocation_possible($program, $source)) {
     redirect($returnurl);
 }
 
-$form = new \tool_muprog\local\form\source_manual_allocate(null, ['program' => $program, 'source' => $source, 'context' => $context]);
+$handler = handler::from_request();
+
+$form = new \tool_muprog\local\form\source_manual_allocate($currenturl, [], ['program' => $program]);
 
 if ($form->is_cancelled()) {
-    $form->ajax_form_cancelled($returnurl);
+    $handler->cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
@@ -78,15 +82,11 @@ if ($data = $form->get_data()) {
         $allocationids = manual::allocate_users($program->id, $source->id, $userids);
     }
 
-    // Save custom fields.
     foreach ($allocationids as $allocationid) {
-        /** @var \tool_muprog\customfield\allocation_handler $handler */
-        $handler = \tool_muprog\customfield\allocation_handler::create();
-        $data->id = $allocationid;
-        $handler->instance_form_save($data);
+        $form->get_element('customfields')->save($allocationid);
     }
 
-    $form->ajax_form_submitted($returnurl);
+    $handler->submitted($returnurl);
 }
 
-$form->ajax_form_render();
+$handler->render($form);

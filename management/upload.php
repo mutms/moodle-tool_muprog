@@ -27,8 +27,11 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use tool_muprog\local\form\upload_files;
+use tool_muprog\local\form\upload_options;
 use tool_muprog\local\management;
 use tool_muprog\local\upload;
+use tool_mulib\muform\handler;
 
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
@@ -52,46 +55,42 @@ if ($contextid) {
 }
 require_capability('tool/muprog:upload', $context);
 
-management::setup_index_page($currenturl, $context);
-
-$filedata = null;
-if ($draftid && confirm_sesskey()) {
-    $filedata = \tool_muprog\local\util::get_uploaded_data($draftid, false);
+// Programs parsed in the first step are stored in the user's upload area.
+$filedata = \tool_muprog\local\util::get_uploaded_data($draftid, false);
+if ($filedata) {
+    $currenturl->param('files', $draftid);
 }
+
+management::setup_index_page($currenturl, $context);
+$PAGE->set_heading(get_string('upload', 'tool_muprog'));
+
+$handler = handler::from_request();
 
 if (!$filedata) {
-    $form = new \tool_muprog\local\form\upload_files(null, ['contextid' => $contextid]);
-} else {
-    $form = new \tool_muprog\local\form\upload_options(null, [
-        'files' => $draftid, 'contextid' => $contextid, 'filedata' => $filedata]);
+    $form = new upload_files($currenturl, []);
+    if ($form->is_cancelled()) {
+        $handler->cancelled($returnurl);
+    }
+    if ($data = $form->get_data()) {
+        redirect(new core\url($currenturl, ['files' => $data->files]));
+    }
+    $handler->render($form);
 }
 
+$form = new upload_options($currenturl, ['contextid' => $contextid ?: null], ['filedata' => $filedata]);
+
 if ($form->is_cancelled()) {
-    redirect($returnurl);
+    $handler->cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
-    if ($filedata && $form instanceof \tool_muprog\local\form\upload_options) {
-        upload::process($data, $filedata);
-        redirect($returnurl);
-    }
-    if (!$filedata && $form instanceof \tool_muprog\local\form\upload_files) {
-        $filedata = \tool_muprog\local\util::get_uploaded_data($draftid, false);
-        if ($filedata) {
-            $form = new \tool_muprog\local\form\upload_options(null, [
-                'files' => $draftid, 'contextid' => $contextid, 'filedata' => $filedata]);
-        }
-    }
+    upload::process($data, $filedata);
+    $handler->submitted($returnurl);
 }
 
-$PAGE->set_heading(get_string('upload', 'tool_muprog'));
-echo $OUTPUT->header();
-
-echo $form->render();
-
-if ($filedata) {
-    echo $OUTPUT->heading(get_string('upload_preview', 'tool_muprog'), 3);
-    echo upload::preview($filedata);
-}
-
-echo $OUTPUT->footer();
+$handler->render(function (\core\output\core_renderer $output) use ($form, $filedata): string {
+    $html = $form->render($output);
+    $html .= $output->heading(get_string('upload_preview', 'tool_muprog'), 3);
+    $html .= upload::preview($filedata);
+    return $html;
+});

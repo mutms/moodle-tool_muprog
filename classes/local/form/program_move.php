@@ -18,7 +18,13 @@
 
 namespace tool_muprog\local\form;
 
-use tool_muprog\external\form_autocomplete\program_contextid;
+use tool_mulib\muform\element\autocomplete;
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\info;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\form;
+use tool_muprog\muform\autocomplete\program_contextid;
 
 /**
  * Move program to a different context.
@@ -27,38 +33,22 @@ use tool_muprog\external\form_autocomplete\program_contextid;
  * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class program_move extends \tool_mulib\local\ajax_form {
+final class program_move extends form {
     #[\Override]
-    protected function definition() {
-        $mform = $this->_form;
-        $program = $this->_customdata['program'];
-        $context = $this->_customdata['context'];
+    protected function definition(): void {
+        $program = $this->get_current_data();
 
-        $mform->addElement('static', 'fullname', get_string('programname', 'tool_muprog'), format_string($program->fullname));
+        $this->add(new info('fullname', get_string('programname', 'tool_muprog')));
 
-        $mform->addElement('static', 'idnumber', get_string('idnumber'), format_string($program->idnumber));
+        $this->add(new info('idnumber', get_string('idnumber'), null, info::PLAIN));
 
-        program_contextid::add_element($mform, [], 'contextid', get_string('category'), $context);
+        $source = new program_contextid((int)$program['contextid']);
+        $contextid = new autocomplete('contextid', get_string('category'), $source);
+        $contextid->set_required(true);
+        $this->add($contextid);
 
-        $mform->addElement('hidden', 'id');
-        $mform->setType('id', PARAM_INT);
-
-        $this->add_action_buttons(true, get_string('program_move', 'tool_muprog'));
-
-        $this->set_data($program);
-    }
-
-    #[\Override]
-    public function validation($data, $files) {
-        $errors = parent::validation($data, $files);
-
-        $context = $this->_customdata['context'];
-
-        $error = program_contextid::validate_value($data['contextid'], [], $context);
-        if ($error !== null) {
-            $errors['contextid'] = $error;
-        }
-
-        return $errors;
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', get_string('program_move', 'tool_muprog')), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 }

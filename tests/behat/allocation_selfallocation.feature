@@ -77,10 +77,10 @@ Feature: Program selfallocation tests
     And I follow "Program 000"
     And I follow "Allocation settings"
     And I click on "Update Self allocation" "link"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Active             | Yes |
       | Allow new sign ups | No  |
-    And I click on "Update" "button" in the ".modal-dialog" "css_element"
+    And I click on "Update" "button" in the "dialog[open]" "css_element"
     Then I should see "Active; Sign ups are not allowed" in the "Self allocation" definition list item
     And I log out
 
@@ -97,9 +97,9 @@ Feature: Program selfallocation tests
     And I follow "Program 000"
     And I follow "Allocation settings"
     And I click on "Update Self allocation" "link"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Allow new sign ups | Yes |
-    And I click on "Update" "button" in the ".modal-dialog" "css_element"
+    And I click on "Update" "button" in the "dialog[open]" "css_element"
     Then I should see "Active; Sign ups are allowed" in the "Self allocation" definition list item
     And I log out
 
@@ -109,9 +109,9 @@ Feature: Program selfallocation tests
     And I should see "Program 001"
     And I follow "Program 000"
     And I press "Sign up"
-    And I click on "Cancel" "button" in the ".modal-dialog" "css_element"
+    And I click on "Cancel" "button" in the "dialog[open]" "css_element"
     And I press "Sign up"
-    And I click on "Sign up" "button" in the ".modal-dialog" "css_element"
+    And I click on "Sign up" "button" in the "dialog[open]" "css_element"
     Then I should see "Open" in the "Program status" definition list item
     And I should see "All in any order" in the "Program 000" "table_row"
 
@@ -123,10 +123,10 @@ Feature: Program selfallocation tests
     And I follow "Allocation settings"
 
     When I click on "Update Self allocation" "link"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Active      | Yes   |
       | Sign up key | heslo |
-    And I click on "Update" "button" in the ".modal-dialog" "css_element"
+    And I click on "Update" "button" in the "dialog[open]" "css_element"
     Then I should see "Active; Sign up key is required; Sign ups are allowed" in the "Self allocation" definition list item
     And I log out
 
@@ -134,15 +134,15 @@ Feature: Program selfallocation tests
     And I am on the "tool_muprog > Program catalogue" page
     And I follow "Program 000"
     And I press "Sign up"
-    And I click on "Sign up" "button" in the ".modal-dialog" "css_element"
+    And I click on "Sign up" "button" in the "dialog[open]" "css_element"
     And I should see "Required"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Sign up key | hEslo |
-    And I click on "Sign up" "button" in the ".modal-dialog" "css_element"
+    And I click on "Sign up" "button" in the "dialog[open]" "css_element"
     And I should see "Error"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Sign up key | heslo |
-    And I click on "Sign up" "button" in the ".modal-dialog" "css_element"
+    And I click on "Sign up" "button" in the "dialog[open]" "css_element"
     Then I should see "Open" in the "Program status" definition list item
     And I should see "All in any order" in the "Program 000" "table_row"
 
@@ -154,10 +154,10 @@ Feature: Program selfallocation tests
     And I follow "Allocation settings"
 
     When I click on "Update Self allocation" "link"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Active    | Yes |
       | Max users | 2   |
-    And I click on "Update" "button" in the ".modal-dialog" "css_element"
+    And I click on "Update" "button" in the "dialog[open]" "css_element"
     Then I should see "Active; Users 0/2; Sign ups are allowed" in the "Self allocation" definition list item
     And I log out
 
@@ -165,14 +165,14 @@ Feature: Program selfallocation tests
     And I am on the "tool_muprog > Program catalogue" page
     And I follow "Program 001"
     And I press "Sign up"
-    And I click on "Sign up" "button" in the ".modal-dialog" "css_element"
+    And I click on "Sign up" "button" in the "dialog[open]" "css_element"
     And I should see "Open" in the "Program status" definition list item
     And I log out
     And I log in as "student2"
     And I am on the "tool_muprog > Program catalogue" page
     And I follow "Program 001"
     And I press "Sign up"
-    And I click on "Sign up" "button" in the ".modal-dialog" "css_element"
+    And I click on "Sign up" "button" in the "dialog[open]" "css_element"
     And I log out
 
     When I log in as "student3"

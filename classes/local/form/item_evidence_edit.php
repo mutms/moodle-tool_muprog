@@ -19,6 +19,16 @@
 
 namespace tool_muprog\local\form;
 
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\checkbox;
+use tool_mulib\muform\element\datetime;
+use tool_mulib\muform\element\info;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\element\textarea;
+use tool_mulib\muform\form;
+use tool_mulib\muform\validator\required_if_visible;
+
 /**
  * Edit item completion evidence data.
  *
@@ -28,71 +38,25 @@ namespace tool_muprog\local\form;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class item_evidence_edit extends \tool_mulib\local\ajax_form {
+final class item_evidence_edit extends form {
     #[\Override]
-    protected function definition() {
-        $mform = $this->_form;
-        $context = $this->_customdata['context'];
-        $allocation = $this->_customdata['allocation'];
-        $item = $this->_customdata['item'];
-        $completion = $this->_customdata['completion'];
-        $evidence = $this->_customdata['evidence'];
+    protected function definition(): void {
+        $this->add(new info('itemfullname', get_string('item', 'tool_muprog')));
 
-        $mform->addElement(
-            'static',
-            'staticitem',
-            get_string('item', 'tool_muprog'),
-            format_string($item->fullname)
-        );
+        $this->add(new info('completiondate', get_string('completiondate', 'tool_muprog')));
 
-        if ($completion && $completion->timecompleted) {
-            $strcompleted = userdate($completion->timecompleted);
-        } else {
-            $strcompleted = get_string('notset', 'tool_muprog');
-        }
-        $mform->addElement('static', 'statictimecompleted', get_string('completiondate', 'tool_muprog'), $strcompleted);
+        $this->add(new datetime('evidencetimecompleted', get_string('evidencedate', 'tool_muprog')));
 
-        $mform->addElement('date_time_selector', 'evidencetimecompleted', get_string('evidencedate', 'tool_muprog'), ['optional' => true]);
-        if ($evidence && $evidence->timecompleted) {
-            $mform->setDefault('evidencetimecompleted', $evidence->timecompleted);
-        }
+        $evidencedetails = new textarea('evidencedetails', get_string('evidence_details', 'tool_muprog'));
+        $evidencedetails->set_required_marker(true);
+        $evidencedetails->add_validator(new required_if_visible());
+        $this->add($evidencedetails);
+        $this->get_display_manager()->hide_if('evidencedetails', 'evidencetimecompleted', 'empty');
 
-        $mform->addElement('textarea', 'evidencedetails', get_string('evidence_details', 'tool_muprog'));
-        $mform->setType('evidencedetails', PARAM_RAW); // Plain text only.
-        if ($evidence && $evidence->evidencejson) {
-            $data = (object)json_decode($evidence->evidencejson);
-            if ($data->details) {
-                $mform->setDefault('evidencedetails', $data->details);
-            }
-        }
-        $mform->hideIf('evidencedetails', 'evidencetimecompleted[enabled]', 'notchecked');
+        $this->add(new checkbox('itemrecalculate', get_string('itemrecalculate', 'tool_muprog')));
 
-        $mform->addElement('advcheckbox', 'itemrecalculate', get_string('itemrecalculate', 'tool_muprog'));
-        if (!$item->topitem && $evidence && $completion && $evidence->timecompleted == $completion->timecompleted) {
-            $mform->setDefault('itemrecalculate', 1);
-        }
-
-        $mform->addElement('hidden', 'allocationid');
-        $mform->setType('allocationid', PARAM_INT);
-        $mform->setDefault('allocationid', $allocation->id);
-
-        $mform->addElement('hidden', 'itemid');
-        $mform->setType('itemid', PARAM_INT);
-        $mform->setDefault('itemid', $item->id);
-
-        $this->add_action_buttons(true, get_string('update'));
-    }
-
-    #[\Override]
-    public function validation($data, $files) {
-        $errors = parent::validation($data, $files);
-
-        if ($data['evidencetimecompleted']) {
-            if (trim($data['evidencedetails']) === '') {
-                $errors['evidencedetails'] = get_string('required');
-            }
-        }
-
-        return $errors;
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', get_string('update')), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 }

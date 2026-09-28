@@ -19,8 +19,13 @@
 
 namespace tool_muprog\local\form;
 
-use tool_muprog\local\management;
-use tool_muprog\external\form_autocomplete\program_visibility_edit_cohortids;
+use tool_mulib\muform\element\autocompletemany;
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\select;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\form;
+use tool_muprog\muform\autocompletemany\program_visibility_edit_cohortids;
 
 /**
  * Edit program visibility.
@@ -31,48 +36,20 @@ use tool_muprog\external\form_autocomplete\program_visibility_edit_cohortids;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class program_visibility_edit extends \tool_mulib\local\ajax_form {
+final class program_visibility_edit extends form {
     #[\Override]
-    protected function definition() {
-        $mform = $this->_form;
-        $data = $this->_customdata['data'];
-        $context = $this->_customdata['context'];
+    protected function definition(): void {
+        $programid = (int)$this->get_current_data()['id'];
 
-        $mform->addElement('select', 'publicaccess', get_string('publicaccess', 'tool_muprog'), [0 => get_string('no'), 1 => get_string('yes')]);
-        $mform->setDefault('publicaccess', $data->publicaccess);
-        $mform->addHelpButton('publicaccess', 'publicaccess', 'tool_muprog');
+        $publicaccess = new select('publicaccess', get_string('publicaccess', 'tool_muprog'), [0 => get_string('no'), 1 => get_string('yes')]);
+        $publicaccess->add_help_button('publicaccess', 'tool_muprog');
+        $this->add($publicaccess);
 
-        program_visibility_edit_cohortids::add_element(
-            $mform,
-            ['programid' => $data->id],
-            'cohortids',
-            get_string('cohorts', 'tool_muprog'),
-            $context
-        );
-        $cohorts = management::fetch_current_cohorts_menu($data->id);
-        $mform->setDefault('cohortids', array_keys($cohorts));
+        $source = new program_visibility_edit_cohortids($programid);
+        $this->add(new autocompletemany('cohortids', get_string('cohorts', 'tool_muprog'), $source));
 
-        $mform->addElement('hidden', 'id');
-        $mform->setType('id', PARAM_INT);
-        $mform->setDefault('id', $data->id);
-
-        $this->add_action_buttons(true, get_string('program_update', 'tool_muprog'));
-    }
-
-    #[\Override]
-    public function validation($data, $files) {
-        $errors = parent::validation($data, $files);
-        $program = $this->_customdata['data'];
-        $context = $this->_customdata['context'];
-
-        foreach ($data['cohortids'] as $cohortid) {
-            $error = program_visibility_edit_cohortids::validate_value($cohortid, ['programid' => $program->id], $context);
-            if ($error !== null) {
-                $errors['cohorts'] = $error;
-                break;
-            }
-        }
-
-        return $errors;
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', get_string('program_update', 'tool_muprog')), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 }

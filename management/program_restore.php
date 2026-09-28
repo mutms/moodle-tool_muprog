@@ -26,14 +26,13 @@
  */
 
 use tool_muprog\local\program;
+use tool_mulib\muform\handler;
 
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
 /** @var core_renderer $OUTPUT */
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
-
-define('AJAX_SCRIPT', true);
 
 require('../../../../config.php');
 
@@ -48,8 +47,13 @@ require_capability('tool/muprog:edit', $context);
 $currenturl = new core\url('/admin/tool/muprog/management/program_restore.php', ['id' => $program->id]);
 $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
+$title = get_string('program_restore', 'tool_muprog');
+$PAGE->set_title($title);
+$PAGE->set_heading($title);
 
-$form = new \tool_muprog\local\form\program_restore(null, ['program' => $program]);
+$handler = handler::from_request();
+
+$form = new \tool_muprog\local\form\program_restore($currenturl, $program);
 $returnurl = new core\url('/admin/tool/muprog/management/program.php', ['id' => $program->id]);
 
 if (!$program->archived) {
@@ -57,12 +61,12 @@ if (!$program->archived) {
 }
 
 if ($form->is_cancelled()) {
-    $form->ajax_form_cancelled($returnurl);
+    $handler->cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
     program::restore($program->id);
-    $form->ajax_form_submitted($returnurl);
+    $handler->submitted($returnurl);
 }
 
-$form->ajax_form_render();
+$handler->render($form);

@@ -65,52 +65,39 @@ Feature: Import allocation settings
     And I follow "Program 000"
     And I click on "Allocation settings" "link" in the ".secondary-navigation" "css_element"
     And I click on "Update allocations" "link"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | timeallocationstart[enabled] | 1    |
-      | timeallocationstart[day]     | 5    |
-      | timeallocationstart[month]   | 11   |
-      | timeallocationstart[year]    | 2020 |
-      | timeallocationstart[hour]    | 09   |
-      | timeallocationstart[minute]  | 00   |
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | timeallocationend[enabled] | 1    |
-      | timeallocationend[day]     | 5    |
-      | timeallocationend[month]   | 11   |
-      | timeallocationend[year]    | 2028 |
-      | timeallocationend[hour]    | 09   |
-      | timeallocationend[minute]  | 00   |
-    And I click on "Update allocations" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | timeallocationstart | 2020-11-05 09:00 |
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | timeallocationend | 2028-11-05 09:00 |
+    And I click on "Update allocations" "button" in the "dialog[open]" "css_element"
     And I click on "Update scheduling" "link"
-    And I set the following fields to these values:
-      | Program start             | Delay start after allocation |
-      | programstart_delay[value] | 5      |
-      | programstart_delay[type]  | months |
-      | Program due               | Due after start |
-      | programdue_delay[value]   | 8      |
-      | programdue_delay[type]    | months |
-      | Program end               | End after start |
-      | programend_delay[value]   | 10     |
-      | programend_delay[type]    | months |
-    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program start      | Delay start after allocation |
+      | programstart_delay | P5M                          |
+      | Program due        | Due after start              |
+      | programdue_delay   | P8M                          |
+      | Program end        | End after start              |
+      | programend_delay   | P10M                         |
+    And I click on "Update scheduling" "button" in the "dialog[open]" "css_element"
     And I click on "Update Automatic cohort allocation" "link"
-    And I set the following fields to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Active           | Yes                |
       | Allocate cohorts | Cohort 1, Cohort 2 |
-    And I click on "Update" "button" in the ".modal-dialog" "css_element"
+    And I click on "Update" "button" in the "dialog[open]" "css_element"
     And I click on "Update Requests with approval" "link"
-    And I set the following fields to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Active             | Yes |
       | Allow new requests | No  |
-    And I click on "Update" "button" in the ".modal-dialog" "css_element"
+    And I click on "Update" "button" in the "dialog[open]" "css_element"
     And I click on "Update Manual allocation" "link"
-    And I set the following fields to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Active | Yes |
-    And I click on "Update" "button" in the ".modal-dialog" "css_element"
+    And I click on "Update" "button" in the "dialog[open]" "css_element"
     And I click on "Update Self allocation" "link"
-    And I set the following fields to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Active             | Yes |
       | Allow new sign ups | No  |
-    And I click on "Update" "button" in the ".modal-dialog" "css_element"
+    And I click on "Update" "button" in the "dialog[open]" "css_element"
     And I should see "Thursday, 5 November 2020, 9:00" in the "Allocation start" definition list item
     And I should see "Sunday, 5 November 2028, 9:00" in the "Allocation end" definition list item
     And I should see "Delay start after allocation - 5 months" in the "Program start" definition list item
@@ -135,12 +122,12 @@ Feature: Import allocation settings
     And I should see "Inactive" in the "Automatic cohort allocation" definition list item
 
     When I click on "Import allocation settings" action from "Allocation settings actions" dropdown
-    And I set the following fields to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Select program | Program 000 |
-    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
-    And I set the following fields to these values:
-      | Allocation start | 1 |
-    And I click on "Import allocation settings" "button" in the ".modal-dialog" "css_element"
+    And I click on "Continue" "button" in the "dialog[open]" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | importallocationstart | 1 |
+    And I click on "Import allocation settings" "button" in the "dialog[open]" "css_element"
     Then I should see "Thursday, 5 November 2020, 9:00" in the "Allocation start" definition list item
     And I should see "Not set" in the "Allocation end" definition list item
     And I should see "Start immediately after allocation" in the "Program start" definition list item
@@ -152,20 +139,20 @@ Feature: Import allocation settings
     And I should see "Inactive" in the "Automatic cohort allocation" definition list item
 
     When I click on "Import allocation settings" action from "Allocation settings actions" dropdown
-    And I set the following fields to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Select program | Program 000 |
-    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
-    And I set the following fields to these values:
-      | Allocation start            | 1 |
-      | Allocation end              | 1 |
-      | Program start               | 1 |
-      | Program due                 | 1 |
-      | Program end                 | 1 |
-      | Requests with approval      | 1 |
-      | Automatic cohort allocation | 1 |
-      | Manual allocation           | 1 |
-      | Self allocation             | 1 |
-    And I click on "Import allocation settings" "button" in the ".modal-dialog" "css_element"
+    And I click on "Continue" "button" in the "dialog[open]" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | importallocationstart | 1 |
+      | importallocationend        | 1 |
+      | importprogramstart         | 1 |
+      | importprogramdue           | 1 |
+      | importprogramend           | 1 |
+      | importsourceapproval       | 1 |
+      | importsourcecohort         | 1 |
+      | importsourcemanual         | 1 |
+      | importsourceselfallocation | 1 |
+    And I click on "Import allocation settings" "button" in the "dialog[open]" "css_element"
     Then I should see "Thursday, 5 November 2020, 9:00" in the "Allocation start" definition list item
     And I should see "Sunday, 5 November 2028, 9:00" in the "Allocation end" definition list item
     And I should see "Delay start after allocation - 5 months" in the "Program start" definition list item

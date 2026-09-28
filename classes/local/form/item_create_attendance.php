@@ -19,8 +19,14 @@
 
 namespace tool_muprog\local\form;
 
-use tool_muprog\local\content\set;
-use tool_muprog\external\form_autocomplete\item_create_course_courseids;
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\duration;
+use tool_mulib\muform\element\info;
+use tool_mulib\muform\element\number;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\element\text;
+use tool_mulib\muform\form;
 
 /**
  * Add offline attendance to program.
@@ -29,53 +35,21 @@ use tool_muprog\external\form_autocomplete\item_create_course_courseids;
  * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class item_create_attendance extends \tool_mulib\local\ajax_form {
+final class item_create_attendance extends form {
     #[\Override]
-    protected function definition() {
-        $mform = $this->_form;
+    protected function definition(): void {
+        $this->add(new info('typename', get_string('item_type', 'tool_muprog')));
 
-        $currentdata = $this->_customdata['currentdata'];
-        $types = $this->_customdata['types'];
+        $fullname = new text('fullname', get_string('fullname'), ['maxlength' => 254]);
+        $fullname->set_required(true);
+        $this->add($fullname);
 
-        $mform->addElement('static', 'statictype', get_string('item_type', 'tool_muprog'), $types[$currentdata['type']]);
+        $this->add(new duration('completiondelay', get_string('completiondelay', 'tool_muprog')));
 
-        $mform->addElement('text', 'fullname', get_string('fullname'), 'maxlength="254" size="50"');
-        $mform->addRule('fullname', get_string('required'), 'required', null, 'client');
-        $mform->setType('fullname', PARAM_TEXT);
+        $this->add(new number('points', get_string('itempoints', 'tool_muprog'), ['min' => 0]));
 
-        $mform->addElement(
-            'duration',
-            'completiondelay',
-            get_string('completiondelay', 'tool_muprog'),
-            ['optional' => true, 'defaultunit' => DAYSECS]
-        );
-
-        $mform->addElement('text', 'points', get_string('itempoints', 'tool_muprog'));
-        $mform->setType('points', PARAM_INT);
-
-        $mform->addElement('hidden', 'parentid');
-        $mform->setType('parentid', PARAM_INT);
-
-        $mform->addElement('hidden', 'type');
-        $mform->setType('type', PARAM_ALPHANUM);
-
-        $this->add_action_buttons(true, get_string('item_create_attendance', 'tool_muprog'));
-
-        $this->set_data($currentdata);
-    }
-
-    #[\Override]
-    public function validation($data, $files) {
-        $errors = parent::validation($data, $files);
-
-        if (trim($data['fullname']) === '') {
-            $errors['fullname'] = get_string('required');
-        }
-
-        if ($data['points'] < 0) {
-            $errors['points'] = get_string('error');
-        }
-
-        return $errors;
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', get_string('item_create_attendance', 'tool_muprog')), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 }

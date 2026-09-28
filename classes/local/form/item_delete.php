@@ -18,8 +18,13 @@
 
 namespace tool_muprog\local\form;
 
-use tool_muprog\local\content\course;
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\info;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\form;
 use tool_muprog\local\content\attendance;
+use tool_muprog\local\content\course;
 use tool_muprog\local\content\credits;
 
 /**
@@ -31,19 +36,14 @@ use tool_muprog\local\content\credits;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class item_delete extends \tool_mulib\local\ajax_form {
+final class item_delete extends form {
     #[\Override]
-    protected function definition() {
-        $mform = $this->_form;
-        $item = $this->_customdata['item'];
+    protected function definition(): void {
+        $item = $this->get_extra_data()['item'];
 
-        $mform->addElement('static', 'statictype', get_string('item_type', 'tool_muprog'), $item::get_type_name());
+        $this->add(new info('typename', get_string('item_type', 'tool_muprog')));
 
-        $mform->addElement('static', 'staticfullname', get_string('fullname'), format_string($item->get_fullname()));
-
-        $mform->addElement('hidden', 'id');
-        $mform->setType('id', PARAM_INT);
-        $mform->setDefault('id', $item->get_id());
+        $this->add(new info('fullname', get_string('fullname')));
 
         if ($item instanceof course) {
             $deletestr = get_string('deletecourse', 'tool_muprog');
@@ -55,6 +55,8 @@ final class item_delete extends \tool_mulib\local\ajax_form {
             $deletestr = get_string('deleteset', 'tool_muprog');
         }
 
-        $this->add_action_buttons(true, $deletestr);
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', $deletestr), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 }

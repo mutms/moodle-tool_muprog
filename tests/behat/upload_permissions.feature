@@ -39,9 +39,9 @@ Feature: Program upload permissions tests
     And I am on the "Category 2" "tool_muprog > Program management" page
 
     When I click on "Upload programs" action from "Programs actions" dropdown
-    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_json.zip" file to "Files" filemanager
+    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_json.zip" file to "files" muform filemanager
     And I press "Continue"
-    And the following fields match these values:
+    And the following muform fields match:
       | usecategory | 0          |
       | contextid   | Category 2 |
     And the following should exist in the "upload_preview" table:

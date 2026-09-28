@@ -19,6 +19,12 @@
 
 namespace tool_muprog\local\form;
 
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\datetime;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\form;
+
 /**
  * Edit program allocation.
  *
@@ -28,39 +34,29 @@ namespace tool_muprog\local\form;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class program_allocations_edit extends \tool_mulib\local\ajax_form {
+final class program_allocations_edit extends form {
     #[\Override]
-    protected function definition() {
-        $mform = $this->_form;
-        $data = $this->_customdata['data'];
-        $context = $this->_customdata['context'];
+    protected function definition(): void {
+        $start = new datetime('timeallocationstart', get_string('allocationstart', 'tool_muprog'));
+        $start->add_help_button('allocationstart', 'tool_muprog');
+        $this->add($start);
 
-        $mform->addElement('date_time_selector', 'timeallocationstart', get_string('allocationstart', 'tool_muprog'), ['optional' => true]);
-        $mform->addHelpButton('timeallocationstart', 'allocationstart', 'tool_muprog');
+        $end = new datetime('timeallocationend', get_string('allocationend', 'tool_muprog'));
+        $end->add_help_button('allocationend', 'tool_muprog');
+        $this->add($end);
 
-        $mform->addElement('date_time_selector', 'timeallocationend', get_string('allocationend', 'tool_muprog'), ['optional' => true]);
-        $mform->addHelpButton('timeallocationend', 'allocationend', 'tool_muprog');
-
-        $mform->addElement('hidden', 'id');
-        $mform->setType('id', PARAM_INT);
-        $mform->setDefault('id', $data->id);
-
-        $this->add_action_buttons(true, get_string('program_allocations_edit', 'tool_muprog'));
-
-        $this->set_data($data);
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', get_string('program_allocations_edit', 'tool_muprog')), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 
     #[\Override]
-    public function validation($data, $files): array {
-        $errors = parent::validation($data, $files);
-
+    protected function validation(array $data, array &$allerrors): void {
         if (
             $data['timeallocationstart'] && $data['timeallocationend']
             && $data['timeallocationstart'] >= $data['timeallocationend']
         ) {
-            $errors['timeallocationend'] = get_string('error');
+            $allerrors['timeallocationend'][] = get_string('error');
         }
-
-        return $errors;
     }
 }

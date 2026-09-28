@@ -33,15 +33,15 @@ Feature: External database query program allocation tests
 
     When I click on "Allocation settings" "link" in the ".secondary-navigation" "css_element"
     And I click on "Update External database allocation" "link"
-    And I set the following fields to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Active                  | Yes          |
       | External database query | Test query 1 |
       | Archive missing users   | 1            |
-    And I click on "Update" "button" in the ".modal-dialog" "css_element"
+    And I click on "Update" "button" in the "dialog[open]" "css_element"
     Then I should see "Active (Test query 1)" in the "External database allocation" definition list item
 
     When I click on "Process allocations" "link"
-    And I click on "Process allocations" "button" in the ".modal-dialog" "css_element"
+    And I click on "Process allocations" "button" in the "dialog[open]" "css_element"
     Then I should see "External database allocation ad-hoc task created"
 
     When I run all ad-hoc tasks
@@ -54,12 +54,12 @@ Feature: External database query program allocation tests
 
     When I click on "Allocation settings" "link" in the ".secondary-navigation" "css_element"
     And I click on "Update External database allocation" "link"
-    And I set the following fields to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | External database query | Test query 2 |
       | Archive missing users   | 0            |
-    And I click on "Update" "button" in the ".modal-dialog" "css_element"
+    And I click on "Update" "button" in the "dialog[open]" "css_element"
     And I click on "Process allocations" "link"
-    And I click on "Process allocations" "button" in the ".modal-dialog" "css_element"
+    And I click on "Process allocations" "button" in the "dialog[open]" "css_element"
     And I should see "External database allocation ad-hoc task created"
     And I run all ad-hoc tasks
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
@@ -71,12 +71,12 @@ Feature: External database query program allocation tests
 
     When I click on "Allocation settings" "link" in the ".secondary-navigation" "css_element"
     And I click on "Update External database allocation" "link"
-    And I set the following fields to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | External database query | Test query 2 |
       | Archive missing users   | 1            |
-    And I click on "Update" "button" in the ".modal-dialog" "css_element"
+    And I click on "Update" "button" in the "dialog[open]" "css_element"
     And I click on "Process allocations" "link"
-    And I click on "Process allocations" "button" in the ".modal-dialog" "css_element"
+    And I click on "Process allocations" "button" in the "dialog[open]" "css_element"
     And I should see "External database allocation ad-hoc task created"
     And I run all ad-hoc tasks
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
@@ -88,12 +88,12 @@ Feature: External database query program allocation tests
 
     When I click on "Allocation settings" "link" in the ".secondary-navigation" "css_element"
     And I click on "Update External database allocation" "link"
-    And I set the following fields to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | External database query | Test query 1 |
       | Archive missing users   | 1            |
-    And I click on "Update" "button" in the ".modal-dialog" "css_element"
+    And I click on "Update" "button" in the "dialog[open]" "css_element"
     And I click on "Process allocations" "link"
-    And I click on "Process allocations" "button" in the ".modal-dialog" "css_element"
+    And I click on "Process allocations" "button" in the "dialog[open]" "css_element"
     And I should see "External database allocation ad-hoc task created"
     And I run all ad-hoc tasks
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"

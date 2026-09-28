@@ -19,7 +19,11 @@
 
 namespace tool_muprog\local\form;
 
-use tool_muprog\local\content\set;
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\radios;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\form;
 
 /**
  * Select item type to add.
@@ -28,37 +32,17 @@ use tool_muprog\local\content\set;
  * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class item_create extends \tool_mulib\local\ajax_form {
+final class item_create extends form {
     #[\Override]
-    protected function definition() {
-        $mform = $this->_form;
+    protected function definition(): void {
+        $types = $this->get_extra_data()['types'];
 
-        $currentdata = $this->_customdata['currentdata'];
-        $types = $this->_customdata['types'];
+        $type = new radios('type', get_string('item_type', 'tool_muprog'), array_map('strval', $types));
+        $type->set_required(true);
+        $this->add($type);
 
-        $radios = [];
-        foreach ($types as $k => $v) {
-            $radios[] = $mform->createElement('radio', 'type', '', $v, $k);
-        }
-        $mform->addElement('group', 'type_group', get_string('item_type', 'tool_muprog'), $radios, '<div class="w-100" />', false);
-        $mform->addRule('type_group', get_string('required'), 'required', null, 'client');
-
-        $mform->addElement('hidden', 'parentid');
-        $mform->setType('parentid', PARAM_INT);
-
-        $this->add_action_buttons(true, get_string('continue'));
-
-        $this->set_data($currentdata);
-    }
-
-    #[\Override]
-    public function validation($data, $files) {
-        $errors = parent::validation($data, $files);
-
-        if (empty($data['type'])) {
-            $errors['type_group'] = get_string('required');
-        }
-
-        return $errors;
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', get_string('continue')), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 }

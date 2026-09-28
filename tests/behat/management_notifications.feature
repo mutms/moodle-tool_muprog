@@ -47,10 +47,10 @@ Feature: Program notifications management tests
     And I am on the "tool_muprog > All programs management" page
 
     And I click on "Add program" "button"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Program name  | Program 001 |
-      | Program ID    | PR01        |
-    And I click on "Add program" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program name | Program 001 |
+      | Program ID   | PR01        |
+    And I click on "Add program" "button" in the "dialog[open]" "css_element"
     And I follow "Notifications"
     When I click on "Add notification" "link"
     And I set the following muform fields in the "dialog[open]" "css_element":
@@ -99,10 +99,10 @@ Feature: Program notifications management tests
     And I am on the "tool_muprog > All programs management" page
 
     And I click on "Add program" "button"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Program name  | Program 001 |
-      | Program ID    | PR01        |
-    And I click on "Add program" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program name | Program 001 |
+      | Program ID   | PR01        |
+    And I click on "Add program" "button" in the "dialog[open]" "css_element"
     And I follow "Notifications"
 
     When I click on "Add notification" "link"

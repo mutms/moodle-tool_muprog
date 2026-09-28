@@ -18,7 +18,12 @@
 
 namespace tool_muprog\local\form;
 
-use tool_muprog\external\form_autocomplete\program_allocation_import_fromprogram;
+use tool_mulib\muform\element\autocomplete;
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\form;
+use tool_muprog\muform\autocomplete\program_allocation_import_fromprogram;
 
 /**
  * Import allocation settings - program selection step.
@@ -28,43 +33,21 @@ use tool_muprog\external\form_autocomplete\program_allocation_import_fromprogram
  * @author     Farhan Karmali
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class program_allocation_import extends \tool_mulib\local\ajax_form {
+final class program_allocation_import extends form {
     #[\Override]
-    protected function definition() {
-        $mform = $this->_form;
-        $targetprogram = $this->_customdata['targetprogram'];
-        $context = $this->_customdata['context'];
+    protected function definition(): void {
+        $targetprogram = $this->get_extra_data()['targetprogram'];
 
-        $args = ['programid' => $targetprogram->id];
-
-        program_allocation_import_fromprogram::add_element(
-            $mform,
-            $args,
+        $fromprogram = new autocomplete(
             'fromprogram',
             get_string('importselectprogram', 'tool_muprog'),
-            $context
+            new program_allocation_import_fromprogram((int)$targetprogram->id)
         );
-        $mform->addRule('fromprogram', null, 'required', null, 'client');
+        $fromprogram->set_required(true);
+        $this->add($fromprogram);
 
-        $mform->addElement('hidden', 'id');
-        $mform->setType('id', PARAM_INT);
-        $mform->setDefault('id', $targetprogram->id);
-
-        $this->add_action_buttons(true, get_string('continue'));
-    }
-
-    #[\Override]
-    public function validation($data, $files) {
-        $errors = parent::validation($data, $files);
-        $targetprogram = $this->_customdata['targetprogram'];
-        $context = $this->_customdata['context'];
-
-        $args = ['programid' => $targetprogram->id];
-        $error = program_allocation_import_fromprogram::validate_value($data['fromprogram'], $args, $context);
-        if ($error !== null) {
-            $errors['fromprogram'] = $error;
-        }
-
-        return $errors;
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', get_string('continue')), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 }

@@ -28,11 +28,11 @@
  */
 
 use tool_muprog\local\program;
+use tool_mulib\muform\handler;
+use tool_mulib\muform\util\file_area;
 
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
-
-define('AJAX_SCRIPT', true);
 
 require('../../../../config.php');
 
@@ -48,33 +48,32 @@ $syscontext = \context_system::instance();
 $currenturl = new core\url('/admin/tool/muprog/management/program_update.php', ['id' => $program->id]);
 $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
+$title = get_string('program_update', 'tool_muprog');
+$PAGE->set_title($title);
+$PAGE->set_heading($title);
 
-$editoroptions = program::get_description_editor_options();
-$program = file_prepare_standard_editor(
-    $program,
-    'description',
-    $editoroptions,
-    $syscontext,
-    'tool_muprog',
-    'description',
-    $program->id
-);
-$program->tags = core_tag_tag::get_item_tags_array('tool_muprog', 'tool_muprog_program', $program->id);
+$handler = handler::from_request();
 
-$program->image = file_get_submitted_draft_itemid('image');
-file_prepare_draft_area($program->image, $syscontext->id, 'tool_muprog', 'image', $program->id, ['subdirs' => 0]);
-
-$form = new \tool_muprog\local\form\program_update(null, ['data' => $program, 'editoroptions' => $editoroptions, 'context' => $context]);
+$current = (array)$program;
+$current['image'] = new file_area($syscontext, 'tool_muprog', 'image', $program->id);
+$current['descriptionfilearea'] = new file_area($syscontext, 'tool_muprog', 'description', $program->id);
+$form = new \tool_muprog\local\form\program_update($currenturl, $current);
 
 $returnurl = new core\url('/admin/tool/muprog/management/program.php', ['id' => $program->id]);
 
 if ($form->is_cancelled()) {
-    $form->ajax_form_cancelled($returnurl);
+    $handler->cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
-    $program = program::update_general($data);
-    $form->ajax_form_submitted($returnurl);
+    // Custom fields and description files are saved by the form elements.
+    $record = (object)array_filter((array)$data, fn($key) => !str_starts_with($key, 'customfield_'), ARRAY_FILTER_USE_KEY);
+    $record->id = $program->id;
+    unset($record->archived);
+    $program = program::update_general($record);
+    $form->get_element('description')->save_area();
+    $form->get_element('customfields')->save($program->id);
+    $handler->submitted($returnurl);
 }
 
-$form->ajax_form_render();
+$handler->render($form);

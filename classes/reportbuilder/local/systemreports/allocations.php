@@ -182,7 +182,7 @@ final class allocations extends system_report {
         $program = $this->program;
 
         $url = new url('/admin/tool/muprog/management/allocation_update.php', ['id' => ':id']);
-        $link = new \tool_mulib\output\ajax_form\link($url, new lang_string('allocation_update', 'tool_muprog'), 'i/settings');
+        $link = new \tool_mulib\output\muform\dialog\link($url, new lang_string('allocation_update', 'tool_muprog'), 'i/settings');
         $this->add_action($link->create_report_action()
             ->add_callback(static function (\stdclass $row) use ($program): bool {
                 global $DB;
@@ -208,7 +208,7 @@ final class allocations extends system_report {
             }));
 
         $url = new url('/admin/tool/muprog/management/allocation_archive.php', ['id' => ':id']);
-        $link = new \tool_mulib\output\ajax_form\link($url, new lang_string('allocation_archive', 'tool_muprog'), 'i/lock');
+        $link = new \tool_mulib\output\muform\dialog\link($url, new lang_string('allocation_archive', 'tool_muprog'), 'i/lock');
         $this->add_action($link->create_report_action()
             ->add_callback(static function (\stdclass $row) use ($program): bool {
                 global $DB;
@@ -234,7 +234,7 @@ final class allocations extends system_report {
             }));
 
         $url = new url('/admin/tool/muprog/management/allocation_restore.php', ['id' => ':id']);
-        $link = new \tool_mulib\output\ajax_form\link($url, new lang_string('allocation_restore', 'tool_muprog'), 'i/unlock');
+        $link = new \tool_mulib\output\muform\dialog\link($url, new lang_string('allocation_restore', 'tool_muprog'), 'i/unlock');
         $this->add_action($link->create_report_action()
             ->add_callback(static function (\stdclass $row) use ($program): bool {
                 global $DB;
@@ -260,7 +260,7 @@ final class allocations extends system_report {
             }));
 
         $url = new url('/admin/tool/muprog/management/allocation_delete.php', ['id' => ':id']);
-        $link = new \tool_mulib\output\ajax_form\link($url, new lang_string('deleteallocation', 'tool_muprog'), 'i/delete');
+        $link = new \tool_mulib\output\muform\dialog\link($url, new lang_string('deleteallocation', 'tool_muprog'), 'i/delete');
         $this->add_action($link->create_report_action(['class' => 'text-danger'])
             ->add_callback(static function (\stdclass $row) use ($program): bool {
                 global $DB;

@@ -19,10 +19,13 @@
 
 namespace tool_muprog\local\form;
 
-defined('MOODLE_INTERNAL') || die();
-
-global $CFG;
-require_once($CFG->dirroot . '/lib/formslib.php');
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\checkbox;
+use tool_mulib\muform\element\info;
+use tool_mulib\muform\element\select;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\form;
 
 /**
  * Upload programs confirmation.
@@ -33,66 +36,45 @@ require_once($CFG->dirroot . '/lib/formslib.php');
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class upload_options extends \moodleform {
-    /** @var int upload count */
-    protected $uploadcount;
-    /** @var int invalid count */
-    protected $invalidcount;
-
+final class upload_options extends form {
     #[\Override]
-    protected function definition() {
-        $mform = $this->_form;
-        $contextid = $this->_customdata['contextid'];
-        $draftid = $this->_customdata['files'];
-        $filedata = $this->_customdata['filedata'];
+    protected function definition(): void {
+        $filedata = $this->get_extra_data()['filedata'];
 
-        $this->uploadcount = 0;
-        $this->invalidcount = 0;
-        $cateogryfail = false;
+        $uploadcount = 0;
+        $invalidcount = 0;
+        $categoryfail = false;
         foreach ($filedata as $program) {
             if ($program->errors) {
-                $this->invalidcount++;
+                $invalidcount++;
                 continue;
             }
-            $this->uploadcount++;
+            $uploadcount++;
             if (!$program->contextid) {
-                $cateogryfail = true;
+                $categoryfail = true;
             }
         }
 
-        $mform->addElement('advcheckbox', 'usecategory', get_string('upload_usecategory', 'tool_muprog'), '&nbsp;');
-        if ($cateogryfail) {
-            $mform->setConstant('usecategory', 0);
-            $mform->hardFreeze('usecategory');
+        $usecategory = new checkbox('usecategory', get_string('upload_usecategory', 'tool_muprog'));
+        if ($categoryfail) {
+            $usecategory->set_default(0);
+            $usecategory->set_frozen(true);
         } else {
-            $mform->setDefault('usecategory', 1);
+            $usecategory->set_default(1);
         }
+        $this->add($usecategory);
 
-        $mform->addElement('select', 'contextid', get_string('upload_targetcontext', 'tool_muprog'), self::get_category_options());
-        if ($contextid) {
-            $mform->setDefault('contextid', $contextid);
+        $this->add(new select('contextid', get_string('upload_targetcontext', 'tool_muprog'), self::get_category_options()));
+        $this->get_display_manager()->hide_if('contextid', 'usecategory', 'checked');
+
+        $this->add(new info('uploadcount', get_string('upload_uploadcount', 'tool_muprog'), (string)$uploadcount));
+        $this->add(new info('invalidcount', get_string('upload_invalidcount', 'tool_muprog'), (string)$invalidcount));
+
+        $this->add(new buttons('buttons'));
+        if ($uploadcount) {
+            $this->add(new submit('submit', get_string('upload', 'tool_muprog')), 'buttons');
         }
-        $mform->hideIf('contextid', 'usecategory', 'eq', 1);
-
-        $mform->addElement('static', 'uploadcount', get_string('upload_uploadcount', 'tool_muprog'), $this->uploadcount);
-        $mform->addElement('static', 'invalidcount', get_string('upload_invalidcount', 'tool_muprog'), $this->invalidcount);
-
-        $mform->addElement('hidden', 'files');
-        $mform->setType('files', PARAM_INT);
-        $mform->setDefault('files', $draftid);
-
-        if ($this->uploadcount) {
-            $this->add_action_buttons(true, get_string('upload', 'tool_muprog'));
-        } else {
-            $mform->addElement('cancel');
-        }
-    }
-
-    #[\Override]
-    public function validation($data, $files) {
-        $errors = parent::validation($data, $files);
-
-        return $errors;
+        $this->add(new cancel(), 'buttons');
     }
 
     /**
@@ -100,7 +82,8 @@ final class upload_options extends \moodleform {
      *
      * @return array
      */
-    protected function get_category_options(): array {
+    protected static function get_category_options(): array {
+        $options = [];
         $syscontext = \context_system::instance();
         if (has_capability('tool/muprog:upload', $syscontext)) {
             $options[$syscontext->id] = $syscontext->get_context_name();
@@ -108,7 +91,7 @@ final class upload_options extends \moodleform {
         $categories = \core_course_category::make_categories_list('tool/muprog:upload');
         foreach ($categories as $catid => $categoryname) {
             $catcontext = \context_coursecat::instance($catid);
-            $options[$catcontext->id] = $categoryname;
+            $options[$catcontext->id] = (string)$categoryname;
         }
         return $options;
     }

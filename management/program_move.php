@@ -26,11 +26,10 @@
  */
 
 use tool_muprog\local\program;
+use tool_mulib\muform\handler;
 
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
-
-define('AJAX_SCRIPT', true);
 
 require('../../../../config.php');
 
@@ -45,17 +44,22 @@ require_capability('tool/muprog:edit', $context);
 $currenturl = new core\url('/admin/tool/muprog/management/program_move.php', ['id' => $program->id]);
 $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
+$title = get_string('program_move', 'tool_muprog');
+$PAGE->set_title($title);
+$PAGE->set_heading($title);
 
-$form = new \tool_muprog\local\form\program_move(null, ['program' => $program, 'context' => $context]);
+$handler = handler::from_request();
+
+$form = new \tool_muprog\local\form\program_move($currenturl, $program);
 $returnurl = new core\url('/admin/tool/muprog/management/program.php', ['id' => $program->id]);
 
 if ($form->is_cancelled()) {
-    $form->ajax_form_cancelled($returnurl);
+    $handler->cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
-    program::move($data->id, $data->contextid);
-    $form->ajax_form_submitted($returnurl);
+    program::move($program->id, (int)$data->contextid);
+    $handler->submitted($returnurl);
 }
 
-$form->ajax_form_render();
+$handler->render($form);

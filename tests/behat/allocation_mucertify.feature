@@ -16,10 +16,10 @@ Feature: Certification program allocation tests
     And I am on the "tool_muprog > All programs management" page
 
     When I click on "Add program" "button"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Program name      | Program 001 |
-      | Program ID        | PR01        |
-      | Certifications    | 1           |
-    And I click on "Add program" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program name   | Program 001 |
+      | Program ID     | PR01        |
+      | addsources     | mucertify   |
+    And I click on "Add program" "button" in the "dialog[open]" "css_element"
     And I follow "Allocation settings"
     Then I should see "Active" in the "Certifications" definition list item

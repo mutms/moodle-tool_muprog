@@ -27,13 +27,13 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use tool_mulib\muform\handler;
+
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
 /** @var core_renderer $OUTPUT */
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
-
-define('AJAX_SCRIPT', true);
 
 require('../../../../config.php');
 
@@ -47,7 +47,7 @@ $source = $DB->get_record('tool_muprog_source', ['programid' => $program->id, 't
 $context = context::instance_by_id($program->contextid);
 require_capability('tool/muprog:edit', $context);
 
-$currenturl = new core\url('/admin/tool/muprog/management/program_source_edit.php', ['id' => $program->id]);
+$currenturl = new core\url('/admin/tool/muprog/management/program_source_edit.php', ['programid' => $program->id, 'type' => $type]);
 $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
 
@@ -59,6 +59,10 @@ if (!isset($sourceclasses[$type])) {
     throw new coding_exception('Invalid source type');
 }
 $sourceclass = $sourceclasses[$type];
+
+$title = get_string('updatesource', 'tool_muprog', $sourceclass::get_name());
+$PAGE->set_title($title);
+$PAGE->set_heading($title);
 
 if ($source) {
     if (!$sourceclass::is_update_allowed($program)) {
@@ -79,17 +83,25 @@ if ($source) {
 }
 $source = $sourceclass::decode_datajson($source);
 
-/** @var \tool_mulib\local\ajax_form $formclass */
+$handler = handler::from_request();
+
+/** @var \tool_mulib\muform\form $formclass */
 $formclass = $sourceclass::get_edit_form_class();
-$form = new $formclass(null, ['source' => $source, 'program' => $program, 'context' => $context]);
+$form = new $formclass($currenturl, $source, ['source' => $source, 'program' => $program]);
 
 if ($form->is_cancelled()) {
-    $form->ajax_form_cancelled($returnurl);
+    $handler->cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
+    $data->programid = $program->id;
+    $data->type = $type;
+    if (property_exists($data, 'selfallocation_key') && $data->selfallocation_key === null) {
+        // Shared keys are not submitted unless changed.
+        $data->selfallocation_key = $source->selfallocation_key;
+    }
     tool_muprog\local\source\base::update_source($data);
-    $form->ajax_form_submitted($returnurl);
+    $handler->submitted($returnurl);
 }
 
-$form->ajax_form_render();
+$handler->render($form);

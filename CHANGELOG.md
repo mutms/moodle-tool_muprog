@@ -9,7 +9,16 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 ### Changed
 
 - migration to new forms library
+- program scheduling delays are entered as intervals with a single time unit
 
 ### Fixed
 
 - custom field data context not updated when moving programs
+- editing of self allocation settings always enabled sign-ups
+- pending external database synchronisation check was inverted
+- minimum prerequisites and minimum points of sets were not validated
+- editing of set and attendance names could damage multilang names
+- evidence upload accepted a missing completion date column
+- manual allocation and evidence upload did not detect user column used also as another column
+- allocation import date errors were not displayed
+- program certificate expiry allowed a zero relative expiry

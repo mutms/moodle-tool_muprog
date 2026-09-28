@@ -58,8 +58,8 @@ $actions = new header_actions(get_string('management_program_allocation_actions'
 
 if (has_capability('tool/muprog:edit', $context) && !$program->archived) {
     $url = new core\url('/admin/tool/muprog/management/program_allocation_import.php', ['id' => $program->id]);
-    $link = new \tool_mulib\output\ajax_form\link($url, get_string('importprogramallocation', 'tool_muprog'), 'i/import');
-    $actions->get_dropdown()->add_ajax_form($link);
+    $link = new \tool_mulib\output\muform\dialog\link($url, get_string('importprogramallocation', 'tool_muprog'), 'i/import');
+    $actions->get_dropdown()->add_dialog($link);
 }
 
 if ($actions->has_items()) {
@@ -70,7 +70,7 @@ echo $OUTPUT->header();
 
 if (has_capability('tool/muprog:edit', $context)) {
     $editurl = new core\url('/admin/tool/muprog/management/program_allocations_edit.php', ['id' => $program->id]);
-    $updateicon = new tool_mulib\output\ajax_form\icon($editurl, get_string('program_allocations_edit', 'tool_muprog'), 'i/settings');
+    $updateicon = new tool_mulib\output\muform\dialog\icon($editurl, get_string('program_allocations_edit', 'tool_muprog'), 'i/settings');
     $updateicon->set_modal_title(get_string('allocations', 'tool_muprog'));
     $updateicon = ' <span style="font-size: .9375rem !important">' . $OUTPUT->render($updateicon) . '</span>';
 } else {
@@ -81,7 +81,7 @@ echo $managementoutput->render_program_allocation($program);
 
 if (has_capability('tool/muprog:edit', $context)) {
     $editurl = new core\url('/admin/tool/muprog/management/program_scheduling_edit.php', ['id' => $program->id]);
-    $updateicon = new tool_mulib\output\ajax_form\icon($editurl, get_string('updatescheduling', 'tool_muprog'), 'i/settings');
+    $updateicon = new tool_mulib\output\muform\dialog\icon($editurl, get_string('updatescheduling', 'tool_muprog'), 'i/settings');
     $updateicon->set_modal_title(get_string('scheduling', 'tool_muprog'));
     $updateicon = ' <span style="font-size: .9375rem !important">' . $OUTPUT->render($updateicon) . '</span>';
 } else {

@@ -18,6 +18,12 @@
 
 namespace tool_muprog\local\form;
 
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\inforawhtml;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\form;
+
 /**
  * Request program allocation.
  *
@@ -27,27 +33,14 @@ namespace tool_muprog\local\form;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class source_approval_request extends \tool_mulib\local\ajax_form {
+final class source_approval_request extends form {
     #[\Override]
-    protected function definition() {
-        $mform = $this->_form;
-        $source = $this->_customdata['source'];
-        $program = $this->_customdata['program'];
-
+    protected function definition(): void {
         $confirmation = markdown_to_html(get_string('source_approval_confirm', 'tool_muprog'));
-        $mform->addElement('static', 'confirmation', '', clean_text($confirmation));
+        $this->add(new inforawhtml('confirmation', '', clean_text($confirmation)));
 
-        $mform->addElement('hidden', 'sourceid');
-        $mform->setType('sourceid', PARAM_INT);
-        $mform->setDefault('sourceid', $source->id);
-
-        $this->add_action_buttons(true, get_string('source_approval_makerequest', 'tool_muprog'));
-    }
-
-    #[\Override]
-    public function validation($data, $files) {
-        $errors = parent::validation($data, $files);
-
-        return $errors;
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', get_string('source_approval_makerequest', 'tool_muprog')), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 }

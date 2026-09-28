@@ -29,9 +29,9 @@
 /** @var moodle_page $PAGE */
 
 use tool_muprog\local\program;
+use tool_mulib\muform\form;
+use tool_mulib\muform\handler;
 use core\url;
-
-define('AJAX_SCRIPT', true);
 
 require('../../../../config.php');
 
@@ -50,7 +50,6 @@ if ($program->archived) {
 }
 
 $PAGE->set_context($context);
-$PAGE->set_url('/admin/tool/muprog/management/item_create.php', ['parentid' => $parentrecord->id, 'type' => $type]);
 
 $returnurl = new url('/admin/tool/muprog/management/program_content.php', ['id' => $program->id]);
 
@@ -70,56 +69,64 @@ if (!isset($types[$type])) {
     $type = '';
 }
 
+$pageurl = new url('/admin/tool/muprog/management/item_create.php', ['parentid' => $parentrecord->id]);
+if ($type) {
+    $currenturl = new url($pageurl, ['type' => $type]);
+    $title = get_string('item_create_' . $type, 'tool_muprog');
+} else {
+    $currenturl = $pageurl;
+    $title = get_string('appenditem', 'tool_muprog');
+}
+$PAGE->set_url($currenturl);
+$PAGE->set_title($title);
+$PAGE->set_heading($title);
+
+$handler = handler::from_request();
+
+$createform = function (string $type, url $formurl) use ($types, $program): form {
+    $current = [
+        'typename' => (string)$types[$type],
+        'points' => 1,
+    ];
+    $extra = ['programid' => (int)$program->id];
+    if ($type === 'set') {
+        $current['sequencetype'] = \tool_muprog\local\content\set::SEQUENCE_TYPE_ALLINANYORDER;
+        $current['minprerequisites'] = 1;
+        $current['minpoints'] = 1;
+        return new \tool_muprog\local\form\item_create_set($formurl, $current, $extra);
+    } else if ($type === 'course') {
+        return new \tool_muprog\local\form\item_create_course($formurl, $current, $extra);
+    } else if ($type === 'attendance') {
+        return new \tool_muprog\local\form\item_create_attendance($formurl, $current, $extra);
+    } else if ($type === 'credits') {
+        return new \tool_muprog\local\form\item_create_credits($formurl, $current, $extra);
+    }
+    throw new \core\exception\coding_exception('Unknown item type');
+};
+
 if (!$type) {
-    $currentdata = ['parentid' => $parent->get_id()];
-    $form = new \tool_muprog\local\form\item_create(
-        null,
-        ['currentdata' => $currentdata, 'types' => $types]
-    );
+    $form = new \tool_muprog\local\form\item_create($currenturl, [], ['types' => $types]);
     if ($form->is_cancelled()) {
-        $form->ajax_form_cancelled($returnurl);
+        $handler->cancelled($returnurl);
     }
     if ($data = $form->get_data()) {
-        $type = $data->type;
-    } else {
-        $form->ajax_form_render();
+        $nexturl = new url($pageurl, ['type' => $data->type]);
+        if ($handler->is_dialog()) {
+            // The dialog continues with the second step, the page gets it from the next URL.
+            $handler->render(
+                $createform($data->type, $nexturl),
+                get_string('item_create_' . $data->type, 'tool_muprog')
+            );
+        }
+        redirect($nexturl);
     }
+    $handler->render($form);
 }
 
-$currentdata = [
-    'parentid' => $parent->get_id(),
-    'type' => $type,
-    'points' => 1,
-];
-if ($type === 'set') {
-    $currentdata['sequencetype'] = $top::SEQUENCE_TYPE_ALLINANYORDER;
-    $currentdata['minprerequisites'] = 1;
-    $currentdata['minpoints'] = 1;
-    $form = new tool_muprog\local\form\item_create_set(
-        null,
-        ['currentdata' => $currentdata, 'types' => $types, 'parent' => $parent, 'context' => $context]
-    );
-} else if ($type === 'course') {
-    $form = new tool_muprog\local\form\item_create_course(
-        null,
-        ['currentdata' => $currentdata, 'types' => $types, 'parent' => $parent, 'context' => $context]
-    );
-} else if ($type === 'attendance') {
-    $form = new tool_muprog\local\form\item_create_attendance(
-        null,
-        ['currentdata' => $currentdata, 'types' => $types, 'parent' => $parent, 'context' => $context]
-    );
-} else if ($type === 'credits') {
-    $form = new tool_muprog\local\form\item_create_credits(
-        null,
-        ['currentdata' => $currentdata, 'types' => $types, 'parent' => $parent, 'context' => $context]
-    );
-} else {
-    throw new \core\exception\coding_exception('Unknown item type');
-}
+$form = $createform($type, $currenturl);
 
 if ($form->is_cancelled()) {
-    $form->ajax_form_cancelled($returnurl);
+    $handler->cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
@@ -129,15 +136,16 @@ if ($data = $form->get_data()) {
         $courseids = $data->courseids;
         unset($data->courseids);
         foreach ($courseids as $courseid) {
-            $coursecontext = context_course::instance($courseid);
-            $top->append_course($parent, $courseid, (array)$data);
+            $top->append_course($parent, (int)$courseid, (array)$data);
         }
     } else if ($type === 'attendance') {
         $top->append_attendance($parent, (array)$data);
     } else if ($type === 'credits') {
-        $top->append_credits($parent, $data->creditframeworkid, (array)$data);
+        $creditframeworkid = (int)$data->creditframeworkid;
+        unset($data->creditframeworkid);
+        $top->append_credits($parent, $creditframeworkid, (array)$data);
     }
-    $form->ajax_form_submitted($returnurl);
+    $handler->submitted($returnurl);
 }
 
-$form->ajax_form_render();
+$handler->render($form);

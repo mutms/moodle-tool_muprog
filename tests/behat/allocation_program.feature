@@ -44,19 +44,19 @@ Feature: Completed programs allocation tests
     And I follow "Users"
     And I follow "Student 1"
     And I click on "Update other evidence" "link" in the "Program 000" "table_row"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | evidencetimecompleted[enabled] | 1        |
-      | Details                        | no need! |
-    And I click on "Update" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | evidencetimecompleted | ##now##  |
+      | Details               | no need! |
+    And I click on "Update" "button" in the "dialog[open]" "css_element"
     And I should see "Completed" in the "Program status" definition list item
 
     When I am on the "Program 001" "tool_muprog > Program" page
     And I click on "Allocation settings" "link" in the ".secondary-navigation" "css_element"
     And I click on "Update Completed program" "link"
-    And I set the following fields to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Active              | Yes         |
       | Program to complete | Program 000 |
-    And I click on "Update" "button" in the ".modal-dialog" "css_element"
+    And I click on "Update" "button" in the "dialog[open]" "css_element"
     Then I should see "Active" in the "Completed program" definition list item
     And I should see "Program 000" in the "Completed program" definition list item
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"

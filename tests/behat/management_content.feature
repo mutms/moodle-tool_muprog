@@ -58,185 +58,167 @@ Feature: Program content management tests
 
     # Add courses and sets
     When I click on "Append item" "link" in the "Program 000" "table_row"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Course | 1 |
-    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
-    And the following fields in the ".modal-dialog" "css_element" match these values:
-      | Points                    | 1            |
-      | completiondelay[enabled]  | 0            |
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Courses                   | Course 1     |
-      | Points                    | 123          |
-      | completiondelay[enabled]  | 1            |
-      | completiondelay[number]   | 3            |
-      | completiondelay[timeunit] | days         |
-    Then I click on "Add courses" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | type | course |
+    And I click on "Continue" "button" in the "dialog[open]" "css_element"
+    And the following muform fields in the "dialog[open]" "css_element" match:
+      | Points          | 1 |
+      | completiondelay |   |
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Courses         | Course 1 |
+      | Points          | 123      |
+      | completiondelay | 259200   |
+    Then I click on "Add courses" "button" in the "dialog[open]" "css_element"
     And I should see "123" in the "Course 1" "table_row"
     And I should see "Completion delay: 3 days" in the "Course 1" "table_row"
 
     When I click on "Append item" "link" in the "Program 000" "table_row"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Set | 1 |
-    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Full name                 | First set    |
-      | Completion type           | All in order |
-      | Points                    | 321          |
-      | completiondelay[enabled]  | 1            |
-      | completiondelay[number]   | 7            |
-      | completiondelay[timeunit] | days         |
-    And I click on "Add set" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | type | set |
+    And I click on "Continue" "button" in the "dialog[open]" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Full name       | First set    |
+      | Completion type | All in order |
+      | Points          | 321          |
+      | completiondelay | 604800       |
+    And I click on "Add set" "button" in the "dialog[open]" "css_element"
     Then I should see "All in order" in the "First set" "table_row"
     And I should see "321" in the "First set" "table_row"
     And I should see "Completion delay: 7 days" in the "First set" "table_row"
 
     When I click on "Append item" "link" in the "First set" "table_row"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Set | 1 |
-    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Full name                 | Second set   |
-      | Completion type           | At least X   |
-      | At least X                | 2            |
-      | completiondelay[enabled]  | 1            |
-      | completiondelay[number]   | 5            |
-      | completiondelay[timeunit] | days         |
-    And I click on "Add set" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | type | set |
+    And I click on "Continue" "button" in the "dialog[open]" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Full name       | Second set |
+      | Completion type | At least X |
+      | At least X      | 2          |
+      | completiondelay | 432000     |
+    And I click on "Add set" "button" in the "dialog[open]" "css_element"
     Then I should see "At least 2" in the "Second set" "table_row"
     And I should see "Completion delay: 5 days" in the "Second set" "table_row"
 
     When I click on "Append item" "link" in the "Second set" "table_row"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Course | 1 |
-    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Courses                   | Course 2, Course 3, Course 4 |
-      | completiondelay[enabled]  | 1            |
-      | completiondelay[number]   | 5            |
-      | completiondelay[timeunit] | days         |
-    And I click on "Add courses" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | type | course |
+    And I click on "Continue" "button" in the "dialog[open]" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Courses         | Course 2, Course 3, Course 4 |
+      | completiondelay | 432000                       |
+    And I click on "Add courses" "button" in the "dialog[open]" "css_element"
     Then I should see "Completion delay: 5 days" in the "Course 2" "table_row"
 
     When I click on "Append item" "link" in the "Program 000" "table_row"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Set | 1 |
-    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | type | set |
+    And I click on "Continue" "button" in the "dialog[open]" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Full name       | Third set        |
       | Completion type | All in any order |
-    And I click on "Add set" "button" in the ".modal-dialog" "css_element"
+    And I click on "Add set" "button" in the "dialog[open]" "css_element"
     Then I should see "All in any order" in the "Third set" "table_row"
 
     When I click on "Append item" "link" in the "Third set" "table_row"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Course | 1 |
-    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Courses         | Course 5         |
-    And I click on "Add courses" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | type | course |
+    And I click on "Continue" "button" in the "dialog[open]" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Courses | Course 5 |
+    And I click on "Add courses" "button" in the "dialog[open]" "css_element"
     Then I should see "Course completion" in the "Course 5" "table_row"
 
     When I click on "Append item" "link" in the "Program 000" "table_row"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Set | 1 |
-    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | type | set |
+    And I click on "Continue" "button" in the "dialog[open]" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Full name        | Fourth set       |
       | Completion type  | Minimum X points |
       | Minimum X points | 7                |
       | Points           | 456              |
-    And I click on "Add set" "button" in the ".modal-dialog" "css_element"
+    And I click on "Add set" "button" in the "dialog[open]" "css_element"
     Then I should see "Minimum 7 points" in the "Fourth set" "table_row"
     And I should see "456" in the "Fourth set" "table_row"
 
     # Update sets
     When I click on "Update set" "link" in the "Program 000" "table_row"
-    And the following fields in the ".modal-dialog" "css_element" match these values:
-      | Completion type           | All in any order |
-      | completiondelay[enabled]  | 0            |
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Completion type           | All in order |
-      | completiondelay[enabled]  | 1            |
-      | completiondelay[number]   | 2            |
-      | completiondelay[timeunit] | days         |
-    And I click on "Update" "button" in the ".modal-dialog" "css_element"
+    And the following muform fields in the "dialog[open]" "css_element" match:
+      | Completion type | All in any order |
+      | completiondelay |                  |
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Completion type | All in order |
+      | completiondelay | 172800       |
+    And I click on "Update" "button" in the "dialog[open]" "css_element"
     Then I should see "All in order" in the "Program 000" "table_row"
     And I should see "Completion delay: 2 days" in the "Program 000" "table_row"
 
     When I click on "Update set" "link" in the "Third set" "table_row"
-    And the following fields in the ".modal-dialog" "css_element" match these values:
-      | Completion type           | All in any order |
-      | Full name                 | Third set        |
-      | Completion type           | All in any order |
-      | Points                    | 1                |
-      | completiondelay[enabled]  | 0                |
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Full name                 | Treti set        |
-      | Completion type           | All in order     |
-      | Points                    | 77               |
-      | completiondelay[enabled]  | 1                |
-      | completiondelay[number]   | 11               |
-      | completiondelay[timeunit] | days             |
-    And I click on "Update set" "button" in the ".modal-dialog" "css_element"
+    And the following muform fields in the "dialog[open]" "css_element" match:
+      | Completion type | All in any order |
+      | Full name       | Third set        |
+      | Completion type | All in any order |
+      | Points          | 1                |
+      | completiondelay |                  |
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Full name       | Treti set    |
+      | Completion type | All in order |
+      | Points          | 77           |
+      | completiondelay | 950400       |
+    And I click on "Update set" "button" in the "dialog[open]" "css_element"
     Then I should see "All in order" in the "Treti set" "table_row"
     And I should see "77" in the "Treti set" "table_row"
     And I should see "Completion delay: 11 days" in the "Treti set" "table_row"
 
     When I click on "Update set" "link" in the "Treti set" "table_row"
-    And the following fields in the ".modal-dialog" "css_element" match these values:
-      | Full name                 | Treti set        |
-      | Completion type           | All in order     |
-      | Points                    | 77               |
-      | completiondelay[enabled]  | 1                |
-      | completiondelay[number]   | 11               |
-      | completiondelay[timeunit] | days             |
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Full name                 | Third set        |
-      | Completion type           | At least X       |
-      | At least X                | 3                |
-      | Points                    | 0                |
-      | completiondelay[enabled]  | 0                |
-    And I click on "Update set" "button" in the ".modal-dialog" "css_element"
+    And the following muform fields in the "dialog[open]" "css_element" match:
+      | Full name       | Treti set    |
+      | Completion type | All in order |
+      | Points          | 77           |
+      | completiondelay | 950400       |
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Full name       | Third set  |
+      | Completion type | At least X |
+      | At least X      | 3          |
+      | Points          | 0          |
+      | completiondelay |            |
+    And I click on "Update set" "button" in the "dialog[open]" "css_element"
     Then I should see "At least 3" in the "Third set" "table_row"
     And I should see "0" in the "Third set" "table_row"
     And I should not see "Completion delay" in the "Third set" "table_row"
 
     When I click on "Update set" "link" in the "Third set" "table_row"
-    And the following fields in the ".modal-dialog" "css_element" match these values:
-      | Full name       | Third set        |
-      | Completion type | At least X       |
-      | At least X      | 3                |
-      | Points          | 0                |
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Completion type | Minimum X points |
-      | Minimum X points| 10               |
-      | Points          | 11               |
-    And I click on "Update set" "button" in the ".modal-dialog" "css_element"
+    And the following muform fields in the "dialog[open]" "css_element" match:
+      | Full name       | Third set  |
+      | Completion type | At least X |
+      | At least X      | 3          |
+      | Points          | 0          |
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Completion type  | Minimum X points |
+      | Minimum X points | 10               |
+      | Points           | 11               |
+    And I click on "Update set" "button" in the "dialog[open]" "css_element"
     Then I should see "Minimum 10 points" in the "Third set" "table_row"
     And I should see "11" in the "Third set" "table_row"
 
     When I click on "Update course" "link" in the "Course 1" "table_row"
-    And the following fields in the ".modal-dialog" "css_element" match these values:
-      | Points                    | 123              |
-      | completiondelay[enabled]  | 1                |
-      | completiondelay[number]   | 3                |
-      | completiondelay[timeunit] | days             |
-    And I set the following fields to these values:
-      | Points                    | 789              |
-      | completiondelay[enabled]  | 0                |
-    And I click on "Update course" "button" in the ".modal-dialog" "css_element"
+    And the following muform fields in the "dialog[open]" "css_element" match:
+      | Points          | 123    |
+      | completiondelay | 259200 |
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Points          | 789 |
+      | completiondelay |     |
+    And I click on "Update course" "button" in the "dialog[open]" "css_element"
     Then I should see "789" in the "Course 1" "table_row"
     And I should not see "Completion delay" in the "Course 1" "table_row"
 
     When I click on "Update course" "link" in the "Course 1" "table_row"
-    And the following fields in the ".modal-dialog" "css_element" match these values:
-      | Points                    | 789              |
-      | completiondelay[enabled]  | 0                |
-    And I set the following fields to these values:
-      | completiondelay[enabled]  | 1                |
-      | completiondelay[number]   | 4                |
-      | completiondelay[timeunit] | days             |
-    And I click on "Update course" "button" in the ".modal-dialog" "css_element"
+    And the following muform fields in the "dialog[open]" "css_element" match:
+      | Points          | 789 |
+      | completiondelay |     |
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | completiondelay | 345600 |
+    And I click on "Update course" "button" in the "dialog[open]" "css_element"
     Then I should see "789" in the "Course 1" "table_row"
     And I should see "Completion delay: 4 days" in the "Course 1" "table_row"
 
@@ -281,42 +263,42 @@ Feature: Program content management tests
     # Deleting of items
 
     When I click on "Remove course" "link" in the "Course 5" "table_row"
-    And I click on "Cancel" "button" in the ".modal-dialog" "css_element"
+    And I click on "Cancel" "button" in the "dialog[open]" "css_element"
     Then I should see "Course 5"
 
     When I click on "Remove course" "link" in the "Course 5" "table_row"
-    And I click on "Remove course" "button" in the ".modal-dialog" "css_element"
+    And I click on "Remove course" "button" in the "dialog[open]" "css_element"
     Then I should not see "Course 5"
 
     When I click on "Delete set" "link" in the "Fourth set" "table_row"
-    And I click on "Delete set" "button" in the ".modal-dialog" "css_element"
+    And I click on "Delete set" "button" in the "dialog[open]" "css_element"
     Then I should not see "Fourth set"
 
     When I click on "Delete set" "link" in the "Third set" "table_row"
-    And I click on "Cancel" "button" in the ".modal-dialog" "css_element"
+    And I click on "Cancel" "button" in the "dialog[open]" "css_element"
     Then I should see "Third set"
 
     When I click on "Delete set" "link" in the "Third set" "table_row"
-    And I click on "Delete set" "button" in the ".modal-dialog" "css_element"
+    And I click on "Delete set" "button" in the "dialog[open]" "css_element"
     Then I should not see "Third set"
 
     When I click on "Remove course" "link" in the "Course 3" "table_row"
-    And I click on "Remove course" "button" in the ".modal-dialog" "css_element"
+    And I click on "Remove course" "button" in the "dialog[open]" "css_element"
 
     When I click on "Remove course" "link" in the "Course 4" "table_row"
-    And I click on "Remove course" "button" in the ".modal-dialog" "css_element"
+    And I click on "Remove course" "button" in the "dialog[open]" "css_element"
 
     When I click on "Remove course" "link" in the "Course 1" "table_row"
-    And I click on "Remove course" "button" in the ".modal-dialog" "css_element"
+    And I click on "Remove course" "button" in the "dialog[open]" "css_element"
 
     When I click on "Remove course" "link" in the "Course 2" "table_row"
-    And I click on "Remove course" "button" in the ".modal-dialog" "css_element"
+    And I click on "Remove course" "button" in the "dialog[open]" "css_element"
 
     When I click on "Delete set" "link" in the "Second set" "table_row"
-    And I click on "Delete set" "button" in the ".modal-dialog" "css_element"
+    And I click on "Delete set" "button" in the "dialog[open]" "css_element"
 
     When I click on "Delete set" "link" in the "First set" "table_row"
-    And I click on "Delete set" "button" in the ".modal-dialog" "css_element"
+    And I click on "Delete set" "button" in the "dialog[open]" "css_element"
 
   @javascript
   Scenario: Manager may add deleted references to missing courses from program
@@ -342,7 +324,7 @@ Feature: Program content management tests
     And I should not see "Course is missing" in the "Course 3" "table_row"
 
     When I click on "Remove course" "link" in the "Course 1" "table_row"
-    And I click on "Remove course" "button" in the ".modal-dialog" "css_element"
+    And I click on "Remove course" "button" in the "dialog[open]" "css_element"
     Then I should not see "Course 1"
     And I should see "Course 2"
     And I should see "Course 3"
@@ -374,27 +356,25 @@ Feature: Program content management tests
     And I click on "Content" "link" in the ".secondary-navigation" "css_element"
 
     When I click on "Append item" "link" in the "Program 000" "table_row"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Credits | 1 |
-    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
-    And I set the following fields to these values:
-      | Credits                  | TFR 001   |
-    And I click on "Add credits" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | type | credits |
+    And I click on "Continue" "button" in the "dialog[open]" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Credits | TFR 001 |
+    And I click on "Add credits" "button" in the "dialog[open]" "css_element"
     Then I should see "Required credits: 10" in the "TFR 001" "table_row"
 
     When I click on "Update credits" "link" in the "TFR 001" "table_row"
-    And I set the following fields to these values:
-      | Points                    | 789              |
-      | completiondelay[enabled]  | 1                |
-      | completiondelay[number]   | 3                |
-      | completiondelay[timeunit] | days             |
-    And I click on "Update credits" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Points          | 789    |
+      | completiondelay | 259200 |
+    And I click on "Update credits" "button" in the "dialog[open]" "css_element"
     Then I should see "789" in the "TFR 001" "table_row"
     And I should see "Completion delay: 3 days" in the "TFR 001" "table_row"
     And I should see "Required credits: 10" in the "TFR 001" "table_row"
 
     When I click on "Remove credits" "link" in the "TFR 001" "table_row"
-    And I click on "Remove credits" "button" in the ".modal-dialog" "css_element"
+    And I click on "Remove credits" "button" in the "dialog[open]" "css_element"
     Then I should not see "TFR 001"
 
   @javascript @tool_mutenancy
@@ -406,27 +386,27 @@ Feature: Program content management tests
       | Tenant 2 | ten2     | CAT2     |
     And I log in as "manager"
     And I click on "Switch tenant" "link"
-    And I set the following fields to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Tenant      | Tenant 1         |
-    And I click on "Switch tenant" "button" in the ".modal-dialog" "css_element"
+    And I click on "Switch tenant" "button" in the "dialog[open]" "css_element"
 
     When I am on the "tool_muprog > All programs management" page
     And I follow "Program 000"
     And I click on "Content" "link" in the ".secondary-navigation" "css_element"
     And I click on "Append item" "link" in the "Program 000" "table_row"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Course | 1 |
-    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
-    And I set the following fields to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | type | course |
+    And I click on "Continue" "button" in the "dialog[open]" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Courses | Course 1 |
-    And I click on "Add courses" "button" in the ".modal-dialog" "css_element"
+    And I click on "Add courses" "button" in the "dialog[open]" "css_element"
     Then I should see "Course 1" in the "#program_content" "css_element"
 
     When I click on "Append item" "link" in the "Program 000" "table_row"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Course | 1 |
-    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
-    And I set the following fields to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | type | course |
+    And I click on "Continue" "button" in the "dialog[open]" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Courses | Course 4 |
-    And I click on "Add courses" "button" in the ".modal-dialog" "css_element"
+    And I click on "Add courses" "button" in the "dialog[open]" "css_element"
     Then I should see "Course 4" in the "#program_content" "css_element"

@@ -135,20 +135,14 @@ Feature: Programs plugin English wiki documentation image generator
     And I follow "Basic First Aid"
     And I click on "Allocation settings" "link" in the ".secondary-navigation" "css_element"
     And I click on "Update allocations" "link"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | timeallocationstart[enabled] | 1    |
-      | timeallocationstart[day]     | 1    |
-      | timeallocationstart[month]   | 1    |
-      | timeallocationstart[year]    | 2026 |
-      | timeallocationstart[hour]    | 10   |
-      | timeallocationstart[minute]  | 00   |
-    And I click on "Update allocations" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | timeallocationstart | 2026-01-01 10:00 |
+    And I click on "Update allocations" "button" in the "dialog[open]" "css_element"
     And I click on "Update scheduling" "link"
-    And I set the following fields to these values:
-      | Program due             | Due after start |
-      | programdue_delay[value] | 3               |
-      | programdue_delay[type]  | months          |
-    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program due      | Due after start |
+      | programdue_delay | P3M             |
+    And I click on "Update scheduling" "button" in the "dialog[open]" "css_element"
     And I change window size to "1208x900"
 
     Then I make documentation screenshot "img_program_allocation.png" for "tool_muprog" plugin

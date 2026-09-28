@@ -46,14 +46,14 @@ Feature: Program export tests
     And I am on the "tool_muprog > All programs management" page
 
     When I click on "Export programs" action from "Programs actions" dropdown
-    And the following fields match these values:
+    And the following muform fields match:
       | includesubcontexts | 0            |
       | archived           | 0            |
       | File format        | JSON         |
     Then I press "Export programs"
     And I wait "1" seconds
 
-    When I set the following fields to these values:
+    When I set the following muform fields:
       | Category           | System       |
       | includesubcontexts | 1            |
       | archived           | 0            |
@@ -61,10 +61,10 @@ Feature: Program export tests
     Then I press "Export programs"
     And I wait "1" seconds
 
-    When I set the following fields to these values:
+    When I set the following muform fields:
       | Category           | Category 1   |
       | includesubcontexts | 0            |
-      | archived           | 2            |
+      | archived           | 1            |
       | File format        | CSV          |
     Then I press "Export programs"
     And I wait "1" seconds
@@ -76,7 +76,7 @@ Feature: Program export tests
     Then I press "Export programs"
     And I wait "1" seconds
 
-    When I set the following fields to these values:
+    When I set the following muform fields:
       | Programs    | Program 001, Program 002 |
     Then I press "Export programs"
     And I wait "1" seconds
@@ -86,14 +86,14 @@ Feature: Program export tests
     And I am on the "Category 2" "tool_muprog > Program management" page
 
     When I click on "Export programs" action from "Programs actions" dropdown
-    And the following fields match these values:
+    And the following muform fields match:
       | includesubcontexts | 0            |
       | archived           | 0            |
       | File format        | JSON         |
     Then I press "Export programs"
     And I wait "1" seconds
 
-    When I set the following fields to these values:
+    When I set the following muform fields:
       | Category           | Category 3   |
       | includesubcontexts | 1            |
       | archived           | 1            |
@@ -109,7 +109,7 @@ Feature: Program export tests
     Then I press "Export programs"
     And I wait "1" seconds
 
-    When I set the following fields to these values:
+    When I set the following muform fields:
       | Programs    | Program 002, Program 003 |
     Then I press "Export programs"
     And I wait "1" seconds

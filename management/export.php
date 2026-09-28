@@ -29,6 +29,7 @@
 
 use tool_muprog\local\management;
 use tool_muprog\local\export;
+use tool_mulib\muform\handler;
 
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
@@ -75,21 +76,30 @@ if ($program) {
 } else {
     management::setup_index_page($currenturl, $context);
 }
+$PAGE->set_heading(get_string('export', 'tool_muprog'));
 
-$form = new \tool_muprog\local\form\export(null,
-    ['program' => $program, 'context' => $context, 'contextid' => $contextid, 'archived' => $archived]);
+$handler = handler::from_request();
+
+$current = [
+    'format' => 'json',
+    'delimiter_name' => \tool_muprog\local\form\export::get_default_delimiter(),
+    'encoding' => 'UTF-8',
+];
+if ($program) {
+    $current['programids'] = [$program->id];
+} else {
+    $current['contextid'] = $contextid;
+    $current['includesubcontexts'] = 0;
+    $current['archived'] = $archived;
+}
+$form = new \tool_muprog\local\form\export($currenturl, $current, ['program' => $program, 'context' => $context]);
 
 if ($form->is_cancelled()) {
-    redirect($returnurl);
+    $handler->cancelled($returnurl);
 }
 if ($data = $form->get_data()) {
     export::process($data);
     die;
 }
 
-$PAGE->set_heading(get_string('export', 'tool_muprog'));
-echo $OUTPUT->header();
-
-echo $form->render();
-
-echo $OUTPUT->footer();
+$handler->render($form);

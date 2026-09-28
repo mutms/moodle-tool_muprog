@@ -31,11 +31,11 @@
 use tool_muprog\local\program;
 use core\url;
 use tool_muprog\local\content\set;
+use tool_muprog\local\content\top;
 use tool_muprog\local\content\course;
 use tool_muprog\local\content\attendance;
 use tool_muprog\local\content\credits;
-
-define('AJAX_SCRIPT', true);
+use tool_mulib\muform\handler;
 
 require('../../../../config.php');
 
@@ -52,8 +52,9 @@ if ($program->archived) {
     require_capability('tool/muprog:admin', $context);
 }
 
+$currenturl = new url('/admin/tool/muprog/management/item_update.php', ['id' => $record->id]);
 $PAGE->set_context($context);
-$PAGE->set_url('/admin/tool/muprog/management/item_update.php', ['id' => $record->id]);
+$PAGE->set_url($currenturl);
 
 $returnurl = new url('/admin/tool/muprog/management/program_content.php', ['id' => $program->id]);
 
@@ -63,19 +64,56 @@ $item = $top->find_item($record->id);
 
 $type = $item::get_type();
 if ($type === 'set' || $type === 'top') {
-    $form = new tool_muprog\local\form\item_update_set(null, ['set' => $item, 'context' => $context]);
+    $title = get_string('updateset', 'tool_muprog');
 } else if ($type === 'course') {
-    $form = new tool_muprog\local\form\item_update_course(null, ['course' => $item, 'context' => $context]);
+    $title = get_string('updatecourse', 'tool_muprog');
 } else if ($type === 'attendance') {
-    $form = new tool_muprog\local\form\item_update_attendance(null, ['attendance' => $item, 'context' => $context]);
+    $title = get_string('updateattendance', 'tool_muprog');
 } else if ($type === 'credits') {
-    $form = new tool_muprog\local\form\item_update_credits(null, ['credits' => $item, 'context' => $context]);
+    $title = get_string('updatecredits', 'tool_muprog');
 } else {
     throw new \core\exception\coding_exception('Unknown item type');
 }
+$PAGE->set_title($title);
+$PAGE->set_heading($title);
+
+$handler = handler::from_request();
+
+$current = [
+    'typename' => $item::get_type_name(),
+    'fullname' => $record->fullname,
+    'completiondelay' => $item->get_completiondelay(),
+    'points' => $item->get_points(),
+];
+if ($type === 'set' || $type === 'top') {
+    $current['sequencetype'] = $item->get_sequencetype();
+    if ($item->get_sequencetype() === set::SEQUENCE_TYPE_ATLEAST) {
+        $minprerequisites = $item->get_minprerequisites();
+    } else {
+        $minprerequisites = count($item->get_children());
+    }
+    if ($item->get_sequencetype() === set::SEQUENCE_TYPE_MINPOINTS) {
+        $minpoints = $item->get_minpoints();
+    } else {
+        $minpoints = 0;
+        foreach ($item->get_children() as $child) {
+            $minpoints += $child->get_points();
+        }
+    }
+    // Zero is not a valid minimum, leave the hidden fields empty instead.
+    $current['minprerequisites'] = $minprerequisites ?: null;
+    $current['minpoints'] = $minpoints ?: null;
+    $form = new tool_muprog\local\form\item_update_set($currenturl, $current, ['istop' => ($item instanceof top)]);
+} else if ($type === 'course') {
+    $form = new tool_muprog\local\form\item_update_course($currenturl, $current);
+} else if ($type === 'attendance') {
+    $form = new tool_muprog\local\form\item_update_attendance($currenturl, $current);
+} else {
+    $form = new tool_muprog\local\form\item_update_credits($currenturl, $current);
+}
 
 if ($form->is_cancelled()) {
-    $form->ajax_form_cancelled($returnurl);
+    $handler->cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
@@ -88,7 +126,7 @@ if ($data = $form->get_data()) {
     } else if ($type === 'credits') {
         $top->update_credits($item, (array)$data);
     }
-    $form->ajax_form_submitted($returnurl);
+    $handler->submitted($returnurl);
 }
 
-$form->ajax_form_render();
+$handler->render($form);

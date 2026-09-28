@@ -26,14 +26,14 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use tool_mulib\muform\handler;
+
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
 /** @var core_renderer $OUTPUT */
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
 /** @var stdClass $USER */
-
-define('AJAX_SCRIPT', true);
 
 require('../../../../config.php');
 
@@ -57,20 +57,23 @@ if (!\tool_muprog\local\source\selfallocation::can_user_request($program, $sourc
     redirect(new core\url('/admin/tool/muprog/catalogue/index.php'));
 }
 
+$title = get_string('source_selfallocation_allocate', 'tool_muprog');
+$PAGE->set_title($title);
+$PAGE->set_heading($title);
+
 $returnurl = new core\url('/admin/tool/muprog/catalogue/program.php', ['id' => $program->id]);
 
-$form = new tool_muprog\local\form\source_selfallocation(null, ['source' => $source, 'program' => $program]);
+$handler = handler::from_request();
+
+$form = new tool_muprog\local\form\source_selfallocation($PAGE->url, [], ['source' => $source]);
 
 if ($form->is_cancelled()) {
-    $form->ajax_form_cancelled($returnurl);
+    $handler->cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
     tool_muprog\local\source\selfallocation::signup($program->id, $source->id);
-    $form->ajax_form_submitted($returnurl);
+    $handler->submitted($returnurl);
 }
 
-/** @var \tool_muprog\output\catalogue\renderer $catalogueoutput */
-$catalogueoutput = $PAGE->get_renderer('tool_muprog', 'catalogue');
-
-$form->ajax_form_render();
+$handler->render($form);

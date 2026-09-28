@@ -19,6 +19,13 @@
 
 namespace tool_muprog\local\form;
 
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\datetime;
+use tool_mulib\muform\element\info;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\form;
+
 /**
  * Edit item completion data.
  *
@@ -28,55 +35,23 @@ namespace tool_muprog\local\form;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class item_completion_override extends \tool_mulib\local\ajax_form {
+final class item_completion_override extends form {
     #[\Override]
-    protected function definition() {
-        $mform = $this->_form;
-        $context = $this->_customdata['context'];
-        $user = $this->_customdata['user'];
-        $allocation = $this->_customdata['allocation'];
-        $item = $this->_customdata['item'];
-        $completion = $this->_customdata['completion'];
-        $evidence = $this->_customdata['evidence'];
+    protected function definition(): void {
+        $this->add(new info('userfullname', get_string('user')));
 
-        $mform->addElement('static', 'userfullname', get_string('user'), fullname($user));
+        $this->add(new info('itemfullname', get_string('item', 'tool_muprog')));
 
-        $mform->addElement(
-            'static',
-            'staticitem',
-            get_string('item', 'tool_muprog'),
-            format_string($item->fullname)
-        );
-
-        if ($evidence) {
-            $mform->addElement(
-                'static',
-                'staticevidencedate',
-                get_string('evidencedate', 'tool_muprog'),
-                userdate($evidence->timecompleted)
-            );
+        if ($this->get_extra_data()['hasevidence']) {
+            $evidencetimecompleted = new datetime('evidencetimecompleted', get_string('evidencedate', 'tool_muprog'));
+            $evidencetimecompleted->set_frozen(true);
+            $this->add($evidencetimecompleted);
         }
 
-        $mform->addElement('date_time_selector', 'timecompleted', get_string('completiondate', 'tool_muprog'), ['optional' => true]);
-        if ($completion && $completion->timecompleted) {
-            $mform->setDefault('timecompleted', $completion->timecompleted);
-        }
+        $this->add(new datetime('timecompleted', get_string('completiondate', 'tool_muprog')));
 
-        $mform->addElement('hidden', 'allocationid');
-        $mform->setType('allocationid', PARAM_INT);
-        $mform->setDefault('allocationid', $allocation->id);
-
-        $mform->addElement('hidden', 'itemid');
-        $mform->setType('itemid', PARAM_INT);
-        $mform->setDefault('itemid', $item->id);
-
-        $this->add_action_buttons(true, get_string('update'));
-    }
-
-    #[\Override]
-    public function validation($data, $files) {
-        $errors = parent::validation($data, $files);
-
-        return $errors;
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', get_string('update')), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 }

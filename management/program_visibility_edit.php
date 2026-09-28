@@ -28,14 +28,14 @@
  */
 
 use tool_muprog\local\program;
+use tool_muprog\local\management;
+use tool_mulib\muform\handler;
 
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
 /** @var core_renderer $OUTPUT */
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
-
-define('AJAX_SCRIPT', true);
 
 require('../../../../config.php');
 
@@ -50,22 +50,29 @@ require_capability('tool/muprog:edit', $context);
 $currenturl = new core\url('/admin/tool/muprog/management/program_visibility_edit.php', ['id' => $id]);
 $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
+$title = get_string('program_update', 'tool_muprog');
+$PAGE->set_title($title);
+$PAGE->set_heading($title);
 
-$current = new stdClass();
-$current->id = $program->id;
-$current->publicaccess = $program->publicaccess;
+$handler = handler::from_request();
 
-$form = new \tool_muprog\local\form\program_visibility_edit(null, ['data' => $current, 'context' => $context]);
+$current = [
+    'id' => $program->id,
+    'publicaccess' => $program->publicaccess,
+    'cohortids' => array_keys(management::fetch_current_cohorts_menu($program->id)),
+];
+$form = new \tool_muprog\local\form\program_visibility_edit($currenturl, $current);
 
 $returnurl = new core\url('/admin/tool/muprog/management/program_visibility.php', ['id' => $program->id]);
 
 if ($form->is_cancelled()) {
-    $form->ajax_form_cancelled($returnurl);
+    $handler->cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
+    $data->id = $program->id;
     program::update_visibility($data);
-    $form->ajax_form_submitted($returnurl);
+    $handler->submitted($returnurl);
 }
 
-$form->ajax_form_render();
+$handler->render($form);

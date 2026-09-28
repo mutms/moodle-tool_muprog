@@ -84,6 +84,7 @@ $string['customfieldvisible:allocatee'] = 'Allocatee';
 $string['customfieldvisible:everyone'] = 'Everybody who can see other program details';
 $string['customfieldvisible:viewcapability'] = 'Users with view programs capability';
 $string['customfieldvisibleto'] = 'Field content is visible to';
+$string['delay_oneunit'] = 'Use one time unit only.';
 $string['deleteallocation'] = 'Delete program allocation';
 $string['deleteattendance'] = 'Delete offline attendance';
 $string['deletecourse'] = 'Remove course';

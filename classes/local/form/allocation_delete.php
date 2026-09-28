@@ -19,6 +19,14 @@
 
 namespace tool_muprog\local\form;
 
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\datetime;
+use tool_mulib\muform\element\info;
+use tool_mulib\muform\element\select;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\form;
+
 /**
  * Delete user allocation.
  *
@@ -28,40 +36,30 @@ namespace tool_muprog\local\form;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class allocation_delete extends \tool_mulib\local\ajax_form {
+final class allocation_delete extends form {
     #[\Override]
-    protected function definition() {
-        $mform = $this->_form;
-        $allocation = $this->_customdata['allocation'];
-        $user = $this->_customdata['user'];
-        $context = $this->_customdata['context'];
+    protected function definition(): void {
+        $this->add(new info('userfullname', get_string('user')));
 
-        $mform->addElement('static', 'userfullname', get_string('user'), fullname($user));
+        $dates = [
+            'timeallocated' => get_string('allocationdate', 'tool_muprog'),
+            'timestart' => get_string('programstart_date', 'tool_muprog'),
+            'timedue' => get_string('programdue_date', 'tool_muprog'),
+            'timeend' => get_string('programend_date', 'tool_muprog'),
+            'timecompleted' => get_string('completiondate', 'tool_muprog'),
+        ];
+        foreach ($dates as $name => $label) {
+            $date = new datetime($name, $label);
+            $date->set_frozen(true);
+            $this->add($date);
+        }
 
-        $mform->addElement('date_time_selector', 'timeallocated', get_string('allocationdate', 'tool_muprog'), ['optional' => false]);
-        $mform->freeze('timeallocated');
+        $archived = new select('archived', get_string('archived', 'tool_muprog'), ['0' => get_string('no'), '1' => get_string('yes')]);
+        $archived->set_frozen(true);
+        $this->add($archived);
 
-        $mform->addElement('date_time_selector', 'timestart', get_string('programstart_date', 'tool_muprog'), ['optional' => false]);
-        $mform->freeze('timestart');
-
-        $mform->addElement('date_time_selector', 'timedue', get_string('programdue_date', 'tool_muprog'), ['optional' => true]);
-        $mform->freeze('timedue');
-
-        $mform->addElement('date_time_selector', 'timeend', get_string('programend_date', 'tool_muprog'), ['optional' => true]);
-        $mform->freeze('timeend');
-
-        $mform->addElement('date_time_selector', 'timecompleted', get_string('completiondate', 'tool_muprog'), ['optional' => true]);
-        $mform->freeze('timecompleted');
-
-        $mform->addElement('select', 'archived', get_string('archived', 'tool_muprog'), [0 => get_string('no'), 1 => get_string('yes')]);
-        $mform->freeze('archived');
-
-        $mform->addElement('hidden', 'id');
-        $mform->setType('id', PARAM_INT);
-        $mform->setDefault('id', $allocation->id);
-
-        $this->add_action_buttons(true, get_string('deleteallocation', 'tool_muprog'));
-
-        $this->set_data($allocation);
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', get_string('deleteallocation', 'tool_muprog')), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 }

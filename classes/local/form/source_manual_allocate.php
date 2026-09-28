@@ -18,8 +18,16 @@
 
 namespace tool_muprog\local\form;
 
-use tool_muprog\external\form_autocomplete\source_manual_allocate_users;
-use tool_mulib\local\mulib;
+use tool_mulib\muform\element\autocomplete;
+use tool_mulib\muform\element\autocompletemany;
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\customfields;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\form;
+use tool_muprog\customfield\allocation_handler;
+use tool_muprog\muform\autocomplete\source_manual_allocate_cohortid;
+use tool_muprog\muform\autocompletemany\source_manual_allocate_users;
 
 /**
  * Allocate users and cohorts manually.
@@ -30,99 +38,19 @@ use tool_mulib\local\mulib;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class source_manual_allocate extends \tool_mulib\local\ajax_form {
-    /** @var array $arguments for WS call to get candidate users */
-    protected $arguments;
-    /** @var \tool_muprog\customfield\allocation_handler */
-    protected $handler;
-
+final class source_manual_allocate extends form {
     #[\Override]
-    protected function definition() {
-        $mform = $this->_form;
-        $program = $this->_customdata['program'];
-        $source = $this->_customdata['source'];
-        $context = $this->_customdata['context'];
+    protected function definition(): void {
+        $programid = (int)$this->get_extra_data()['program']->id;
 
-        $this->arguments = ['programid' => $program->id];
-        source_manual_allocate_users::add_element(
-            $mform,
-            $this->arguments,
-            'users',
-            get_string('users'),
-            $context
-        );
+        $this->add(new autocompletemany('users', get_string('users'), new source_manual_allocate_users($programid)));
 
-        $options = ['contextid' => $context->id, 'multiple' => false];
-        $mform->addElement('cohort', 'cohortid', get_string('cohort', 'cohort'), $options);
+        $this->add(new autocomplete('cohortid', get_string('cohort', 'cohort'), new source_manual_allocate_cohortid($programid)));
 
-        $mform->addElement('hidden', 'programid');
-        $mform->setType('programid', PARAM_INT);
-        $mform->setDefault('programid', $source->programid);
+        $this->add(new customfields('customfields', allocation_handler::create(), null));
 
-        $mform->addElement('hidden', 'sourceid');
-        $mform->setType('sourceid', PARAM_INT);
-        $mform->setDefault('sourceid', $source->id);
-
-        // Add custom fields to the form.
-        $this->handler = \tool_muprog\customfield\allocation_handler::create();
-        $this->handler->set_new_item_context($context);
-        $this->handler->instance_form_definition($mform);
-
-        $this->add_action_buttons(true, get_string('source_manual_allocateusers', 'tool_muprog'));
-
-        // Prepare custom fields data.
-        $data = (object)[];
-        $this->handler->instance_form_before_set_data($data);
-        $this->set_data($data);
-    }
-
-    #[\Override]
-    public function definition_after_data() {
-        parent::definition_after_data();
-        $mform = $this->_form;
-        $this->handler->instance_form_definition_after_data($mform, 0);
-    }
-
-    #[\Override]
-    public function validation($data, $files) {
-        global $DB;
-
-        $errors = parent::validation($data, $files);
-
-        $context = $this->_customdata['context'];
-
-        if ($data['cohortid']) {
-            $cohort = $DB->get_record('cohort', ['id' => $data['cohortid']], '*', MUST_EXIST);
-            $cohortcontext = \context::instance_by_id($cohort->contextid);
-            if (!$cohort->visible && !has_capability('moodle/cohort:view', $cohortcontext)) {
-                $errors['cohortid'] = get_string('error');
-            }
-            if (mulib::is_mutenancy_active()) {
-                if ($context->tenantid) {
-                    if ($cohortcontext->tenantid && $cohortcontext->tenantid != $context->tenantid) {
-                        $errors['cohortid'] = get_string('error');
-                    }
-                }
-            }
-        }
-
-        if ($data['users']) {
-            foreach ($data['users'] as $userid) {
-                $error = source_manual_allocate_users::validate_value(
-                    $userid,
-                    $this->arguments,
-                    $context
-                );
-                if ($error !== null) {
-                    $errors['users'] = $error;
-                    break;
-                }
-            }
-        }
-
-        // Add the custom fields validation.
-        $errors = array_merge($errors, $this->handler->instance_form_validation($data, $files));
-
-        return $errors;
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', get_string('source_manual_allocateusers', 'tool_muprog')), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 }

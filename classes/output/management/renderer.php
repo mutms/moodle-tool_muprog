@@ -69,7 +69,7 @@ class renderer extends \plugin_renderer_base {
         $category = $context->get_context_name(false);
         if (has_capability('tool/muprog:edit', $context)) {
             $url = new url('/admin/tool/muprog/management/program_move.php', ['id' => $program->id]);
-            $action = new \tool_mulib\output\ajax_form\icon($url, get_string('program_move', 'tool_muprog'), 'i/edit');
+            $action = new \tool_mulib\output\muform\dialog\icon($url, get_string('program_move', 'tool_muprog'), 'i/edit');
             $category .= $this->output->render($action);
         }
         $details->add(get_string('category'), $category);
@@ -91,10 +91,10 @@ class renderer extends \plugin_renderer_base {
         if (has_capability('tool/muprog:edit', $context)) {
             if ($program->archived) {
                 $url = new url('/admin/tool/muprog/management/program_restore.php', ['id' => $program->id]);
-                $action = new \tool_mulib\output\ajax_form\icon($url, get_string('program_restore', 'tool_muprog'), 'i/settings');
+                $action = new \tool_mulib\output\muform\dialog\icon($url, get_string('program_restore', 'tool_muprog'), 'i/settings');
             } else {
                 $url = new url('/admin/tool/muprog/management/program_archive.php', ['id' => $program->id]);
-                $action = new \tool_mulib\output\ajax_form\icon($url, get_string('program_archive', 'tool_muprog'), 'i/settings');
+                $action = new \tool_mulib\output\muform\dialog\icon($url, get_string('program_archive', 'tool_muprog'), 'i/settings');
             }
             $action->set_form_size('sm');
             $archived .= $this->output->render($action);
@@ -301,11 +301,11 @@ class renderer extends \plugin_renderer_base {
                 $importurl = null;
                 if ($item instanceof set) {
                     $appendurl = new url('/admin/tool/muprog/management/item_create.php', ['parentid' => $id]);
-                    $appendaction = new \tool_mulib\output\ajax_form\icon($appendurl, get_string('appenditem', 'tool_muprog'), 'appenditem', 'tool_muprog');
+                    $appendaction = new \tool_mulib\output\muform\dialog\icon($appendurl, get_string('appenditem', 'tool_muprog'), 'appenditem', 'tool_muprog');
                     $actions[] = $output->render($appendaction);
                     if ($item instanceof top) {
                         $importurl = new url('/admin/tool/muprog/management/program_content_import.php', ['id' => $item->get_programid()]);
-                        $importaction = new \tool_mulib\output\ajax_form\icon(
+                        $importaction = new \tool_mulib\output\muform\dialog\icon(
                             $importurl,
                             get_string('importprogramcontent', 'tool_muprog'),
                             'import',
@@ -327,7 +327,7 @@ class renderer extends \plugin_renderer_base {
                         $deletestr = get_string('deleteset', 'tool_muprog');
                     }
                     $deleteurl = new url('/admin/tool/muprog/management/item_delete.php', ['id' => $id]);
-                    $deleteaction = new \tool_mulib\output\ajax_form\icon($deleteurl, $deletestr, 'deleteitem', 'tool_muprog');
+                    $deleteaction = new \tool_mulib\output\muform\dialog\icon($deleteurl, $deletestr, 'deleteitem', 'tool_muprog');
                     $actions[] = $output->render($deleteaction);
                 } else {
                     if (!$importurl) {
@@ -357,21 +357,21 @@ class renderer extends \plugin_renderer_base {
 
                 if ($item instanceof set) {
                     $editurl = new url('/admin/tool/muprog/management/item_update.php', ['id' => $id]);
-                    $editaction = new \tool_mulib\output\ajax_form\icon($editurl, get_string('updateset', 'tool_muprog'), 'i/settings');
+                    $editaction = new \tool_mulib\output\muform\dialog\icon($editurl, get_string('updateset', 'tool_muprog'), 'i/settings');
                     $actions[] = $output->render($editaction);
                 } else if ($item instanceof course) {
                     $editurl = new url('/admin/tool/muprog/management/item_update.php', ['id' => $id]);
-                    $editaction = new \tool_mulib\output\ajax_form\icon($editurl, get_string('updatecourse', 'tool_muprog'), 'i/settings');
+                    $editaction = new \tool_mulib\output\muform\dialog\icon($editurl, get_string('updatecourse', 'tool_muprog'), 'i/settings');
                     $actions[] = $output->render($editaction);
                     $actions[] = $output->pix_icon('i/navigationitem', '') . ' ';
                 } else if ($item instanceof attendance) {
                     $editurl = new url('/admin/tool/muprog/management/item_update.php', ['id' => $id]);
-                    $editaction = new \tool_mulib\output\ajax_form\icon($editurl, get_string('updateattendance', 'tool_muprog'), 'i/settings');
+                    $editaction = new \tool_mulib\output\muform\dialog\icon($editurl, get_string('updateattendance', 'tool_muprog'), 'i/settings');
                     $actions[] = $output->render($editaction);
                     $actions[] = $output->pix_icon('i/navigationitem', '') . ' ';
                 } else if ($item instanceof credits) {
                     $editurl = new url('/admin/tool/muprog/management/item_update.php', ['id' => $id]);
-                    $editaction = new \tool_mulib\output\ajax_form\icon($editurl, get_string('updatecredits', 'tool_muprog'), 'i/settings');
+                    $editaction = new \tool_mulib\output\muform\dialog\icon($editurl, get_string('updatecredits', 'tool_muprog'), 'i/settings');
                     $actions[] = $output->render($editaction);
                     $actions[] = $output->pix_icon('i/navigationitem', '') . ' ';
                 } else {
@@ -586,7 +586,7 @@ class renderer extends \plugin_renderer_base {
         } else {
             if (!$program->archived && !$allocation->archived && has_capability('tool/muprog:reset', $context)) {
                 $url = new url('/admin/tool/muprog/management/allocation_reset.php', ['id' => $allocation->id]);
-                $action = new \tool_mulib\output\ajax_form\icon($url, get_string('allocation_reset', 'tool_muprog'), 't/reset');
+                $action = new \tool_mulib\output\muform\dialog\icon($url, get_string('allocation_reset', 'tool_muprog'), 't/reset');
                 $progress .= $this->output->render($action);
             }
         }
@@ -616,7 +616,7 @@ class renderer extends \plugin_renderer_base {
         $programcompletion = (isset($allocation->timecompleted) ? userdate($allocation->timecompleted) : $strnotset);
         if (has_capability('tool/muprog:admin', $context)) {
             $url = new url('/admin/tool/muprog/management/program_completion_override.php', ['id' => $allocation->id]);
-            $action = new \tool_mulib\output\ajax_form\icon($url, get_string('programcompletionoverride', 'tool_muprog'), 'i/edit');
+            $action = new \tool_mulib\output\muform\dialog\icon($url, get_string('programcompletionoverride', 'tool_muprog'), 'i/edit');
             $programcompletion .= $this->output->render($action);
         }
         $details->add(get_string('programcompletion', 'tool_muprog'), $programcompletion);
@@ -628,7 +628,7 @@ class renderer extends \plugin_renderer_base {
             if ($allocation->archived && has_capability('tool/muprog:allocate', $context)) {
                 if ($sourceclass::is_allocation_restore_possible($program, $source, $allocation)) {
                     $url = new url('/admin/tool/muprog/management/allocation_restore.php', ['id' => $allocation->id]);
-                    $action = new \tool_mulib\output\ajax_form\icon($url, get_string('allocation_restore', 'tool_muprog'), 'i/settings');
+                    $action = new \tool_mulib\output\muform\dialog\icon($url, get_string('allocation_restore', 'tool_muprog'), 'i/settings');
                     $action->set_form_size('sm');
                     $archived .= $this->output->render($action);
                 }
@@ -636,7 +636,7 @@ class renderer extends \plugin_renderer_base {
             if (!$allocation->archived && has_capability('tool/muprog:deallocate', $context)) {
                 if ($sourceclass::is_allocation_archive_possible($program, $source, $allocation)) {
                     $url = new url('/admin/tool/muprog/management/allocation_archive.php', ['id' => $allocation->id]);
-                    $action = new \tool_mulib\output\ajax_form\icon($url, get_string('allocation_archive', 'tool_muprog'), 'i/settings');
+                    $action = new \tool_mulib\output\muform\dialog\icon($url, get_string('allocation_archive', 'tool_muprog'), 'i/settings');
                     $action->set_form_size('sm');
                     $archived .= $this->output->render($action);
                 }
@@ -659,15 +659,15 @@ class renderer extends \plugin_renderer_base {
                 && !$program->archived && !$allocation->archived
             ) {
                 $url = new url('/admin/tool/muprog/management/allocation_update.php', ['id' => $allocation->id]);
-                $button = new \tool_mulib\output\ajax_form\button($url, get_string('allocation_update', 'tool_muprog'));
+                $button = new \tool_mulib\output\muform\dialog\button($url, get_string('allocation_update', 'tool_muprog'));
                 $buttons[] = $this->output->render($button);
             }
         }
         if (has_capability('tool/muprog:deallocate', $context)) {
             if ($sourceclass::is_allocation_delete_possible($program, $source, $allocation)) {
                 $url = new url('/admin/tool/muprog/management/allocation_delete.php', ['id' => $allocation->id]);
-                $button = new \tool_mulib\output\ajax_form\button($url, get_string('deleteallocation', 'tool_muprog'));
-                $button->set_submitted_action($button::SUBMITTED_ACTION_REDIRECT);
+                $button = new \tool_mulib\output\muform\dialog\button($url, get_string('deleteallocation', 'tool_muprog'));
+                $button->set_submitted_action(\tool_mulib\muform\handler\dialog::ACTION_REDIRECT);
                 $buttons[] = $this->output->render($button);
             }
         }
@@ -766,7 +766,7 @@ class renderer extends \plugin_renderer_base {
                 }
                 if ($canteakeattendance && !$program->archived && !$allocation->archived) {
                     $editurl = new url('/admin/tool/muprog/management/item_attendance_take.php', ['itemid' => $item->get_id(), 'userid' => $allocation->userid]);
-                    $editaction = new \tool_mulib\output\ajax_form\icon($editurl, get_string('attendance_take', 'tool_muprog'), 'i/checked');
+                    $editaction = new \tool_mulib\output\muform\dialog\icon($editurl, get_string('attendance_take', 'tool_muprog'), 'i/checked');
                     $completiontype .= ' ' . $output->render($editaction);
                 }
             } else if ($item instanceof credits) {
@@ -829,7 +829,7 @@ class renderer extends \plugin_renderer_base {
             }
             if ($canadmin) {
                 $editurl = new url('/admin/tool/muprog/management/item_completion_override.php', ['allocationid' => $allocation->id, 'itemid' => $item->get_id()]);
-                $editaction = new \tool_mulib\output\ajax_form\icon($editurl, get_string('completionoverride', 'tool_muprog'), 'i/edit');
+                $editaction = new \tool_mulib\output\muform\dialog\icon($editurl, get_string('completionoverride', 'tool_muprog'), 'i/edit');
                 $completioninfo .= ' ' . $output->render($editaction);
             }
 
@@ -842,9 +842,9 @@ class renderer extends \plugin_renderer_base {
             if ($canevidence && !$program->archived && !$allocation->archived) {
                 $editurl = new url('/admin/tool/muprog/management/item_evidence_edit.php', ['allocationid' => $allocation->id, 'itemid' => $item->get_id()]);
                 if ($evidence) {
-                    $editaction = new \tool_mulib\output\ajax_form\icon($editurl, get_string('evidenceupdate', 'tool_muprog'), 'i/edit');
+                    $editaction = new \tool_mulib\output\muform\dialog\icon($editurl, get_string('evidenceupdate', 'tool_muprog'), 'i/edit');
                 } else {
-                    $editaction = new \tool_mulib\output\ajax_form\icon($editurl, get_string('evidenceupdate', 'tool_muprog'), 't/add');
+                    $editaction = new \tool_mulib\output\muform\dialog\icon($editurl, get_string('evidenceupdate', 'tool_muprog'), 't/add');
                 }
                 $evidenceinfo .= ' ' . $output->render($editaction);
             }

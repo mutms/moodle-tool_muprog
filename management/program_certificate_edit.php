@@ -27,13 +27,13 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use tool_mulib\muform\handler;
+
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
 /** @var core_renderer $OUTPUT */
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
-
-define('AJAX_SCRIPT', true);
 
 require('../../../../config.php');
 
@@ -46,52 +46,49 @@ $context = context::instance_by_id($program->contextid);
 require_capability('tool/muprog:edit', $context);
 
 if (!\tool_muprog\local\certificate::is_available()) {
-    redirect(new core\url('/admin/tool/muprog/program.php', ['id' => $program->id]));
+    redirect(new core\url('/admin/tool/muprog/management/program.php', ['id' => $program->id]));
 }
 
 $currenturl = new core\url('/admin/tool/muprog/management/program_certificate_edit.php', ['id' => $id]);
 $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
+$title = get_string('certificate', 'tool_certificate');
+$PAGE->set_title($title);
+$PAGE->set_heading($title);
+
+$handler = handler::from_request();
 
 $cert = $DB->get_record('tool_muprog_cert', ['programid' => $program->id]);
 
-$current = new stdClass();
-$current->id = $program->id;
-
+$current = [
+    'templateid' => null,
+    'expirydatetype' => 0,
+    'expirydateabsolute' => null,
+    'expirydaterelative' => 0,
+];
 if ($cert) {
-    $current->templateid = $cert->templateid;
-    $current->expirydatetype = $cert->expirydatetype;
+    $current['templateid'] = $cert->templateid;
     if ($cert->expirydatetype == 1) {
-        $current->expirydateabsolute = $cert->expirydateoffset;
-        $current->expirydaterelative = null;
+        $current['expirydatetype'] = 1;
+        $current['expirydateabsolute'] = $cert->expirydateoffset;
     } else if ($cert->expirydatetype == 2) {
-        $current->expirydateabsolute = null;
-        $current->expirydaterelative = $cert->expirydateoffset;
-    } else {
-        $current->expirydatetype = 0;
-        $current->expirydaterelative = null;
-        $current->expirydateabsolute = null;
+        $current['expirydatetype'] = 2;
+        $current['expirydaterelative'] = $cert->expirydateoffset;
     }
-    $current->existing = true;
-} else {
-    $current->templateid = null;
-    $current->expirydatetype = 0;
-    $current->expirydaterelative = null;
-    $current->expirydateabsolute = null;
-    $current->existing = false;
 }
 
-$form = new \tool_muprog\local\form\program_certificate_edit(null, ['data' => $current, 'context' => $context]);
+$form = new \tool_muprog\local\form\program_certificate_edit($currenturl, $current, ['context' => $context]);
 
 $returnurl = new core\url('/admin/tool/muprog/management/program_certificate.php', ['id' => $program->id]);
 
 if ($form->is_cancelled()) {
-    $form->ajax_form_cancelled($returnurl);
+    $handler->cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
+    $data->id = $program->id;
     \tool_muprog\local\certificate::update_program_certificate((array)$data);
-    $form->ajax_form_submitted($returnurl);
+    $handler->submitted($returnurl);
 }
 
-$form->ajax_form_render();
+$handler->render($form);

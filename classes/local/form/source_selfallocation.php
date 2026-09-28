@@ -19,6 +19,13 @@
 
 namespace tool_muprog\local\form;
 
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\inforawhtml;
+use tool_mulib\muform\element\secret;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\form;
+
 /**
  * Program self-allocation confirmation.
  *
@@ -28,43 +35,32 @@ namespace tool_muprog\local\form;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class source_selfallocation extends \tool_mulib\local\ajax_form {
+final class source_selfallocation extends form {
     #[\Override]
-    protected function definition() {
-        $mform = $this->_form;
-        $source = $this->_customdata['source'];
-        $program = $this->_customdata['program'];
+    protected function definition(): void {
+        $source = $this->get_extra_data()['source'];
 
         $confirmation = markdown_to_html(get_string('source_selfallocation_confirm', 'tool_muprog'));
-        $mform->addElement('static', 'confirmation', '', clean_text($confirmation));
+        $this->add(new inforawhtml('confirmation', '', clean_text($confirmation)));
 
         $data = (object)json_decode($source->datajson);
         if (isset($data->key)) {
-            $mform->addElement('passwordunmask', 'key', get_string('source_selfallocation_key', 'tool_muprog'));
-            $mform->addRule('key', get_string('required'), 'required', null, 'client');
+            $key = new secret('key', get_string('source_selfallocation_key', 'tool_muprog'));
+            $key->set_required(true);
+            $this->add($key);
         }
 
-        $mform->addElement('hidden', 'sourceid');
-        $mform->setType('sourceid', PARAM_INT);
-        $mform->setDefault('sourceid', $source->id);
-
-        $this->add_action_buttons(true, get_string('source_selfallocation_allocate', 'tool_muprog'));
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', get_string('source_selfallocation_allocate', 'tool_muprog')), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 
     #[\Override]
-    public function validation($data, $files) {
-        $errors = parent::validation($data, $files);
-
-        $source = $this->_customdata['source'];
+    protected function validation(array $data, array &$allerrors): void {
+        $source = $this->get_extra_data()['source'];
         $sourcedata = (object)json_decode($source->datajson);
-        if (isset($sourcedata->key)) {
-            if (trim($data['key']) === '') {
-                $errors['key'] = get_string('required');
-            } else if ($data['key'] !== $sourcedata->key) {
-                $errors['key'] = get_string('error');
-            }
+        if (isset($sourcedata->key) && $data['key'] !== null && $data['key'] !== $sourcedata->key) {
+            $allerrors['key'][] = get_string('error');
         }
-
-        return $errors;
     }
 }

@@ -15,31 +15,30 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
-// phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace tool_muprog\phpunit\external\form_autocomplete;
+namespace tool_muprog\phpunit\muform\autocompletemany;
 
-use tool_muprog\external\form_autocomplete\export_programids;
+use tool_muprog\muform\autocompletemany\export_programids;
 
 /**
- * External API for form Import allocation settings
+ * Export programs autocomplete source test.
  *
  * @group      MuTMS
  * @package    tool_muprog
- * @copyright  2024 Open LMS (https://www.openlms.net/)
- * @copyright  2025 Petr Skoda
- * @author     Petr Skoda
+ * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @covers \tool_muprog\external\form_autocomplete\export_programids
+ * @covers \tool_muprog\muform\autocompletemany\export_programids
+ * @covers \tool_muprog\muform\util\autocomplete\program_trait
  */
 final class export_programids_test extends \advanced_testcase {
+    #[\Override]
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
     }
 
-    public function test_execute(): void {
+    public function test_search_labels(): void {
         /** @var \tool_muprog_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
 
@@ -85,23 +84,48 @@ final class export_programids_test extends \advanced_testcase {
         $viewerroleid = $this->getDataGenerator()->create_role();
         assign_capability('tool/muprog:export', CAP_ALLOW, $viewerroleid, $syscontext);
         role_assign($viewerroleid, $user1->id, $catcontext1->id);
+        $user2 = $this->getDataGenerator()->create_user();
 
-        $this->setUser($user1->id);
-        $response = export_programids::execute('');
-        $result = export_programids::clean_returnvalue(export_programids::execute_returns(), $response);
-        $this->assertFalse($result['overflow']);
-        $this->assertCount(1, $result['list']);
+        $all = [(string)$program1->id, (string)$program2->id, (string)$program3->id];
 
-        $this->assertNull(export_programids::validate_value($program2->id, [], $syscontext));
-        $this->assertNotNull(export_programids::validate_value($program1->id, [], $syscontext));
+        $this->setUser($user1);
+        $source = new export_programids((int)$catcontext1->id);
+        $this->assertSame([(int)$catcontext1->id], $source->get_args());
+        $this->assertSame([(int)$program2->id => 'pokus'], $source->search('', 50, []));
+        $this->assertSame([], $source->search('', 50, [(string)$program2->id]));
+        $this->assertSame([(int)$program2->id => 'pokus'], $source->labels($all));
+        $this->assertSame([], $source->validate($all));
+        try {
+            new export_programids((int)$syscontext->id);
+            $this->fail('Exception expected');
+        } catch (\moodle_exception $ex) {
+            $this->assertInstanceOf(\required_capability_exception::class, $ex);
+        }
 
         $this->setAdminUser();
-        $response = export_programids::execute('');
-        $result = export_programids::clean_returnvalue(export_programids::execute_returns(), $response);
-        $this->assertFalse($result['overflow']);
-        $this->assertCount(3, $result['list']);
-        $this->assertNull(export_programids::validate_value($program2->id, [], $syscontext));
-        $this->assertNull(export_programids::validate_value($program1->id, [], $syscontext));
-        $this->assertNull(export_programids::validate_value($program3->id, [], $syscontext));
+        $source = new export_programids((int)$syscontext->id);
+        $this->assertSame(
+            [(int)$program1->id => 'hokus', (int)$program2->id => 'pokus', (int)$program3->id => 'Prog3'],
+            $source->search('', 50, [])
+        );
+        $this->assertSame(
+            [(int)$program1->id => 'hokus', (int)$program3->id => 'Prog3'],
+            $source->search('', 50, [(string)$program2->id])
+        );
+        $this->assertSame([(int)$program2->id => 'pokus'], $source->search('desc 2', 50, []));
+        $this->assertNull($source->search('', 2, []));
+        $this->assertSame(
+            [(int)$program1->id => 'hokus', (int)$program2->id => 'pokus', (int)$program3->id => 'Prog3'],
+            $source->labels($all)
+        );
+        $this->assertSame([], $source->labels(['0', '-1', 'abc', '', (string)($program3->id + 100)]));
+
+        $this->setUser($user2);
+        try {
+            new export_programids((int)$catcontext1->id);
+            $this->fail('Exception expected');
+        } catch (\moodle_exception $ex) {
+            $this->assertInstanceOf(\required_capability_exception::class, $ex);
+        }
     }
 }

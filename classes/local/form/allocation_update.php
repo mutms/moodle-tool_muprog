@@ -19,6 +19,16 @@
 
 namespace tool_muprog\local\form;
 
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\customfields;
+use tool_mulib\muform\element\datetime;
+use tool_mulib\muform\element\info;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\form;
+use tool_muprog\customfield\allocation_handler;
+use tool_muprog\local\allocation;
+
 /**
  * Edit user allocation.
  *
@@ -28,65 +38,37 @@ namespace tool_muprog\local\form;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class allocation_update extends \tool_mulib\local\ajax_form {
-    /** @var \tool_muprog\customfield\allocation_handler */
-    protected $handler;
-
+final class allocation_update extends form {
     #[\Override]
-    protected function definition() {
-        $mform = $this->_form;
-        $allocation = $this->_customdata['allocation'];
-        $user = $this->_customdata['user'];
-        $context = $this->_customdata['context'];
+    protected function definition(): void {
+        $allocation = $this->get_extra_data()['allocation'];
 
-        $mform->addElement('static', 'userfullname', get_string('user'), fullname($user));
+        $this->add(new info('userfullname', get_string('user')));
 
-        $mform->addElement('date_time_selector', 'timeallocated', get_string('allocationdate', 'tool_muprog'), ['optional' => false]);
-        $mform->freeze('timeallocated');
+        $timeallocated = new datetime('timeallocated', get_string('allocationdate', 'tool_muprog'));
+        $timeallocated->set_frozen(true);
+        $this->add($timeallocated);
 
-        $mform->addElement('date_time_selector', 'timestart', get_string('programstart_date', 'tool_muprog'), ['optional' => false]);
+        $timestart = new datetime('timestart', get_string('programstart_date', 'tool_muprog'));
+        $timestart->set_required(true);
+        $this->add($timestart);
 
-        $mform->addElement('date_time_selector', 'timedue', get_string('programdue_date', 'tool_muprog'), ['optional' => true]);
+        $this->add(new datetime('timedue', get_string('programdue_date', 'tool_muprog')));
 
-        $mform->addElement('date_time_selector', 'timeend', get_string('programend_date', 'tool_muprog'), ['optional' => true]);
+        $this->add(new datetime('timeend', get_string('programend_date', 'tool_muprog')));
 
-        $mform->addElement('hidden', 'id');
-        $mform->setType('id', PARAM_INT);
-        $mform->setDefault('id', $allocation->id);
+        $this->add(new customfields('customfields', allocation_handler::create(), (int)$allocation->id));
 
-        // Add custom fields to the form.
-        $this->handler = \tool_muprog\customfield\allocation_handler::create();
-        $this->handler->instance_form_definition($mform);
-
-        $this->add_action_buttons(true, get_string('allocation_update', 'tool_muprog'));
-
-        // Prepare custom fields data.
-        $this->handler->instance_form_before_set_data($allocation);
-
-        $this->set_data($allocation);
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', get_string('allocation_update', 'tool_muprog')), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 
     #[\Override]
-    public function definition_after_data() {
-        parent::definition_after_data();
-        $mform = $this->_form;
-        $allocation = $this->_customdata['allocation'];
-        $this->handler->instance_form_definition_after_data($mform, $allocation->id);
-    }
-
-    #[\Override]
-    public function validation($data, $files) {
-        $errors = parent::validation($data, $files);
-
-        $errors = array_merge($errors, \tool_muprog\local\allocation::validate_allocation_dates(
-            $data['timestart'],
-            $data['timedue'],
-            $data['timeend']
-        ));
-
-        // Add the custom fields validation.
-        $errors = array_merge($errors, $this->handler->instance_form_validation($data, $files));
-
-        return $errors;
+    protected function validation(array $data, array &$allerrors): void {
+        $errors = allocation::validate_allocation_dates((int)$data['timestart'], $data['timedue'], $data['timeend']);
+        foreach ($errors as $name => $error) {
+            $allerrors[$name][] = $error;
+        }
     }
 }

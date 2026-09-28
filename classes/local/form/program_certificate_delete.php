@@ -18,6 +18,12 @@
 
 namespace tool_muprog\local\form;
 
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\info;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\form;
+
 /**
  * Delete program certificate settings.
  *
@@ -27,24 +33,19 @@ namespace tool_muprog\local\form;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class program_certificate_delete extends \tool_mulib\local\ajax_form {
+final class program_certificate_delete extends form {
     #[\Override]
-    protected function definition() {
+    protected function definition(): void {
         global $DB;
 
-        $mform = $this->_form;
-        $data = $this->_customdata['data'];
-        $context = $this->_customdata['context'];
-
-        $record = $DB->get_record('tool_certificate_templates', ['id' => $data->templateid]);
+        $templateid = $this->get_current_data()['templateid'];
+        $record = $DB->get_record('tool_certificate_templates', ['id' => $templateid]);
         if ($record) {
-            $template = format_string($record->name);
-            $mform->addElement('static', 'template', get_string('certificatetemplate', 'tool_certificate'), $template);
+            $this->add(new info('template', get_string('certificatetemplate', 'tool_certificate'), $record->name));
         }
 
-        $mform->addElement('hidden', 'id', $data->id);
-        $mform->setType('id', PARAM_INT);
-
-        $this->add_action_buttons(true, get_string('delete'));
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', get_string('delete')), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 }

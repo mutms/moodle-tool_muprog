@@ -18,7 +18,14 @@
 
 namespace tool_muprog\local\form;
 
-use tool_muprog\external\form_autocomplete\source_extdb_edit_queryid;
+use tool_mulib\muform\element\autocomplete;
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\checkbox;
+use tool_mulib\muform\element\select;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\form;
+use tool_muprog\muform\autocomplete\source_extdb_edit_queryid;
 
 /**
  * Edit external database sync settings.
@@ -27,69 +34,36 @@ use tool_muprog\external\form_autocomplete\source_extdb_edit_queryid;
  * @copyright  2025 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class source_extdb_edit extends \tool_mulib\local\ajax_form {
+final class source_extdb_edit extends form {
     #[\Override]
-    protected function definition() {
-        $mform = $this->_form;
-        $context = $this->_customdata['context'];
-        $source = $this->_customdata['source'];
-        $program = $this->_customdata['program'];
+    protected function definition(): void {
+        $source = $this->get_extra_data()['source'];
+        $yesno = ['1' => get_string('yes'), '0' => get_string('no')];
+        $dm = $this->get_display_manager();
 
-        $mform->addElement('select', 'enable', get_string('active'), ['1' => get_string('yes'), '0' => get_string('no')]);
-        $mform->setDefault('enable', $source->enable);
-        if ($source->hasallocations) {
-            $mform->hardFreeze('enable');
-        }
+        $enable = new select('enable', get_string('active'), $yesno);
+        $enable->set_frozen($source->hasallocations);
+        $this->add($enable);
 
-        source_extdb_edit_queryid::add_element(
-            $mform,
-            ['programid' => $program->id],
+        $programid = (int)$this->get_extra_data()['program']->id;
+        $auxint1 = new autocomplete(
             'auxint1',
             get_string('extdb_query', 'tool_mulib'),
-            $context
+            new source_extdb_edit_queryid($programid)
         );
-        if (!empty($source->auxint1)) {
-            $mform->setDefault('auxint1', $source->auxint1);
-        }
-        $mform->hideIf('auxint1', 'enable', 'eq', 0);
+        $this->add($auxint1);
+        $dm->hide_if('auxint1', 'enable', 'eq', '0');
 
-        $mform->addElement('advcheckbox', 'auxint2', get_string('source_extdb_archiveremoved', 'tool_muprog'), ' ');
-        if (!empty($source->id)) {
-            $mform->setDefault('auxint2', (int)$source->auxint2);
-        } else {
-            $mform->setDefault('auxint2', 1);
-        }
-        $mform->hideIf('auxint2', 'enable', 'eq', 0);
+        $auxint2 = new checkbox('auxint2', get_string('source_extdb_archiveremoved', 'tool_muprog'));
+        // Archive removed allocations by default in new sources.
+        $auxint2->set_default(1);
+        $this->add($auxint2);
+        $dm->hide_if('auxint2', 'enable', 'eq', '0');
 
         // TODO: add more aux settings.
 
-        $mform->addElement('hidden', 'programid');
-        $mform->setType('programid', PARAM_INT);
-        $mform->setDefault('programid', $program->id);
-
-        $mform->addElement('hidden', 'type');
-        $mform->setType('type', PARAM_ALPHANUMEXT);
-        $mform->setDefault('type', $source->type);
-
-        $this->add_action_buttons(true, get_string('update'));
-    }
-
-    #[\Override]
-    public function validation($data, $files) {
-        $errors = parent::validation($data, $files);
-        $program = $this->_customdata['program'];
-        $context = $this->_customdata['context'];
-
-        $args = ['programid' => $program->id];
-        if ($data['enable']) {
-            if ($data['auxint1']) {
-                $error = source_extdb_edit_queryid::validate_value($data['auxint1'], $args, $context);
-                if ($error !== null) {
-                    $errors['auxint1'] = $error;
-                }
-            }
-        }
-
-        return $errors;
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', get_string('update')), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 }

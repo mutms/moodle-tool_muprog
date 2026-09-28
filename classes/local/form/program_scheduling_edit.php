@@ -19,6 +19,15 @@
 
 namespace tool_muprog\local\form;
 
+use stdClass;
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\dateinterval;
+use tool_mulib\muform\element\datetime;
+use tool_mulib\muform\element\select;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\form;
+use tool_mulib\muform\validator\required_if_visible;
 use tool_muprog\local\program;
 
 /**
@@ -30,40 +39,26 @@ use tool_muprog\local\program;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class program_scheduling_edit extends \tool_mulib\local\ajax_form {
+final class program_scheduling_edit extends form {
+    /** @var string[] names of program dates */
+    public const DATES = ['start', 'due', 'end'];
+
     #[\Override]
-    protected function definition() {
-        $mform = $this->_form;
-        $data = $this->_customdata['data'];
-        $context = $this->_customdata['context'];
+    protected function definition(): void {
+        foreach (self::DATES as $name) {
+            $this->add_program_date($name);
+        }
 
-        $this->parse_program_allocation_date($data, 'start');
-        $this->add_program_date('start');
-
-        $this->parse_program_allocation_date($data, 'due');
-        $this->add_program_date('due');
-
-        $this->parse_program_allocation_date($data, 'end');
-        $this->add_program_date('end');
-
-        $mform->addElement('hidden', 'id');
-        $mform->setType('id', PARAM_INT);
-        $mform->setDefault('id', $data->id);
-
-        $this->add_action_buttons(true, get_string('updatescheduling', 'tool_muprog'));
-
-        $this->set_data($data);
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', get_string('updatescheduling', 'tool_muprog')), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 
     #[\Override]
-    public function validation($data, $files) {
-        $errors = parent::validation($data, $files);
-
-        $this->validate_program_date('start', $data, $errors);
-        $this->validate_program_date('due', $data, $errors);
-        $this->validate_program_date('end', $data, $errors);
-
-        return $errors;
+    protected function validation(array $data, array &$allerrors): void {
+        foreach (self::DATES as $name) {
+            $this->validate_program_date($name, $data, $allerrors);
+        }
     }
 
     /**
@@ -73,25 +68,25 @@ final class program_scheduling_edit extends \tool_mulib\local\ajax_form {
      * @return void
      */
     protected function add_program_date(string $name): void {
-        $mform = $this->_form;
+        $dm = $this->get_display_manager();
 
-        $delaytypes = [
-            'months' => get_string('months'),
-            'days' => get_string('days'),
-            'hours' => get_string('hours'),
-        ];
+        $datetypes = array_map('strval', program::{'get_program_' . $name . 'date_types'}());
+        $type = new select('program' . $name . '_type', get_string('program' . $name, 'tool_muprog'), $datetypes);
+        $type->set_required(true);
+        $type->add_help_button('program' . $name, 'tool_muprog');
+        $this->add($type);
 
-        $datetypes = program::{'get_program_' . $name . 'date_types'}();
+        $date = new datetime('program' . $name . '_date', get_string('program' . $name . '_date', 'tool_muprog'));
+        $date->set_required_marker(true);
+        $date->add_validator(new required_if_visible());
+        $this->add($date);
+        $dm->hide_if('program' . $name . '_date', 'program' . $name . '_type', 'neq', 'date');
 
-        $mform->addElement('select', 'program' . $name . '_type', get_string('program' . $name, 'tool_muprog'), $datetypes);
-        $mform->addHelpButton('program' . $name . '_type', 'program' . $name, 'tool_muprog');
-        $mform->addElement('date_time_selector', 'program' . $name . '_date', get_string('program' . $name . '_date', 'tool_muprog'), ['optional' => false]);
-        $mform->hideIf('program' . $name . '_date', 'program' . $name . '_type', 'notequal', 'date');
-        $dvalue = $mform->createElement('text', 'value', '');
-        $dtype = $mform->createElement('select', 'type', '', $delaytypes);
-        $mform->addGroup([$dvalue, $dtype], 'program' . $name . '_delay', get_string('program' . $name . '_delay', 'tool_muprog'));
-        $mform->setType('program' . $name . '_delay[value]', PARAM_INT);
-        $mform->hideIf('program' . $name . '_delay', 'program' . $name . '_type', 'notequal', 'delay');
+        $delay = new dateinterval('program' . $name . '_delay', get_string('program' . $name . '_delay', 'tool_muprog'), ['m', 'd', 'h']);
+        $delay->set_required_marker(true);
+        $delay->add_validator(new required_if_visible());
+        $this->add($delay);
+        $dm->hide_if('program' . $name . '_delay', 'program' . $name . '_type', 'neq', 'delay');
     }
 
     /**
@@ -99,63 +94,82 @@ final class program_scheduling_edit extends \tool_mulib\local\ajax_form {
      *
      * @param string $name
      * @param array $data
-     * @param array $errors
+     * @param array $allerrors
      * @return void
      */
-    protected function validate_program_date(string $name, array $data, array &$errors): void {
+    protected function validate_program_date(string $name, array $data, array &$allerrors): void {
         if ($data['program' . $name . '_type'] === 'delay') {
-            if ($data['program' . $name . '_delay']['value'] <= 0) {
-                $errors['program' . $name . '_delay'] = get_string('required');
+            $delay = $data['program' . $name . '_delay'];
+            // Program scheduling supports one time unit only.
+            if ($delay !== null && !preg_match('/^(P[1-9][0-9]*[MD]|PT[1-9][0-9]*H)$/D', $delay)) {
+                $allerrors['program' . $name . '_delay'][] = get_string('delay_oneunit', 'tool_muprog');
             }
         }
-        if ($name !== 'start') {
-            if ($data['program' . $name . '_type'] === 'date') {
-                if ($data['programstart_type'] === 'date') {
-                    if ($data['programstart_date'] >= $data['program' . $name . '_date']) {
-                        $errors['program' . $name . '_date'] = get_string('error');
-                    }
-                }
+        if ($name === 'start') {
+            return;
+        }
+        if ($data['program' . $name . '_type'] === 'date' && $data['programstart_type'] === 'date') {
+            if (
+                $data['programstart_date'] && $data['program' . $name . '_date']
+                && $data['programstart_date'] >= $data['program' . $name . '_date']
+            ) {
+                $allerrors['program' . $name . '_date'][] = get_string('error');
             }
-            if ($name === 'end') {
-                if ($data['programdue_type'] === 'date' && $data['programend_type'] === 'date') {
-                    if ($data['programdue_date'] > $data['programend_date']) {
-                        $errors['programend_date'] = get_string('error');
-                    }
-                }
+        }
+        if ($name === 'end' && $data['programdue_type'] === 'date' && $data['programend_type'] === 'date') {
+            if (
+                $data['programdue_date'] && $data['programend_date']
+                && $data['programdue_date'] > $data['programend_date']
+            ) {
+                $allerrors['programend_date'][] = get_string('error');
             }
         }
     }
 
     /**
-     * Parse date.
+     * Current data of program date elements.
      *
-     * @param \stdClass $program
-     * @param string $name
-     * @return void
+     * @param stdClass $program
+     * @param string $name start, due or end
+     * @return array
      */
-    protected function parse_program_allocation_date(\stdClass $program, string $name): void {
+    public static function get_date_current_data(stdClass $program, string $name): array {
+        $current = [];
         if (!$program->{$name . 'datejson'}) {
+            return $current;
+        }
+        $json = (array)json_decode($program->{$name . 'datejson'});
+        if (isset($json['type'])) {
+            $current['program' . $name . '_type'] = $json['type'];
+        }
+        if (isset($json['date'])) {
+            $current['program' . $name . '_date'] = $json['date'];
+        }
+        if (isset($json['delay'])) {
+            $current['program' . $name . '_delay'] = $json['delay'];
+        }
+        return $current;
+    }
+
+    /**
+     * Convert submitted delay interval to the format expected by program::update_scheduling().
+     *
+     * @param stdClass $data form data, modified
+     * @param string $name start, due or end
+     */
+    public static function apply_delay(stdClass $data, string $name): void {
+        $key = 'program' . $name . '_delay';
+        if ($data->{'program' . $name . '_type'} !== 'delay') {
+            unset($data->$key);
             return;
         }
-
-        $start = (array)json_decode($program->{$name . 'datejson'});
-        foreach ($start as $k => $v) {
-            $program->{'program' . $name . '_' . $k} = $v;
-        }
-
-        if (isset($program->{'program' . $name . '_delay'})) {
-            $di = new \DateInterval($program->{'program' . $name . '_delay'});
-            $program->{'program' . $name . '_delay'} = [];
-            if ($di->m) {
-                $program->{'program' . $name . '_delay'}['type'] = 'months';
-                $program->{'program' . $name . '_delay'}['value'] = $di->m;
-            } else if ($di->d) {
-                $program->{'program' . $name . '_delay'}['type'] = 'days';
-                $program->{'program' . $name . '_delay'}['value'] = $di->d;
-            } else if ($di->h) {
-                $program->{'program' . $name . '_delay'}['type'] = 'hours';
-                $program->{'program' . $name . '_delay'}['value'] = $di->h;
-            }
+        $di = new \DateInterval($data->$key);
+        if ($di->m) {
+            $data->$key = ['type' => 'months', 'value' => $di->m];
+        } else if ($di->d) {
+            $data->$key = ['type' => 'days', 'value' => $di->d];
+        } else {
+            $data->$key = ['type' => 'hours', 'value' => $di->h];
         }
     }
 }

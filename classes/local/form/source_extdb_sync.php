@@ -18,6 +18,12 @@
 
 namespace tool_muprog\local\form;
 
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\info;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\form;
+
 /**
  * Edit external database manual sync form
  *
@@ -25,59 +31,42 @@ namespace tool_muprog\local\form;
  * @copyright  2025 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class source_extdb_sync extends \tool_mulib\local\ajax_form {
+final class source_extdb_sync extends form {
     #[\Override]
-    protected function definition() {
-        $mform = $this->_form;
-        $source = $this->_customdata['source'];
-        $program = $this->_customdata['program'];
-        $query = $this->_customdata['query'];
+    protected function definition(): void {
+        $source = $this->get_extra_data()['source'];
 
-        $mform->addElement('hidden', 'sourceid');
-        $mform->setType('sourceid', PARAM_INT);
-        $mform->setDefault('sourceid', $source->id);
+        $this->add(new info('program', get_string('program', 'tool_muprog')));
 
-        $mform->addElement('static', 'program', get_string('program', 'tool_muprog'), format_string($program->fullname));
-
-        if (!$query) {
-            $qname = get_string('error');
-        } else {
-            $qname = s($query->name);
-        }
-        $mform->addElement('static', 'query', get_string('extdb_query', 'tool_mulib'), $qname);
+        $this->add(new info('query', get_string('extdb_query', 'tool_mulib'), null, info::PLAIN));
 
         if ($source->auxint4 || $source->auxint3) {
-            $mform->addElement('static', 'pendingsync', get_string('source_extdb_pendingsync', 'tool_muprog'), get_string('yes'));
+            $this->add(new info('pendingsync', get_string('source_extdb_pendingsync', 'tool_muprog'), get_string('yes')));
         }
 
-        if ($source->auxint5) {
-            $last = userdate($source->auxint5);
-        } else {
-            $last = get_string('none');
-        }
-        $mform->addElement('static', 'lastsync', get_string('source_extdb_lastsync', 'tool_muprog'), $last);
+        $this->add(new info('lastsync', get_string('source_extdb_lastsync', 'tool_muprog')));
 
-        $this->add_action_buttons(true, get_string('source_extdb_sync', 'tool_muprog'));
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', get_string('source_extdb_sync', 'tool_muprog')), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 
     #[\Override]
-    public function validation($data, $files) {
-        $errors = parent::validation($data, $files);
-        $program = $this->_customdata['program'];
-        $source = $this->_customdata['source'];
-        $query = $this->_customdata['query'];
+    protected function validation(array $data, array &$allerrors): void {
+        $extra = $this->get_extra_data();
+        $program = $extra['program'];
+        $source = $extra['source'];
+        $query = $extra['query'];
 
         if ($program->archived) {
-            $errors['program'] = get_string('error');
+            $allerrors['program'][] = get_string('error');
         } else if (!$query) {
-            $errors['query'] = get_string('error');
+            $allerrors['query'][] = get_string('error');
         }
 
-        if ($source->auxint4 && $source->auxint4 + HOURSECS < time()) {
+        if ($source->auxint4 && $source->auxint4 + HOURSECS > time()) {
             // Task is still running right now, wait at least an hour before adding a new task.
-            $errors['pendingsync'] = get_string('error');
+            $allerrors['pendingsync'][] = get_string('error');
         }
-
-        return $errors;
     }
 }

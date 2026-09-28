@@ -18,6 +18,12 @@
 
 namespace tool_muprog\local\form;
 
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\inforawhtml;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\form;
+
 /**
  * Add program content items confirmation.
  *
@@ -27,18 +33,15 @@ namespace tool_muprog\local\form;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class program_content_import_confirmation extends \tool_mulib\local\ajax_form {
+final class program_content_import_confirmation extends form {
     #[\Override]
-    protected function definition() {
-        global $DB, $PAGE;
-        $mform = $this->_form;
+    protected function definition(): void {
+        global $PAGE;
+
+        $fromprogram = $this->get_extra_data()['fromprogram'];
+        $fromcontext = \context::instance_by_id($fromprogram->contextid);
 
         $renderer = $PAGE->get_renderer('core', null, RENDERER_TARGET_GENERAL);
-
-        $targetprogram = $DB->get_record('tool_muprog_program', ['id' => $this->_customdata['id']], '*', MUST_EXIST);
-        $fromprogram = $DB->get_record('tool_muprog_program', ['id' => $this->_customdata['fromprogram']], '*', MUST_EXIST);
-
-        $fromcontext = \context::instance_by_id($fromprogram->contextid);
 
         $a = new \stdClass();
         $a->fullname = format_string($fromprogram->fullname);
@@ -47,37 +50,14 @@ final class program_content_import_confirmation extends \tool_mulib\local\ajax_f
         $message = get_string('importprogramcontentconfirmation', 'tool_muprog', $a);
         $message = markdown_to_html($message);
         $message = $renderer->notification($message, \core\notification::INFO);
-        $mform->addElement('html', $message);
+        $this->add(new inforawhtml('confirmation', '', $message));
 
         /** @var \tool_muprog\output\catalogue\renderer $catalogueoutput */
-        $catalogueoutput = $PAGE->get_renderer('tool_muprog', 'catalogue', 'general');
+        $catalogueoutput = $PAGE->get_renderer('tool_muprog', 'catalogue', RENDERER_TARGET_GENERAL);
+        $this->add(new inforawhtml('content', '', $catalogueoutput->render_program_content($fromprogram)));
 
-        $content = $catalogueoutput->render_program_content($fromprogram);
-        $mform->addElement('html', $content);
-
-        $mform->addElement('hidden', 'fromprogram');
-        $mform->setType('fromprogram', PARAM_INT);
-        $mform->setDefault('fromprogram', $fromprogram->id);
-
-        $mform->addElement('hidden', 'id');
-        $mform->setType('id', PARAM_INT);
-        $mform->setDefault('id', $targetprogram->id);
-
-        $this->add_action_buttons(true, get_string('importprogramcontent', 'tool_muprog'));
-    }
-
-    #[\Override]
-    public function validation($data, $files) {
-        global $DB;
-        $errors = parent::validation($data, $files);
-
-        // Check if the user has capability to copy the selected program.
-        $programid = $data['fromprogram'];
-        $programcontextid = $DB->get_field('tool_muprog_program', 'contextid', ['id' => $programid]);
-        $context = \context::instance_by_id($programcontextid);
-        if (!has_capability('tool/muprog:clone', $context)) {
-            $errors['fromprogram'] = get_string('error');
-        }
-        return $errors;
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', get_string('importprogramcontent', 'tool_muprog')), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 }

@@ -19,6 +19,14 @@
 
 namespace tool_muprog\local\form;
 
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\checkbox;
+use tool_mulib\muform\element\datetime;
+use tool_mulib\muform\element\info;
+use tool_mulib\muform\element\select;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\form;
 use tool_muprog\local\allocation;
 use tool_muprog\local\course_reset;
 
@@ -31,64 +39,59 @@ use tool_muprog\local\course_reset;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class allocation_reset extends \tool_mulib\local\ajax_form {
-    /** @var bool editing supported*/
-    private $editpossible;
-
+final class allocation_reset extends form {
     #[\Override]
-    protected function definition() {
-        $mform = $this->_form;
-        $program = $this->_customdata['program'];
-        $source = $this->_customdata['source'];
-        $allocation = $this->_customdata['allocation'];
-        $user = $this->_customdata['user'];
-        $context = $this->_customdata['context'];
-
-        $mform->addElement('static', 'userfullname', get_string('user'), fullname($user));
+    protected function definition(): void {
+        $this->add(new info('userfullname', get_string('user')));
 
         $options = [
             '' => get_string('choosedots'),
-            course_reset::RESETTYPE_STANDARD => new \lang_string('resettype_standard', 'tool_muprog'),
-            course_reset::RESETTYPE_FULL => new \lang_string('resettype_full', 'tool_muprog'),
+            course_reset::RESETTYPE_STANDARD => get_string('resettype_standard', 'tool_muprog'),
+            course_reset::RESETTYPE_FULL => get_string('resettype_full', 'tool_muprog'),
         ];
-        $mform->addElement('select', 'resettype', get_string('resettype', 'tool_muprog'), $options);
-        $mform->addRule('resettype', null, 'required', null, 'client');
+        $resettype = new select('resettype', get_string('resettype', 'tool_muprog'), $options);
+        $resettype->set_required(true);
+        $this->add($resettype);
 
-        $sourceclass = allocation::get_source_classname($source->type);
-        if ($sourceclass && $sourceclass::is_allocation_update_possible($program, $source, $allocation)) {
-            $this->editpossible = true;
-            $mform->addElement('advcheckbox', 'updateallocation', get_string('allocation_reset_updateallocation', 'tool_muprog'));
-            $mform->addElement('date_time_selector', 'timestart', get_string('programstart_date', 'tool_muprog'), ['optional' => false]);
-            $mform->disabledIf('timestart', 'updateallocation', 'eq', 0);
-            $mform->addElement('date_time_selector', 'timedue', get_string('programdue_date', 'tool_muprog'), ['optional' => true]);
-            $mform->disabledIf('timedue', 'updateallocation', 'eq', 0);
-            $mform->addElement('date_time_selector', 'timeend', get_string('programend_date', 'tool_muprog'), ['optional' => true]);
-            $mform->disabledIf('timeend', 'updateallocation', 'eq', 0);
-        } else {
-            $this->editpossible = false;
+        if ($this->is_edit_possible()) {
+            $this->add(new checkbox('updateallocation', get_string('allocation_reset_updateallocation', 'tool_muprog')));
+
+            $timestart = new datetime('timestart', get_string('programstart_date', 'tool_muprog'));
+            $timestart->set_required_marker(true);
+            $this->add($timestart);
+
+            $this->add(new datetime('timedue', get_string('programdue_date', 'tool_muprog')));
+            $this->add(new datetime('timeend', get_string('programend_date', 'tool_muprog')));
+
+            $dm = $this->get_display_manager();
+            $dm->disable_if('timestart', 'updateallocation', 'notchecked');
+            $dm->disable_if('timedue', 'updateallocation', 'notchecked');
+            $dm->disable_if('timeend', 'updateallocation', 'notchecked');
         }
 
-        $mform->addElement('hidden', 'id');
-        $mform->setType('id', PARAM_INT);
-        $mform->setDefault('id', $allocation->id);
-
-        $this->add_action_buttons(true, get_string('allocation_reset', 'tool_muprog'));
-
-        $this->set_data($allocation);
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', get_string('allocation_reset', 'tool_muprog')), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 
     #[\Override]
-    public function validation($data, $files) {
-        $errors = parent::validation($data, $files);
-
-        if ($this->editpossible && $data['updateallocation']) {
-            $errors = array_merge($errors, \tool_muprog\local\allocation::validate_allocation_dates(
-                $data['timestart'],
-                $data['timedue'],
-                $data['timeend']
-            ));
+    protected function validation(array $data, array &$allerrors): void {
+        if ($this->is_edit_possible() && $data['updateallocation']) {
+            $errors = allocation::validate_allocation_dates((int)$data['timestart'], $data['timedue'], $data['timeend']);
+            foreach ($errors as $name => $error) {
+                $allerrors[$name][] = $error;
+            }
         }
+    }
 
-        return $errors;
+    /**
+     * Can the allocation dates be updated during reset?
+     *
+     * @return bool
+     */
+    private function is_edit_possible(): bool {
+        $extra = $this->get_extra_data();
+        $sourceclass = allocation::get_source_classname($extra['source']->type);
+        return $sourceclass && $sourceclass::is_allocation_update_possible($extra['program'], $extra['source'], $extra['allocation']);
     }
 }

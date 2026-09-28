@@ -20,6 +20,14 @@
 namespace tool_muprog\local\form;
 
 use tool_muprog\local\content\attendance;
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\datetime;
+use tool_mulib\muform\element\info;
+use tool_mulib\muform\element\radios;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\form;
+use tool_mulib\muform\validator\required_if_visible;
 
 /**
  * Take offline attendance data.
@@ -28,46 +36,25 @@ use tool_muprog\local\content\attendance;
  * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class item_attendance_take extends \tool_mulib\local\ajax_form {
+final class item_attendance_take extends form {
     #[\Override]
-    protected function definition() {
-        $mform = $this->_form;
-        $attendance = $this->_customdata['attendance'];
-        $user = $this->_customdata['user'];
-        $item = $this->_customdata['item'];
+    protected function definition(): void {
+        $this->add(new info('userfullname', get_string('user')));
 
-        $mform->addElement('static', 'staticuser', get_string('user'), fullname($user));
+        $this->add(new info('itemfullname', get_string('fullname')));
 
-        $mform->addElement('static', 'staticfullname', get_string('fullname'), format_string($item->fullname));
+        $status = new radios('status', get_string('attendance_status', 'tool_muprog'), array_map('strval', attendance::get_statuses()));
+        $status->set_required(true);
+        $this->add($status);
 
-        $radios = [];
-        foreach (attendance::get_statuses() as $k => $v) {
-            $radios[] = $mform->createElement('radio', 'status', '', $v, $k);
-        }
-        $mform->addElement('group', 'status_group', get_string('attendance_status', 'tool_muprog'), $radios, '<div class="w-100" />', false);
+        $timeeffective = new datetime('timeeffective', get_string('attendance_effective', 'tool_muprog'));
+        $timeeffective->set_required_marker(true);
+        $timeeffective->add_validator(new required_if_visible());
+        $this->add($timeeffective);
+        $this->get_display_manager()->hide_if('timeeffective', 'status', 'eq', attendance::STATUS_NOTSET);
 
-        $mform->addElement('date_time_selector', 'timeeffective', get_string('attendance_effective', 'tool_muprog'), ['optional' => false]);
-        $mform->hideIf('timeeffective', 'status', 'eq', attendance::STATUS_NOTSET);
-
-        $mform->addElement('hidden', 'itemid');
-        $mform->setType('itemid', PARAM_INT);
-
-        $mform->addElement('hidden', 'userid');
-        $mform->setType('userid', PARAM_INT);
-
-        $this->add_action_buttons(true, get_string('attendance_take', 'tool_muprog'));
-
-        $this->set_data($attendance);
-    }
-
-    #[\Override]
-    public function validation($data, $files) {
-        $errors = parent::validation($data, $files);
-
-        if (!isset($data['status'])) {
-            $errors['status_group'] = get_string('required');
-        }
-
-        return $errors;
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', get_string('attendance_take', 'tool_muprog')), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 }

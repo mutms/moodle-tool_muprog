@@ -28,14 +28,13 @@
  */
 
 use tool_muprog\local\allocation;
+use tool_mulib\muform\handler;
 
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
 /** @var core_renderer $OUTPUT */
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
-
-define('AJAX_SCRIPT', true);
 
 require('../../../../config.php');
 
@@ -58,21 +57,31 @@ require_capability('tool/muprog:admin', $context);
 $currenturl = new core\url('/admin/tool/muprog/management/item_completion_override.php', ['allocationid' => $allocation->id, 'itemid' => $item->id]);
 $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
+$title = get_string('completionoverride', 'tool_muprog');
+$PAGE->set_title($title);
+$PAGE->set_heading($title);
 
 $returnurl = new core\url('/admin/tool/muprog/management/allocation.php', ['id' => $allocation->id]);
 
-$form = new \tool_muprog\local\form\item_completion_override(null, [
-    'allocation' => $allocation, 'item' => $item, 'user' => $user,
-    'completion' => $completion, 'evidence' => $evidence, 'context' => $context,
-]);
+$handler = handler::from_request();
+
+$current = [
+    'userfullname' => fullname($user),
+    'itemfullname' => $item->fullname,
+    'evidencetimecompleted' => $evidence ? $evidence->timecompleted : null,
+    'timecompleted' => $completion ? $completion->timecompleted : null,
+];
+$form = new \tool_muprog\local\form\item_completion_override($currenturl, $current, ['hasevidence' => (bool)$evidence]);
 
 if ($form->is_cancelled()) {
-    $form->ajax_form_cancelled($returnurl);
+    $handler->cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
+    $data->allocationid = $allocation->id;
+    $data->itemid = $item->id;
     allocation::update_item_completion($data);
-    $form->ajax_form_submitted($returnurl);
+    $handler->submitted($returnurl);
 }
 
-$form->ajax_form_render();
+$handler->render($form);

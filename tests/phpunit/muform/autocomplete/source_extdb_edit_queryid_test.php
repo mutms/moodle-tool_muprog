@@ -15,31 +15,31 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
-// phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace tool_muprog\phpunit\external\form_autocomplete;
+namespace tool_muprog\phpunit\muform\autocomplete;
 
-use tool_muprog\external\form_autocomplete\source_extdb_edit_queryid;
+use tool_muprog\muform\autocomplete\source_extdb_edit_queryid;
 use tool_mulib\local\mulib;
 
 /**
- * External API for program external db sync query selection.
+ * External database allocation query autocomplete source test.
  *
  * @group      MuTMS
  * @package    tool_muprog
- * @copyright  2025 Petr Skoda
+ * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @covers \tool_muprog\external\form_autocomplete\source_extdb_edit_queryid
+ * @covers \tool_muprog\muform\autocomplete\source_extdb_edit_queryid
  */
 final class source_extdb_edit_queryid_test extends \advanced_testcase {
+    #[\Override]
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
     }
 
-    public function test_execute(): void {
-        global $CFG;
+    public function test_search_label(): void {
+        global $CFG, $DB;
         $this->preventResetByRollback();
 
         /** @var \tool_mulib_generator $generator */
@@ -86,6 +86,17 @@ final class source_extdb_edit_queryid_test extends \advanced_testcase {
             'type' => 'allocation',
             'sqlquery' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id=2",
         ]);
+        $query3 = $generator->create_extdb_query([
+            'contextid' => $syscontext->id,
+            'name' => 'Other query',
+            'note' => '',
+            'serverid' => $server->id,
+            'component' => 'tool_muprog',
+            'type' => 'allocation',
+            'sqlquery' => "SELECT id AS userid FROM {$CFG->prefix}user WHERE id=2",
+        ]);
+        // Queries of other plugins or types must not be used for program allocation.
+        $DB->set_field('tool_mulib_extdb_query', 'type', 'xallocation', ['id' => $query3->id]);
 
         $progroleid = $this->getDataGenerator()->create_role();
         $queryroleid = $this->getDataGenerator()->create_role();
@@ -106,44 +117,56 @@ final class source_extdb_edit_queryid_test extends \advanced_testcase {
 
         $this->setUser($user0);
 
-        $result = source_extdb_edit_queryid::execute('', $program0->id);
-        $result = source_extdb_edit_queryid::clean_returnvalue(source_extdb_edit_queryid::execute_returns(), $result);
-        $this->assertCount(1, $result['list']);
-        $this->assert_result_contains($query0->id, $result);
+        $source = new source_extdb_edit_queryid((int)$program0->id);
+        $this->assertSame([(int)$program0->id], $source->get_args());
+        $this->assertSame([(int)$query0->id => 'System query'], $source->search('', 50));
+        $this->assertSame('System query', $source->label((string)$query0->id));
+        $this->assertNull($source->label((string)$query1->id));
+        $this->assertNull($source->label((string)$query3->id));
+        $this->assertNull($source->label((string)($query3->id + 100)));
+        $this->assertNull($source->label('abc'));
 
-        $result = source_extdb_edit_queryid::execute('', $program1->id);
-        $result = source_extdb_edit_queryid::clean_returnvalue(source_extdb_edit_queryid::execute_returns(), $result);
-        $this->assertCount(2, $result['list']);
-        $this->assert_result_contains($query0->id, $result);
-        $this->assert_result_contains($query1->id, $result);
-
-        $result = source_extdb_edit_queryid::execute('System', $program1->id);
-        $result = source_extdb_edit_queryid::clean_returnvalue(source_extdb_edit_queryid::execute_returns(), $result);
-        $this->assertCount(1, $result['list']);
-        $this->assert_result_contains($query0->id, $result);
-
-        $result = source_extdb_edit_queryid::execute('argh', $program1->id);
-        $result = source_extdb_edit_queryid::clean_returnvalue(source_extdb_edit_queryid::execute_returns(), $result);
-        $this->assertCount(1, $result['list']);
-        $this->assert_result_contains($query1->id, $result);
+        $source = new source_extdb_edit_queryid((int)$program1->id);
+        $this->assertSame(
+            [(int)$query1->id => 'Category 1 query', (int)$query0->id => 'System query'],
+            $source->search('', 50)
+        );
+        $this->assertNull($source->search('', 1));
+        $this->assertSame([(int)$query0->id => 'System query'], $source->search('System', 50));
+        $this->assertSame([(int)$query1->id => 'Category 1 query'], $source->search('argh', 50));
+        $this->assertSame('System query', $source->label((string)$query0->id));
+        $this->assertSame('Category 1 query', $source->label((string)$query1->id));
+        $this->assertNull($source->label((string)$query2->id));
+        $this->assertNull($source->validate((string)$query1->id));
 
         $this->setUser($user1);
 
-        $result = source_extdb_edit_queryid::execute('', $program1->id);
-        $result = source_extdb_edit_queryid::clean_returnvalue(source_extdb_edit_queryid::execute_returns(), $result);
-        $this->assertCount(1, $result['list']);
-        $this->assert_result_contains($query1->id, $result);
+        $source = new source_extdb_edit_queryid((int)$program1->id);
+        $this->assertSame([(int)$query1->id => 'Category 1 query'], $source->search('', 50));
+        $this->assertSame('Category 1 query', $source->label((string)$query1->id));
+        $this->assertNull($source->label((string)$query0->id));
 
-        $result = source_extdb_edit_queryid::execute('', $program2->id);
-        $result = source_extdb_edit_queryid::clean_returnvalue(source_extdb_edit_queryid::execute_returns(), $result);
-        $this->assertCount(0, $result['list']);
+        $source = new source_extdb_edit_queryid((int)$program2->id);
+        $this->assertSame([], $source->search('', 50));
+        $this->assertNull($source->label((string)$query2->id));
+
+        // Current value is always allowed.
+        $DB->insert_record('tool_muprog_source', (object)[
+            'programid' => $program2->id,
+            'type' => 'extdb',
+            'datajson' => '{}',
+            'auxint1' => $query2->id,
+        ]);
+        $this->assertSame('Kategoie 2 query', $source->label((string)$query2->id));
+        $this->assertNull($source->label((string)$query0->id));
 
         $this->setUser($user2);
 
         try {
-            source_extdb_edit_queryid::execute('', $program1->id);
+            new source_extdb_edit_queryid((int)$program1->id);
             $this->fail('Exception expected');
         } catch (\core\exception\moodle_exception $ex) {
+            $this->assertInstanceOf(\required_capability_exception::class, $ex);
             $this->assertSame(
                 'Sorry, but you do not currently have permissions to do that (Add and update programs).',
                 $ex->getMessage()
@@ -151,8 +174,8 @@ final class source_extdb_edit_queryid_test extends \advanced_testcase {
         }
     }
 
-    public function test_execution_tenant(): void {
-        global $CFG;
+    public function test_search_tenant(): void {
+        global $CFG, $DB;
 
         if (!mulib::is_mutenancy_available()) {
             $this->markTestSkipped('tenant support not available');
@@ -176,7 +199,6 @@ final class source_extdb_edit_queryid_test extends \advanced_testcase {
 
         $program0 = $programgenerator->create_program(['contextid' => $syscontext->id]);
         $program1 = $programgenerator->create_program(['contextid' => $tenantcatcontext1->id]);
-        $program2 = $programgenerator->create_program(['contextid' => $tenantcatcontext2->id]);
 
         $server = $generator->create_extdb_server([]);
         $query0 = $generator->create_extdb_query([
@@ -218,41 +240,25 @@ final class source_extdb_edit_queryid_test extends \advanced_testcase {
 
         $this->setUser($user0);
 
-        $result = source_extdb_edit_queryid::execute('', $program0->id);
-        $result = source_extdb_edit_queryid::clean_returnvalue(source_extdb_edit_queryid::execute_returns(), $result);
-        $this->assertCount(1, $result['list']);
-        $this->assert_result_contains($query0->id, $result);
+        $source = new source_extdb_edit_queryid((int)$program0->id);
+        $this->assertSame([(int)$query0->id => 'System query'], $source->search('', 50));
 
-        $result = source_extdb_edit_queryid::execute('', $program1->id);
-        $result = source_extdb_edit_queryid::clean_returnvalue(source_extdb_edit_queryid::execute_returns(), $result);
-        $this->assertCount(2, $result['list']);
-        $this->assert_result_contains($query0->id, $result);
-        $this->assert_result_contains($query1->id, $result);
+        $source = new source_extdb_edit_queryid((int)$program1->id);
+        $this->assertSame(
+            [(int)$query1->id => 'Category 1 query', (int)$query0->id => 'System query'],
+            $source->search('', 50)
+        );
+        $this->assertSame([(int)$query0->id => 'System query'], $source->search('System', 50));
+        $this->assertSame([(int)$query1->id => 'Category 1 query'], $source->search('argh', 50));
 
-        $result = source_extdb_edit_queryid::execute('System', $program1->id);
-        $result = source_extdb_edit_queryid::clean_returnvalue(source_extdb_edit_queryid::execute_returns(), $result);
-        $this->assertCount(1, $result['list']);
-        $this->assert_result_contains($query0->id, $result);
-
-        $result = source_extdb_edit_queryid::execute('argh', $program1->id);
-        $result = source_extdb_edit_queryid::clean_returnvalue(source_extdb_edit_queryid::execute_returns(), $result);
-        $this->assertCount(1, $result['list']);
-        $this->assert_result_contains($query1->id, $result);
-    }
-
-    /**
-     * Assert query is in result.
-     *
-     * @param int $queryid
-     * @param array $result
-     * @return void
-     */
-    protected function assert_result_contains(int $queryid, array $result): void {
-        foreach ($result['list'] as $item) {
-            if ($item['value'] == $queryid) {
-                return;
-            }
-        }
-        $this->fail("Result does not contain item $queryid");
+        // Queries from other tenants are not allowed, not even the current value.
+        $DB->insert_record('tool_muprog_source', (object)[
+            'programid' => $program1->id,
+            'type' => 'extdb',
+            'datajson' => '{}',
+            'auxint1' => $query2->id,
+        ]);
+        $this->assertNull($source->label((string)$query2->id));
+        $this->assertSame('Category 1 query', $source->label((string)$query1->id));
     }
 }

@@ -58,7 +58,7 @@ echo $OUTPUT->header();
 $buttons = [];
 if (has_capability('tool/muprog:edit', $context)) {
     $editurl = new core\url('/admin/tool/muprog/management/program_visibility_edit.php', ['id' => $program->id]);
-    $editbutton = new tool_mulib\output\ajax_form\button($editurl, get_string('edit'));
+    $editbutton = new tool_mulib\output\muform\dialog\button($editurl, get_string('edit'));
     $editbutton->set_modal_title(get_string('program_update', 'tool_muprog'));
     $buttons[] = $OUTPUT->render($editbutton);
 }

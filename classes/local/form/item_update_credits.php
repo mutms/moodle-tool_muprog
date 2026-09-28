@@ -18,7 +18,13 @@
 
 namespace tool_muprog\local\form;
 
-use tool_muprog\local\content\credits;
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\duration;
+use tool_mulib\muform\element\info;
+use tool_mulib\muform\element\number;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\form;
 
 /**
  * Edit program credits item.
@@ -29,44 +35,19 @@ use tool_muprog\local\content\credits;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class item_update_credits extends \tool_mulib\local\ajax_form {
+final class item_update_credits extends form {
     #[\Override]
-    protected function definition() {
-        $mform = $this->_form;
-        /** @var credits $credits */
-        $credits = $this->_customdata['credits'];
+    protected function definition(): void {
+        $this->add(new info('typename', get_string('item_type', 'tool_muprog')));
 
-        $mform->addElement('static', 'statictype', get_string('item_type', 'tool_muprog'), $credits::get_type_name());
+        $this->add(new info('fullname', get_string('fullname')));
 
-        $mform->addElement('static', 'staticfullname', get_string('fullname'), format_string($credits->get_fullname()));
+        $this->add(new duration('completiondelay', get_string('completiondelay', 'tool_muprog')));
 
-        $mform->addElement(
-            'duration',
-            'completiondelay',
-            get_string('completiondelay', 'tool_muprog'),
-            ['optional' => true, 'defaultunit' => DAYSECS]
-        );
-        $mform->setDefault('completiondelay', $credits->get_completiondelay());
+        $this->add(new number('points', get_string('itempoints', 'tool_muprog'), ['min' => 0]));
 
-        $mform->addElement('text', 'points', get_string('itempoints', 'tool_muprog'));
-        $mform->setType('points', PARAM_INT);
-        $mform->setDefault('points', $credits->get_points());
-
-        $mform->addElement('hidden', 'id');
-        $mform->setType('id', PARAM_INT);
-        $mform->setDefault('id', $credits->get_id());
-
-        $this->add_action_buttons(true, get_string('updatecredits', 'tool_muprog'));
-    }
-
-    #[\Override]
-    public function validation($data, $files) {
-        $errors = parent::validation($data, $files);
-
-        if ($data['points'] < 0) {
-            $errors['points'] = get_string('error');
-        }
-
-        return $errors;
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', get_string('updatecredits', 'tool_muprog')), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 }

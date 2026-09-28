@@ -15,31 +15,31 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
-// phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace tool_muprog\phpunit\external\form_autocomplete;
+namespace tool_muprog\phpunit\muform\autocomplete;
 
-use tool_muprog\external\form_autocomplete\program_content_import_fromprogram;
+use tool_muprog\muform\autocomplete\program_content_import_fromprogram;
 use tool_mulib\local\mulib;
 
 /**
- * External API for form import program content
+ * Content import program autocomplete source test.
  *
  * @group      MuTMS
  * @package    tool_muprog
- * @copyright  2023 Open LMS (https://www.openlms.net/)
- * @author     Farhan Karmali
+ * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @covers \tool_muprog\external\form_autocomplete\program_content_import_fromprogram
+ * @covers \tool_muprog\muform\autocomplete\program_content_import_fromprogram
+ * @covers \tool_muprog\muform\util\autocomplete\program_trait
  */
 final class program_content_import_fromprogram_test extends \advanced_testcase {
+    #[\Override]
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
     }
 
-    public function test_execute(): void {
+    public function test_search(): void {
         /** @var \tool_muprog_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
 
@@ -80,21 +80,39 @@ final class program_content_import_fromprogram_test extends \advanced_testcase {
             'contextid' => $syscontext->id,
             'sources' => ['manual' => []],
         ]);
+        $program4 = $generator->create_program([
+            'fullname' => 'Prog4',
+            'idnumber' => 'p4',
+            'contextid' => $catcontext1->id,
+        ]);
 
         $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $editorroleid = $this->getDataGenerator()->create_role();
+        assign_capability('tool/muprog:edit', CAP_ALLOW, $editorroleid, $syscontext);
+        assign_capability('tool/muprog:clone', CAP_ALLOW, $editorroleid, $syscontext);
+        role_assign($editorroleid, $user2->id, $catcontext1->id);
 
         $this->setAdminUser();
-        $response = program_content_import_fromprogram::execute('', $program1->id);
-        $results = program_content_import_fromprogram::clean_returnvalue(
-            program_content_import_fromprogram::execute_returns(),
-            $response
+        $source = new program_content_import_fromprogram((int)$program1->id);
+        $this->assertSame([(int)$program1->id], $source->get_args());
+        $this->assertSame(
+            [(int)$program2->id => 'pokus', (int)$program3->id => 'Prog3', (int)$program4->id => 'Prog4'],
+            $source->search('', 50)
         );
-        $this->assertFalse($results['overflow']);
-        $this->assertCount(2, $results['list']);
+        $this->assertSame([(int)$program2->id => 'pokus'], $source->search('desc 2', 50));
+        $this->assertSame([(int)$program3->id => 'Prog3'], $source->search('p3', 50));
+        $this->assertNull($source->search('', 2));
+        $this->assertSame('pokus', $source->label((string)$program2->id));
+        $this->assertSame('Prog3', $source->label((string)$program3->id));
+        $this->assertNull($source->label((string)$program1->id));
+        $this->assertNull($source->label((string)($program4->id + 100)));
+        $this->assertNull($source->label('abc'));
+        $this->assertNull($source->validate((string)$program2->id));
 
         $this->setUser($user1);
         try {
-            $response = program_content_import_fromprogram::execute('', $program1->id);
+            new program_content_import_fromprogram((int)$program1->id);
             $this->fail('Exception excepted');
         } catch (\moodle_exception $ex) {
             $this->assertInstanceOf(\required_capability_exception::class, $ex);
@@ -103,10 +121,17 @@ final class program_content_import_fromprogram_test extends \advanced_testcase {
                 $ex->getMessage()
             );
         }
+
+        $this->setUser($user2);
+        $source = new program_content_import_fromprogram((int)$program2->id);
+        $this->assertSame([(int)$program4->id => 'Prog4'], $source->search('', 50));
+        $this->assertSame('Prog4', $source->label((string)$program4->id));
+        $this->assertNull($source->label((string)$program1->id));
+        $this->assertNull($source->label((string)$program2->id));
     }
 
-    public function test_execute_tenant(): void {
-        global $DB, $CFG;
+    public function test_search_tenant(): void {
+        global $DB;
         if (!mulib::is_mutenancy_available()) {
             $this->markTestSkipped('tenant support not available');
         }
@@ -120,24 +145,23 @@ final class program_content_import_fromprogram_test extends \advanced_testcase {
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
 
         $tenant1 = $tenantgenerator->create_tenant();
-        $tenant1context = \context_tenant::instance($tenant1->id);
         $tenant1catcontext = \context_coursecat::instance($tenant1->categoryid);
         $tenant2 = $tenantgenerator->create_tenant();
-        $tenant2context = \context_tenant::instance($tenant2->id);
         $tenant2catcontext = \context_coursecat::instance($tenant2->categoryid);
 
         $program0 = $generator->create_program(['fullname' => 'prg0', 'sources' => ['manual' => []]]);
-        $source0 = $DB->get_record('tool_muprog_source', ['programid' => $program0->id, 'type' => 'manual'], '*', MUST_EXIST);
-        $program1 = $generator->create_program(['idnumber' => 'prg2', 'contextid' => $tenant1catcontext->id, 'sources' => ['manual' => []]]);
-        $source1 = $DB->get_record('tool_muprog_source', ['programid' => $program1->id, 'type' => 'manual'], '*', MUST_EXIST);
-        $program2 = $generator->create_program(['idnumber' => 'prg3', 'contextid' => $tenant2catcontext->id, 'sources' => ['manual' => []]]);
-        $source2 = $DB->get_record('tool_muprog_source', ['programid' => $program2->id, 'type' => 'manual'], '*', MUST_EXIST);
-        $program3 = $generator->create_program(['idnumber' => 'prg4', 'contextid' => $tenant1catcontext->id, 'sources' => ['manual' => []]]);
+        $program1 = $generator->create_program(
+            ['fullname' => 'prg1', 'contextid' => $tenant1catcontext->id, 'sources' => ['manual' => []]]
+        );
+        $program2 = $generator->create_program(
+            ['fullname' => 'prg2', 'contextid' => $tenant2catcontext->id, 'sources' => ['manual' => []]]
+        );
+        $program3 = $generator->create_program(
+            ['fullname' => 'prg3', 'contextid' => $tenant1catcontext->id, 'sources' => ['manual' => []]]
+        );
 
-        $admin = get_admin();
         $user0 = $this->getDataGenerator()->create_user(['lastname' => 'Prijmeni 1', 'tenantid' => 0]);
         $user1 = $this->getDataGenerator()->create_user(['lastname' => 'Prijmeni 1', 'tenantid' => $tenant1->id]);
-        $user2 = $this->getDataGenerator()->create_user(['lastname' => 'Prijmeni 2', 'tenantid' => $tenant2->id]);
 
         $syscontext = \context_system::instance();
         $editorroleid = $this->getDataGenerator()->create_role();
@@ -146,12 +170,24 @@ final class program_content_import_fromprogram_test extends \advanced_testcase {
         role_assign($editorroleid, $user1->id, $tenant1catcontext->id);
 
         $this->setAdminUser();
-        $response = program_content_import_fromprogram::execute('', $program0->id);
-        $this->assertCount(3, $response['list']);
+        $source = new program_content_import_fromprogram((int)$program0->id);
+        $this->assertSame(
+            [(int)$program1->id => 'prg1', (int)$program2->id => 'prg2', (int)$program3->id => 'prg3'],
+            $source->search('', 50)
+        );
+        $this->assertSame('prg2', $source->label((string)$program2->id));
+
+        $source = new program_content_import_fromprogram((int)$program1->id);
+        $this->assertSame(
+            [(int)$program0->id => 'prg0', (int)$program3->id => 'prg3'],
+            $source->search('', 50)
+        );
+        $this->assertSame('prg0', $source->label((string)$program0->id));
+        $this->assertNull($source->label((string)$program2->id));
 
         $this->setUser($user0);
         try {
-            $response = program_content_import_fromprogram::execute('', $program1->id);
+            new program_content_import_fromprogram((int)$program1->id);
             $this->fail('Exception excepted');
         } catch (\moodle_exception $ex) {
             $this->assertInstanceOf(\required_capability_exception::class, $ex);
@@ -162,10 +198,9 @@ final class program_content_import_fromprogram_test extends \advanced_testcase {
         }
 
         $this->setUser($user1);
-        $response = program_content_import_fromprogram::execute('', $program1->id);
-        $this->assertCount(1, $response['list']);
-        $program3resp = array_pop($response['list']);
-        $this->assertSame($program3->id, $program3resp['value']);
-        $this->assertSame($program3->fullname, $program3resp['label']);
+        $source = new program_content_import_fromprogram((int)$program1->id);
+        $this->assertSame([(int)$program3->id => 'prg3'], $source->search('', 50));
+        $this->assertSame('prg3', $source->label((string)$program3->id));
+        $this->assertNull($source->label((string)$program0->id));
     }
 }

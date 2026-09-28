@@ -75,10 +75,10 @@ Feature: Visible cohorts program allocation tests
     And I follow "Program 000"
     And I click on "Allocation settings" "link" in the ".secondary-navigation" "css_element"
     And I click on "Update Automatic cohort allocation" "link"
-    And I set the following fields to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Active           | Yes                |
       | Allocate cohorts | Cohort 1, Cohort 2 |
-    And I click on "Update" "button" in the ".modal-dialog" "css_element"
+    And I click on "Update" "button" in the "dialog[open]" "css_element"
     Then I should see "Active (Cohort 1, Cohort 2)" in the "Automatic cohort allocation" definition list item
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
     And "Student 1" row "Source" column of "reportbuilder-table" table should contain "Automatic cohort allocation"
@@ -93,9 +93,9 @@ Feature: Visible cohorts program allocation tests
 
     When I click on "Allocation settings" "link" in the ".secondary-navigation" "css_element"
     And I click on "Update Automatic cohort allocation" "link"
-    And I set the following fields to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Allocate cohorts | Cohort 1 |
-    And I click on "Update" "button" in the ".modal-dialog" "css_element"
+    And I click on "Update" "button" in the "dialog[open]" "css_element"
     Then I should see "Active (Cohort 1)" in the "Automatic cohort allocation" definition list item
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
     And "Student 1" row "Source" column of "reportbuilder-table" table should contain "Automatic cohort allocation"
@@ -110,27 +110,27 @@ Feature: Visible cohorts program allocation tests
 
     When I click on "Allocation settings" "link" in the ".secondary-navigation" "css_element"
     And I click on "Update Automatic cohort allocation" "link"
-    And I set the following fields to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Allocate cohorts | Cohort 4 |
-    And I click on "Update" "button" in the ".modal-dialog" "css_element"
+    And I click on "Update" "button" in the "dialog[open]" "css_element"
     And I should see "Active (Cohort 4)" in the "Automatic cohort allocation" definition list item
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
     And I click on "Actions" "link" in the "Student 1" "table_row"
     And I click on "Delete program allocation" "link" in the "Student 1" "table_row"
-    And I click on "Delete program allocation" "button" in the ".modal-dialog" "css_element"
+    And I click on "Delete program allocation" "button" in the "dialog[open]" "css_element"
     And I click on "Actions" "link" in the "Student 2" "table_row"
     And I click on "Delete program allocation" "link" in the "Student 2" "table_row"
-    And I click on "Delete program allocation" "button" in the ".modal-dialog" "css_element"
+    And I click on "Delete program allocation" "button" in the "dialog[open]" "css_element"
     And I click on "Actions" "link" in the "Student 3" "table_row"
     And I click on "Delete program allocation" "link" in the "Student 3" "table_row"
-    And I click on "Delete program allocation" "button" in the ".modal-dialog" "css_element"
+    And I click on "Delete program allocation" "button" in the "dialog[open]" "css_element"
     And I click on "Actions" "link" in the "Student 4" "table_row"
     And I click on "Delete program allocation" "link" in the "Student 4" "table_row"
-    And I click on "Delete program allocation" "button" in the ".modal-dialog" "css_element"
+    And I click on "Delete program allocation" "button" in the "dialog[open]" "css_element"
     And I should see "No user allocations found"
     And I click on "Allocation settings" "link" in the ".secondary-navigation" "css_element"
     And I click on "Update Automatic cohort allocation" "link"
-    And I set the following fields to these values:
-      | Active              | No                |
-    And I click on "Update" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Active | No |
+    And I click on "Update" "button" in the "dialog[open]" "css_element"
     Then I should see "Inactive" in the "Automatic cohort allocation" definition list item

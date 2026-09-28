@@ -19,8 +19,15 @@
 
 namespace tool_muprog\local\form;
 
-use tool_muprog\local\content\set;
-use tool_muprog\external\form_autocomplete\item_create_course_courseids;
+use tool_muprog\muform\autocompletemany\item_create_course_courseids;
+use tool_mulib\muform\element\autocompletemany;
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\duration;
+use tool_mulib\muform\element\info;
+use tool_mulib\muform\element\number;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\form;
 
 /**
  * Add courses to program.
@@ -29,77 +36,23 @@ use tool_muprog\external\form_autocomplete\item_create_course_courseids;
  * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class item_create_course extends \tool_mulib\local\ajax_form {
+final class item_create_course extends form {
     #[\Override]
-    protected function definition() {
-        $mform = $this->_form;
+    protected function definition(): void {
+        $programid = $this->get_extra_data()['programid'];
 
-        $currentdata = $this->_customdata['currentdata'];
-        $types = $this->_customdata['types'];
-        /** @var set $parent */
-        $parent = $this->_customdata['parent'];
-        /** @var \context $context */
-        $context = $this->_customdata['context'];
+        $this->add(new info('typename', get_string('item_type', 'tool_muprog')));
 
-        $mform->addElement('static', 'statictype', get_string('item_type', 'tool_muprog'), $types[$currentdata['type']]);
+        $courseids = new autocompletemany('courseids', get_string('courses'), new item_create_course_courseids($programid));
+        $courseids->set_required(true);
+        $this->add($courseids);
 
-        $args = ['programid' => $parent->get_programid()];
-        item_create_course_courseids::add_element(
-            $mform,
-            $args,
-            'courseids',
-            get_string('courses'),
-            $context
-        );
-        $mform->addRule('courseids', get_string('required'), 'required', null, 'client');
+        $this->add(new duration('completiondelay', get_string('completiondelay', 'tool_muprog')));
 
-        $mform->addElement(
-            'duration',
-            'completiondelay',
-            get_string('completiondelay', 'tool_muprog'),
-            ['optional' => true, 'defaultunit' => DAYSECS]
-        );
+        $this->add(new number('points', get_string('itempoints', 'tool_muprog'), ['min' => 0]));
 
-        $mform->addElement('text', 'points', get_string('itempoints', 'tool_muprog'));
-        $mform->setType('points', PARAM_INT);
-
-        $mform->addElement('hidden', 'parentid');
-        $mform->setType('parentid', PARAM_INT);
-
-        $mform->addElement('hidden', 'type');
-        $mform->setType('type', PARAM_ALPHANUM);
-
-        $this->add_action_buttons(true, get_string('item_create_course', 'tool_muprog'));
-
-        $this->set_data($currentdata);
-    }
-
-    #[\Override]
-    public function validation($data, $files) {
-        $errors = parent::validation($data, $files);
-
-        /** @var set $parent */
-        $parent = $this->_customdata['parent'];
-        /** @var \context $context */
-        $context = $this->_customdata['context'];
-
-        if ($data['courseids']) {
-            $args = ['programid' => $parent->get_programid()];
-            foreach ($data['courseids'] as $courseid) {
-                $error = item_create_course_courseids::validate_value($courseid, $args, $context);
-                if ($error !== null) {
-                    $errors['courseids'] = $error;
-                    break;
-                }
-            }
-        } else {
-            $errors['courseids'] = get_string('required');
-        }
-
-        if ($data['points'] < 0) {
-            $errors['points'] = get_string('error');
-        }
-
-        return $errors;
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', get_string('item_create_course', 'tool_muprog')), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 }

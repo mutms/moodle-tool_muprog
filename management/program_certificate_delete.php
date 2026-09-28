@@ -27,13 +27,13 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use tool_mulib\muform\handler;
+
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
 /** @var core_renderer $OUTPUT */
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
-
-define('AJAX_SCRIPT', true);
 
 require('../../../../config.php');
 
@@ -46,29 +46,31 @@ $context = context::instance_by_id($program->contextid);
 require_capability('tool/muprog:edit', $context);
 
 if (!\tool_muprog\local\certificate::is_available()) {
-    redirect(new core\url('/admin/tool/muprog/program.php', ['id' => $program->id]));
+    redirect(new core\url('/admin/tool/muprog/management/program.php', ['id' => $program->id]));
 }
 
 $currenturl = new core\url('/admin/tool/muprog/management/program_certificate_delete.php', ['id' => $id]);
 $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
+$title = get_string('certificate', 'tool_certificate');
+$PAGE->set_title($title);
+$PAGE->set_heading($title);
+
+$handler = handler::from_request();
 
 $cert = $DB->get_record('tool_muprog_cert', ['programid' => $program->id], '*', MUST_EXIST);
 
-$current = clone($cert);
-$current->id = $current->programid;
-
-$form = new \tool_muprog\local\form\program_certificate_delete(null, ['data' => $current, 'context' => $context]);
+$form = new \tool_muprog\local\form\program_certificate_delete($currenturl, ['templateid' => $cert->templateid]);
 
 $returnurl = new core\url('/admin/tool/muprog/management/program_certificate.php', ['id' => $program->id]);
 
 if ($form->is_cancelled()) {
-    $form->ajax_form_cancelled($returnurl);
+    $handler->cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
-    \tool_muprog\local\certificate::delete_program_certificate($data->id);
-    $form->ajax_form_submitted($returnurl);
+    \tool_muprog\local\certificate::delete_program_certificate($program->id);
+    $handler->submitted($returnurl);
 }
 
-$form->ajax_form_render();
+$handler->render($form);

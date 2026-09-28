@@ -62,11 +62,11 @@ if (has_capability('tool/muprog:export', $context)) {
 }
 if ($program->archived && has_capability('tool/muprog:delete', $context)) {
     $url = new core\url('/admin/tool/muprog/management/program_delete.php', ['id' => $program->id]);
-    $link = new tool_mulib\output\ajax_form\link($url, get_string('program_delete', 'tool_muprog'), 'i/delete');
+    $link = new tool_mulib\output\muform\dialog\link($url, get_string('program_delete', 'tool_muprog'), 'i/delete');
     $link->add_class('text-danger');
     $link->set_form_size('sm');
-    $link->set_submitted_action($link::SUBMITTED_ACTION_REDIRECT);
-    $actions->get_dropdown()->add_ajax_form($link);
+    $link->set_submitted_action(\tool_mulib\muform\handler\dialog::ACTION_REDIRECT);
+    $actions->get_dropdown()->add_dialog($link);
 }
 if ($actions->has_items()) {
     $PAGE->add_header_action($OUTPUT->render($actions));
@@ -77,7 +77,7 @@ echo $OUTPUT->header();
 $buttons = [];
 if (has_capability('tool/muprog:edit', $context)) {
     $url = new core\url('/admin/tool/muprog/management/program_update.php', ['id' => $program->id]);
-    $editbutton = new tool_mulib\output\ajax_form\button($url, get_string('edit'));
+    $editbutton = new tool_mulib\output\muform\dialog\button($url, get_string('edit'));
     $buttons[] = $OUTPUT->render($editbutton);
 }
 

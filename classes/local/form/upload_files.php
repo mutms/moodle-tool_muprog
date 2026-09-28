@@ -19,11 +19,12 @@
 
 namespace tool_muprog\local\form;
 
-defined('MOODLE_INTERNAL') || die();
-
-global $CFG;
-require_once($CFG->dirroot . '/lib/formslib.php');
-require_once($CFG->dirroot . '/repository/lib.php');
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\filemanager;
+use tool_mulib\muform\element\select;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\form;
 
 /**
  * Upload programs files.
@@ -34,47 +35,30 @@ require_once($CFG->dirroot . '/repository/lib.php');
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class upload_files extends \moodleform {
+final class upload_files extends form {
     #[\Override]
-    protected function definition() {
-        $mform = $this->_form;
-        $contextid = $this->_customdata['contextid'];
+    protected function definition(): void {
+        $files = new filemanager('files', get_string('upload_files', 'tool_muprog'), null, ['.json', '.zip', '.txt', '.csv']);
+        $files->set_required(true);
+        $this->add($files);
 
-        $options = [
-            'maxfiles' => -1,
-            'subdirs' => 0,
-            'accepted_types' => ['.json', '.zip', '.txt', '.csv'],
-            'return_types' => FILE_INTERNAL,
-        ];
-        $mform->addElement('filemanager', 'files', get_string('upload_files', 'tool_muprog'), null, $options);
-        $mform->addRule('files', null, 'required');
+        $encoding = new select('encoding', get_string('encoding', 'tool_uploaduser'), \core_text::get_encodings());
+        $encoding->set_default('UTF-8');
+        $this->add($encoding);
 
-        $choices = \core_text::get_encodings();
-        $mform->addElement('select', 'encoding', get_string('encoding', 'tool_uploaduser'), $choices);
-        $mform->setDefault('encoding', 'UTF-8');
-
-        $mform->addElement('hidden', 'contextid');
-        $mform->setType('contextid', PARAM_INT);
-        $mform->setDefault('contextid', $contextid);
-
-        $this->add_action_buttons(true, get_string('continue'));
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', get_string('continue')), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 
     #[\Override]
-    public function validation($data, $files) {
-        $errors = parent::validation($data, $files);
-
-        // File validation is bad in mforms, so work around it here.
-        if (empty($data['files'])) {
-            $errors['files'] = get_string('error');
-            return $errors;
+    protected function validation(array $data, array &$allerrors): void {
+        if (!empty($allerrors['files'])) {
+            return;
         }
-
-        $error = \tool_muprog\local\upload::store_filedata($data['files'], $data['encoding']);
+        $error = \tool_muprog\local\upload::store_filedata((int)$data['files'], (string)$data['encoding']);
         if ($error !== null) {
-            $errors['files'] = $error;
+            $allerrors['files'][] = $error;
         }
-
-        return $errors;
     }
 }

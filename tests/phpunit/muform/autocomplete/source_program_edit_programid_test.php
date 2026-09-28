@@ -15,30 +15,31 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
-// phpcs:disable moodle.Files.LineLength.TooLong
 
-namespace tool_muprog\phpunit\external\form_autocomplete;
+namespace tool_muprog\phpunit\muform\autocomplete;
 
-use tool_muprog\external\form_autocomplete\source_program_edit_programid;
+use tool_muprog\muform\autocomplete\source_program_edit_programid;
 use tool_mulib\local\mulib;
 
 /**
- * Autocompletion support for completed program selection.
+ * Program completion allocation source program autocomplete source test.
  *
  * @group      MuTMS
  * @package    tool_muprog
- * @copyright  2025 Petr Skoda
+ * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @covers \tool_muprog\external\form_autocomplete\source_program_edit_programid
+ * @covers \tool_muprog\muform\autocomplete\source_program_edit_programid
+ * @covers \tool_muprog\muform\util\autocomplete\program_trait
  */
 final class source_program_edit_programid_test extends \advanced_testcase {
+    #[\Override]
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
     }
 
-    public function test_execute(): void {
+    public function test_search(): void {
         /** @var \tool_muprog_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
 
@@ -63,19 +64,28 @@ final class source_program_edit_programid_test extends \advanced_testcase {
         ]);
 
         $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $editorroleid = $this->getDataGenerator()->create_role();
+        assign_capability('tool/muprog:edit', CAP_ALLOW, $editorroleid, $syscontext);
+        role_assign($editorroleid, $user2->id, $syscontext->id);
+        $allocatorroleid = $this->getDataGenerator()->create_role();
+        assign_capability('tool/muprog:allocate', CAP_ALLOW, $allocatorroleid, $syscontext);
+        role_assign($allocatorroleid, $user2->id, $catcontext1->id);
 
         $this->setAdminUser();
-        $response = source_program_edit_programid::execute('', $program1->id);
-        $results = source_program_edit_programid::clean_returnvalue(
-            source_program_edit_programid::execute_returns(),
-            $response
-        );
-        $this->assertFalse($results['overflow']);
-        $this->assertCount(2, $results['list']);
+        $source = new source_program_edit_programid((int)$program1->id);
+        $this->assertSame([(int)$program1->id], $source->get_args());
+        $this->assertSame([(int)$program2->id => 'pokus', (int)$program3->id => 'Prog3'], $source->search('', 50));
+        $this->assertSame([(int)$program3->id => 'Prog3'], $source->search('p3', 50));
+        $this->assertNull($source->search('', 1));
+        $this->assertSame('pokus', $source->label((string)$program2->id));
+        $this->assertNull($source->label((string)$program1->id));
+        $this->assertNull($source->label((string)($program3->id + 100)));
+        $this->assertNull($source->label('abc'));
 
         $this->setUser($user1);
         try {
-            $response = source_program_edit_programid::execute('', $program1->id);
+            new source_program_edit_programid((int)$program1->id);
             $this->fail('Exception excepted');
         } catch (\moodle_exception $ex) {
             $this->assertInstanceOf(\required_capability_exception::class, $ex);
@@ -84,9 +94,15 @@ final class source_program_edit_programid_test extends \advanced_testcase {
                 $ex->getMessage()
             );
         }
+
+        $this->setUser($user2);
+        $source = new source_program_edit_programid((int)$program1->id);
+        $this->assertSame([(int)$program2->id => 'pokus'], $source->search('', 50));
+        $this->assertSame('pokus', $source->label((string)$program2->id));
+        $this->assertNull($source->label((string)$program3->id));
     }
 
-    public function test_execute_tenant(): void {
+    public function test_search_tenant(): void {
         if (!mulib::is_mutenancy_available()) {
             $this->markTestSkipped('tenant support not available');
         }
@@ -100,10 +116,8 @@ final class source_program_edit_programid_test extends \advanced_testcase {
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
 
         $tenant1 = $tenantgenerator->create_tenant();
-        $tenant1context = \context_tenant::instance($tenant1->id);
         $tenant1catcontext = \context_coursecat::instance($tenant1->categoryid);
         $tenant2 = $tenantgenerator->create_tenant();
-        $tenant2context = \context_tenant::instance($tenant2->id);
         $tenant2catcontext = \context_coursecat::instance($tenant2->categoryid);
 
         $program1 = $generator->create_program([]);
@@ -112,9 +126,7 @@ final class source_program_edit_programid_test extends \advanced_testcase {
         $program4 = $generator->create_program(['contextid' => $tenant1catcontext->id]);
         $program5 = $generator->create_program(['contextid' => $tenant2catcontext->id]);
 
-        $admin = get_admin();
         $user1 = $this->getDataGenerator()->create_user(['tenantid' => $tenant1->id]);
-        $user2 = $this->getDataGenerator()->create_user(['tenantid' => $tenant2->id]);
 
         $syscontext = \context_system::instance();
         $editorroleid = $this->getDataGenerator()->create_role();
@@ -123,20 +135,25 @@ final class source_program_edit_programid_test extends \advanced_testcase {
         role_assign($editorroleid, $user1->id, $tenant1catcontext->id);
 
         $this->setAdminUser();
-        $response = source_program_edit_programid::execute('', $program1->id);
-        $this->assertSame([['value' => $program2->id, 'label' => $program2->fullname]], $response['list']);
+        $source = new source_program_edit_programid((int)$program1->id);
+        $this->assertSame([(int)$program2->id => $program2->fullname], $source->search('', 50));
+        $this->assertSame($program2->fullname, $source->label((string)$program2->id));
+        $this->assertNull($source->label((string)$program3->id));
 
-        $response = source_program_edit_programid::execute('', $program3->id);
-        $this->assertSame([['value' => $program4->id, 'label' => $program4->fullname]], $response['list']);
+        $source = new source_program_edit_programid((int)$program3->id);
+        $this->assertSame([(int)$program4->id => $program4->fullname], $source->search('', 50));
+        $this->assertSame($program4->fullname, $source->label((string)$program4->id));
+        $this->assertNull($source->label((string)$program1->id));
+        $this->assertNull($source->label((string)$program5->id));
 
-        $response = source_program_edit_programid::execute('', $program5->id);
-        $this->assertSame([], $response['list']);
+        $source = new source_program_edit_programid((int)$program5->id);
+        $this->assertSame([], $source->search('', 50));
 
         $this->setUser($user1);
-        $response = source_program_edit_programid::execute('', $program3->id);
-        $this->assertSame([['value' => $program4->id, 'label' => $program4->fullname]], $response['list']);
+        $source = new source_program_edit_programid((int)$program3->id);
+        $this->assertSame([(int)$program4->id => $program4->fullname], $source->search('', 50));
         try {
-            source_program_edit_programid::execute('', $program1->id);
+            new source_program_edit_programid((int)$program1->id);
             $this->fail('Exception excepted');
         } catch (\moodle_exception $ex) {
             $this->assertInstanceOf(\required_capability_exception::class, $ex);

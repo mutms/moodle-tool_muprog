@@ -28,14 +28,13 @@
  */
 
 use tool_muprog\local\allocation;
+use tool_mulib\muform\handler;
 
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
 /** @var core_renderer $OUTPUT */
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
-
-define('AJAX_SCRIPT', true);
 
 require('../../../../config.php');
 
@@ -53,6 +52,9 @@ require_capability('tool/muprog:reset', $context);
 $currenturl = new core\url('/admin/tool/muprog/management/allocation_reset.php', ['id' => $allocation->id]);
 $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
+$title = get_string('allocation_reset', 'tool_muprog');
+$PAGE->set_title($title);
+$PAGE->set_heading($title);
 
 $returnurl = new core\url('/admin/tool/muprog/management/allocation.php', ['id' => $allocation->id]);
 
@@ -62,18 +64,24 @@ if ($program->archived || $allocation->archived) {
     redirect($returnurl);
 }
 
+$handler = handler::from_request();
+
+$current = (array)$allocation;
+$current['userfullname'] = fullname($user);
 $form = new \tool_muprog\local\form\allocation_reset(
-    null,
-    ['allocation' => $allocation, 'user' => $user, 'context' => $context, 'source' => $source, 'program' => $program]
+    $currenturl,
+    $current,
+    ['allocation' => $allocation, 'source' => $source, 'program' => $program]
 );
 
 if ($form->is_cancelled()) {
-    $form->ajax_form_cancelled($returnurl);
+    $handler->cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
+    $data->id = $allocation->id;
     allocation::reset($data);
-    $form->ajax_form_submitted($returnurl);
+    $handler->submitted($returnurl);
 }
 
-$form->ajax_form_render();
+$handler->render($form);

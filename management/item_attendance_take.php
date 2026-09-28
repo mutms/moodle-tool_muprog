@@ -26,11 +26,10 @@
  */
 
 use tool_muprog\local\content\attendance;
+use tool_mulib\muform\handler;
 
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
-
-define('AJAX_SCRIPT', true);
 
 require('../../../../config.php');
 
@@ -48,8 +47,12 @@ require_capability('tool/muprog:takeattendance', $context);
 $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program->id, 'userid' => $userid], '*', MUST_EXIST);
 $user = $DB->get_record('user', ['id' => $allocation->userid, 'deleted' => 0], '*', MUST_EXIST);
 
+$currenturl = new core\url('/admin/tool/muprog/management/item_attendance_take.php', ['itemid' => $item->id, 'userid' => $user->id]);
 $PAGE->set_context($context);
-$PAGE->set_url('/admin/tool/muprog/management/item_attendance_take.php', ['itemid' => $item->id, 'userid' => $user->id]);
+$PAGE->set_url($currenturl);
+$title = get_string('attendance_take', 'tool_muprog');
+$PAGE->set_title($title);
+$PAGE->set_heading($title);
 
 $returnurl = new core\url('/admin/tool/muprog/management/allocation.php', ['id' => $allocation->id]);
 
@@ -74,18 +77,25 @@ if ($attendance) {
     ];
 }
 
-$form = new \tool_muprog\local\form\item_attendance_take(
-    null,
-    ['item' => $item, 'user' => $user, 'attendance' => $attendance]
-);
+$handler = handler::from_request();
+
+$current = [
+    'userfullname' => fullname($user),
+    'itemfullname' => $item->fullname,
+    'status' => $attendance->status,
+    'timeeffective' => $attendance->timeeffective,
+];
+$form = new \tool_muprog\local\form\item_attendance_take($currenturl, $current);
 
 if ($form->is_cancelled()) {
-    $form->ajax_form_cancelled($returnurl);
+    $handler->cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
+    $data->itemid = $item->id;
+    $data->userid = $user->id;
     attendance::take_attendance($data);
-    $form->ajax_form_submitted($returnurl);
+    $handler->submitted($returnurl);
 }
 
-$form->ajax_form_render();
+$handler->render($form);

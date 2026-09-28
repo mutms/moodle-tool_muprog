@@ -39,11 +39,11 @@ Feature: Program encoding upload tests
     And I am on the "Category 2" "tool_muprog > Program management" page
 
     When I click on "Upload programs" action from "Programs actions" dropdown
-    And I upload "admin/tool/muprog/tests/fixtures/upload/czech.zip" file to "Files" filemanager
-    And I set the following fields to these values:
+    And I upload "admin/tool/muprog/tests/fixtures/upload/czech.zip" file to "files" muform filemanager
+    And I set the following muform fields:
       | Encoding    | ISO-8859-2 |
     And I press "Continue"
-    And I set the following fields to these values:
+    And I set the following muform fields:
       | usecategory | 0          |
       | contextid   | Category 2 |
     And the following should exist in the "upload_preview" table:

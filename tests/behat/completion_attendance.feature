@@ -57,14 +57,10 @@ Feature: Program offline attendance completion tests
     And I follow "Student 1"
 
     When I click on "Take attendance" "link" in the "Car test drive" "table_row"
-    And I set the following fields to these values:
-      | No show                | 1    |
-      | timeeffective[day]     | 7    |
-      | timeeffective[month]   | 1    |
-      | timeeffective[year]    | 2025 |
-      | timeeffective[hour]    | 09   |
-      | timeeffective[minute]  | 00   |
-    And I click on "Take attendance" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | status        | No show          |
+      | timeeffective | 2025-01-07 09:00 |
+    And I click on "Take attendance" "button" in the "dialog[open]" "css_element"
     Then the following should exist in the "program_content" table:
       | Item                 | Points | Completion type               | Completion date | Other evidence |
       | Program 001          |        | All in any order              |                 |                |
@@ -75,9 +71,9 @@ Feature: Program offline attendance completion tests
     And I should not see "7/01/25"
 
     When I click on "Take attendance" "link" in the "Car test drive" "table_row"
-    And I set the following fields to these values:
-      | Failed                 | 1    |
-    And I click on "Take attendance" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | status | Failed |
+    And I click on "Take attendance" "button" in the "dialog[open]" "css_element"
     Then the following should exist in the "program_content" table:
       | Item                 | Points | Completion type               | Completion date | Other evidence |
       | Program 001          |        | All in any order              |                 |                |
@@ -88,9 +84,9 @@ Feature: Program offline attendance completion tests
     And I should not see "7/01/25"
 
     When I click on "Take attendance" "link" in the "Car test drive" "table_row"
-    And I set the following fields to these values:
-      | Completed              | 1    |
-    And I click on "Take attendance" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | status | Completed |
+    And I click on "Take attendance" "button" in the "dialog[open]" "css_element"
     Then the following should exist in the "program_content" table:
       | Item                 | Points | Completion type               | Completion date | Other evidence |
       | Program 001          |        | All in any order              |                 |                |
@@ -100,9 +96,9 @@ Feature: Program offline attendance completion tests
     And I should see "33 %" in the "Progress" definition list item
 
     When I click on "Take attendance" "link" in the "Car test drive" "table_row"
-    And I set the following fields to these values:
-      | Not set                | 1    |
-    And I click on "Take attendance" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | status | Not set |
+    And I click on "Take attendance" "button" in the "dialog[open]" "css_element"
     Then the following should exist in the "program_content" table:
       | Item                 | Points | Completion type               | Completion date | Other evidence |
       | Program 001          |        | All in any order              |                 |                |
@@ -113,14 +109,10 @@ Feature: Program offline attendance completion tests
     And I should see "0 %" in the "Progress" definition list item
 
     When I click on "Take attendance" "link" in the "Car test drive" "table_row"
-    And I set the following fields to these values:
-      | Completed              | 1    |
-      | timeeffective[day]     | 8    |
-      | timeeffective[month]   | 1    |
-      | timeeffective[year]    | 2025 |
-      | timeeffective[hour]    | 08   |
-      | timeeffective[minute]  | 00   |
-    And I click on "Take attendance" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | status        | Completed        |
+      | timeeffective | 2025-01-08 08:00 |
+    And I click on "Take attendance" "button" in the "dialog[open]" "css_element"
     Then the following should exist in the "program_content" table:
       | Item                 | Points | Completion type               | Completion date | Other evidence |
       | Program 001          |        | All in any order              |                 |                |
@@ -130,14 +122,10 @@ Feature: Program offline attendance completion tests
     And I should see "33 %" in the "Progress" definition list item
 
     When I click on "Take attendance" "link" in the "Motorcycle test ride" "table_row"
-    And I set the following fields to these values:
-      | Completed              | 1    |
-      | timeeffective[day]     | 5    |
-      | timeeffective[month]   | 1    |
-      | timeeffective[year]    | 2025 |
-      | timeeffective[hour]    | 10   |
-      | timeeffective[minute]  | 00   |
-    And I click on "Take attendance" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | status        | Completed        |
+      | timeeffective | 2025-01-05 10:00 |
+    And I click on "Take attendance" "button" in the "dialog[open]" "css_element"
     Then the following should exist in the "program_content" table:
       | Item                 | Points | Completion type               | Completion date | Other evidence |
       | Program 001          |        | All in any order              |                 |                |
@@ -164,23 +152,15 @@ Feature: Program offline attendance completion tests
     And I follow "Users"
     And I follow "Student 1"
     And I click on "Take attendance" "link" in the "Car test drive" "table_row"
-    And I set the following fields to these values:
-      | Failed                 | 1    |
-      | timeeffective[day]     | 8    |
-      | timeeffective[month]   | 1    |
-      | timeeffective[year]    | 2025 |
-      | timeeffective[hour]    | 08   |
-      | timeeffective[minute]  | 00   |
-    And I click on "Take attendance" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | status        | Failed           |
+      | timeeffective | 2025-01-08 08:00 |
+    And I click on "Take attendance" "button" in the "dialog[open]" "css_element"
     And I click on "Take attendance" "link" in the "Motorcycle test ride" "table_row"
-    And I set the following fields to these values:
-      | Completed              | 1    |
-      | timeeffective[day]     | 5    |
-      | timeeffective[month]   | 1    |
-      | timeeffective[year]    | 2025 |
-      | timeeffective[hour]    | 10   |
-      | timeeffective[minute]  | 00   |
-    And I click on "Take attendance" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | status        | Completed        |
+      | timeeffective | 2025-01-05 10:00 |
+    And I click on "Take attendance" "button" in the "dialog[open]" "css_element"
     And the following should exist in the "program_content" table:
       | Item                 | Points | Completion type               | Completion date | Other evidence |
       | Program 001          |        | All in any order              |                 |                |
@@ -190,16 +170,11 @@ Feature: Program offline attendance completion tests
     And I should see "33 %" in the "Progress" definition list item
 
     When I click on "Update other evidence" "link" in the "Car test drive" "table_row"
-    And I set the following fields to these values:
-      | evidencetimecompleted[enabled] | 1        |
-      | evidencetimecompleted[day]     | 3        |
-      | evidencetimecompleted[month]   | 1        |
-      | evidencetimecompleted[year]    | 2025     |
-      | evidencetimecompleted[hour]    | 08       |
-      | evidencetimecompleted[minute]  | 00       |
-      | Details                        | no need! |
-      | itemrecalculate                | 1        |
-    And I click on "Update" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | evidencetimecompleted | 2025-01-03 08:00 |
+      | Details               | no need!         |
+      | itemrecalculate       | 1                |
+    And I click on "Update" "button" in the "dialog[open]" "css_element"
     Then the following should exist in the "program_content" table:
       | Item                 | Points | Completion type               | Completion date | Other evidence |
       | Program 001          |        | All in any order              |                 |                |
@@ -209,10 +184,10 @@ Feature: Program offline attendance completion tests
     And I should see "67 %" in the "Progress" definition list item
 
     When I click on "Update other evidence" "link" in the "Car test drive" "table_row"
-    And I set the following fields to these values:
-      | evidencetimecompleted[enabled] | 0        |
-      | itemrecalculate                | 1        |
-    And I click on "Update" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | evidencetimecompleted |   |
+      | itemrecalculate       | 1 |
+    And I click on "Update" "button" in the "dialog[open]" "css_element"
     Then the following should exist in the "program_content" table:
       | Item                 | Points | Completion type               | Completion date | Other evidence |
       | Program 001          |        | All in any order              |                 |                |
@@ -224,16 +199,11 @@ Feature: Program offline attendance completion tests
     And I should not see "no need"
 
     When I click on "Update other evidence" "link" in the "Motorcycle test ride" "table_row"
-    And I set the following fields to these values:
-      | evidencetimecompleted[enabled] | 1        |
-      | evidencetimecompleted[day]     | 3        |
-      | evidencetimecompleted[month]   | 1        |
-      | evidencetimecompleted[year]    | 2025     |
-      | evidencetimecompleted[hour]    | 08       |
-      | evidencetimecompleted[minute]  | 00       |
-      | Details                        | no need! |
-      | itemrecalculate                | 1        |
-    And I click on "Update" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | evidencetimecompleted | 2025-01-03 08:00 |
+      | Details               | no need!         |
+      | itemrecalculate       | 1                |
+    And I click on "Update" "button" in the "dialog[open]" "css_element"
     Then the following should exist in the "program_content" table:
       | Item                 | Points | Completion type               | Completion date | Other evidence |
       | Program 001          |        | All in any order              |                 |                |
@@ -243,10 +213,10 @@ Feature: Program offline attendance completion tests
     And I should see "33 %" in the "Progress" definition list item
 
     When I click on "Update other evidence" "link" in the "Motorcycle test ride" "table_row"
-    And I set the following fields to these values:
-      | evidencetimecompleted[enabled] | 0        |
-      | itemrecalculate                | 1        |
-    And I click on "Update" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | evidencetimecompleted |   |
+      | itemrecalculate       | 1 |
+    And I click on "Update" "button" in the "dialog[open]" "css_element"
     Then the following should exist in the "program_content" table:
       | Item                 | Points | Completion type               | Completion date | Other evidence |
       | Program 001          |        | All in any order              |                 |                |

@@ -26,6 +26,8 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use tool_mulib\muform\handler;
+
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
 /** @var core_renderer $OUTPUT */
@@ -33,14 +35,12 @@
 /** @var stdClass $COURSE */
 /** @var stdClass $USER */
 
-define('AJAX_SCRIPT', true);
-
 require('../../../../config.php');
 
 $sourceid = required_param('sourceid', PARAM_INT);
 
 $PAGE->set_context(context_system::instance());
-$PAGE->set_url(new core\url('/admin/tool/muprog/catalogue/source_approval_requests.php', ['sourceid' => $sourceid]));
+$PAGE->set_url(new core\url('/admin/tool/muprog/catalogue/source_approval_request.php', ['sourceid' => $sourceid]));
 
 require_login();
 require_capability('tool/muprog:viewcatalogue', context_system::instance());
@@ -57,20 +57,23 @@ if (!\tool_muprog\local\source\approval::can_user_request($program, $source, $US
     redirect(new core\url('/admin/tool/muprog/catalogue/index.php'));
 }
 
+$title = get_string('source_approval_makerequest', 'tool_muprog');
+$PAGE->set_title($title);
+$PAGE->set_heading($title);
+
 $returnurl = new core\url('/admin/tool/muprog/catalogue/program.php', ['id' => $program->id]);
 
-$form = new tool_muprog\local\form\source_approval_request(null, ['source' => $source, 'program' => $program]);
+$handler = handler::from_request();
+
+$form = new tool_muprog\local\form\source_approval_request($PAGE->url, []);
 
 if ($form->is_cancelled()) {
-    $form->ajax_form_cancelled($returnurl);
+    $handler->cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
     tool_muprog\local\source\approval::request($program->id, $source->id);
-    $form->ajax_form_submitted($returnurl);
+    $handler->submitted($returnurl);
 }
 
-/** @var \tool_muprog\output\catalogue\renderer $catalogueoutput */
-$catalogueoutput = $PAGE->get_renderer('tool_muprog', 'catalogue');
-
-$form->ajax_form_render();
+$handler->render($form);

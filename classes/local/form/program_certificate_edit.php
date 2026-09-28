@@ -19,6 +19,17 @@
 
 namespace tool_muprog\local\form;
 
+use tool_certificate\certificate;
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\datetime;
+use tool_mulib\muform\element\duration;
+use tool_mulib\muform\element\inforawhtml;
+use tool_mulib\muform\element\select;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\form;
+use tool_mulib\muform\validator\required_if_visible;
+
 /**
  * Edit program certificate settings.
  *
@@ -28,59 +39,53 @@ namespace tool_muprog\local\form;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class program_certificate_edit extends \tool_mulib\local\ajax_form {
+final class program_certificate_edit extends form {
     #[\Override]
-    protected function definition() {
+    protected function definition(): void {
         global $OUTPUT;
 
-        $mform = $this->_form;
-        $data = $this->_customdata['data'];
-        $context = $this->_customdata['context'];
+        $current = $this->get_current_data();
+        $context = $this->get_extra_data()['context'];
 
-        $canmanagetemplates = \tool_certificate\permission::can_manage_anywhere();
-        $templates = self::get_templates($context, $data->templateid);
-
+        $templates = self::get_templates($context, $current['templateid'] ? (int)$current['templateid'] : null);
         $templateoptions = ['' => get_string('certificatetemplatechoose', 'tool_muprog')] + $templates;
-        $manageurl = new \core\url('/admin/tool/certificate/manage_templates.php');
+        $templateid = new select('templateid', get_string('certificatetemplate', 'tool_certificate'), $templateoptions);
+        $templateid->set_required(true);
+        $this->add($templateid);
 
-        $elements = [];
-        $elements[] = $mform->createElement('select', 'templateid', get_string('certificatetemplate', 'tool_certificate'), $templateoptions);
-
-        if ($canmanagetemplates) {
-            $elements[] = $mform->createElement(
-                'static',
-                'managetemplates',
-                '',
-                $OUTPUT->action_link($manageurl, get_string('managetemplates', 'tool_certificate'))
+        if (\tool_certificate\permission::can_manage_anywhere()) {
+            // Opens in a new window, the form must not be lost.
+            $manage = get_string('managetemplates', 'tool_certificate');
+            $link = \html_writer::link(
+                new \core\url('/admin/tool/certificate/manage_templates.php'),
+                $OUTPUT->pix_icon('i/settings', $manage) . ' ' . $manage,
+                ['target' => '_blank', 'class' => 'small']
             );
+            $this->add(new inforawhtml('managetemplates', '', $link));
         }
-        $mform->addGroup(
-            $elements,
-            'template_group',
-            get_string('certificatetemplate', 'tool_certificate'),
-            \html_writer::div('', 'w-100'),
-            false
-        );
 
-        $rules = [];
-        $rules['templateid'][] = [null, 'required', null, 'client'];
-        $mform->addGroupRule('template_group', $rules);
+        $expirydateoptions = [
+            certificate::DATE_EXPIRATION_NEVER => get_string('never', 'tool_certificate'),
+            certificate::DATE_EXPIRATION_ABSOLUTE => get_string('selectdate', 'tool_certificate'),
+            certificate::DATE_EXPIRATION_AFTER => get_string('after', 'tool_certificate'),
+        ];
+        $this->add(new select('expirydatetype', get_string('expirydate', 'tool_certificate'), $expirydateoptions));
 
-        \tool_certificate\certificate::add_expirydate_to_form($mform);
+        $absolute = new datetime('expirydateabsolute', get_string('selectdate', 'tool_certificate'));
+        $absolute->set_required_marker(true);
+        $absolute->add_validator(new required_if_visible());
+        $this->add($absolute);
+        $this->get_display_manager()->hide_if('expirydateabsolute', 'expirydatetype', 'neq', certificate::DATE_EXPIRATION_ABSOLUTE);
 
-        $mform->addElement('hidden', 'id', $data->id);
-        $mform->setType('id', PARAM_INT);
+        $relative = new duration('expirydaterelative', get_string('after', 'tool_certificate'), ['w', 'd']);
+        $relative->set_required_marker(true);
+        $relative->add_validator(new required_if_visible());
+        $this->add($relative);
+        $this->get_display_manager()->hide_if('expirydaterelative', 'expirydatetype', 'neq', certificate::DATE_EXPIRATION_AFTER);
 
-        $this->add_action_buttons(true, get_string('program_update', 'tool_muprog'));
-
-        $this->set_data($data);
-    }
-
-    #[\Override]
-    public function validation($data, $files) {
-        $errors = parent::validation($data, $files);
-
-        return $errors;
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', get_string('program_update', 'tool_muprog')), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 
     /**

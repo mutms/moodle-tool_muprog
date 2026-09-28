@@ -44,10 +44,10 @@ Feature: Program allocation management tests
     And I am on the "tool_muprog > All programs management" page
 
     And I click on "Add program" "button"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Program name  | Program 001 |
-      | Program ID    | PR01        |
-    And I click on "Add program" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program name | Program 001 |
+      | Program ID   | PR01        |
+    And I click on "Add program" "button" in the "dialog[open]" "css_element"
     And I follow "Allocation settings"
     And I should see "Not set" in the "Allocation start" definition list item
     And I should see "Not set" in the "Allocation end" definition list item
@@ -71,57 +71,42 @@ Feature: Program allocation management tests
     And I follow "Allocation settings"
 
     When I click on "Update allocations" "link"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | timeallocationstart[enabled] | 1    |
-      | timeallocationstart[day]     | 5    |
-      | timeallocationstart[month]   | 11   |
-      | timeallocationstart[year]    | 2020 |
-      | timeallocationstart[hour]    | 09   |
-      | timeallocationstart[minute]  | 00   |
-    And I click on "Update allocations" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | timeallocationstart | 2020-11-05 09:00 |
+    And I click on "Update allocations" "button" in the "dialog[open]" "css_element"
     Then I should see "Thursday, 5 November 2020, 9:00" in the "Allocation start" definition list item
     And I should see "Not set" in the "Allocation end" definition list item
 
     When I click on "Update allocations" "link"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | timeallocationend[enabled]   | 1    |
-      | timeallocationend[day]       | 4   |
-      | timeallocationend[month]     | 11   |
-      | timeallocationend[year]      | 2020 |
-      | timeallocationend[hour]      | 20   |
-      | timeallocationend[minute]    | 00   |
-    And I click on "Update allocations" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | timeallocationend | 2020-11-04 20:00 |
+    And I click on "Update allocations" "button" in the "dialog[open]" "css_element"
     Then I should see "Error"
-    When  I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | timeallocationend[enabled]   | 1    |
-      | timeallocationend[day]       | 10   |
-      | timeallocationend[month]     | 11   |
-      | timeallocationend[year]      | 2020 |
-      | timeallocationend[hour]      | 20   |
-      | timeallocationend[minute]    | 00   |
-    And I click on "Update allocations" "button" in the ".modal-dialog" "css_element"
+    When I set the following muform fields in the "dialog[open]" "css_element":
+      | timeallocationend | 2020-11-10 20:00 |
+    And I click on "Update allocations" "button" in the "dialog[open]" "css_element"
     Then I should see "Thursday, 5 November 2020, 9:00" in the "Allocation start" definition list item
     And I should see "Tuesday, 10 November 2020, 8:00" in the "Allocation end" definition list item
 
     When I click on "Update allocations" "link"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | timeallocationstart[enabled] | 0    |
-      | timeallocationend[enabled]   | 0    |
-    And I click on "Cancel" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | timeallocationstart |  |
+      | timeallocationend   |  |
+    And I click on "Cancel" "button" in the "dialog[open]" "css_element"
     Then I should see "Thursday, 5 November 2020, 9:00" in the "Allocation start" definition list item
     And I should see "Tuesday, 10 November 2020, 8:00" in the "Allocation end" definition list item
 
     When I click on "Update allocations" "link"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | timeallocationstart[enabled] | 0    |
-    And I click on "Update allocations" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | timeallocationstart |  |
+    And I click on "Update allocations" "button" in the "dialog[open]" "css_element"
     And I should see "Not set" in the "Allocation start" definition list item
     And I should see "Tuesday, 10 November 2020, 8:00" in the "Allocation end" definition list item
 
     When I click on "Update allocations" "link"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | timeallocationend[enabled]   | 0    |
-    And I click on "Update allocations" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | timeallocationend |  |
+    And I click on "Update allocations" "button" in the "dialog[open]" "css_element"
     And I should see "Not set" in the "Allocation start" definition list item
     And I should see "Not set" in the "Allocation end" definition list item
 
@@ -137,178 +122,133 @@ Feature: Program allocation management tests
     And I follow "Allocation settings"
 
     When I click on "Update scheduling" "link"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Program start              | At a fixed date |
-      | programstart_date[day]     | 5    |
-      | programstart_date[month]   | 11   |
-      | programstart_date[year]    | 2032 |
-      | programstart_date[hour]    | 09   |
-      | programstart_date[minute]  | 00   |
-    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program start     | At a fixed date  |
+      | programstart_date | 2032-11-05 09:00 |
+    And I click on "Update scheduling" "button" in the "dialog[open]" "css_element"
     Then I should see "Friday, 5 November 2032, 9:00" in the "Program start" definition list item
 
     When I click on "Update scheduling" "link"
-    And I set the following fields to these values:
-      | Program start             | Delay start after allocation |
-      | programstart_delay[value] | 5      |
-      | programstart_delay[type]  | months |
-    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program start      | Delay start after allocation |
+      | programstart_delay | P5M                          |
+    And I click on "Update scheduling" "button" in the "dialog[open]" "css_element"
     Then I should see "Delay start after allocation - 5 months" in the "Program start" definition list item
 
     When I click on "Update scheduling" "link"
-    And I set the following fields to these values:
-      | Program start             | Delay start after allocation |
-      | programstart_delay[value] | 3      |
-      | programstart_delay[type]  | days   |
-    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program start      | Delay start after allocation |
+      | programstart_delay | P3D                          |
+    And I click on "Update scheduling" "button" in the "dialog[open]" "css_element"
     Then I should see "Delay start after allocation - 3 days" in the "Program start" definition list item
 
     When I click on "Update scheduling" "link"
-    And I set the following fields to these values:
-      | Program start             | Delay start after allocation |
-      | programstart_delay[value] | 7      |
-      | programstart_delay[type]  | hours  |
-    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program start      | Delay start after allocation |
+      | programstart_delay | PT7H                         |
+    And I click on "Update scheduling" "button" in the "dialog[open]" "css_element"
     Then I should see "Delay start after allocation - 7 hours" in the "Program start" definition list item
 
     When I click on "Update scheduling" "link"
-    And I set the following fields to these values:
-      | Program start             | Start immediately after allocation |
-    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program start | Start immediately after allocation |
+    And I click on "Update scheduling" "button" in the "dialog[open]" "css_element"
     Then I should see "Start immediately after allocation" in the "Program start" definition list item
 
     When I click on "Update scheduling" "link"
-    And I set the following fields to these values:
-      | Program due              | At a fixed date |
-      | programdue_date[day]     | 5    |
-      | programdue_date[month]   | 11   |
-      | programdue_date[year]    | 2032 |
-      | programdue_date[hour]    | 09   |
-      | programdue_date[minute]  | 00   |
-    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program due     | At a fixed date  |
+      | programdue_date | 2032-11-05 09:00 |
+    And I click on "Update scheduling" "button" in the "dialog[open]" "css_element"
     Then I should see "Friday, 5 November 2032, 9:00" in the "Program due" definition list item
 
     When I click on "Update scheduling" "link"
-    And I set the following fields to these values:
-      | Program due             | Due after start |
-      | programdue_delay[value] | 5      |
-      | programdue_delay[type]  | months |
-    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program due      | Due after start |
+      | programdue_delay | P5M             |
+    And I click on "Update scheduling" "button" in the "dialog[open]" "css_element"
     Then I should see "Due after start - 5 months" in the "Program due" definition list item
 
     When I click on "Update scheduling" "link"
-    And I set the following fields to these values:
-      | Program due             | Due after start |
-      | programdue_delay[value] | 3      |
-      | programdue_delay[type]  | days   |
-    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program due      | Due after start |
+      | programdue_delay | P3D             |
+    And I click on "Update scheduling" "button" in the "dialog[open]" "css_element"
     Then I should see "Due after start - 3 days" in the "Program due" definition list item
 
     When I click on "Update scheduling" "link"
-    And I set the following fields to these values:
-      | Program due             | Due after start |
-      | programdue_delay[value] | 7      |
-      | programdue_delay[type]  | hours  |
-    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program due      | Due after start |
+      | programdue_delay | PT7H            |
+    And I click on "Update scheduling" "button" in the "dialog[open]" "css_element"
     Then I should see "Due after start - 7 hours" in the "Program due" definition list item
 
     When I click on "Update scheduling" "link"
-    And I set the following fields to these values:
-      | Program due             | Not set |
-    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program due | Not set |
+    And I click on "Update scheduling" "button" in the "dialog[open]" "css_element"
     Then I should see "Not set" in the "Program due" definition list item
 
     When I click on "Update scheduling" "link"
-    And I set the following fields to these values:
-      | Program end              | At a fixed date |
-      | programend_date[day]     | 5    |
-      | programend_date[month]   | 11   |
-      | programend_date[year]    | 2032 |
-      | programend_date[hour]    | 09   |
-      | programend_date[minute]  | 00   |
-    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program end     | At a fixed date  |
+      | programend_date | 2032-11-05 09:00 |
+    And I click on "Update scheduling" "button" in the "dialog[open]" "css_element"
     Then I should see "Friday, 5 November 2032, 9:00" in the "Program end" definition list item
 
     When I click on "Update scheduling" "link"
-    And I set the following fields to these values:
-      | Program end             | End after start |
-      | programend_delay[value] | 5      |
-      | programend_delay[type]  | months |
-    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program end      | End after start |
+      | programend_delay | P5M             |
+    And I click on "Update scheduling" "button" in the "dialog[open]" "css_element"
     Then I should see "End after start - 5 months" in the "Program end" definition list item
 
     When I click on "Update scheduling" "link"
-    And I set the following fields to these values:
-      | Program end             | End after start |
-      | programend_delay[value] | 3      |
-      | programend_delay[type]  | days   |
-    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program end      | End after start |
+      | programend_delay | P3D             |
+    And I click on "Update scheduling" "button" in the "dialog[open]" "css_element"
     Then I should see "End after start - 3 days" in the "Program end" definition list item
 
     When I click on "Update scheduling" "link"
-    And I set the following fields to these values:
-      | Program end             | End after start |
-      | programend_delay[value] | 7      |
-      | programend_delay[type]  | hours  |
-    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program end      | End after start |
+      | programend_delay | PT7H            |
+    And I click on "Update scheduling" "button" in the "dialog[open]" "css_element"
     Then I should see "End after start - 7 hours" in the "Program end" definition list item
 
     When I click on "Update scheduling" "link"
-    And I set the following fields to these values:
-      | Program end             | Not set |
-    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program end | Not set |
+    And I click on "Update scheduling" "button" in the "dialog[open]" "css_element"
     Then I should see "Not set" in the "Program end" definition list item
 
     When I click on "Update scheduling" "link"
-    And I set the following fields to these values:
-      | Program start            | At a fixed date |
-      | programstart_date[day]   | 5    |
-      | programstart_date[month] | 11   |
-      | programstart_date[year]  | 2032 |
-      | programstart_date[hour]  | 09   |
-      | programstart_date[minute]| 00   |
-    And I set the following fields to these values:
-      | Program end              | At a fixed date |
-      | programend_date[day]     | 1    |
-      | programend_date[month]   | 11   |
-      | programend_date[year]    | 2032 |
-      | programend_date[hour]    | 09   |
-      | programend_date[minute]  | 00   |
-    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program start     | At a fixed date  |
+      | programstart_date | 2032-11-05 09:00 |
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program end     | At a fixed date  |
+      | programend_date | 2032-11-01 09:00 |
+    And I click on "Update scheduling" "button" in the "dialog[open]" "css_element"
     Then I should see "Error"
-    And I set the following fields to these values:
-      | Program end              | At a fixed date |
-      | programend_date[day]     | 20   |
-      | programend_date[month]   | 11   |
-      | programend_date[year]    | 2032 |
-      | programend_date[hour]    | 09   |
-      | programend_date[minute]  | 00   |
-    And I set the following fields to these values:
-      | Program due              | At a fixed date |
-      | programdue_date[day]     | 1    |
-      | programdue_date[month]   | 11   |
-      | programdue_date[year]    | 2032 |
-      | programdue_date[hour]    | 09   |
-      | programdue_date[minute]  | 00   |
-    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program end     | At a fixed date  |
+      | programend_date | 2032-11-20 09:00 |
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program due     | At a fixed date  |
+      | programdue_date | 2032-11-01 09:00 |
+    And I click on "Update scheduling" "button" in the "dialog[open]" "css_element"
     Then I should see "Error"
-    And I set the following fields to these values:
-      | Program due              | At a fixed date |
-      | programdue_date[day]     | 22   |
-      | programdue_date[month]   | 11   |
-      | programdue_date[year]    | 2032 |
-      | programdue_date[hour]    | 09   |
-      | programdue_date[minute]  | 00   |
-    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program due     | At a fixed date  |
+      | programdue_date | 2032-11-22 09:00 |
+    And I click on "Update scheduling" "button" in the "dialog[open]" "css_element"
     Then I should see "Error"
-    And I set the following fields to these values:
-      | Program due              | At a fixed date |
-      | programdue_date[day]     | 15   |
-      | programdue_date[month]   | 11   |
-      | programdue_date[year]    | 2032 |
-      | programdue_date[hour]    | 09   |
-      | programdue_date[minute]  | 00   |
-    And I click on "Update scheduling" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program due     | At a fixed date  |
+      | programdue_date | 2032-11-15 09:00 |
+    And I click on "Update scheduling" "button" in the "dialog[open]" "css_element"
     Then I should see "Friday, 5 November 2032, 9:00" in the "Program start" definition list item
     And I should see "Monday, 15 November 2032, 9:00" in the "Program due" definition list item
     And I should see "Saturday, 20 November 2032, 9:00" in the "Program end" definition list item

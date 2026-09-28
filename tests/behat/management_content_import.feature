@@ -59,92 +59,92 @@ Feature: Import program content
     And I click on "Content" "link" in the ".secondary-navigation" "css_element"
     And I should see "All in any order" in the "Program 000" "table_row"
     And I click on "Append item" "link" in the "Program 000" "table_row"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Course | 1 |
-    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | type | course |
+    And I click on "Continue" "button" in the "dialog[open]" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Courses | Course 1 |
-    And I click on "Add courses" "button" in the ".modal-dialog" "css_element"
+    And I click on "Add courses" "button" in the "dialog[open]" "css_element"
     And I click on "Append item" "link" in the "Program 000" "table_row"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Set | 1 |
-    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | type | set |
+    And I click on "Continue" "button" in the "dialog[open]" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Full name       | First set    |
       | Completion type | All in order |
-    And I click on "Add set" "button" in the ".modal-dialog" "css_element"
+    And I click on "Add set" "button" in the "dialog[open]" "css_element"
     And I should see "All in order" in the "First set" "table_row"
 
     And I click on "Append item" "link" in the "First set" "table_row"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Set | 1 |
-    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Full name       | Second set   |
-      | Completion type | At least X   |
-      | At least X      | 2            |
-    And I click on "Add set" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | type | set |
+    And I click on "Continue" "button" in the "dialog[open]" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Full name       | Second set |
+      | Completion type | At least X |
+      | At least X      | 2          |
+    And I click on "Add set" "button" in the "dialog[open]" "css_element"
     And I should see "At least 2" in the "Second set" "table_row"
 
     And I click on "Append item" "link" in the "Second set" "table_row"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Course | 1 |
-    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Courses         | Course 2, Course 3, Course 4 |
-    And I click on "Add courses" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | type | course |
+    And I click on "Continue" "button" in the "dialog[open]" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Courses | Course 2, Course 3, Course 4 |
+    And I click on "Add courses" "button" in the "dialog[open]" "css_element"
     And I should see "Course completion" in the "Course 2" "table_row"
     And I should see "Course completion" in the "Course 3" "table_row"
     And I should see "Course completion" in the "Course 4" "table_row"
 
     And I click on "Append item" "link" in the "Program 000" "table_row"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Set | 1 |
-    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | type | set |
+    And I click on "Continue" "button" in the "dialog[open]" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Full name       | Third set        |
       | Completion type | All in any order |
-    And I click on "Add set" "button" in the ".modal-dialog" "css_element"
+    And I click on "Add set" "button" in the "dialog[open]" "css_element"
     And I should see "All in any order" in the "Third set" "table_row"
 
     And I click on "Append item" "link" in the "Third set" "table_row"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Course | 1 |
-    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Courses         | Course 5         |
-    And I click on "Add courses" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | type | course |
+    And I click on "Continue" "button" in the "dialog[open]" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Courses | Course 5 |
+    And I click on "Add courses" "button" in the "dialog[open]" "css_element"
     And I should see "Course completion" in the "Course 5" "table_row"
 
     And I am on the "tool_muprog > All programs management" page
     And I follow "Program 002"
     And I click on "Content" "link" in the ".secondary-navigation" "css_element"
     And I click on "Append item" "link" in the "Program 002" "table_row"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Course | 1 |
-    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | type | course |
+    And I click on "Continue" "button" in the "dialog[open]" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Courses | Course 6 |
-    And I click on "Add courses" "button" in the ".modal-dialog" "css_element"
+    And I click on "Add courses" "button" in the "dialog[open]" "css_element"
 
     And I am on the "tool_muprog > All programs management" page
     And I follow "Program 001"
     And I click on "Content" "link" in the ".secondary-navigation" "css_element"
 
     When I click on "Import program content" "link" in the "Program 001" "table_row"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
      | Select program | Program 000 |
-    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
-    And I click on "Import program content" "button" in the ".modal-dialog" "css_element"
+    And I click on "Continue" "button" in the "dialog[open]" "css_element"
+    And I click on "Import program content" "button" in the "dialog[open]" "css_element"
     Then I should see "Course 1"
     And I should see "First set"
     And I should see "Second set"
 
     When I click on "Import program content" "link" in the "Program 001" "table_row"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Select program | Program 002 |
-    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
-    And I click on "Import program content" "button" in the ".modal-dialog" "css_element"
+    And I click on "Continue" "button" in the "dialog[open]" "css_element"
+    And I click on "Import program content" "button" in the "dialog[open]" "css_element"
     Then I should see "Course 6"
     And I should see "Course 1"
 
@@ -173,10 +173,10 @@ Feature: Import program content
     And I click on "Content" "link" in the ".secondary-navigation" "css_element"
 
     When I click on "Import program content" "link" in the "Program 000" "table_row"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Select program | Program 004 |
-    And I click on "Continue" "button" in the ".modal-dialog" "css_element"
-    And I click on "Import program content" "button" in the ".modal-dialog" "css_element"
+    And I click on "Continue" "button" in the "dialog[open]" "css_element"
+    And I click on "Import program content" "button" in the "dialog[open]" "css_element"
     Then I should not see "Course 1"
     And I should see "Course 2"
     And I should see "Course 3"

@@ -25,10 +25,10 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use tool_mulib\muform\handler;
+
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
-
-define('AJAX_SCRIPT', true);
 
 require('../../../../config.php');
 
@@ -45,16 +45,26 @@ require_capability('tool/muprog:allocate', $context);
 $currenturl = new core\url('/admin/tool/muprog/management/source_extdb_sync.php', ['sourceid' => $source->id]);
 $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
+$title = get_string('source_extdb_sync', 'tool_muprog');
+$PAGE->set_title($title);
+$PAGE->set_heading($title);
 
 $returnurl = new core\url('/admin/tool/muprog/management/program_allocation.php', ['id' => $program->id]);
 
-$form = new \tool_muprog\local\form\source_extdb_sync(null, ['program' => $program, 'source' => $source, 'query' => $query]);
+$handler = handler::from_request();
+
+$current = [
+    'program' => $program->fullname,
+    'query' => $query ? $query->name : get_string('error'),
+    'lastsync' => $source->auxint5 ? userdate($source->auxint5) : get_string('none'),
+];
+$form = new \tool_muprog\local\form\source_extdb_sync($currenturl, $current, ['program' => $program, 'source' => $source, 'query' => $query]);
 
 if ($form->is_cancelled()) {
-    $form->ajax_form_cancelled($returnurl);
+    $handler->cancelled($returnurl);
 }
-$data = $form->get_data();
-if ($data && empty($data->check)) {
+
+if ($data = $form->get_data()) {
     $result = tool_muprog\local\source\extdb::sync_asap($source);
     if ($result) {
         \core\notification::add(
@@ -67,7 +77,7 @@ if ($data && empty($data->check)) {
             \core\notification::ERROR
         );
     }
-    $form->ajax_form_submitted($returnurl);
+    $handler->submitted($returnurl);
 }
 
-$form->ajax_form_render();
+$handler->render($form);

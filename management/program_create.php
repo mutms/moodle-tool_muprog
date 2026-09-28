@@ -28,14 +28,14 @@
  */
 
 use tool_muprog\local\program;
+use tool_mulib\muform\handler;
+use tool_mulib\muform\util\file_area;
 
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
 /** @var core_renderer $OUTPUT */
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
-
-define('AJAX_SCRIPT', true);
 
 require('../../../../config.php');
 
@@ -52,27 +52,35 @@ if ($context->contextlevel != CONTEXT_SYSTEM && $context->contextlevel != CONTEX
 $currenturl = new core\url('/admin/tool/muprog/management/program_create.php', ['contextid' => $context->id]);
 $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
+$title = get_string('program_create', 'tool_muprog');
+$PAGE->set_title($title);
+$PAGE->set_heading($title);
 
-$program = new stdClass();
-$program->contextid = $context->id;
-$program->fullname = '';
-$program->idnumber = '';
-$program->creategroups = 0;
-$program->description = '';
-$program->descriptionformat = FORMAT_HTML;
+$handler = handler::from_request();
 
-$editoroptions = program::get_description_editor_options();
-
-$form = new \tool_muprog\local\form\program_create(null, ['data' => $program, 'editoroptions' => $editoroptions, 'context' => $context]);
+$current = [
+    'contextid' => $context->id,
+    'creategroups' => 0,
+    'descriptionformat' => FORMAT_HTML,
+    'descriptionfilearea' => new file_area(context_system::instance(), 'tool_muprog', 'description', null),
+];
+$form = new \tool_muprog\local\form\program_create($currenturl, $current);
 
 if ($form->is_cancelled()) {
-    redirect(new core\url('/admin/tool/muprog/management/index.php', ['contextid' => $context->id]));
+    $handler->cancelled(new core\url('/admin/tool/muprog/management/index.php', ['contextid' => $context->id]));
 }
 
 if ($data = $form->get_data()) {
-    $program = program::create($data);
+    // Custom fields and description files are saved by the form elements.
+    $record = (object)array_filter((array)$data, fn($key) => !str_starts_with($key, 'customfield_'), ARRAY_FILTER_USE_KEY);
+    $record->addsources = array_fill_keys($data->addsources ?? [], 1);
+    $program = program::create($record);
+    $description = $form->get_element('description');
+    $description->get_file_area()->set_itemid($program->id);
+    $description->save_area();
+    $form->get_element('customfields')->save($program->id);
     $returnurl = new core\url('/admin/tool/muprog/management/program.php', ['id' => $program->id]);
-    $form->ajax_form_submitted($returnurl);
+    $handler->submitted($returnurl);
 }
 
-$form->ajax_form_render();
+$handler->render($form);

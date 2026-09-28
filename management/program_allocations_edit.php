@@ -28,14 +28,13 @@
  */
 
 use tool_muprog\local\program;
+use tool_mulib\muform\handler;
 
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
 /** @var core_renderer $OUTPUT */
 /** @var stdClass $CFG */
 /** @var stdClass $COURSE */
-
-define('AJAX_SCRIPT', true);
 
 require('../../../../config.php');
 
@@ -50,20 +49,28 @@ require_capability('tool/muprog:edit', $context);
 $currenturl = new core\url('/admin/tool/muprog/management/program_allocations_edit.php', ['id' => $id]);
 $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
+$title = get_string('program_allocations_edit', 'tool_muprog');
+$PAGE->set_title($title);
+$PAGE->set_heading($title);
 
-$current = clone($program);
+$handler = handler::from_request();
 
-$form = new \tool_muprog\local\form\program_allocations_edit(null, ['data' => $current, 'context' => $context]);
+$current = [
+    'timeallocationstart' => $program->timeallocationstart,
+    'timeallocationend' => $program->timeallocationend,
+];
+$form = new \tool_muprog\local\form\program_allocations_edit($currenturl, $current);
 
 $returnurl = new core\url('/admin/tool/muprog/management/program_allocation.php', ['id' => $program->id]);
 
 if ($form->is_cancelled()) {
-    $form->ajax_form_cancelled($returnurl);
+    $handler->cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
+    $data->id = $program->id;
     program::update_allocation($data);
-    $form->ajax_form_submitted($returnurl);
+    $handler->submitted($returnurl);
 }
 
-$form->ajax_form_render();
+$handler->render($form);

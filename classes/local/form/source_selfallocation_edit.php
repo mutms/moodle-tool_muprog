@@ -19,6 +19,14 @@
 
 namespace tool_muprog\local\form;
 
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\number;
+use tool_mulib\muform\element\select;
+use tool_mulib\muform\element\sharedkey;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\form;
+
 /**
  * Edit program self allocation settings.
  *
@@ -28,61 +36,32 @@ namespace tool_muprog\local\form;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class source_selfallocation_edit extends \tool_mulib\local\ajax_form {
+final class source_selfallocation_edit extends form {
     #[\Override]
-    protected function definition() {
-        $mform = $this->_form;
-        $context = $this->_customdata['context'];
-        $source = $this->_customdata['source'];
-        $program = $this->_customdata['program'];
+    protected function definition(): void {
+        $source = $this->get_extra_data()['source'];
+        $yesno = ['1' => get_string('yes'), '0' => get_string('no')];
 
-        $mform->addElement('select', 'enable', get_string('active'), ['1' => get_string('yes'), '0' => get_string('no')]);
-        $mform->setDefault('enable', $source->enable);
-        if ($source->hasallocations) {
-            $mform->hardFreeze('enable');
-        }
+        $enable = new select('enable', get_string('active'), $yesno);
+        $enable->set_frozen($source->hasallocations);
+        $this->add($enable);
 
-        $mform->addElement(
-            'select',
-            'selfallocation_allowsignup',
-            get_string('source_selfallocation_allowsignup', 'tool_muprog'),
-            ['1' => get_string('yes'), '0' => get_string('no')]
-        );
-        $mform->setDefault('selfallocation_allowsignup', 1);
-        $mform->hideIf('selfallocation_allowsignup', 'enable', 'eq', '0');
+        $dm = $this->get_display_manager();
 
-        $mform->addElement('passwordunmask', 'selfallocation_key', get_string('source_selfallocation_key', 'tool_muprog'));
-        $mform->setDefault('selfallocation_key', $source->selfallocation_key);
-        $mform->hideIf('selfallocation_key', 'enable', 'eq', '0');
+        $allowsignup = new select('selfallocation_allowsignup', get_string('source_selfallocation_allowsignup', 'tool_muprog'), $yesno);
+        $this->add($allowsignup);
+        $dm->hide_if('selfallocation_allowsignup', 'enable', 'eq', '0');
 
-        $mform->addElement('text', 'selfallocation_maxusers', get_string('source_selfallocation_maxusers', 'tool_muprog'), 'size="8"');
-        $mform->setType('selfallocation_maxusers', PARAM_RAW);
-        $mform->setDefault('selfallocation_maxusers', $source->selfallocation_maxusers);
-        $mform->hideIf('selfallocation_maxusers', 'enable', 'eq', '0');
+        $key = new sharedkey('selfallocation_key', get_string('source_selfallocation_key', 'tool_muprog'), [], true);
+        $this->add($key);
+        $dm->hide_if('selfallocation_key', 'enable', 'eq', '0');
 
-        $mform->addElement('hidden', 'programid');
-        $mform->setType('programid', PARAM_INT);
-        $mform->setDefault('programid', $program->id);
+        $maxusers = new number('selfallocation_maxusers', get_string('source_selfallocation_maxusers', 'tool_muprog'), ['min' => 0, 'width' => 'small']);
+        $this->add($maxusers);
+        $dm->hide_if('selfallocation_maxusers', 'enable', 'eq', '0');
 
-        $mform->addElement('hidden', 'type');
-        $mform->setType('type', PARAM_ALPHANUMEXT);
-        $mform->setDefault('type', $source->type);
-
-        $this->add_action_buttons(true, get_string('update'));
-    }
-
-    #[\Override]
-    public function validation($data, $files) {
-        $errors = parent::validation($data, $files);
-
-        if ($data['selfallocation_maxusers'] !== '') {
-            if (!is_number($data['selfallocation_maxusers'])) {
-                $errors['selfallocation_maxusers'] = get_string('error');
-            } else if ($data['selfallocation_maxusers'] < 0) {
-                $errors['selfallocation_maxusers'] = get_string('error');
-            }
-        }
-
-        return $errors;
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', get_string('update')), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 }

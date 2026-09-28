@@ -52,49 +52,40 @@ Feature: Issuing of certificates for program completion
     And I follow "Certificate"
 
     When I press "Edit"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Certificate template | Certificate 1 |
       | Expiry date          | Never         |
-    And I click on "Update program" "button" in the ".modal-dialog" "css_element"
+    And I click on "Update program" "button" in the "dialog[open]" "css_element"
     Then I should see "Certificate 1" in the "Certificate template" definition list item
     And I should see "Never" in the "Expiry date" definition list item
 
     When I press "Edit"
-    And the following fields in the ".modal-dialog" "css_element" match these values:
+    And the following muform fields in the "dialog[open]" "css_element" match:
       | Certificate template | Certificate 1 |
       | Expiry date          | Never         |
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Certificate template        | Certificate 2 |
-      | Expiry date                 | Select date   |
-      | expirydateabsolute[day]     | 5             |
-      | expirydateabsolute[month]   | 11            |
-      | expirydateabsolute[year]    | 2032          |
-      | expirydateabsolute[hour]    | 09            |
-      | expirydateabsolute[minute]  | 00            |
-    And I click on "Update program" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Certificate template | Certificate 2    |
+      | Expiry date          | Select date      |
+      | expirydateabsolute   | 2032-11-05 09:00 |
+    And I click on "Update program" "button" in the "dialog[open]" "css_element"
     Then I should see "Certificate 2" in the "Certificate template" definition list item
     And I should see "Friday, 5 November 2032, 9:00" in the "Expiry date" definition list item
 
     When I press "Edit"
-    And the following fields in the ".modal-dialog" "css_element" match these values:
-      | Certificate template        | Certificate 2 |
-      | Expiry date                 | Select date   |
-      | expirydateabsolute[day]     | 5             |
-      | expirydateabsolute[month]   | 11            |
-      | expirydateabsolute[year]    | 2032          |
-      | expirydateabsolute[hour]    | 09            |
-      | expirydateabsolute[minute]  | 00            |
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
-      | Certificate template         | Certificate 1 |
-      | Expiry date                  | After         |
-      | expirydaterelative[number]   | 5             |
-      | expirydaterelative[timeunit] | 86400         |
-    And I click on "Update program" "button" in the ".modal-dialog" "css_element"
+    And the following muform fields in the "dialog[open]" "css_element" match:
+      | Certificate template | Certificate 2    |
+      | Expiry date          | Select date      |
+      | expirydateabsolute   | 2032-11-05 09:00 |
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Certificate template | Certificate 1 |
+      | Expiry date          | After         |
+      | expirydaterelative   | 432000        |
+    And I click on "Update program" "button" in the "dialog[open]" "css_element"
     Then I should see "Certificate 1" in the "Certificate template" definition list item
     And I should see "5 days" in the "Expiry date" definition list item
 
     When I press "Delete"
-    And I click on "Delete" "button" in the ".modal-dialog" "css_element"
+    And I click on "Delete" "button" in the "dialog[open]" "css_element"
     Then I should see "Not set" in the "Certificate template" definition list item
 
   @javascript
@@ -109,32 +100,32 @@ Feature: Issuing of certificates for program completion
     And I follow "Certificate"
 
     And I press "Edit"
-    And I set the following fields in the ".modal-dialog" "css_element" to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Certificate template | Certificate 1 |
       | Expiry date          | Never         |
-    And I click on "Update program" "button" in the ".modal-dialog" "css_element"
+    And I click on "Update program" "button" in the "dialog[open]" "css_element"
     And I should see "Certificate 1" in the "Certificate template" definition list item
     And I should see "Never" in the "Expiry date" definition list item
 
     And I follow "Allocation settings"
     And I click on "Update Manual allocation" "link"
-    And I set the following fields to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Active | Yes |
-    And I click on "Update" "button" in the ".modal-dialog" "css_element"
+    And I click on "Update" "button" in the "dialog[open]" "css_element"
     And I should see "Active" in the "Manual allocation" definition list item
     And I follow "Users"
     And I press "Allocate users"
-    And I set the following fields to these values:
+    And I set the following muform fields in the "dialog[open]" "css_element":
       | Users | Student 1 |
-    And I click on "Allocate users" "button" in the ".modal-dialog" "css_element"
+    And I click on "Allocate users" "button" in the "dialog[open]" "css_element"
 
     And I follow "Users"
     And I follow "Student 1"
     And I click on "Update other evidence" "link" in the "Program 000" "table_row"
-    And I set the following fields to these values:
-      | evidencetimecompleted[enabled] | 1        |
-      | Details                        | no need! |
-    And I click on "Update" "button" in the ".modal-dialog" "css_element"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | evidencetimecompleted | ##now##  |
+      | Details               | no need! |
+    And I click on "Update" "button" in the "dialog[open]" "css_element"
     And I should see "Completed" in the "Program status" definition list item
 
     And I log out

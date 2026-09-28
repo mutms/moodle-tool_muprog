@@ -19,6 +19,13 @@
 
 namespace tool_muprog\local\form;
 
+use tool_mulib\muform\element\buttons;
+use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\datetime;
+use tool_mulib\muform\element\info;
+use tool_mulib\muform\element\submit;
+use tool_mulib\muform\form;
+
 /**
  * Edit program completion.
  *
@@ -28,25 +35,15 @@ namespace tool_muprog\local\form;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class program_completion_override extends \tool_mulib\local\ajax_form {
+final class program_completion_override extends form {
     #[\Override]
-    protected function definition() {
+    protected function definition(): void {
+        $this->add(new info('userfullname', get_string('user'), null, info::PLAIN));
 
-        $mform = $this->_form;
-        $allocation = $this->_customdata['allocation'];
-        $user = $this->_customdata['user'];
-        $context = $this->_customdata['context'];
+        $this->add(new datetime('timecompleted', get_string('programcompletion', 'tool_muprog')));
 
-        $mform->addElement('static', 'userfullname', get_string('user'), fullname($user));
-
-        $mform->addElement('date_time_selector', 'timecompleted', get_string('programcompletion', 'tool_muprog'), ['optional' => true]);
-
-        $mform->addElement('hidden', 'id');
-        $mform->setType('id', PARAM_INT);
-        $mform->setDefault('id', $allocation->id);
-
-        $this->add_action_buttons(true, get_string('update'));
-
-        $this->set_data($allocation);
+        $this->add(new buttons('buttons'));
+        $this->add(new submit('submit', get_string('update')), 'buttons');
+        $this->add(new cancel(), 'buttons');
     }
 }

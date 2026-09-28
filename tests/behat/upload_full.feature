@@ -39,9 +39,9 @@ Feature: Program upload full tests
     And I am on the "tool_muprog > All programs management" page
 
     When I click on "Upload programs" action from "Programs actions" dropdown
-    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_json.zip" file to "Files" filemanager
+    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_json.zip" file to "files" muform filemanager
     And I press "Continue"
-    And the following fields match these values:
+    And the following muform fields match:
       | usecategory | 1 |
     And the following should exist in the "upload_preview" table:
       | idnumber | Status | fullname   | category   | description  | publicaccess | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |
@@ -121,9 +121,9 @@ Feature: Program upload full tests
     And I am on the "tool_muprog > All programs management" page
 
     When I click on "Upload programs" action from "Programs actions" dropdown
-    And I upload "admin/tool/muprog/tests/fixtures/upload/programs.json" file to "Files" filemanager
+    And I upload "admin/tool/muprog/tests/fixtures/upload/programs.json" file to "files" muform filemanager
     And I press "Continue"
-    And the following fields match these values:
+    And the following muform fields match:
       | usecategory | 1 |
     And the following should exist in the "upload_preview" table:
       | idnumber | Status | fullname   | category   | description  | publicaccess | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |
@@ -205,9 +205,9 @@ Feature: Program upload full tests
     And I am on the "tool_muprog > All programs management" page
 
     When I click on "Upload programs" action from "Programs actions" dropdown
-    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_old.json" file to "Files" filemanager
+    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_old.json" file to "files" muform filemanager
     And I press "Continue"
-    And the following fields match these values:
+    And the following muform fields match:
       | usecategory | 1 |
     And the following should exist in the "upload_preview" table:
       | idnumber | Status | fullname   | category   | description  | publicaccess | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |
@@ -233,9 +233,9 @@ Feature: Program upload full tests
     And I am on the "tool_muprog > All programs management" page
 
     When I click on "Upload programs" action from "Programs actions" dropdown
-    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_credits.json" file to "Files" filemanager
+    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_credits.json" file to "files" muform filemanager
     And I press "Continue"
-    And the following fields match these values:
+    And the following muform fields match:
       | usecategory | 1 |
     And the following should exist in the "upload_preview" table:
       | idnumber | Status | fullname   | category   | description  | publicaccess | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |
@@ -319,9 +319,9 @@ Feature: Program upload full tests
     And I am on the "tool_muprog > All programs management" page
 
     When I click on "Upload programs" action from "Programs actions" dropdown
-    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_csv_comma.zip" file to "Files" filemanager
+    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_csv_comma.zip" file to "files" muform filemanager
     And I press "Continue"
-    And the following fields match these values:
+    And the following muform fields match:
       | usecategory | 1 |
     And the following should exist in the "upload_preview" table:
       | idnumber | Status | fullname   | category   | description  | publicaccess | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |
@@ -402,9 +402,9 @@ Feature: Program upload full tests
     And I am on the "tool_muprog > All programs management" page
 
     When I click on "Upload programs" action from "Programs actions" dropdown
-    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_csv_semicolon.zip" file to "Files" filemanager
+    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_csv_semicolon.zip" file to "files" muform filemanager
     And I press "Continue"
-    And the following fields match these values:
+    And the following muform fields match:
       | usecategory | 1 |
     And the following should exist in the "upload_preview" table:
       | idnumber | Status | fullname   | category   | description  | publicaccess | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |
@@ -485,9 +485,9 @@ Feature: Program upload full tests
     And I am on the "tool_muprog > All programs management" page
 
     When I click on "Upload programs" action from "Programs actions" dropdown
-    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_csv_tab.zip" file to "Files" filemanager
+    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_csv_tab.zip" file to "files" muform filemanager
     And I press "Continue"
-    And the following fields match these values:
+    And the following muform fields match:
       | usecategory | 1 |
     And the following should exist in the "upload_preview" table:
       | idnumber | Status | fullname   | category   | description  | publicaccess | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |
@@ -568,11 +568,11 @@ Feature: Program upload full tests
     And I am on the "tool_muprog > All programs management" page
 
     When I click on "Upload programs" action from "Programs actions" dropdown
-    And I upload "admin/tool/muprog/tests/fixtures/upload/programs.csv" file to "Files" filemanager
-    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_contents.csv" file to "Files" filemanager
-    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_sources.csv" file to "Files" filemanager
+    And I upload "admin/tool/muprog/tests/fixtures/upload/programs.csv" file to "files" muform filemanager
+    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_contents.csv" file to "files" muform filemanager
+    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_sources.csv" file to "files" muform filemanager
     And I press "Continue"
-    And the following fields match these values:
+    And the following muform fields match:
       | usecategory | 1 |
     And the following should exist in the "upload_preview" table:
       | idnumber | Status | fullname   | category   | description  | publicaccess | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |
@@ -654,11 +654,11 @@ Feature: Program upload full tests
     And I am on the "tool_muprog > All programs management" page
 
     When I click on "Upload programs" action from "Programs actions" dropdown
-    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_old.csv" file to "Files" filemanager
-    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_contents.csv" file to "Files" filemanager
-    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_sources.csv" file to "Files" filemanager
+    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_old.csv" file to "files" muform filemanager
+    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_contents.csv" file to "files" muform filemanager
+    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_sources.csv" file to "files" muform filemanager
     And I press "Continue"
-    And the following fields match these values:
+    And the following muform fields match:
       | usecategory | 1 |
     And the following should exist in the "upload_preview" table:
       | idnumber | Status | fullname   | category   | description  | publicaccess | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |
@@ -683,11 +683,11 @@ Feature: Program upload full tests
     And I am on the "tool_muprog > All programs management" page
 
     When I click on "Upload programs" action from "Programs actions" dropdown
-    And I upload "admin/tool/muprog/tests/fixtures/upload/programs.csv" file to "Files" filemanager
-    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_contents_credits.csv" file to "Files" filemanager
-    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_sources.csv" file to "Files" filemanager
+    And I upload "admin/tool/muprog/tests/fixtures/upload/programs.csv" file to "files" muform filemanager
+    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_contents_credits.csv" file to "files" muform filemanager
+    And I upload "admin/tool/muprog/tests/fixtures/upload/programs_sources.csv" file to "files" muform filemanager
     And I press "Continue"
-    And the following fields match these values:
+    And the following muform fields match:
       | usecategory | 1 |
     And the following should exist in the "upload_preview" table:
       | idnumber | Status | fullname   | category   | description  | publicaccess | creategroups | allocationstart           | allocationend             | startdate                             | duedate                   | enddate                    |

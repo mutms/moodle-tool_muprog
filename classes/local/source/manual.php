@@ -132,13 +132,13 @@ final class manual extends base {
         $context = \context::instance_by_id($program->contextid);
         if (has_capability('tool/muprog:allocate', $context)) {
             $url = new \core\url('/admin/tool/muprog/management/source_manual_allocate.php', ['sourceid' => $source->id]);
-            $button = new \tool_mulib\output\ajax_form\button($url, get_string('source_manual_allocateusers', 'tool_muprog'));
+            $button = new \tool_mulib\output\muform\dialog\button($url, get_string('source_manual_allocateusers', 'tool_muprog'));
             $actions->add_button($button);
 
             $url = new \core\url('/admin/tool/muprog/management/source_manual_upload.php', ['sourceid' => $source->id]);
-            $link = new \tool_mulib\output\ajax_form\link($url, get_string('source_manual_uploadusers', 'tool_muprog'), 'i/publish');
+            $link = new \tool_mulib\output\muform\dialog\link($url, get_string('source_manual_uploadusers', 'tool_muprog'), 'i/publish');
             $link->set_form_size('xl');
-            $actions->get_dropdown()->add_ajax_form($link);
+            $actions->get_dropdown()->add_dialog($link);
         }
     }
 
