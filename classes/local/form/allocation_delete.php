@@ -23,8 +23,8 @@ use tool_mulib\muform\element\buttons;
 use tool_mulib\muform\element\cancel;
 use tool_mulib\muform\element\datetime;
 use tool_mulib\muform\element\info;
-use tool_mulib\muform\element\select;
 use tool_mulib\muform\element\submit;
+use tool_mulib\muform\element\yesno;
 use tool_mulib\muform\form;
 
 /**
@@ -54,7 +54,7 @@ final class allocation_delete extends form {
             $this->add($date);
         }
 
-        $archived = new select('archived', get_string('archived', 'tool_muprog'), ['0' => get_string('no'), '1' => get_string('yes')]);
+        $archived = new yesno('archived', get_string('archived', 'tool_muprog'));
         $archived->set_frozen(true);
         $this->add($archived);
 

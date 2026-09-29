@@ -22,8 +22,8 @@ namespace tool_muprog\local\form;
 use tool_mulib\muform\element\autocompletemany;
 use tool_mulib\muform\element\buttons;
 use tool_mulib\muform\element\cancel;
-use tool_mulib\muform\element\select;
 use tool_mulib\muform\element\submit;
+use tool_mulib\muform\element\yesno;
 use tool_mulib\muform\form;
 use tool_muprog\muform\autocompletemany\program_visibility_edit_cohortids;
 
@@ -41,7 +41,7 @@ final class program_visibility_edit extends form {
     protected function definition(): void {
         $programid = (int)$this->get_current_data()['id'];
 
-        $publicaccess = new select('publicaccess', get_string('publicaccess', 'tool_muprog'), [0 => get_string('no'), 1 => get_string('yes')]);
+        $publicaccess = new yesno('publicaccess', get_string('publicaccess', 'tool_muprog'));
         $publicaccess->add_help_button('publicaccess', 'tool_muprog');
         $this->add($publicaccess);
 

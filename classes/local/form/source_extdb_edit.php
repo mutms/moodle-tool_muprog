@@ -22,8 +22,8 @@ use tool_mulib\muform\element\autocomplete;
 use tool_mulib\muform\element\buttons;
 use tool_mulib\muform\element\cancel;
 use tool_mulib\muform\element\checkbox;
-use tool_mulib\muform\element\select;
 use tool_mulib\muform\element\submit;
+use tool_mulib\muform\element\yesno;
 use tool_mulib\muform\form;
 use tool_muprog\muform\autocomplete\source_extdb_edit_queryid;
 
@@ -38,10 +38,9 @@ final class source_extdb_edit extends form {
     #[\Override]
     protected function definition(): void {
         $source = $this->get_extra_data()['source'];
-        $yesno = ['1' => get_string('yes'), '0' => get_string('no')];
         $dm = $this->get_display_manager();
 
-        $enable = new select('enable', get_string('active'), $yesno);
+        $enable = new yesno('enable', get_string('active'));
         $enable->set_frozen($source->hasallocations);
         $this->add($enable);
 

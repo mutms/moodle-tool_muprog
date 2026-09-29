@@ -26,10 +26,10 @@ use tool_mulib\muform\element\checkboxes;
 use tool_mulib\muform\element\customfields;
 use tool_mulib\muform\element\editor;
 use tool_mulib\muform\element\filemanager;
-use tool_mulib\muform\element\select;
 use tool_mulib\muform\element\submit;
 use tool_mulib\muform\element\tags;
 use tool_mulib\muform\element\text;
+use tool_mulib\muform\element\yesno;
 use tool_mulib\muform\form;
 use tool_muprog\customfield\program_handler;
 use tool_muprog\muform\autocomplete\program_contextid;
@@ -62,7 +62,7 @@ final class program_create extends form {
         $context->set_required(true);
         $this->add($context);
 
-        $creategroups = new select('creategroups', get_string('creategroups', 'tool_muprog'), [0 => get_string('no'), 1 => get_string('yes')]);
+        $creategroups = new yesno('creategroups', get_string('creategroups', 'tool_muprog'));
         $creategroups->add_help_button('creategroups', 'tool_muprog');
         $this->add($creategroups);
 

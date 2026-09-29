@@ -20,8 +20,8 @@ namespace tool_muprog\local\form;
 
 use tool_mulib\muform\element\buttons;
 use tool_mulib\muform\element\cancel;
-use tool_mulib\muform\element\select;
 use tool_mulib\muform\element\submit;
+use tool_mulib\muform\element\yesno;
 use tool_mulib\muform\form;
 
 /**
@@ -37,13 +37,12 @@ final class source_approval_edit extends form {
     #[\Override]
     protected function definition(): void {
         $source = $this->get_extra_data()['source'];
-        $yesno = ['1' => get_string('yes'), '0' => get_string('no')];
 
-        $enable = new select('enable', get_string('active'), $yesno);
+        $enable = new yesno('enable', get_string('active'));
         $enable->set_frozen($source->hasallocations);
         $this->add($enable);
 
-        $allowrequest = new select('approval_allowrequest', get_string('source_approval_allowrequest', 'tool_muprog'), $yesno);
+        $allowrequest = new yesno('approval_allowrequest', get_string('source_approval_allowrequest', 'tool_muprog'));
         $this->add($allowrequest);
         $this->get_display_manager()->hide_if('approval_allowrequest', 'enable', 'eq', '0');
 
