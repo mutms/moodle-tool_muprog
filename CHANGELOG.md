@@ -4,6 +4,10 @@ Plugin versioning is derived from Moodle releases, it does not comply with the s
 
 The format of this change log follows the advice given at [Keep a CHANGELOG](https://keepachangelog.com).
 
+## [Unreleased](https://github.com/mutms/moodle-tool_muprog/compare/v4.5.14.03...MOODLE_405_STABLE)
+
+- No changes
+
 ## [v4.5.14.03](https://github.com/mutms/moodle-tool_muprog/compare/v4.5.14.02...v4.5.14.03) - 2026-09-19
 
 - version pinned to 20260919xx
