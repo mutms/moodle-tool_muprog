@@ -6,7 +6,9 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 
 ## [Unreleased](https://github.com/mutms/moodle-tool_muprog/compare/v4.5.14.03...MOODLE_405_STABLE)
 
-- No changes
+### Fixed
+
+- program export in a category did not check the export capability in the selected category
 
 ## [v4.5.14.03](https://github.com/mutms/moodle-tool_muprog/compare/v4.5.14.02...v4.5.14.03) - 2026-09-19
 
