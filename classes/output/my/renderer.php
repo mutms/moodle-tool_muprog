@@ -281,7 +281,7 @@ class renderer extends \plugin_renderer_base {
 
             $program = $DB->get_record('tool_muprog_program', ['id' => $allocation->programid]);
             $fullname = $programicon . format_string($program->fullname);
-            $detailurl = new url('/admin/tool/muprog/catalogue/program.php', ['id' => $program->id]);
+            $detailurl = new url('/admin/tool/muprog/my/program.php', ['id' => $program->id]);
             $fullname = \html_writer::link($detailurl, $fullname);
             $row[] = $fullname;
 
@@ -318,9 +318,9 @@ class renderer extends \plugin_renderer_base {
      * @return string
      */
     public function render_block_footer(): string {
-        $url = \tool_muprog\local\catalogue::get_catalogue_url();
+        $url = \tool_mucatalog\local\catalogue::get_catalogue_url();
         if ($url) {
-            return '<div class="float-end">' . \html_writer::link($url, get_string('catalogue', 'tool_muprog')) . '</div>';
+            return '<div class="float-end">' . \html_writer::link($url, get_string('catalogue', 'tool_mucatalog')) . '</div>';
         }
         return '';
     }

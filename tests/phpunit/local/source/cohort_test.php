@@ -58,41 +58,6 @@ final class cohort_test extends \advanced_testcase {
         $this->assertFalse(\tool_muprog\local\source\cohort::is_new_allowed_in_new());
     }
 
-    public function test_allocations_ignore_visibility(): void {
-        global $DB;
-
-        /** @var \tool_muprog_generator $generator */
-        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
-
-        $guest = guest_user();
-        $user1 = $this->getDataGenerator()->create_user();
-        $user2 = $this->getDataGenerator()->create_user();
-        $user3 = $this->getDataGenerator()->create_user();
-        $user4 = $this->getDataGenerator()->create_user();
-
-        $cohort1 = $this->getDataGenerator()->create_cohort();
-        $cohort2 = $this->getDataGenerator()->create_cohort();
-
-        $program1 = $generator->create_program(['sources' => ['manual' => [], 'cohort' => ['cohortids' => [$cohort1->id]]]]);
-        $source1m = $DB->get_record('tool_muprog_source', ['programid' => $program1->id, 'type' => 'manual'], '*', MUST_EXIST);
-        $source1c = $DB->get_record('tool_muprog_source', ['programid' => $program1->id, 'type' => 'cohort'], '*', MUST_EXIST);
-
-        \cohort_add_member($cohort1->id, $user1->id);
-        \cohort_add_member($cohort2->id, $user1->id);
-        \cohort_add_member($cohort2->id, $user2->id);
-        $program1 = program::update_visibility(
-            (object)['id' => $program1->id, 'publicaccess' => 1, 'cohortids' => [$cohort1->id, $cohort2->id]]
-        );
-        $allocations = $DB->get_records('tool_muprog_allocation', ['programid' => $program1->id], 'userid ASC');
-        $this->assertCount(1, $allocations);
-
-        $program1 = program::update_visibility(
-            (object)['id' => $program1->id, 'publicaccess' => 1, 'cohortids' => []]
-        );
-        $allocations = $DB->get_records('tool_muprog_allocation', ['programid' => $program1->id], 'userid ASC');
-        $this->assertCount(1, $allocations);
-    }
-
     public function test_fetch_allocation_cohorts_menu(): void {
         global $DB;
         /** @var \tool_muprog_generator $generator */

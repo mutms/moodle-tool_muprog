@@ -38,7 +38,7 @@ use core\exception\invalid_parameter_exception;
  */
 final class get_programs extends external_api {
     /** @var string[] */
-    public const SEARCH_FIELDS = ['id', 'contextid', 'fullname', 'idnumber', 'publicaccess', 'archived', 'tenantid'];
+    public const SEARCH_FIELDS = ['id', 'contextid', 'fullname', 'idnumber', 'archived', 'tenantid'];
 
     /**
      * Describes the external function arguments.
@@ -51,7 +51,7 @@ final class get_programs extends external_api {
                 new external_single_structure(
                     [
                         'field' => new external_value(PARAM_ALPHANUM, 'The name of the field to be searched by list of'
-                            . ' acceptable fields is : id, contextid, fullname, idnumber, publicaccess, archived, tenantid'),
+                            . ' acceptable fields is : id, contextid, fullname, idnumber, archived, tenantid'),
                         'value' => new external_value(PARAM_RAW, 'Value of the field to be searched, NULL allowed only for tenantid'),
                     ]
                 ),
@@ -79,9 +79,6 @@ final class get_programs extends external_api {
         $tenantjoin = '';
         foreach ($fieldvalues as $fieldvalue) {
             ['field' => $field, 'value' => $value] = $fieldvalue;
-            if ($field === 'public') {
-                $field = 'publicaccess';
-            }
             if (!in_array($field, self::SEARCH_FIELDS, true)) {
                 throw new invalid_parameter_exception('Invalid field name: ' . $field);
             }
@@ -136,17 +133,6 @@ final class get_programs extends external_api {
                 'type'
             );
             $program->sources = array_keys($sources);
-            if ($program->publicaccess) {
-                $program->cohortids = [];
-            } else {
-                $cohorts = $DB->get_records_menu(
-                    'tool_muprog_cohort',
-                    ['programid' => $program->id],
-                    'cohortid ASC',
-                    'cohortid'
-                );
-                $program->cohortids = array_keys($cohorts);
-            }
             $results[] = $program;
         }
 
@@ -168,7 +154,6 @@ final class get_programs extends external_api {
                 'description' => new external_value(PARAM_RAW, 'Program description text (in original text format)'),
                 'descriptionformat' => new external_value(PARAM_INT, 'Program description text format'),
                 'presentationjson' => new external_value(PARAM_RAW, 'Presentation json (not stable internal API data)'),
-                'publicaccess' => new external_value(PARAM_BOOL, 'Public flag'),
                 'archived' => new external_value(PARAM_BOOL, 'Archived flag (archived programs should not change)'),
                 'creategroups' => new external_value(PARAM_BOOL, 'Create course groups flag'),
                 'timeallocationstart' => new external_value(PARAM_INT, 'Allocation start date'),
@@ -180,10 +165,6 @@ final class get_programs extends external_api {
                 'sources' => new external_multiple_structure(
                     new external_value(PARAM_ALPHANUMEXT, 'Internal source name'),
                     'Enabled allocation sources'
-                ),
-                'cohortids' => new external_multiple_structure(
-                    new external_value(PARAM_INT, 'Cohort id'),
-                    'Visible cohorts for non-public programs'
                 ),
             ], 'List of programs')
         );

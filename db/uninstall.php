@@ -43,7 +43,6 @@ function xmldb_tool_muprog_uninstall(): bool {
     $DB->delete_records('tool_muprog_request', []);
     $DB->delete_records('tool_muprog_src_cohort', []);
     $DB->delete_records('tool_muprog_source', []);
-    $DB->delete_records('tool_muprog_cohort', []);
     $DB->delete_records('tool_muprog_prerequisite', []);
     $DB->delete_records('tool_muprog_item', []);
 

@@ -40,10 +40,9 @@ require('../../../../config.php');
 $sourceid = required_param('sourceid', PARAM_INT);
 
 $PAGE->set_context(context_system::instance());
-$PAGE->set_url(new core\url('/admin/tool/muprog/catalogue/source_selfallocation.php', ['sourceid' => $sourceid]));
+$PAGE->set_url(new core\url('/admin/tool/muprog/my/source_selfallocation.php', ['sourceid' => $sourceid]));
 
 require_login();
-require_capability('tool/muprog:viewcatalogue', context_system::instance());
 
 if (!\tool_mulib\local\mulib::is_muprog_active()) {
     redirect(new core\url('/'));
@@ -54,14 +53,15 @@ $program = $DB->get_record('tool_muprog_program', ['id' => $source->programid], 
 $programcontext = context::instance_by_id($program->contextid);
 
 if (!\tool_muprog\local\source\selfallocation::can_user_request($program, $source, $USER->id)) {
-    redirect(new core\url('/admin/tool/muprog/catalogue/index.php'));
+    redirect(new core\url('/admin/tool/muprog/my/program.php', ['id' => $program->id]));
 }
 
 $title = get_string('source_selfallocation_allocate', 'tool_muprog');
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
 
-$returnurl = new core\url('/admin/tool/muprog/catalogue/program.php', ['id' => $program->id]);
+// Program page redirects back to catalogue if user is not allocated.
+$returnurl = new core\url('/admin/tool/muprog/my/program.php', ['id' => $program->id]);
 
 $handler = handler::from_request();
 

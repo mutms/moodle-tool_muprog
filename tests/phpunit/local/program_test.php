@@ -61,7 +61,6 @@ final class program_test extends \advanced_testcase {
         $this->assertSame('', $program->description);
         $this->assertSame('1', $program->descriptionformat);
         $this->assertSame('[]', $program->presentationjson);
-        $this->assertSame('0', $program->publicaccess);
         $this->assertSame('0', $program->archived);
         $this->assertSame('0', $program->creategroups);
         $this->assertSame(null, $program->timeallocationstart);
@@ -80,7 +79,6 @@ final class program_test extends \advanced_testcase {
             'description' => 'Some desc',
             'descriptionformat' => '2',
             'presentation' => ['some' => 'test'],
-            'publicaccess' => '1',
             'archived' => '1',
             'creategroups' => '1',
             'timeallocationstart' => (string)(time() - 60 * 60 * 24),
@@ -96,7 +94,6 @@ final class program_test extends \advanced_testcase {
         $this->assertSame($data->description, $program->description);
         $this->assertSame($data->descriptionformat, $program->descriptionformat);
         $this->assertSame('[]', $program->presentationjson);
-        $this->assertSame($data->publicaccess, $program->publicaccess);
         $this->assertSame($data->archived, $program->archived);
         $this->assertSame($data->creategroups, $program->creategroups);
         $this->assertSame($data->timeallocationstart, $program->timeallocationstart);
@@ -149,12 +146,8 @@ final class program_test extends \advanced_testcase {
     }
 
     public function test_update_general(): void {
-        global $DB;
-
         $syscontext = \context_system::instance();
         $category = $this->getDataGenerator()->create_category([]);
-        $cohort1 = $this->getDataGenerator()->create_cohort();
-        $cohort2 = $this->getDataGenerator()->create_cohort();
         $catcontext = \context_coursecat::instance($category->id);
 
         $data = (object)[
@@ -173,8 +166,6 @@ final class program_test extends \advanced_testcase {
             'description' => 'Some desc',
             'descriptionformat' => '2',
             'presentation' => ['some' => 'test'],
-            'publicaccess' => '1',
-            'cohorts' => [$cohort1->id, $cohort2->id],
             'creategroups' => '1',
             'timeallocationstart' => (string)(time() - 60 * 60 * 24),
             'timeallocationend' => (string)(time() + 60 * 60 * 24),
@@ -188,7 +179,6 @@ final class program_test extends \advanced_testcase {
         $this->assertSame($data->description, $program->description);
         $this->assertSame($data->descriptionformat, $program->descriptionformat);
         $this->assertSame('[]', $program->presentationjson);
-        $this->assertSame('0', $program->publicaccess);
         $this->assertSame('0', $program->archived);
         $this->assertSame($data->creategroups, $program->creategroups);
         $this->assertSame(null, $program->timeallocationstart);
@@ -197,9 +187,6 @@ final class program_test extends \advanced_testcase {
         $this->assertSame('{"type":"notset"}', $program->duedatejson);
         $this->assertSame('{"type":"notset"}', $program->enddatejson);
         $this->assertSame($oldprogram->timecreated, $program->timecreated);
-
-        $cohorts = $DB->get_records_menu('tool_muprog_cohort', ['programid' => $program->id], 'cohortid ASC', 'id, cohortid');
-        $this->assertSame([], array_values($cohorts));
 
         $this->assertDebuggingNotCalled();
         $data = (object)[
@@ -478,64 +465,7 @@ final class program_test extends \advanced_testcase {
         $this->assertSame('0', $program->archived);
     }
 
-    public function test_update_visibility(): void {
-        global $DB;
-
-        $syscontext = \context_system::instance();
-        $data = (object)[
-            'fullname' => 'Some program',
-            'idnumber' => 'SP1',
-            'contextid' => $syscontext->id,
-        ];
-
-        $this->setCurrentTimeStart();
-        $oldprogram = program::create($data);
-
-        $category = $this->getDataGenerator()->create_category([]);
-        $cohort1 = $this->getDataGenerator()->create_cohort();
-        $cohort2 = $this->getDataGenerator()->create_cohort();
-        $catcontext = \context_coursecat::instance($category->id);
-        $data = (object)[
-            'id' => $oldprogram->id,
-            'fullname' => 'Some other program',
-            'idnumber' => 'SP2',
-            'contextid' => $catcontext->id,
-            'description' => 'Some desc',
-            'descriptionformat' => '2',
-            'presentation' => ['some' => 'test'],
-            'publicaccess' => '1',
-            'cohortids' => [$cohort1->id, $cohort2->id],
-            'archived' => '1',
-            'creategroups' => '1',
-            'timeallocationstart' => (string)(time() - 60 * 60 * 24),
-            'timeallocationend' => (string)(time() + 60 * 60 * 24),
-        ];
-
-        $program = program::update_visibility($data);
-        $this->assertInstanceOf('stdClass', $program);
-        $this->assertSame($oldprogram->contextid, $program->contextid);
-        $this->assertSame($oldprogram->fullname, $program->fullname);
-        $this->assertSame($oldprogram->idnumber, $program->idnumber);
-        $this->assertSame($oldprogram->description, $program->description);
-        $this->assertSame($oldprogram->descriptionformat, $program->descriptionformat);
-        $this->assertSame('[]', $program->presentationjson);
-        $this->assertSame('1', $program->publicaccess);
-        $this->assertSame('0', $program->archived);
-        $this->assertSame('0', $program->creategroups);
-        $this->assertSame(null, $program->timeallocationstart);
-        $this->assertSame(null, $program->timeallocationend);
-        $this->assertSame('{"type":"allocation"}', $program->startdatejson);
-        $this->assertSame('{"type":"notset"}', $program->duedatejson);
-        $this->assertSame('{"type":"notset"}', $program->enddatejson);
-        $this->assertSame($oldprogram->timecreated, $program->timecreated);
-
-        $cohorts = $DB->get_records_menu('tool_muprog_cohort', ['programid' => $program->id], 'cohortid ASC', 'id, cohortid');
-        $this->assertSame($data->cohortids, array_values($cohorts));
-    }
-
     public function test_update_allocation(): void {
-        global $DB;
-
         $syscontext = \context_system::instance();
         $data = (object)[
             'fullname' => 'Some program',
@@ -547,8 +477,6 @@ final class program_test extends \advanced_testcase {
         $oldprogram = program::create($data);
 
         $category = $this->getDataGenerator()->create_category([]);
-        $cohort1 = $this->getDataGenerator()->create_cohort();
-        $cohort2 = $this->getDataGenerator()->create_cohort();
         $catcontext = \context_coursecat::instance($category->id);
         $data = (object)[
             'id' => $oldprogram->id,
@@ -558,8 +486,6 @@ final class program_test extends \advanced_testcase {
             'description' => 'Some desc',
             'descriptionformat' => '2',
             'presentation' => ['some' => 'test'],
-            'publicaccess' => '1',
-            'cohorts' => [$cohort1->id, $cohort2->id],
             'archived' => '1',
             'creategroups' => '1',
             'timeallocationstart' => (string)(time() - 60 * 60 * 24),
@@ -574,7 +500,6 @@ final class program_test extends \advanced_testcase {
         $this->assertSame($oldprogram->description, $program->description);
         $this->assertSame($oldprogram->descriptionformat, $program->descriptionformat);
         $this->assertSame('[]', $program->presentationjson);
-        $this->assertSame($oldprogram->publicaccess, $program->publicaccess);
         $this->assertSame($oldprogram->archived, $program->archived);
         $this->assertSame($oldprogram->creategroups, $program->creategroups);
         $this->assertSame($data->timeallocationstart, $program->timeallocationstart);
@@ -583,9 +508,6 @@ final class program_test extends \advanced_testcase {
         $this->assertSame('{"type":"notset"}', $program->duedatejson);
         $this->assertSame('{"type":"notset"}', $program->enddatejson);
         $this->assertSame($oldprogram->timecreated, $program->timecreated);
-
-        $cohorts = $DB->get_records_menu('tool_muprog_cohort', ['programid' => $program->id], 'cohortid ASC', 'id, cohortid');
-        $this->assertSame([], array_values($cohorts));
     }
 
     public function test_import_allocation(): void {
@@ -614,8 +536,6 @@ final class program_test extends \advanced_testcase {
             'description' => 'Some desc',
             'descriptionformat' => '2',
             'presentation' => ['some' => 'test'],
-            'publicaccess' => '1',
-            'cohorts' => [$cohort1->id, $cohort2->id],
             'archived' => '1',
             'creategroups' => '1',
             'timeallocationstart' => (string)(time() - 60 * 60 * 24),
@@ -875,5 +795,364 @@ final class program_test extends \advanced_testcase {
         $this->assertSame((string)$syscontext->id, $program1->contextid);
         $program2 = $DB->get_record('tool_muprog_program', ['id' => $program2->id], '*', MUST_EXIST);
         $this->assertSame((string)$syscontext->id, $program2->contextid);
+    }
+
+    public function test_get_catalogue_item(): void {
+        /** @var \tool_muprog_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
+        /** @var \tool_mucatalog_generator $cataloggenerator */
+        $cataloggenerator = $this->getDataGenerator()->get_plugin_generator('tool_mucatalog');
+
+        $guest = guest_user();
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+
+        $cohort1 = $this->getDataGenerator()->create_cohort();
+        cohort_add_member($cohort1->id, $user2->id);
+
+        $program1 = $generator->create_program();
+        $program2 = $generator->create_program();
+        $program3 = $generator->create_program();
+        $program4 = $generator->create_program();
+
+        // Catalogue is not active without active sections.
+        $this->setUser($user1);
+        $section0 = $cataloggenerator->create_section(['uservisible' => 1, 'status' => \tool_mucatalog\local\util::STATUS_DRAFT]);
+        $item0 = $cataloggenerator->create_item(['sectionid' => $section0->id, 'type' => 'program', 'referenceid' => $program1->id]);
+        $this->assertNull(program::get_catalogue_item($program1));
+        $this->assertNull(program::get_catalogue_item($program1, $user1->id));
+        $this->assertNull(program::get_catalogue_item($program1, $user2->id));
+
+        $section1 = $cataloggenerator->create_section(['uservisible' => 1, 'status' => \tool_mucatalog\local\util::STATUS_ACTIVE]);
+        $section2 = $cataloggenerator->create_section([
+            'uservisible' => 0,
+            'cohortvisible' => [$cohort1->id],
+            'status' => \tool_mucatalog\local\util::STATUS_ACTIVE,
+        ]);
+        $item1 = $cataloggenerator->create_item(['sectionid' => $section1->id, 'type' => 'program', 'referenceid' => $program1->id]);
+        $item2 = $cataloggenerator->create_item(['sectionid' => $section2->id, 'type' => 'program', 'referenceid' => $program2->id]);
+        $item3 = $cataloggenerator->create_item(['sectionid' => $section1->id, 'type' => 'program', 'referenceid' => $program3->id]);
+        $program3 = program::archive($program3->id);
+
+        $this->setUser($user1);
+        $this->assertEquals($item1, program::get_catalogue_item($program1));
+        $this->assertNull(program::get_catalogue_item($program2));
+        $this->assertNull(program::get_catalogue_item($program3));
+        $this->assertNull(program::get_catalogue_item($program4));
+        $this->assertEquals($item1, program::get_catalogue_item($program1, $user1->id));
+        $this->assertNull(program::get_catalogue_item($program2, $user1->id));
+        $this->assertNull(program::get_catalogue_item($program3, $user1->id));
+        $this->assertNull(program::get_catalogue_item($program4, $user1->id));
+        $this->assertEquals($item1, program::get_catalogue_item($program1, $user2->id));
+        $this->assertEquals($item2, program::get_catalogue_item($program2, $user2->id));
+        $this->assertNull(program::get_catalogue_item($program3, $user2->id));
+        $this->assertNull(program::get_catalogue_item($program4, $user2->id));
+        $this->assertNull(program::get_catalogue_item($program1, $guest->id));
+        $this->assertNull(program::get_catalogue_item($program2, $guest->id));
+        $this->assertNull(program::get_catalogue_item($program1, 0));
+
+        $this->setUser($user2);
+        $this->assertEquals($item1, program::get_catalogue_item($program1));
+        $this->assertEquals($item2, program::get_catalogue_item($program2));
+        $this->assertNull(program::get_catalogue_item($program3));
+        $this->assertNull(program::get_catalogue_item($program4));
+        $this->assertNull(program::get_catalogue_item($program2, $user1->id));
+
+        $this->setUser($guest);
+        $this->assertNull(program::get_catalogue_item($program1));
+        $this->setUser(null);
+        $this->assertNull(program::get_catalogue_item($program1));
+        $this->assertEquals($item1, program::get_catalogue_item($program1, $user1->id));
+
+        $section1 = \tool_mucatalog\local\section::update((object)['id' => $section1->id, 'guestvisible' => 1]);
+        $this->assertEquals($item1, program::get_catalogue_item($program1));
+        $this->assertEquals($item1, program::get_catalogue_item($program1, $guest->id));
+        $this->setUser($guest);
+        $this->assertEquals($item1, program::get_catalogue_item($program1));
+
+        // First visible item is used when there are multiple items.
+        $item4 = $cataloggenerator->create_item(['sectionid' => $section2->id, 'type' => 'program', 'referenceid' => $program1->id]);
+        $this->assertEquals($item1, program::get_catalogue_item($program1, $user1->id));
+        $this->assertEquals($item1, program::get_catalogue_item($program1, $user2->id));
+        $item1 = \tool_mucatalog\local\item\program::archive($item1->id);
+        $this->assertNull(program::get_catalogue_item($program1, $user1->id));
+        $this->assertEquals($item4, program::get_catalogue_item($program1, $user2->id));
+    }
+
+    public function test_get_catalogue_item_tenant(): void {
+        if (!\tool_mulib\local\mulib::is_mutenancy_available()) {
+            $this->markTestSkipped('tenant support not available');
+        }
+
+        \tool_mutenancy\local\tenancy::activate();
+
+        /** @var \tool_mutenancy_generator $tenantgenerator */
+        $tenantgenerator = $this->getDataGenerator()->get_plugin_generator('tool_mutenancy');
+        /** @var \tool_muprog_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
+        /** @var \tool_mucatalog_generator $cataloggenerator */
+        $cataloggenerator = $this->getDataGenerator()->get_plugin_generator('tool_mucatalog');
+
+        $tenant1 = $tenantgenerator->create_tenant();
+        $tenant2 = $tenantgenerator->create_tenant();
+
+        $user1 = $this->getDataGenerator()->create_user(['tenantid' => $tenant1->id]);
+        $user2 = $this->getDataGenerator()->create_user(['tenantid' => $tenant2->id]);
+        $user3 = $this->getDataGenerator()->create_user();
+
+        $catcontext1 = \context_coursecat::instance($tenant1->categoryid);
+        $catcontext2 = \context_coursecat::instance($tenant2->categoryid);
+
+        $program1 = $generator->create_program();
+        $program2 = $generator->create_program();
+
+        $section1 = $cataloggenerator->create_section(['uservisible' => 1, 'status' => \tool_mucatalog\local\util::STATUS_ACTIVE]);
+        $item1 = $cataloggenerator->create_item(['sectionid' => $section1->id, 'type' => 'program', 'referenceid' => $program1->id]);
+
+        $this->setUser($user1);
+        $this->assertEquals($item1, program::get_catalogue_item($program1));
+        $this->assertNull(program::get_catalogue_item($program2));
+        $this->assertEquals($item1, program::get_catalogue_item($program1, $user1->id));
+        $this->assertEquals($item1, program::get_catalogue_item($program1, $user2->id));
+        $this->assertEquals($item1, program::get_catalogue_item($program1, $user3->id));
+        \tool_mutenancy\local\tenancy::force_current_tenantid($tenant2->id);
+        $this->assertEquals($item1, program::get_catalogue_item($program1));
+        \tool_mutenancy\local\tenancy::unforce_current_tenantid();
+        \tool_mutenancy\local\tenancy::force_current_tenantid(null);
+        $this->assertEquals($item1, program::get_catalogue_item($program1));
+        \tool_mutenancy\local\tenancy::unforce_current_tenantid();
+
+        $program1 = program::move($program1->id, $catcontext1->id);
+
+        $this->setUser($user1);
+        $this->assertEquals($item1, program::get_catalogue_item($program1));
+        $this->assertEquals($item1, program::get_catalogue_item($program1, $user1->id));
+        $this->assertNull(program::get_catalogue_item($program1, $user2->id));
+        $this->assertEquals($item1, program::get_catalogue_item($program1, $user3->id));
+        \tool_mutenancy\local\tenancy::force_current_tenantid($tenant2->id);
+        $this->assertNull(program::get_catalogue_item($program1));
+        \tool_mutenancy\local\tenancy::unforce_current_tenantid();
+        \tool_mutenancy\local\tenancy::force_current_tenantid(null);
+        $this->assertEquals($item1, program::get_catalogue_item($program1));
+        \tool_mutenancy\local\tenancy::unforce_current_tenantid();
+
+        $this->setUser($user2);
+        $this->assertNull(program::get_catalogue_item($program1));
+        $this->setUser($user3);
+        $this->assertEquals($item1, program::get_catalogue_item($program1));
+
+        $program1 = program::move($program1->id, $catcontext2->id);
+
+        $this->setUser($user1);
+        $this->assertNull(program::get_catalogue_item($program1));
+        $this->assertNull(program::get_catalogue_item($program1, $user1->id));
+        $this->assertEquals($item1, program::get_catalogue_item($program1, $user2->id));
+        $this->assertEquals($item1, program::get_catalogue_item($program1, $user3->id));
+        \tool_mutenancy\local\tenancy::force_current_tenantid($tenant2->id);
+        $this->assertEquals($item1, program::get_catalogue_item($program1));
+        \tool_mutenancy\local\tenancy::unforce_current_tenantid();
+
+        // Sections may be hidden from tenant members.
+        $section1 = \tool_mucatalog\local\section::update((object)['id' => $section1->id, 'hiddenfromtenants' => 1]);
+        $this->assertNull(program::get_catalogue_item($program1, $user1->id));
+        $this->assertNull(program::get_catalogue_item($program1, $user2->id));
+        $this->assertEquals($item1, program::get_catalogue_item($program1, $user3->id));
+    }
+
+    public function test_get_catalogue_item_url(): void {
+        /** @var \tool_muprog_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
+        /** @var \tool_mucatalog_generator $cataloggenerator */
+        $cataloggenerator = $this->getDataGenerator()->get_plugin_generator('tool_mucatalog');
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+
+        $cohort1 = $this->getDataGenerator()->create_cohort();
+        cohort_add_member($cohort1->id, $user2->id);
+
+        $program1 = $generator->create_program();
+        $program2 = $generator->create_program();
+
+        $this->setUser($user2);
+        $this->assertNull(program::get_catalogue_item_url($program1));
+
+        $section1 = $cataloggenerator->create_section([
+            'uservisible' => 0,
+            'cohortvisible' => [$cohort1->id],
+            'status' => \tool_mucatalog\local\util::STATUS_ACTIVE,
+        ]);
+        $item1 = $cataloggenerator->create_item(['sectionid' => $section1->id, 'type' => 'program', 'referenceid' => $program1->id]);
+
+        $this->setUser($user1);
+        $this->assertNull(program::get_catalogue_item_url($program1));
+        $this->assertNull(program::get_catalogue_item_url($program2));
+
+        $this->setUser($user2);
+        $url = program::get_catalogue_item_url($program1);
+        $this->assertInstanceOf(\core\url::class, $url);
+        $this->assertSame("https://www.example.com/moodle/admin/tool/mucatalog/item.php?id=$item1->id", $url->out(false));
+        $this->assertNull(program::get_catalogue_item_url($program2));
+    }
+
+    public function test_get_catalogue_actions(): void {
+        global $DB;
+
+        /** @var \tool_muprog_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
+        /** @var \tool_mucatalog_generator $cataloggenerator */
+        $cataloggenerator = $this->getDataGenerator()->get_plugin_generator('tool_mucatalog');
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+
+        $cohort1 = $this->getDataGenerator()->create_cohort();
+        cohort_add_member($cohort1->id, $user1->id);
+
+        $program1 = $generator->create_program();
+        $program2 = $generator->create_program(['sources' => ['manual' => []]]);
+        $program3 = $generator->create_program(['sources' => ['manual' => [], 'selfallocation' => []]]);
+        $source3s = $DB->get_record('tool_muprog_source', ['programid' => $program3->id, 'type' => 'selfallocation'], '*', MUST_EXIST);
+        $program4 = $generator->create_program(['sources' => ['selfallocation' => [], 'approval' => []]]);
+        $source4s = $DB->get_record('tool_muprog_source', ['programid' => $program4->id, 'type' => 'selfallocation'], '*', MUST_EXIST);
+        $source4a = $DB->get_record('tool_muprog_source', ['programid' => $program4->id, 'type' => 'approval'], '*', MUST_EXIST);
+        $program5 = $generator->create_program(['sources' => ['selfallocation' => []]]);
+
+        $section1 = $cataloggenerator->create_section([
+            'uservisible' => 0,
+            'cohortvisible' => [$cohort1->id],
+            'status' => \tool_mucatalog\local\util::STATUS_ACTIVE,
+        ]);
+        $item1 = $cataloggenerator->create_item(['sectionid' => $section1->id, 'type' => 'program', 'referenceid' => $program1->id]);
+        $item2 = $cataloggenerator->create_item(['sectionid' => $section1->id, 'type' => 'program', 'referenceid' => $program2->id]);
+        $item3 = $cataloggenerator->create_item(['sectionid' => $section1->id, 'type' => 'program', 'referenceid' => $program3->id]);
+        $item4 = $cataloggenerator->create_item(['sectionid' => $section1->id, 'type' => 'program', 'referenceid' => $program4->id]);
+
+        $this->setUser($user1);
+        $this->assertSame([], program::get_catalogue_actions($program1));
+        $this->assertSame([], program::get_catalogue_actions($program2));
+        $actions = program::get_catalogue_actions($program3);
+        $this->assertCount(1, $actions);
+        $this->assertStringContainsString("/admin/tool/muprog/my/source_selfallocation.php?sourceid=$source3s->id", $actions[0]);
+        $actions = program::get_catalogue_actions($program4);
+        $this->assertCount(2, $actions);
+        $actions = implode('', $actions);
+        $this->assertStringContainsString("/admin/tool/muprog/my/source_selfallocation.php?sourceid=$source4s->id", $actions);
+        $this->assertStringContainsString("/admin/tool/muprog/my/source_approval_request.php?sourceid=$source4a->id", $actions);
+        // Not in catalogue.
+        $this->assertSame([], program::get_catalogue_actions($program5));
+
+        // Section not visible.
+        $this->setUser($user2);
+        $this->assertSame([], program::get_catalogue_actions($program1));
+        $this->assertSame([], program::get_catalogue_actions($program2));
+        $this->assertSame([], program::get_catalogue_actions($program3));
+        $this->assertSame([], program::get_catalogue_actions($program4));
+        $this->assertSame([], program::get_catalogue_actions($program5));
+
+        $this->setUser($user1);
+        $program3 = program::archive($program3->id);
+        $this->assertSame([], program::get_catalogue_actions($program3));
+    }
+
+    public function test_get_tagged_programs(): void {
+        global $DB;
+
+        /** @var \tool_muprog_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
+        /** @var \tool_mucatalog_generator $cataloggenerator */
+        $cataloggenerator = $this->getDataGenerator()->get_plugin_generator('tool_mucatalog');
+
+        $syscontext = \context_system::instance();
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $user3 = $this->getDataGenerator()->create_user();
+
+        $category1 = $this->getDataGenerator()->create_category([]);
+        $catcontext1 = \context_coursecat::instance($category1->id);
+
+        $cohort1 = $this->getDataGenerator()->create_cohort();
+        cohort_add_member($cohort1->id, $user2->id);
+        cohort_add_member($cohort1->id, $user3->id);
+
+        $program1 = $generator->create_program(['fullname' => 'Prvni']);
+        $program2 = $generator->create_program(['fullname' => 'Druhy']);
+        $program3 = $generator->create_program(['fullname' => 'Treti', 'archived' => 1, 'sources' => ['manual' => []]]);
+        $source3 = $DB->get_record('tool_muprog_source', ['programid' => $program3->id, 'type' => 'manual'], '*', MUST_EXIST);
+        $program4 = $generator->create_program(['fullname' => 'Ctvrty', 'contextid' => $catcontext1->id]);
+        $program5 = $generator->create_program(['fullname' => 'Paty']);
+        $program6 = $generator->create_program(['fullname' => 'Sesty', 'contextid' => $catcontext1->id, 'sources' => ['manual' => []]]);
+        $source6 = $DB->get_record('tool_muprog_source', ['programid' => $program6->id, 'type' => 'manual'], '*', MUST_EXIST);
+
+        \tool_muprog\local\source\manual::allocate_users($program3->id, $source3->id, [$user3->id]);
+        \tool_muprog\local\source\manual::allocate_users($program6->id, $source6->id, [$user3->id]);
+
+        $section1 = $cataloggenerator->create_section(['uservisible' => 1, 'status' => \tool_mucatalog\local\util::STATUS_ACTIVE]);
+        $section2 = $cataloggenerator->create_section([
+            'uservisible' => 0,
+            'cohortvisible' => [$cohort1->id],
+            'status' => \tool_mucatalog\local\util::STATUS_ACTIVE,
+        ]);
+        $cataloggenerator->create_item(['sectionid' => $section1->id, 'type' => 'program', 'referenceid' => $program1->id]);
+        $cataloggenerator->create_item(['sectionid' => $section2->id, 'type' => 'program', 'referenceid' => $program2->id]);
+        $cataloggenerator->create_item(['sectionid' => $section1->id, 'type' => 'program', 'referenceid' => $program3->id]);
+        $cataloggenerator->create_item(['sectionid' => $section2->id, 'type' => 'program', 'referenceid' => $program4->id]);
+        $cataloggenerator->create_item(['sectionid' => $section1->id, 'type' => 'program', 'referenceid' => $program5->id]);
+
+        foreach ([$program1, $program2, $program3, $program4, $program6] as $program) {
+            \core_tag_tag::set_item_tags('tool_muprog', 'tool_muprog_program', $program->id, $syscontext, ['Tag A']);
+        }
+        \core_tag_tag::set_item_tags('tool_muprog', 'tool_muprog_program', $program5->id, $syscontext, ['Tag B']);
+        $taga = $DB->get_record('tag', ['rawname' => 'Tag A'], '*', MUST_EXIST);
+        $tagb = $DB->get_record('tag', ['rawname' => 'Tag B'], '*', MUST_EXIST);
+
+        $link = function (\stdClass $program): string {
+            return 'href="https://www.example.com/moodle/admin/tool/muprog/my/program.php?id=' . $program->id . '"';
+        };
+
+        $this->setUser($user1);
+        $result = program::get_tagged_programs($taga->id, true, 0, 10);
+        $this->assertSame(1, $result['totalcount']);
+        $this->assertStringContainsString($link($program1), $result['content']);
+        $this->assertStringContainsString('Prvni', $result['content']);
+        $this->assertStringNotContainsString($link($program2), $result['content']);
+        $this->assertStringNotContainsString($link($program3), $result['content']);
+        $this->assertStringNotContainsString($link($program4), $result['content']);
+        $this->assertStringNotContainsString($link($program5), $result['content']);
+        $this->assertStringNotContainsString($link($program6), $result['content']);
+        $result = program::get_tagged_programs($tagb->id, false, 0, 10);
+        $this->assertSame(1, $result['totalcount']);
+        $this->assertStringContainsString($link($program5), $result['content']);
+        $this->assertStringNotContainsString($link($program1), $result['content']);
+
+        $this->setUser($user2);
+        $result = program::get_tagged_programs($taga->id, true, 0, 10);
+        $this->assertSame(3, $result['totalcount']);
+        $this->assertStringContainsString($link($program1), $result['content']);
+        $this->assertStringContainsString($link($program2), $result['content']);
+        $this->assertStringNotContainsString($link($program3), $result['content']);
+        $this->assertStringContainsString($link($program4), $result['content']);
+        $this->assertStringNotContainsString($link($program6), $result['content']);
+
+        $this->setUser($user3);
+        $result = program::get_tagged_programs($taga->id, true, 0, 10);
+        $this->assertSame(4, $result['totalcount']);
+        $this->assertStringContainsString($link($program1), $result['content']);
+        $this->assertStringContainsString($link($program2), $result['content']);
+        $this->assertStringNotContainsString($link($program3), $result['content']);
+        $this->assertStringContainsString($link($program4), $result['content']);
+        $this->assertStringContainsString($link($program6), $result['content']);
+
+        // Ordered by name with paging.
+        $result = program::get_tagged_programs($taga->id, true, 1, 2);
+        $this->assertSame(4, $result['totalcount']);
+        $this->assertStringNotContainsString($link($program4), $result['content']);
+        $this->assertStringContainsString($link($program2), $result['content']);
+        $this->assertStringContainsString($link($program1), $result['content']);
+        $this->assertStringNotContainsString($link($program6), $result['content']);
+
+        $result = program::get_tagged_programs($tagb->id + 1000, true, 0, 10);
+        $this->assertSame(['content' => '', 'totalcount' => 0], $result);
     }
 }

@@ -33,13 +33,13 @@ Feature: Program export tests
       | manager2  | pmanager      | Category     | CAT2      |
       | manager2  | pmanager      | Category     | CAT3      |
     When the following "tool_muprog > programs" exist:
-      | fullname    | idnumber | category   | publicaccess |
-      | Program 000 | PR0      |            | 0            |
-      | Program 001 | PR1      | Category 1 | 1            |
-      | Program 002 | PR2      | Category 2 | 0            |
-      | Program 003 | PR3      | Category 3 | 0            |
-      | Program 004 | PR4      | Category 2 | 0            |
-      | Program 005 | PR5      | Category 2 | 0            |
+      | fullname    | idnumber | category   |
+      | Program 000 | PR0      |            |
+      | Program 001 | PR1      | Category 1 |
+      | Program 002 | PR2      | Category 2 |
+      | Program 003 | PR3      | Category 3 |
+      | Program 004 | PR4      | Category 2 |
+      | Program 005 | PR5      | Category 2 |
 
   Scenario: Site program manager may export programs
     Given I log in as "manager1"

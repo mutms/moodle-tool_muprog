@@ -119,7 +119,7 @@ abstract class base extends \tool_mulib\local\notification\notificationtype {
             if (has_capability('tool/muprog:view', $context, $supervisoruser)) {
                 $a['program_url'] = (new \core\url('/admin/tool/muprog/management/allocation.php', ['id' => $allocation->id]))->out(false);
             } else {
-                $a['program_url'] = (new \core\url('/admin/tool/muprog/catalogue/program.php', ['id' => $program->id]))->out(false);
+                $a['program_url'] = (new \core\url('/admin/tool/muprog/my/program.php', ['id' => $program->id]))->out(false);
             }
             if (isset($supervisoruser->supervisortitle)) {
                 $a['supervisor_title'] = format_string($supervisoruser->supervisortitle);

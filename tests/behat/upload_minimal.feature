@@ -51,10 +51,10 @@ Feature: Program minimal upload tests
       | P02      | OK     | Program 02 | -          |
     And I press "Upload programs"
     Then the following should exist in the "reportbuilder-table" table:
-      | Program name | Program ID | Courses | Allocations | Public |
-      | Program 00   | P00        | 2       | 0           | No     |
-      | Program 01   | P01        | 0       | 0           | No     |
-      | Program 02   | P02        | 0       | 0           | No     |
+      | Program name | Program ID | Courses | Allocations |
+      | Program 00   | P00        | 2       | 0           |
+      | Program 01   | P01        | 0       | 0           |
+      | Program 02   | P02        | 0       | 0           |
     And I follow "Program 00"
     And I should see "Program 00" in the "Program name" definition list item
     And I should see "No" in the "Archived" definition list item
@@ -93,7 +93,7 @@ Feature: Program minimal upload tests
       | P02      | OK     | Program 02 | -          |
     And I press "Upload programs"
     Then the following should exist in the "reportbuilder-table" table:
-      | Program name | Program ID | Courses | Allocations | Public |
-      | Program 00   | P00        | 0       | 0           | No     |
-      | Program 01   | P01        | 0       | 0           | No     |
-      | Program 02   | P02        | 0       | 0           | No     |
+      | Program name | Program ID | Courses | Allocations |
+      | Program 00   | P00        | 0       | 0           |
+      | Program 01   | P01        | 0       | 0           |
+      | Program 02   | P02        | 0       | 0           |

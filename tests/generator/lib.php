@@ -102,15 +102,6 @@ class tool_muprog_generator extends component_generator_base {
         }
         unset($record->sources);
 
-        $cohorts = [];
-        if (!empty($record->cohortids)) {
-            $cohorts = $record->cohortids;
-        } else if (!empty($record->cohorts)) {
-            $cohorts = $record->cohorts;
-        }
-        unset($record->cohorts);
-        unset($record->cohortids);
-
         $image = null;
         if (!empty($record->image)) {
             $image = $record->image;
@@ -118,23 +109,6 @@ class tool_muprog_generator extends component_generator_base {
         unset($record->image);
 
         $program = tool_muprog\local\program::create($record);
-
-        if ($cohorts) {
-            $cohortids = [];
-            if (!is_array($cohorts)) {
-                $cohorts = explode(',', $cohorts);
-            }
-            foreach ($cohorts as $cohort) {
-                $cohort = trim($cohort);
-                if (is_number($cohort)) {
-                    $cohortids[] = $cohort;
-                } else {
-                    $record = $DB->get_record('cohort', ['name' => $cohort], '*', MUST_EXIST);
-                    $cohortids[] = $record->id;
-                }
-            }
-            \tool_muprog\local\program::update_visibility((object)['id' => $program->id, 'publicaccess' => $program->publicaccess, 'cohortids' => $cohortids]);
-        }
 
         foreach ($sources as $source => $data) {
             $data['enable'] = 1;

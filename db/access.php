@@ -29,15 +29,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
-    /* Access program catalogue - catalogue uses program.publicaccess, visible cohorts and own allocations. */
-    'tool/muprog:viewcatalogue' => [
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_SYSTEM,
-        'archetypes' => [
-            'user' => CAP_ALLOW,
-        ],
-    ],
-
     /* View programs in profile of other users */
     'tool/muprog:viewuserprograms' => [
         'captype' => 'read',

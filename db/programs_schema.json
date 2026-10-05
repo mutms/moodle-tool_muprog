@@ -31,9 +31,6 @@
             "descriptionformat": {
               "enum": [0, 1, 2, 3, 4]
             },
-            "publicaccess": {
-              "enum": [0, 1]
-            },
             "creategroups": {
               "enum": [0, 1]
             },

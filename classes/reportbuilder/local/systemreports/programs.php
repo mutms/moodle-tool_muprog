@@ -78,7 +78,6 @@ final class programs extends system_report {
             'program:context',
             'program:coursecount',
             'program:allocationcount',
-            'program:publicaccess',
             'program:archived',
         ];
         $this->add_columns_from_entities($columns);
@@ -93,7 +92,6 @@ final class programs extends system_report {
         $filters = [
             'program:fullname',
             'program:idnumber',
-            'program:publicaccess',
             'program:archived',
         ];
         $this->add_filters_from_entities($filters);

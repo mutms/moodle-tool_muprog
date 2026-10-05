@@ -177,40 +177,6 @@ final class management_test extends \advanced_testcase {
         $this->assertSame([], $programids);
     }
 
-    public function test_fetch_current_cohorts_menu(): void {
-        /** @var \tool_muprog_generator $generator */
-        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
-
-        $cohort1 = $this->getDataGenerator()->create_cohort(['name' => 'Cohort A']);
-        $cohort2 = $this->getDataGenerator()->create_cohort(['name' => 'Cohort B']);
-        $cohort3 = $this->getDataGenerator()->create_cohort(['name' => 'Cohort C']);
-
-        $program1 = $generator->create_program();
-        $program2 = $generator->create_program();
-        $program3 = $generator->create_program();
-
-        \tool_muprog\local\program::update_visibility((object)[
-            'id' => $program1->id,
-            'publicaccess' => 0,
-            'cohortids' => [$cohort1->id, $cohort2->id],
-        ]);
-        \tool_muprog\local\program::update_visibility((object)[
-            'id' => $program2->id,
-            'publicaccess' => 1,
-            'cohortids' => [$cohort3->id],
-        ]);
-
-        $expected = [
-            $cohort1->id => $cohort1->name,
-            $cohort2->id => $cohort2->name,
-        ];
-        $menu = management::fetch_current_cohorts_menu($program1->id);
-        $this->assertSame($expected, $menu);
-
-        $menu = management::fetch_current_cohorts_menu($program3->id);
-        $this->assertSame([], $menu);
-    }
-
     public function test_setup_index_page(): void {
         global $PAGE;
 

@@ -37,8 +37,8 @@ Feature: Program offline attendance completion tests
       | admin1    | padmin        | System       |           |
       | viewer1   | pviewer       | Category     | CAT1      |
     And the following "tool_muprog > programs" exist:
-      | fullname    | idnumber | category | publicaccess |
-      | Program 001 | PR1      | Cat 1    | 1            |
+      | fullname    | idnumber | category |
+      | Program 001 | PR1      | Cat 1    |
     And the following "tool_muprog > program_items" exist:
       | program     | type       | fullname             | course   | completiondelay |
       | Program 001 | attendance | Car test drive       |          |                 |

@@ -182,24 +182,16 @@ class renderer extends \plugin_renderer_base {
     }
 
     /**
-     * Render program visibility.
+     * Render list of catalogue sections that include the program.
      *
      * @param stdClass $program
      * @return string
      */
     public function render_program_visibility(stdClass $program): string {
-        $details = new \tool_mulib\output\entity_details();
+        /** @var \tool_mucatalog\output\management\renderer $catalogoutput */
+        $catalogoutput = $this->page->get_renderer('tool_mucatalog', 'management');
 
-        $details->add(get_string('publicaccess', 'tool_muprog'), ($program->publicaccess ? get_string('yes') : get_string('no')));
-        $cohorts = management::fetch_current_cohorts_menu($program->id);
-        if ($cohorts) {
-            $cohrotsstr = implode(', ', array_map('format_string', $cohorts));
-        } else {
-            $cohrotsstr = '-';
-        }
-        $details->add(get_string('cohorts', 'tool_muprog'), $cohrotsstr);
-
-        return $this->output->render($details);
+        return $catalogoutput->render_reference_sections('program', $program->id);
     }
 
     /**
@@ -909,5 +901,82 @@ class renderer extends \plugin_renderer_base {
         }
 
         return $this->output->render($details);
+    }
+
+    /**
+     * Render program content.
+     *
+     * @param stdClass $program
+     * @return string
+     */
+    public function render_program_content(stdClass $program): string {
+        global $DB;
+
+        $top = program::load_content($program->id);
+
+        $rows = [];
+        $renderercolumns = function (item $item, $itemdepth) use (&$renderercolumns, &$rows, &$DB): void {
+            $fullname = $item->get_fullname();
+            $id = $item->get_id();
+            $padding = str_repeat('&nbsp;', $itemdepth * 6);
+
+            $completiontype = '';
+            if ($item instanceof set) {
+                $completiontype = $item->get_sequencetype_info();
+            }
+            if ($completiondelay = $item->get_completiondelay()) {
+                if ($completiontype !== '') {
+                    $completiontype .= '<br />';
+                }
+                $completiontype .= '<small>' . get_string('completiondelay', 'tool_muprog') . ': ' . util::format_duration($completiondelay) . '</small>';
+            }
+
+            if ($item instanceof course) {
+                $courseid = $item->get_courseid();
+                $coursecontext = \context_course::instance($courseid, IGNORE_MISSING);
+                if ($coursecontext) {
+                    $canaccesscourse = false;
+                    if (has_capability('moodle/course:view', $coursecontext)) {
+                        $canaccesscourse = true;
+                    } else {
+                        $course = get_course($courseid);
+                        if ($course && can_access_course($course, null, '', true)) {
+                            $canaccesscourse = true;
+                        }
+                    }
+                    if ($canaccesscourse) {
+                        $detailurl = new \core\url('/course/view.php', ['id' => $courseid]);
+                        $fullname = \html_writer::link($detailurl, $fullname);
+                    }
+                } else {
+                    $fullname .= ' <span class="badge bg-danger">' . get_string('errorcoursemissing', 'tool_muprog') . '</span>';
+                }
+            }
+
+            if ($item instanceof top) {
+                $itemname = $this->output->pix_icon('itemtop', get_string('program', 'tool_muprog'), 'tool_muprog') . '&nbsp;' . $fullname;
+            } else if ($item instanceof course) {
+                $itemname = $padding . $this->output->pix_icon('itemcourse', get_string('course'), 'tool_muprog') . $fullname;
+            } else {
+                $itemname = $padding . $this->output->pix_icon('itemset', get_string('set', 'tool_muprog'), 'tool_muprog') . $fullname;
+            }
+
+            $row = [$itemname, $completiontype];
+
+            $rows[] = $row;
+
+            foreach ($item->get_children() as $child) {
+                $renderercolumns($child, $itemdepth + 1);
+            }
+        };
+        $renderercolumns($top, 0);
+
+        $table = new \html_table();
+        $table->head = [get_string('item', 'tool_muprog'), get_string('sequencetype', 'tool_muprog')];
+        $table->id = 'program_content';
+        $table->attributes['class'] = 'table table-striped table-hover table-bordered';
+        $table->data = $rows;
+
+        return \html_writer::table($table);
     }
 }

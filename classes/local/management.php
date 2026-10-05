@@ -106,25 +106,6 @@ final class management {
     }
 
     /**
-     * Fetch cohorts that allow program visibility.
-     *
-     * @param int $programid
-     * @return array
-     */
-    public static function fetch_current_cohorts_menu(int $programid): array {
-        global $DB;
-
-        $sql = "SELECT c.id, c.name
-                  FROM {cohort} c
-                  JOIN {tool_muprog_cohort} pc ON c.id = pc.cohortid
-                 WHERE pc.programid = :programid
-              ORDER BY c.name ASC, c.id ASC";
-        $params = ['programid' => $programid];
-
-        return $DB->get_records_sql_menu($sql, $params);
-    }
-
-    /**
      * Set up $PAGE for programs management UI.
      *
      * @param url $pageurl

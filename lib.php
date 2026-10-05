@@ -39,7 +39,7 @@
  * @return void
  */
 function tool_muprog_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = []) {
-    global $DB;
+    global $DB, $USER;
 
     if ($context->contextlevel != CONTEXT_SYSTEM) {
         send_file_not_found();
@@ -65,7 +65,8 @@ function tool_muprog_pluginfile($course, $cm, $context, $filearea, $args, $force
     $programcontext = context::instance_by_id($program->contextid);
     if (
         !has_capability('tool/muprog:view', $programcontext)
-        && !\tool_muprog\local\catalogue::is_program_visible($program)
+        && !$DB->record_exists('tool_muprog_allocation', ['programid' => $program->id, 'userid' => $USER->id, 'archived' => 0])
+        && !\tool_muprog\local\program::get_catalogue_item($program)
     ) {
         send_file_not_found();
     }
@@ -159,7 +160,6 @@ function tool_muprog_myprofile_navigation(core_user\output\myprofile\tree $tree,
 function tool_muprog_get_fontawesome_icon_map() {
     return [
         'tool_muprog:appenditem' => 'fa-plus-square',
-        'tool_muprog:catalogue' => 'fa-cubes',
         'tool_muprog:deleteitem' => 'fa-trash-o',
         'tool_muprog:import' => 'fa-copy',
         'tool_muprog:itemcourse' => 'fa-graduation-cap',
@@ -194,7 +194,7 @@ function tool_muprog_get_tagged_programs($tag, $exclusivemode = false, $fromctx 
 
     $perpage = $exclusivemode ? 20 : 5;
 
-    $result = \tool_muprog\local\catalogue::get_tagged_programs($tag->id, $exclusivemode, $page * $perpage, $perpage);
+    $result = \tool_muprog\local\program::get_tagged_programs($tag->id, $exclusivemode, $page * $perpage, $perpage);
 
     $content = $result['content'];
     $totalpages = ceil($result['totalcount'] / $perpage);

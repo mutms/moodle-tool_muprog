@@ -48,9 +48,6 @@ final class get_programs_test extends \advanced_testcase {
         $category1 = $this->getDataGenerator()->create_category([]);
         $catcontext1 = \context_coursecat::instance($category1->id);
 
-        $cohort1 = $this->getDataGenerator()->create_cohort();
-        $cohort2 = $this->getDataGenerator()->create_cohort();
-
         $admin = get_admin();
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
@@ -66,27 +63,22 @@ final class get_programs_test extends \advanced_testcase {
             'idnumber' => 'p1',
             'description' => 'some desc 1',
             'descriptionformat' => \FORMAT_MARKDOWN,
-            'publicaccess' => 1,
             'archived' => 0,
             'contextid' => $syscontext->id,
             'sources' => ['manual' => []],
-            'cohorts' => [$cohort1->id],
         ]);
         $program2 = $generator->create_program([
             'fullname' => 'pokus',
             'idnumber' => 'p2',
             'description' => '<b>some desc 2</b>',
             'descriptionformat' => \FORMAT_HTML,
-            'publicaccess' => 0,
             'archived' => 0,
             'contextid' => $catcontext1->id,
             'sources' => ['manual' => [], 'cohort' => []],
-            'cohorts' => [$cohort1->id, $cohort2->id],
         ]);
         $program3 = $generator->create_program([
             'fullname' => 'Prog3',
             'idnumber' => 'p3',
-            'publicaccess' => 1,
             'archived' => 1,
             'contextid' => $syscontext->id,
             'sources' => ['manual' => []],
@@ -107,7 +99,6 @@ final class get_programs_test extends \advanced_testcase {
         $this->assertSame($program1->description, $result->description);
         $this->assertSame((int)$program1->descriptionformat, $result->descriptionformat);
         $this->assertSame('[]', $result->presentationjson);
-        $this->assertSame(true, $result->publicaccess);
         $this->assertSame(false, $result->archived);
         $this->assertSame(false, $result->creategroups);
         $this->assertSame(null, $result->timeallocationstart);
@@ -117,7 +108,6 @@ final class get_programs_test extends \advanced_testcase {
         $this->assertSame('{"type":"notset"}', $result->enddatejson);
         $this->assertSame((int)$program1->timecreated, $result->timecreated);
         $this->assertSame(['manual'], $result->sources);
-        $this->assertSame([], $result->cohortids);
 
         $result = $results[1];
         $this->assertIsArray($result);
@@ -129,7 +119,6 @@ final class get_programs_test extends \advanced_testcase {
         $this->assertSame($program2->description, $result->description);
         $this->assertSame((int)$program2->descriptionformat, $result->descriptionformat);
         $this->assertSame('[]', $result->presentationjson);
-        $this->assertSame(false, $result->publicaccess);
         $this->assertSame(false, $result->archived);
         $this->assertSame(false, $result->creategroups);
         $this->assertSame(null, $result->timeallocationstart);
@@ -139,7 +128,6 @@ final class get_programs_test extends \advanced_testcase {
         $this->assertSame('{"type":"notset"}', $result->enddatejson);
         $this->assertSame((int)$program2->timecreated, $result->timecreated);
         $this->assertSame(['cohort', 'manual'], $result->sources);
-        $this->assertSame([(int)$cohort1->id, (int)$cohort2->id], $result->cohortids);
 
         $result = $results[2];
         $this->assertIsArray($result);
@@ -151,7 +139,6 @@ final class get_programs_test extends \advanced_testcase {
         $this->assertSame($program3->description, $result->description);
         $this->assertSame((int)$program3->descriptionformat, $result->descriptionformat);
         $this->assertSame('[]', $result->presentationjson);
-        $this->assertSame(true, $result->publicaccess);
         $this->assertSame(true, $result->archived);
         $this->assertSame(false, $result->creategroups);
         $this->assertSame(null, $result->timeallocationstart);
@@ -161,7 +148,6 @@ final class get_programs_test extends \advanced_testcase {
         $this->assertSame('{"type":"notset"}', $result->enddatejson);
         $this->assertSame((int)$program3->timecreated, $result->timecreated);
         $this->assertSame(['manual'], $result->sources);
-        $this->assertSame([], $result->cohortids);
 
         $response = get_programs::execute([['field' => 'id', 'value' => $program1->id]]);
         $results = get_programs::clean_returnvalue(get_programs::execute_returns(), $response);
@@ -184,35 +170,11 @@ final class get_programs_test extends \advanced_testcase {
         $this->assertEquals($program1->id, $results[0]['id']);
         $this->assertEquals($program3->id, $results[1]['id']);
 
-        $response = get_programs::execute([['field' => 'publicaccess', 'value' => 1]]);
-        $results = get_programs::clean_returnvalue(get_programs::execute_returns(), $response);
-        $this->assertCount(2, $results);
-        $this->assertEquals($program1->id, $results[0]['id']);
-        $this->assertEquals($program3->id, $results[1]['id']);
-
         $response = get_programs::execute([['field' => 'archived', 'value' => 0]]);
         $results = get_programs::clean_returnvalue(get_programs::execute_returns(), $response);
         $this->assertCount(2, $results);
         $this->assertEquals($program1->id, $results[0]['id']);
         $this->assertEquals($program2->id, $results[1]['id']);
-
-        $response = get_programs::execute([['field' => 'id', 'value' => $program1->id], ['field' => 'publicaccess', 'value' => 1]]);
-        $results = get_programs::clean_returnvalue(get_programs::execute_returns(), $response);
-        $this->assertCount(1, $results);
-        $this->assertEquals($program1->id, $results[0]['id']);
-
-        $response = get_programs::execute([['field' => 'id', 'value' => $program1->id], ['field' => 'publicaccess', 'value' => true]]);
-        $results = get_programs::clean_returnvalue(get_programs::execute_returns(), $response);
-        $this->assertCount(1, $results);
-        $this->assertEquals($program1->id, $results[0]['id']);
-
-        $response = get_programs::execute([['field' => 'id', 'value' => $program1->id], ['field' => 'publicaccess', 'value' => 0]]);
-        $results = get_programs::clean_returnvalue(get_programs::execute_returns(), $response);
-        $this->assertCount(0, $results);
-
-        $response = get_programs::execute([['field' => 'id', 'value' => $program1->id], ['field' => 'publicaccess', 'value' => false]]);
-        $results = get_programs::clean_returnvalue(get_programs::execute_returns(), $response);
-        $this->assertCount(0, $results);
 
         $this->setUser($user1);
         $response = get_programs::execute([]);
@@ -288,13 +250,11 @@ final class get_programs_test extends \advanced_testcase {
         ]);
         $program2 = $generator->create_program([
             'fullname' => 'Prog 2',
-            'publicaccess' => 1,
             'contextid' => $tenantcontext2->id,
             'sources' => ['manual' => []],
         ]);
         $program3 = $generator->create_program([
             'fullname' => 'Prog 3',
-            'publicaccess' => 0,
             'contextid' => $tenantsubcontext2->id,
             'sources' => ['manual' => []],
         ]);
@@ -325,10 +285,5 @@ final class get_programs_test extends \advanced_testcase {
         $this->assertCount(2, $results);
         $this->assertEquals($program2->id, $results[0]['id']);
         $this->assertEquals($program3->id, $results[1]['id']);
-
-        $response = get_programs::execute([['field' => 'tenantid', 'value' => $tenant2->id], ['field' => 'publicaccess', 'value' => 1]]);
-        $results = get_programs::clean_returnvalue(get_programs::execute_returns(), $response);
-        $this->assertCount(1, $results);
-        $this->assertEquals($program2->id, $results[0]['id']);
     }
 }

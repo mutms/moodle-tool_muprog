@@ -73,7 +73,7 @@ final class program_viewed extends \core\event\base {
      * @return \core\url
      */
     public function get_url() {
-        return new \core\url('/admin/tool/muprog/catalogue/program.php', ['id' => $this->objectid]);
+        return new \core\url('/admin/tool/muprog/my/program.php', ['id' => $this->objectid]);
     }
 
     /**

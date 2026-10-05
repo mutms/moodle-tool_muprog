@@ -47,35 +47,27 @@ final class program_content_import_fromprogram_test extends \advanced_testcase {
         $category1 = $this->getDataGenerator()->create_category([]);
         $catcontext1 = \context_coursecat::instance($category1->id);
 
-        $cohort1 = $this->getDataGenerator()->create_cohort();
-        $cohort2 = $this->getDataGenerator()->create_cohort();
-
         $program1 = $generator->create_program([
             'fullname' => 'hokus',
             'idnumber' => 'p1',
             'description' => 'some desc 1',
             'descriptionformat' => \FORMAT_MARKDOWN,
-            'publicaccess' => 1,
             'archived' => 0,
             'contextid' => $syscontext->id,
             'sources' => ['manual' => []],
-            'cohorts' => [$cohort1->id],
         ]);
         $program2 = $generator->create_program([
             'fullname' => 'pokus',
             'idnumber' => 'p2',
             'description' => '<b>some desc 2</b>',
             'descriptionformat' => \FORMAT_HTML,
-            'publicaccess' => 0,
             'archived' => 0,
             'contextid' => $catcontext1->id,
             'sources' => ['manual' => [], 'cohort' => []],
-            'cohorts' => [$cohort1->id, $cohort2->id],
         ]);
         $program3 = $generator->create_program([
             'fullname' => 'Prog3',
             'idnumber' => 'p3',
-            'publicaccess' => 1,
             'archived' => 1,
             'contextid' => $syscontext->id,
             'sources' => ['manual' => []],

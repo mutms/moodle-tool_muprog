@@ -92,6 +92,7 @@ jobs:
         run: |
           moodle-plugin-ci add-plugin --branch $MOODLE_BRANCH mutms/moodle-tool_certificate
           moodle-plugin-ci add-plugin --branch $MOODLE_BRANCH mutms/moodle-tool_mulib
+          moodle-plugin-ci add-plugin --branch $MOODLE_BRANCH mutms/moodle-tool_mucatalog
           moodle-plugin-ci add-plugin --branch $MOODLE_BRANCH mutms/moodle-enrol_muprog
           moodle-plugin-ci add-plugin --branch $MOODLE_BRANCH mutms/moodle-block_muprog_my
           moodle-plugin-ci add-plugin --branch $MOODLE_BRANCH mutms/moodle-block_muprogmyoverview

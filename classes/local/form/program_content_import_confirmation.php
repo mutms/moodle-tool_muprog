@@ -52,9 +52,9 @@ final class program_content_import_confirmation extends form {
         $message = $renderer->notification($message, \core\notification::INFO);
         $this->add(new inforawhtml('confirmation', '', $message));
 
-        /** @var \tool_muprog\output\catalogue\renderer $catalogueoutput */
-        $catalogueoutput = $PAGE->get_renderer('tool_muprog', 'catalogue', RENDERER_TARGET_GENERAL);
-        $this->add(new inforawhtml('content', '', $catalogueoutput->render_program_content($fromprogram)));
+        /** @var \tool_muprog\output\management\renderer $managementoutput */
+        $managementoutput = $PAGE->get_renderer('tool_muprog', 'management', RENDERER_TARGET_GENERAL);
+        $this->add(new inforawhtml('content', '', $managementoutput->render_program_content($fromprogram)));
 
         $this->add(new buttons('buttons'));
         $this->add(new submit('submit', get_string('importprogramcontent', 'tool_muprog')), 'buttons');

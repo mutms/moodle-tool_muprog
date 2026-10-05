@@ -60,7 +60,6 @@ final class generator_test extends \advanced_testcase {
         $this->assertSame('', $program->description);
         $this->assertSame('1', $program->descriptionformat);
         $this->assertSame('[]', $program->presentationjson);
-        $this->assertSame('0', $program->publicaccess);
         $this->assertSame('0', $program->archived);
         $this->assertSame('0', $program->creategroups);
         $this->assertSame(null, $program->timeallocationstart);
@@ -73,9 +72,6 @@ final class generator_test extends \advanced_testcase {
         $sources = $DB->get_records('tool_muprog_source', ['programid' => $program->id]);
         $this->assertCount(0, $sources);
 
-        $cohort1 = $this->getDataGenerator()->create_cohort();
-        $cohort2 = $this->getDataGenerator()->create_cohort();
-
         $category = $this->getDataGenerator()->create_category([]);
         $catcontext = \context_coursecat::instance($category->id);
         $data = (object)[
@@ -85,13 +81,11 @@ final class generator_test extends \advanced_testcase {
             'description' => 'Some desc',
             'descriptionformat' => '2',
             'presentation' => ['some' => 'test'],
-            'publicaccess' => '1',
             'archived' => '1',
             'creategroups' => '1',
             'timeallocationstart' => (string)(time() - 60 * 60 * 24),
             'timeallocationend' => (string)(time() + 60 * 60 * 24),
             'sources' => ['manual' => []],
-            'cohorts' => [$cohort1->id, $cohort2->name],
         ];
 
         $this->setCurrentTimeStart();
@@ -103,7 +97,6 @@ final class generator_test extends \advanced_testcase {
         $this->assertSame($data->description, $program->description);
         $this->assertSame($data->descriptionformat, $program->descriptionformat);
         $this->assertSame('[]', $program->presentationjson);
-        $this->assertSame($data->publicaccess, $program->publicaccess);
         $this->assertSame($data->archived, $program->archived);
         $this->assertSame($data->creategroups, $program->creategroups);
         $this->assertSame($data->timeallocationstart, $program->timeallocationstart);
@@ -117,11 +110,6 @@ final class generator_test extends \advanced_testcase {
         $this->assertCount(1, $sources);
         $source = reset($sources);
         $this->assertSame('manual', $source->type);
-        $cs = $DB->get_records('tool_muprog_cohort', ['programid' => $program->id], 'cohortid ASC');
-        $this->assertCount(2, $cs);
-        $cs = array_values($cs);
-        $this->assertSame($cohort1->id, $cs[0]->cohortid);
-        $this->assertSame($cohort2->id, $cs[1]->cohortid);
 
         $category2 = $this->getDataGenerator()->create_category(['name' => 'Cat 2', 'idnumber' => 'CT2']);
         $catcontext2 = \context_coursecat::instance($category2->id);
@@ -130,17 +118,6 @@ final class generator_test extends \advanced_testcase {
 
         $program = $generator->create_program(['category' => $category2->idnumber]);
         $this->assertSame((string)$catcontext2->id, $program->contextid);
-
-        $data = (object)[
-            'cohortids' => "$cohort1->name, $cohort2->id",
-        ];
-        $program = $generator->create_program($data);
-        $cs = $DB->get_records('tool_muprog_cohort', ['programid' => $program->id]);
-        $this->assertCount(2, $cs);
-        $this->assertCount(2, $cs);
-        $cs = array_values($cs);
-        $this->assertSame($cohort1->id, $cs[0]->cohortid);
-        $this->assertSame($cohort2->id, $cs[1]->cohortid);
 
         $data = (object)[
             'sources' => 'manual, cohort',

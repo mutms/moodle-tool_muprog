@@ -257,7 +257,7 @@ final class notification_manager extends \tool_mulib\local\notification\manager 
     public static function delete_program_notifications(stdClass $program) {
         global $DB;
 
-        if (!property_exists($program, 'publicaccess')) {
+        if (!property_exists($program, 'presentationjson')) {
             debugging('Invalid program parameter', DEBUG_DEVELOPER);
             return;
         }

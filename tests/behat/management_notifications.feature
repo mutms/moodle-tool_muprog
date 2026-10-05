@@ -138,9 +138,9 @@ Feature: Program notifications management tests
   @javascript
   Scenario: Manager can import notification from one program to another
     Given the following "tool_muprog > programs" exist:
-      | fullname    | idnumber | category | cohorts  | publicaccess |
-      | Program 000 | PR0      |          |          |              |
-      | Program 001 | PR1      |          |          | 1            |
+      | fullname    | idnumber | category |
+      | Program 000 | PR0      |          |
+      | Program 001 | PR1      |          |
     And the following "permission overrides" exist:
       | capability                  | permission | role     | contextlevel | reference |
       | tool/muprog:clone           | Allow      | pmanager | System       |           |

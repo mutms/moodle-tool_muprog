@@ -118,7 +118,6 @@ Feature: General programs management tests
     And I should see "Algebra" in the "Tags" definition list item
     And I am on the "Cat 2" "tool_muprog > Program management" page
     And "PR01" row "Program name" column of "reportbuilder-table" table should contain "Program 001"
-    And "PR01" row "Public" column of "reportbuilder-table" table should contain "No"
     And "PR01" row "Courses" column of "reportbuilder-table" table should contain "0"
     And "PR01" row "Allocations" column of "reportbuilder-table" table should contain "0"
 

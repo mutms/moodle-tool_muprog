@@ -80,9 +80,9 @@ $manageurl = \tool_muprog\local\management::get_management_url();
 if ($manageurl) {
     $actions->get_dropdown()->add_item(get_string('management', 'tool_muprog'), $manageurl);
 }
-$catalogueurl = \tool_muprog\local\catalogue::get_catalogue_url();
+$catalogueurl = \tool_mucatalog\local\catalogue::get_catalogue_url();
 if ($catalogueurl) {
-    $button = html_writer::link($catalogueurl, get_string('catalogue', 'tool_muprog'), ['class' => 'btn btn-secondary']);
+    $button = html_writer::link($catalogueurl, get_string('catalogue', 'tool_mucatalog'), ['class' => 'btn btn-secondary']);
     $actions->add_button($button);
 }
 

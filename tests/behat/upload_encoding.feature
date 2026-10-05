@@ -53,7 +53,7 @@ Feature: Program encoding upload tests
       | PČ2      | OK     | Programíček 02 | -          |
     And I press "Upload programs"
     Then the following should exist in the "reportbuilder-table" table:
-      | Program name     | Program ID | Allocations | Public |
-      | Programíček 00   | PČ0        | 0           | No     |
-      | Programíček 01   | PČ1        | 0           | No     |
-      | Programíček 02   | PČ2        | 0           | No     |
+      | Program name     | Program ID | Allocations |
+      | Programíček 00   | PČ0        | 0           |
+      | Programíček 01   | PČ1        | 0           |
+      | Programíček 02   | PČ2        | 0           |

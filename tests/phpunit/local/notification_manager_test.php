@@ -352,18 +352,15 @@ final class notification_manager_test extends \advanced_testcase {
 
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
         $syscontext = \context_system::instance();
-        $cohort1 = $this->getDataGenerator()->create_cohort();
 
         $program1 = $generator->create_program([
             'fullname' => 'hokus',
             'idnumber' => 'p1',
             'description' => 'some desc 1',
             'descriptionformat' => \FORMAT_MARKDOWN,
-            'publicaccess' => 1,
             'archived' => 0,
             'contextid' => $syscontext->id,
             'sources' => ['manual' => []],
-            'cohorts' => [$cohort1->id],
         ]);
         $notification1 = $generator->create_program_notification(['notificationtype' => 'allocation', 'programid' => $program1->id,
             'custom' => 1, 'subject' => 'You are allocated', 'body' => 'Welcome to the program']);
@@ -373,11 +370,9 @@ final class notification_manager_test extends \advanced_testcase {
             'idnumber' => 'p2',
             'description' => 'some desc 2',
             'descriptionformat' => \FORMAT_MARKDOWN,
-            'publicaccess' => 1,
             'archived' => 0,
             'contextid' => $syscontext->id,
             'sources' => ['manual' => []],
-            'cohorts' => [$cohort1->id],
         ]);
         $generator->create_program_notification(['notificationtype' => 'allocation', 'programid' => $program2->id]);
         $notificationsbeforeimport = $DB->get_records('tool_mulib_notification');

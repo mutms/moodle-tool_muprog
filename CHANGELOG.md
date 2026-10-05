@@ -8,11 +8,18 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 
 ### Changed
 
+- program catalogue was replaced by Universal catalogue plugin, public programs are migrated
+  to active catalogue sections, programs visible to cohorts are migrated to draft sections
+- catalogue access is controlled by _tool/mucatalog:browse_ capability,
+  _tool/muprog:viewcatalogue_ capability was removed
+- _publicaccess_ and _cohortids_ were removed from _tool_muprog_get_programs_ web service
+- _publicaccess_ was removed from program export, it is ignored in program upload
 - migration to new forms library
 - program scheduling delays are entered as intervals with a single time unit
 
 ### Fixed
 
+- program notifications and Catalogue visibility tables use the same styling as other management tables
 - custom field data context not updated when moving programs
 - editing of self allocation settings always enabled sign-ups
 - pending external database synchronisation check was inverted

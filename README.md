@@ -17,7 +17,8 @@ offerings at scale.
 * Multiple allocation sources, including allocation from an external database
 * Advanced scheduling settings per program
 * Automated course enrolment
-* Program catalogue — learners can browse available programs and related courses
+* Programs can be offered to learners in the Universal catalogue, including self-allocation
+  and allocation requests
 * My programs profile page and overview page (card, list, and details views), accessible from the
   main menu
 * My programs dashboard block for quick access
@@ -31,6 +32,7 @@ offerings at scale.
 Required plugins:
 
 * [Additional tools library plugin](https://github.com/mutms/moodle-tool_mulib)
+* [Universal catalogue plugin](https://github.com/mutms/moodle-tool_mucatalog)
 * [Program enrolment plugin](https://github.com/mutms/moodle-enrol_muprog)
 * [My programs block](https://github.com/mutms/moodle-block_muprog_my)
 * [My programs overview page plugin](https://github.com/mutms/moodle-block_muprogmyoverview)
@@ -46,7 +48,6 @@ Recommended plugins:
 
 ## Roadmap
 
-* Universal catalogue plugin replacing current Program catalogue
 * Supervisor approval workflows via Supervisors and teams plugin
 * Script for migration from Programs by Open LMS
 

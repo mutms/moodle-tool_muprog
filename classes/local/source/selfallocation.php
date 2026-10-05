@@ -124,7 +124,7 @@ final class selfallocation extends base {
             return false;
         }
 
-        if (!\tool_muprog\local\catalogue::is_program_visible($program, $userid)) {
+        if (!\tool_muprog\local\program::get_catalogue_item($program, $userid)) {
             return false;
         }
 
@@ -170,8 +170,11 @@ final class selfallocation extends base {
             }
         }
 
-        $url = new \core\url('/admin/tool/muprog/catalogue/source_selfallocation.php', ['sourceid' => $source->id]);
+        $url = new \core\url('/admin/tool/muprog/my/source_selfallocation.php', ['sourceid' => $source->id]);
         $button = new \tool_mulib\output\muform\dialog\button($url, get_string('source_selfallocation_allocate', 'tool_muprog'));
+
+        // Open My program page after sign up.
+        $button->set_submitted_action(\tool_mulib\muform\handler\dialog::ACTION_REDIRECT);
 
         $button = $OUTPUT->render($button);
 

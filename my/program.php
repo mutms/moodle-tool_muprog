@@ -79,7 +79,7 @@ if (!$program || $program->archived) {
             redirect(new core\url('/admin/tool/muprog/management/index.php'));
         }
     } else {
-        redirect(new core\url('/admin/tool/muprog/catalogue/index.php'));
+        redirect(\tool_mucatalog\local\catalogue::get_catalogue_url() ?? new core\url('/'));
     }
 }
 $programcontext = context::instance_by_id($program->contextid);
@@ -93,13 +93,14 @@ if ($allocation && !$allocation->archived) {
     $allocation = $DB->get_record('tool_muprog_allocation', ['programid' => $program->id, 'userid' => $user->id]);
 }
 if (!$allocation || $allocation->archived) {
-    if (\tool_muprog\local\catalogue::is_program_visible($program)) {
-        redirect(new core\url('/admin/tool/muprog/catalogue/program.php', ['id' => $id]));
+    $catalogueitemurl = \tool_muprog\local\program::get_catalogue_item_url($program);
+    if ($catalogueitemurl) {
+        redirect($catalogueitemurl);
     } else {
         if (has_capability('tool/muprog:view', $programcontext)) {
             redirect(new core\url('/admin/tool/muprog/management/program.php', ['id' => $program->id]));
         } else {
-            redirect(new core\url('/admin/tool/muprog/catalogue/index.php'));
+            redirect(\tool_mucatalog\local\catalogue::get_catalogue_url() ?? new core\url('/'));
         }
     }
 }

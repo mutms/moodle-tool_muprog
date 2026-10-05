@@ -37,30 +37,28 @@ Feature: Programs behat generator tests
 
   Scenario: Programs Behat generator creates programs
     When the following "tool_muprog > programs" exist:
-      | fullname    | idnumber | category | publicaccess | cohorts            |
-      | Program 000 | PR0      |          | 0            | Cohort 1, Cohort 2 |
-      | Program 001 | PR1      | Cat 1    | 1            |                    |
-      | Program 002 | PR2      | Cat 2    | 0            |                    |
+      | fullname    | idnumber | category |
+      | Program 000 | PR0      |          |
+      | Program 001 | PR1      | Cat 1    |
+      | Program 002 | PR2      | Cat 2    |
 
     And I log in as "viewer1"
     And I am on the "tool_muprog > All programs management" page
     Then the following should exist in the "reportbuilder-table" table:
-      | Program name  | Category   | Program ID | Courses | Allocations | Public |
-      | Program 000   | System     | PR0        | 0       | 0           | No     |
-      | Program 001   | Cat 1      | PR1        | 0       | 0           | Yes    |
-      | Program 002   | Cat 2      | PR2        | 0       | 0           | No     |
+      | Program name  | Category   | Program ID | Courses | Allocations |
+      | Program 000   | System     | PR0        | 0       | 0           |
+      | Program 001   | Cat 1      | PR1        | 0       | 0           |
+      | Program 002   | Cat 2      | PR2        | 0       | 0           |
     And I follow "Program 000"
     And I follow "Catalogue visibility"
-    And I should see "Cohort 1"
-    And I should see "Cohort 2"
-    And I should not see "Cohort 3"
+    And I should see "Not included in any catalogue section"
 
   Scenario: Programs Behat generator creates program items
     Given the following "tool_muprog > programs" exist:
-      | fullname    | idnumber | category | publicaccess | cohorts            |
-      | Program 000 | PR0      |          | 0            | Cohort 1, Cohort 2 |
-      | Program 001 | PR1      | Cat 1    | 1            |                    |
-      | Program 002 | PR2      | Cat 2    | 0            |                    |
+      | fullname    | idnumber | category |
+      | Program 000 | PR0      |          |
+      | Program 001 | PR1      | Cat 1    |
+      | Program 002 | PR2      | Cat 2    |
 
     When the following "tool_muprog > program_items" exist:
       | program     | parent     | course   | fullname   | sequencetype     | minprerequisites | minpoints | points | type       | completiondelay |
@@ -119,10 +117,10 @@ Feature: Programs behat generator tests
       | Framework 1 | 1            | 5                | 0               | credits1 | System       |           |
       | Framework 2 | 1            | 7                | 1               | credits1 | Category     | CAT2      |
     And the following "tool_muprog > programs" exist:
-      | fullname    | idnumber | category | publicaccess | cohorts            |
-      | Program 000 | PR0      |          | 0            | Cohort 1, Cohort 2 |
-      | Program 001 | PR1      | Cat 1    | 1            |                    |
-      | Program 002 | PR2      | Cat 2    | 0            |                    |
+      | fullname    | idnumber | category |
+      | Program 000 | PR0      |          |
+      | Program 001 | PR1      | Cat 1    |
+      | Program 002 | PR2      | Cat 2    |
 
     When the following "tool_muprog > program_items" exist:
       | program     | credits     |
@@ -142,10 +140,10 @@ Feature: Programs behat generator tests
 
   Scenario: Programs Behat generator creates allocations
     Given the following "tool_muprog > programs" exist:
-      | fullname    | idnumber | category | publicaccess | cohorts            |
-      | Program 000 | PR0      |          | 0            | Cohort 1, Cohort 2 |
-      | Program 001 | PR1      | Cat 1    | 1            |                    |
-      | Program 002 | PR2      | Cat 2    | 0            |                    |
+      | fullname    | idnumber | category |
+      | Program 000 | PR0      |          |
+      | Program 001 | PR1      | Cat 1    |
+      | Program 002 | PR2      | Cat 2    |
 
     When the following "tool_muprog > program_allocations" exist:
       | program     | user     |

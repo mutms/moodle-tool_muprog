@@ -339,4 +339,132 @@ final class upload_test extends \advanced_testcase {
 
         $this->assertEquals($rawprograms, $result);
     }
+
+    /**
+     * Prepare categories and courses referenced from upload fixtures.
+     *
+     * @return string fixtures directory
+     */
+    protected function prepare_upload_fixtures(): string {
+        global $CFG;
+
+        // NOTE: Default 'Category 1' is already present.
+        $this->getDataGenerator()->create_category(['name' => 'Category 2', 'idnumber' => 'CAT2']);
+        for ($i = 1; $i <= 5; $i++) {
+            $this->getDataGenerator()->create_course(['shortname' => 'C0' . $i, 'idnumber' => 'C0' . $i]);
+        }
+
+        return "$CFG->dirroot/admin/tool/muprog/tests/fixtures/upload";
+    }
+
+    /**
+     * Upload decoded programs and delete them again.
+     *
+     * @param array $rawprograms
+     */
+    protected function process_and_delete_programs(array $rawprograms): void {
+        global $DB;
+
+        $this->assertCount(3, $rawprograms);
+        \tool_muprog\local\upload::validate_references($rawprograms);
+        foreach ($rawprograms as $rawprogram) {
+            $this->assertSame([], $rawprogram->errors);
+        }
+        \tool_muprog\local\upload::process((object)['usecategory' => 1, 'encoding' => 'UTF-8'], $rawprograms);
+        $this->assertDebuggingNotCalled();
+
+        $programs = $DB->get_records('tool_muprog_program', [], 'idnumber ASC');
+        $this->assertSame(['P00', 'P01', 'P02'], array_column($programs, 'idnumber'));
+        foreach ($programs as $program) {
+            \tool_muprog\local\program::delete($program->id);
+        }
+    }
+
+    public function test_fixtures_json(): void {
+        $this->setAdminUser();
+        $fixturesdir = $this->prepare_upload_fixtures();
+
+        $content = file_get_contents("$fixturesdir/programs.json");
+        $this->assertStringNotContainsString('"public"', $content);
+        $this->assertStringNotContainsString('"publicaccess"', $content);
+
+        $rawprograms = \tool_muprog\local\upload::decode_json_file("$fixturesdir/programs.json", 'UTF-8');
+        $this->process_and_delete_programs($rawprograms);
+    }
+
+    public function test_fixtures_csv(): void {
+        $this->setAdminUser();
+        $fixturesdir = $this->prepare_upload_fixtures();
+
+        $content = file_get_contents("$fixturesdir/programs.csv");
+        $this->assertStringNotContainsString('public', $content);
+
+        $csvfiles = [
+            "$fixturesdir/programs.csv",
+            "$fixturesdir/programs_contents.csv",
+            "$fixturesdir/programs_sources.csv",
+        ];
+        $rawprograms = \tool_muprog\local\upload::decode_csv_files($csvfiles, 'UTF-8');
+        $this->process_and_delete_programs($rawprograms);
+    }
+
+    /**
+     * Files exported before migration to Universal catalogue contain catalogue visibility flag,
+     * the flag was called 'public' originally and 'publicaccess' later, it is ignored now.
+     */
+    public function test_legacy_fixtures_json(): void {
+        $this->setAdminUser();
+        $fixturesdir = $this->prepare_upload_fixtures();
+
+        $content = file_get_contents("$fixturesdir/programs_legacy_public.json");
+        $this->assertStringContainsString('"public"', $content);
+        $this->assertStringNotContainsString('"publicaccess"', $content);
+        $rawprograms = \tool_muprog\local\upload::decode_json_file("$fixturesdir/programs_legacy_public.json", 'UTF-8');
+        $this->process_and_delete_programs($rawprograms);
+
+        $content = file_get_contents("$fixturesdir/programs_legacy_publicaccess.json");
+        $this->assertStringContainsString('"publicaccess"', $content);
+        $this->assertStringNotContainsString('"public"', $content);
+        $rawprograms = \tool_muprog\local\upload::decode_json_file("$fixturesdir/programs_legacy_publicaccess.json", 'UTF-8');
+        $legacyprograms = unserialize(serialize($rawprograms));
+        $this->process_and_delete_programs($rawprograms);
+
+        // The only difference from the current format is the ignored flag.
+        foreach ($legacyprograms as $legacyprogram) {
+            $this->assertObjectHasProperty('publicaccess', $legacyprogram);
+            unset($legacyprogram->publicaccess);
+        }
+        $this->assertEquals(
+            \tool_muprog\local\upload::decode_json_file("$fixturesdir/programs.json", 'UTF-8'),
+            $legacyprograms
+        );
+    }
+
+    /**
+     * Files exported before migration to Universal catalogue contain catalogue visibility column,
+     * the column was called 'public' originally and 'publicaccess' later, it is ignored now.
+     */
+    public function test_legacy_fixtures_csv(): void {
+        $this->setAdminUser();
+        $fixturesdir = $this->prepare_upload_fixtures();
+
+        $csvfiles = [
+            "$fixturesdir/programs.csv",
+            "$fixturesdir/programs_contents.csv",
+            "$fixturesdir/programs_sources.csv",
+        ];
+        $currentprograms = \tool_muprog\local\upload::decode_csv_files($csvfiles, 'UTF-8');
+
+        $this->assertStringContainsString(',public,', file_get_contents("$fixturesdir/programs_legacy_public.csv"));
+        $csvfiles[0] = "$fixturesdir/programs_legacy_public.csv";
+        $rawprograms = \tool_muprog\local\upload::decode_csv_files($csvfiles, 'UTF-8');
+        $this->assertEquals($currentprograms, $rawprograms);
+        $this->process_and_delete_programs($rawprograms);
+
+        $this->assertStringContainsString(',publicaccess,', file_get_contents("$fixturesdir/programs_legacy_publicaccess.csv"));
+        $csvfiles[0] = "$fixturesdir/programs_legacy_publicaccess.csv";
+        $rawprograms = \tool_muprog\local\upload::decode_csv_files($csvfiles, 'UTF-8');
+        $this->assertEquals($currentprograms, $rawprograms);
+        $this->process_and_delete_programs($rawprograms);
+    }
 }

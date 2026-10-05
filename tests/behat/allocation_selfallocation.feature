@@ -59,16 +59,24 @@ Feature: Program selfallocation tests
       | manager2  | pmanager      | Category     | CAT3      |
       | viewer1   | pviewer       | System       |           |
     And the following "tool_muprog > programs" exist:
-      | fullname    | idnumber | category | cohorts  | publicaccess |
-      | Program 000 | PR0      |          | Cohort 2 |              |
-      | Program 001 | PR1      | Cat 1    |          | 1            |
-      | Program 002 | PR2      | Cat 2    |          |              |
-      | Program 003 | PR3      | Cat 3    |          |              |
+      | fullname    | idnumber | category |
+      | Program 000 | PR0      |          |
+      | Program 001 | PR1      | Cat 1    |
+      | Program 002 | PR2      | Cat 2    |
+      | Program 003 | PR3      | Cat 3    |
     And the following "tool_muprog > program_items" exist:
       | program     | parent     | course   | fullname   | sequencetype     | minprerequisites |
       | Program 001 |            | Course 1 |            |                  |                  |
       | Program 001 |            | Course 2 |            |                  |                  |
       | Program 001 |            | Course 3 |            |                  |                  |
+    And the following "tool_mucatalog > sections" exist:
+      | name           | status | guestvisible | uservisible | cohortvisible |
+      | Public section | active | 0            | 1           |               |
+      | Cohort section | active | 0            | 0           | CH2           |
+    And the following "tool_mucatalog > items" exist:
+      | section        | type    | reference   |
+      | Cohort section | program | Program 000 |
+      | Public section | program | Program 001 |
 
   @javascript
   Scenario: Student may self allocate without a key
@@ -85,7 +93,7 @@ Feature: Program selfallocation tests
     And I log out
 
     When I log in as "student2"
-    And I am on the "tool_muprog > Program catalogue" page
+    And I am on the "tool_mucatalog > Catalogue All Items" page
     And I should see "Program 000"
     And I should see "Program 001"
     And I follow "Program 000"
@@ -104,7 +112,7 @@ Feature: Program selfallocation tests
     And I log out
 
     When I log in as "student2"
-    And I am on the "tool_muprog > Program catalogue" page
+    And I am on the "tool_mucatalog > Catalogue All Items" page
     And I should see "Program 000"
     And I should see "Program 001"
     And I follow "Program 000"
@@ -131,7 +139,7 @@ Feature: Program selfallocation tests
     And I log out
 
     When I log in as "student2"
-    And I am on the "tool_muprog > Program catalogue" page
+    And I am on the "tool_mucatalog > Catalogue All Items" page
     And I follow "Program 000"
     And I press "Sign up"
     And I click on "Sign up" "button" in the "dialog[open]" "css_element"
@@ -162,27 +170,62 @@ Feature: Program selfallocation tests
     And I log out
 
     And I log in as "student1"
-    And I am on the "tool_muprog > Program catalogue" page
+    And I am on the "tool_mucatalog > Catalogue All Items" page
     And I follow "Program 001"
     And I press "Sign up"
     And I click on "Sign up" "button" in the "dialog[open]" "css_element"
     And I should see "Open" in the "Program status" definition list item
     And I log out
     And I log in as "student2"
-    And I am on the "tool_muprog > Program catalogue" page
+    And I am on the "tool_mucatalog > Catalogue All Items" page
     And I follow "Program 001"
     And I press "Sign up"
     And I click on "Sign up" "button" in the "dialog[open]" "css_element"
     And I log out
 
     When I log in as "student3"
-    And I am on the "tool_muprog > Program catalogue" page
+    And I am on the "tool_mucatalog > Catalogue All Items" page
     And I follow "Program 001"
     Then I should see "Maximum number of users self-allocated already"
 
   @javascript
-  Scenario: Student may see course is missing before self allocation into program
-    Given I log in as "admin"
+  Scenario: Student cannot see or sign up to program in catalogue section not visible to them
+    Given I log in as "manager1"
+    And I am on the "tool_muprog > All programs management" page
+    And I follow "Program 000"
+    And I follow "Allocation settings"
+    And I click on "Update Self allocation" "link"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Active | Yes |
+    And I click on "Update" "button" in the "dialog[open]" "css_element"
+    And I should see "Active; Sign ups are allowed" in the "Self allocation" definition list item
+    And I log out
+
+    When I log in as "student1"
+    And I am on the "tool_mucatalog > Catalogue All Items" page
+    Then I should see "Program 001"
+    And I should not see "Program 000"
+    And I log out
+
+    When I log in as "student4"
+    And I am on the "tool_mucatalog > Catalogue All Items" page
+    And I should see "Program 001"
+    And I follow "Program 000"
+    Then I should see "Program 000" in the "#tool_mucatalog-item" "css_element"
+    And "Sign up" "button" should exist in the ".item-detail-actions" "css_element"
+
+  @javascript
+  Scenario: Student may see course is missing after self allocation into program
+    Given I log in as "manager1"
+    And I am on the "tool_muprog > All programs management" page
+    And I follow "Program 001"
+    And I follow "Allocation settings"
+    And I click on "Update Self allocation" "link"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Active | Yes |
+    And I click on "Update" "button" in the "dialog[open]" "css_element"
+    And I log out
+    And I log in as "admin"
     And I go to the courses management page
     And I should see the "Course categories and courses" management page
     And I click on category "Cat 1" in the management interface
@@ -191,7 +234,9 @@ Feature: Program selfallocation tests
     And I log out
 
     When I log in as "student1"
-    And I am on the "tool_muprog > Program catalogue" page
+    And I am on the "tool_mucatalog > Catalogue All Items" page
     And I follow "Program 001"
+    And I press "Sign up"
+    And I click on "Sign up" "button" in the "dialog[open]" "css_element"
     Then I should see "Course is missing" in the "Course 1" "table_row"
     And I should not see "Course is missing" in the "Course 2" "table_row"

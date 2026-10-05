@@ -66,11 +66,19 @@ Feature: Program approval allocations tests
       | viewer1   | pviewer       | System       |           |
       | allocator | allocator     | Category     | CAT1      |
     And the following "tool_muprog > programs" exist:
-      | fullname    | idnumber | category | cohorts  | publicaccess |
-      | Program 000 | PR0      |          | Cohort 2 |              |
-      | Program 001 | PR1      | Cat 1    |          | 1            |
-      | Program 002 | PR2      | Cat 2    |          |              |
-      | Program 003 | PR3      | Cat 3    |          |              |
+      | fullname    | idnumber | category |
+      | Program 000 | PR0      |          |
+      | Program 001 | PR1      | Cat 1    |
+      | Program 002 | PR2      | Cat 2    |
+      | Program 003 | PR3      | Cat 3    |
+    And the following "tool_mucatalog > sections" exist:
+      | name           | status | guestvisible | uservisible | cohortvisible |
+      | Public section | active | 0            | 1           |               |
+      | Cohort section | active | 0            | 0           | CH2           |
+    And the following "tool_mucatalog > items" exist:
+      | section        | type    | reference   |
+      | Cohort section | program | Program 000 |
+      | Public section | program | Program 001 |
 
   @javascript
   Scenario: Allocator approves student allocation request for a program
@@ -87,7 +95,7 @@ Feature: Program approval allocations tests
     And I log out
 
     When I log in as "student2"
-    And I am on the "tool_muprog > Program catalogue" page
+    And I am on the "tool_mucatalog > Catalogue All Items" page
     And I follow "Program 001"
     And I should not see "Request access"
     And I log out
@@ -104,7 +112,7 @@ Feature: Program approval allocations tests
     And I log out
 
     When I log in as "student2"
-    And I am on the "tool_muprog > Program catalogue" page
+    And I am on the "tool_mucatalog > Catalogue All Items" page
     And I follow "Program 001"
     And I press "Request access"
     And I click on "Cancel" "button" in the "dialog[open]" "css_element"
@@ -160,7 +168,7 @@ Feature: Program approval allocations tests
     And I log out
 
     When I log in as "student2"
-    And I am on the "tool_muprog > Program catalogue" page
+    And I am on the "tool_mucatalog > Catalogue All Items" page
     And I follow "Program 001"
     And I press "Request access"
     And I click on "Request access" "button" in the "dialog[open]" "css_element"
@@ -182,7 +190,7 @@ Feature: Program approval allocations tests
     And I log out
 
     When I log in as "student2"
-    And I am on the "tool_muprog > Program catalogue" page
+    And I am on the "tool_mucatalog > Catalogue All Items" page
     And I follow "Program 001"
     Then I should see "Access request was rejected"
     And I log out
@@ -198,7 +206,7 @@ Feature: Program approval allocations tests
     And I log out
 
     When I log in as "student2"
-    And I am on the "tool_muprog > Program catalogue" page
+    And I am on the "tool_mucatalog > Catalogue All Items" page
     And I follow "Program 001"
     And I press "Request access"
     And I click on "Request access" "button" in the "dialog[open]" "css_element"

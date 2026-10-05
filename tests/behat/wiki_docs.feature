@@ -33,12 +33,22 @@ Feature: Programs plugin English wiki documentation image generator
       | Motorcycle Tyre Changing                  | M3        | ME       |
       | Chain and Sprocket Maintenance            | M4        | ME       |
     And the following "tool_muprog > programs" exist:
-      | fullname                             | idnumber | category | publicaccess | archived | description                                     | image                                           | cohorts            |
-      | Basic First Aid                      | FA1      | HS       | 1            | 0        | Sample program for basic first aid credits.    | admin/tool/muprog/tests/fixtures/docs/bfa.jpeg  |                    |
-      | Advanced First Aid                   | FA2      | HS       | 1            | 0        | Sample program for advanced first aid credits. | admin/tool/muprog/tests/fixtures/docs/afa.jpeg  |                    |
-      | Motorcycle Maintenance for Beginners | ME       | ME       | 1            | 0        | Basics of motorcycle maintenance.               | admin/tool/muprog/tests/fixtures/docs/mm.jpeg   |                    |
-      | Motorcycle Track Days                | MTD      | WF       | 0            | 0        | Learn how to become a better track rider.       | admin/tool/muprog/tests/fixtures/docs/td.jpeg   | Petrol Heads       |
-      | Horse Riding Trips                   | HRT      | WF       | 1            | 1        | Discontinued horse riding.                      |                                                 |                    |
+      | fullname                             | idnumber | category | archived | description                                    | image                                          |
+      | Basic First Aid                      | FA1      | HS       | 0        | Sample program for basic first aid credits.    | admin/tool/muprog/tests/fixtures/docs/bfa.jpeg |
+      | Advanced First Aid                   | FA2      | HS       | 0        | Sample program for advanced first aid credits. | admin/tool/muprog/tests/fixtures/docs/afa.jpeg |
+      | Motorcycle Maintenance for Beginners | ME       | ME       | 0        | Basics of motorcycle maintenance.              | admin/tool/muprog/tests/fixtures/docs/mm.jpeg  |
+      | Motorcycle Track Days                | MTD      | WF       | 0        | Learn how to become a better track rider.      | admin/tool/muprog/tests/fixtures/docs/td.jpeg  |
+      | Horse Riding Trips                   | HRT      | WF       | 1        | Discontinued horse riding.                     |                                                |
+    And the following "tool_mucatalog > sections" exist:
+      | name              | status | guestvisible | uservisible | cohortvisible |
+      | Training programs | active | 0            | 1           |               |
+      | Petrol Heads only | active | 0            | 0           | CH1           |
+    And the following "tool_mucatalog > items" exist:
+      | section           | type    | reference                            |
+      | Training programs | program | Basic First Aid                      |
+      | Training programs | program | Advanced First Aid                   |
+      | Training programs | program | Motorcycle Maintenance for Beginners |
+      | Petrol Heads only | program | Motorcycle Track Days                |
     And the following "tool_muprog > program_items" exist:
       | program                              | parent            | course                                | fullname          | sequencetype     | minprerequisites |
       | Basic First Aid                      |                   |                                       | Mandatory courses | All in order     |                  |
@@ -197,10 +207,10 @@ Feature: Programs plugin English wiki documentation image generator
     Then I make documentation screenshot "img_dashboard_my_programs.png" for "tool_muprog" plugin
     And site is restored after documentation screenshots
 
-  Scenario: Documentation screenshots for Program catalogue page
+  Scenario: Documentation screenshots for programs in Universal catalogue page
     Given I log in as "a"
     And I am on the "tool_muprog > My programs" page
-    And I follow "Program catalogue"
+    And I click on "Catalogue" "link" in the "#page-header" "css_element"
 
     Then I make documentation screenshot "img_catalogue.png" for "tool_muprog" plugin
     And site is restored after documentation screenshots

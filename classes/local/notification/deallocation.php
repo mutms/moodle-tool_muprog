@@ -65,7 +65,7 @@ final class deallocation extends base {
         if (has_capability('tool/muprog:view', $context)) {
             $a['program_url'] = (new \core\url('/admin/tool/muprog/management/program.php', ['id' => $program->id]))->out(false);
         } else {
-            $a['program_url'] = (new \core\url('/admin/tool/muprog/catalogue/program.php', ['id' => $program->id]))->out(false);
+            $a['program_url'] = (new \core\url('/admin/tool/muprog/my/program.php', ['id' => $program->id]))->out(false);
         }
         return $a;
     }

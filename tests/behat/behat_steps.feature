@@ -44,11 +44,11 @@ Feature: Programs navigation behat steps test
       | viewer2  | pviewer       | Category     | CAT1      |
       | viewer3  | uviewer       | User         | student1  |
     And the following "tool_muprog > programs" exist:
-      | fullname    | idnumber | category | publicaccess | archived |
-      | Program 000 | PR0      |          | 0            | 0        |
-      | Program 001 | PR1      | Cat 1    | 1            | 0        |
-      | Program 002 | PR2      | Cat 2    | 0            | 0        |
-      | Program 003 | PR3      |          | 1            | 1        |
+      | fullname    | idnumber | category | archived |
+      | Program 000 | PR0      |          | 0        |
+      | Program 001 | PR1      | Cat 1    | 0        |
+      | Program 002 | PR2      | Cat 2    | 0        |
+      | Program 003 | PR3      |          | 1        |
 
   @javascript
   Scenario: Admin navigates to programs via behat step
@@ -227,16 +227,6 @@ Feature: Programs navigation behat steps test
     Then I should see "Programs"
     And I should not see "Program 000"
     And I should see "Program 001"
-    And I should not see "Program 002"
-    And I should not see "Program 003"
-
-  Scenario: Student navigates to Program catalogue via behat step
-    Given I log in as "student1"
-
-    When I am on the "tool_muprog > Program catalogue" page
-    Then I should see "Program catalogue"
-    And I should see "Program 001"
-    And I should not see "Program 000"
     And I should not see "Program 002"
     And I should not see "Program 003"
 

@@ -38,8 +38,6 @@ class behat_tool_muprog extends behat_base {
         switch (strtolower($page)) {
             case 'all programs management':
                 return new moodle_url('/admin/tool/muprog/management/index.php');
-            case 'program catalogue':
-                return new moodle_url('/admin/tool/muprog/catalogue/index.php');
             case 'my programs':
                 return new moodle_url('/admin/tool/muprog/my/index.php');
 

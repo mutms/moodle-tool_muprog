@@ -8,6 +8,7 @@
     "moodle/composer-installer": "*",
     "moodle/moodle": "5.3.*",
     "mutms/moodle-tool_mulib": "*",
+    "mutms/moodle-tool_mucatalog": "*",
     "mutms/moodle-enrol_muprog": "*",
     "mutms/moodle-block_muprog_my": "*",
     "mutms/moodle-block_muprogmyoverview": "*"

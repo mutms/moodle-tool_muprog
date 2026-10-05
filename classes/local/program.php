@@ -123,7 +123,7 @@ final class program {
         $data->presentationjson = util::json_encode([]);
         unset($data->presentation);
 
-        $data->publicaccess = isset($data->publicaccess) ? (int)(bool)$data->publicaccess : 0;
+        unset($data->publicaccess); // Legacy catalogue visibility.
         $data->archived = isset($data->archived) ? (int)(bool)$data->archived : 0;
         $data->creategroups = isset($data->creategroups) ? (int)(bool)$data->creategroups : 0;
         if (empty($data->timeallocationstart)) {
@@ -615,66 +615,6 @@ final class program {
     }
 
     /**
-     * Update program visibility.
-     *
-     * @param stdClass $data
-     * @return stdClass
-     */
-    public static function update_visibility(stdClass $data): stdClass {
-        global $DB;
-
-        if (
-            (isset($data->cohortids) && !is_array($data->cohortids))
-            || empty($data->id) || !isset($data->publicaccess)
-        ) {
-            throw new \coding_exception('Invalid data');
-        }
-
-        if (isset($data->cohorts)) {
-            debugging('use cohortids key instead of cohorts', DEBUG_DEVELOPER);
-        }
-
-        $trans = $DB->start_delegated_transaction();
-
-        $oldprogram = $DB->get_record('tool_muprog_program', ['id' => $data->id], '*', MUST_EXIST);
-
-        if ($oldprogram->publicaccess != $data->publicaccess) {
-            $DB->set_field('tool_muprog_program', 'publicaccess', (int)(bool)$data->publicaccess, ['id' => $data->id]);
-        }
-
-        if (isset($data->cohortids)) {
-            $oldcohorts = management::fetch_current_cohorts_menu($data->id);
-            $oldcohorts = array_keys($oldcohorts);
-            $oldcohorts = array_flip($oldcohorts);
-            foreach ($data->cohortids as $cid) {
-                if (isset($oldcohorts[$cid])) {
-                    unset($oldcohorts[$cid]);
-                    continue;
-                }
-                $record = (object)['programid' => $data->id, 'cohortid' => $cid];
-                $DB->insert_record('tool_muprog_cohort', $record);
-            }
-            foreach ($oldcohorts as $cid => $unused) {
-                $DB->delete_records('tool_muprog_cohort', ['programid' => $data->id, 'cohortid' => $cid]);
-            }
-        }
-
-        self::fix_itemscount($data->id);
-
-        $program = $DB->get_record('tool_muprog_program', ['id' => $data->id], '*', MUST_EXIST);
-
-        \tool_muprog\event\program_updated::create_from_program($program)->trigger();
-
-        $trans->allow_commit();
-
-        allocation::fix_allocation_sources($program->id, null);
-        allocation::fix_enrol_instances($program->id);
-        allocation::fix_user_enrolments($program->id, null);
-
-        return $program;
-    }
-
-    /**
      * Fixed cached count of items in program record.
      *
      * @param int $programid record may be updated
@@ -1042,7 +982,6 @@ final class program {
         }
         unset($sources);
         $DB->delete_records('tool_muprog_source', ['programid' => $program->id]);
-        $DB->delete_records('tool_muprog_cohort', ['programid' => $program->id]);
         $DB->delete_records('tool_muprog_item', ['programid' => $program->id]);
 
         $DB->delete_records('tool_muprog_cert_issue', ['programid' => $program->id]);
@@ -1080,5 +1019,133 @@ final class program {
      */
     public static function load_content(int $programid): content\top {
         return content\top::load($programid);
+    }
+
+    /**
+     * Returns first Universal catalogue item with this program that the user may see.
+     *
+     * @param stdClass $program
+     * @param int|null $userid defaults to current user
+     * @return stdClass|null catalogue item record
+     */
+    public static function get_catalogue_item(stdClass $program, ?int $userid = null): ?stdClass {
+        global $USER;
+
+        if ($userid === null) {
+            $userid = (int)$USER->id;
+        }
+
+        if ($program->archived) {
+            return null;
+        }
+
+        $tenantid = null;
+        if (\tool_mulib\local\mulib::is_mutenancy_active()) {
+            if ($userid == $USER->id) {
+                $tenantid = \tool_mutenancy\local\tenancy::get_current_tenantid();
+            } else {
+                $tenantid = \tool_mutenancy\local\tenancy::get_user_tenantid($userid);
+            }
+            if ($tenantid) {
+                $programcontext = \context::instance_by_id($program->contextid);
+                if ($programcontext->tenantid && $programcontext->tenantid != $tenantid) {
+                    return null;
+                }
+            }
+        }
+
+        return \tool_mucatalog\local\catalogue::get_visible_reference_item('program', (int)$program->id, $userid, $tenantid);
+    }
+
+    /**
+     * Returns URL of the first Universal catalogue item with this program that the current user may see.
+     *
+     * @param stdClass $program
+     * @return url|null
+     */
+    public static function get_catalogue_item_url(stdClass $program): ?url {
+        $item = self::get_catalogue_item($program);
+        if (!$item) {
+            return null;
+        }
+        return new url('/admin/tool/mucatalog/item.php', ['id' => $item->id]);
+    }
+
+    /**
+     * Returns list of actions available to current user in Universal catalogue.
+     *
+     * @param stdClass $program
+     * @return string[] html fragments
+     */
+    public static function get_catalogue_actions(stdClass $program): array {
+        global $DB;
+
+        $actions = [];
+        /** @var \tool_muprog\local\source\base[] $sourceclasses */ // Type hack.
+        $sourceclasses = allocation::get_source_classes();
+        foreach ($sourceclasses as $type => $classname) {
+            $source = $DB->get_record('tool_muprog_source', ['programid' => $program->id, 'type' => $type]);
+            if (!$source) {
+                continue;
+            }
+            $actions = array_merge($actions, $classname::get_catalogue_actions($program, $source));
+        }
+
+        return $actions;
+    }
+
+    /**
+     * Render programs with a tag that current user is allocated to
+     * or can see in Universal catalogue.
+     *
+     * @param int $tagid
+     * @param bool $exclusive
+     * @param int $limitfrom
+     * @param int $limitnum
+     * @return array ['content' => string, 'totalcount' => int]
+     */
+    public static function get_tagged_programs(int $tagid, bool $exclusive, int $limitfrom, int $limitnum): array {
+        global $DB, $USER, $OUTPUT;
+
+        // NOTE: When learners browse programs we ignore the contexts, programs have a flat structure.
+
+        $sql = new sql(
+            "SELECT p.*, pa.id AS allocationid
+               FROM {tool_muprog_program} p
+               JOIN {tag_instance} tt ON tt.itemid = p.id AND tt.itemtype = 'tool_muprog_program' AND tt.tagid = :tagid AND tt.component = 'tool_muprog'
+          LEFT JOIN {tool_muprog_allocation} pa ON pa.programid = p.id AND pa.userid = :userid AND pa.archived = 0
+              WHERE p.archived = 0
+                    AND (pa.id IS NOT NULL OR EXISTS (
+                         SELECT 'x'
+                           FROM {tool_mucatalog_item} ci
+                          WHERE ci.type = 'program' AND ci.referenceid = p.id))
+           ORDER BY p.fullname ASC, p.id ASC",
+            ['tagid' => $tagid, 'userid' => $USER->id]
+        );
+        $programs = $DB->get_records_sql($sql->sql, $sql->params);
+
+        // Catalogue visibility rules are not simple, luckily there should not be many programs with the same tag.
+        foreach ($programs as $k => $program) {
+            if ($program->allocationid) {
+                continue;
+            }
+            if (!self::get_catalogue_item($program)) {
+                unset($programs[$k]);
+            }
+        }
+
+        $totalcount = count($programs);
+        $programs = array_slice($programs, $limitfrom, $limitnum);
+
+        $result = [];
+        foreach ($programs as $program) {
+            $fullname = format_string($program->fullname);
+            // Program page redirects to catalogue if user is not allocated.
+            $url = new url('/admin/tool/muprog/my/program.php', ['id' => $program->id]);
+            $icon = $OUTPUT->pix_icon('program', '', 'tool_muprog');
+            $result[] = '<div class="program-link">' . $icon . \html_writer::link($url, $fullname) . '</div>';
+        }
+
+        return ['content' => implode('', $result), 'totalcount' => $totalcount];
     }
 }

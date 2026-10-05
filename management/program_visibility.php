@@ -53,21 +53,22 @@ $PAGE->set_docs_path('https://github.com/mutms/moodle-tool_muprog/wiki/Program-v
 /** @var \tool_muprog\output\management\renderer $managementoutput */
 $managementoutput = $PAGE->get_renderer('tool_muprog', 'management');
 
-echo $OUTPUT->header();
-
-$buttons = [];
-if (has_capability('tool/muprog:edit', $context)) {
-    $editurl = new core\url('/admin/tool/muprog/management/program_visibility_edit.php', ['id' => $program->id]);
-    $editbutton = new tool_mulib\output\muform\dialog\button($editurl, get_string('edit'));
-    $editbutton->set_modal_title(get_string('program_update', 'tool_muprog'));
-    $buttons[] = $OUTPUT->render($editbutton);
+$actions = new \tool_mulib\output\header_actions(get_string('management_actions', 'tool_mucatalog'));
+$sectionsurl = \tool_mucatalog\local\management::get_sections_management_url($context);
+if ($sectionsurl) {
+    $actions->get_dropdown()->add_item(get_string('management_sections', 'tool_mucatalog'), $sectionsurl, new \core\output\pix_icon('i/menubars', ''));
 }
+if ($actions->has_items()) {
+    $PAGE->add_header_action($OUTPUT->render($actions));
+}
+
+echo $OUTPUT->header();
 
 echo $managementoutput->render_program_visibility($program);
 
-if ($buttons) {
-    $buttons = implode(' ', $buttons);
-    echo $OUTPUT->box($buttons, 'buttons');
+$addbutton = \tool_mucatalog\local\management::get_reference_add_button('program', $program->id, $currenturl);
+if ($addbutton) {
+    echo $OUTPUT->box($OUTPUT->render($addbutton), 'buttons');
 }
 
 echo $OUTPUT->footer();

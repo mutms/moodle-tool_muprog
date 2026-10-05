@@ -67,33 +67,4 @@ final class program_updated_test extends \advanced_testcase {
         $programurl = new \core\url('/admin/tool/muprog/management/program.php', ['id' => $program->id]);
         $this->assertSame($programurl->out(false), $event->get_url()->out(false));
     }
-
-    public function test_update_visibility(): void {
-        $syscontext = \context_system::instance();
-        $data = (object)[
-            'fullname' => 'Some program',
-            'idnumber' => 'SP1',
-            'contextid' => $syscontext->id,
-        ];
-        $this->setAdminUser();
-        $program = program::create($data);
-
-        $data = (object)['id' => $program->id, 'publicaccess' => 1];
-        $sink = $this->redirectEvents();
-        $program = program::update_visibility($data);
-        $events = $sink->get_events();
-        $sink->close();
-
-        $this->assertCount(1, $events);
-        $event = reset($events);
-        $this->assertInstanceOf('tool_muprog\event\program_updated', $event);
-        $this->assertEquals($syscontext->id, $event->contextid);
-        $this->assertSame($program->id, $event->objectid);
-        $this->assertSame('u', $event->crud);
-        $this->assertSame($event::LEVEL_OTHER, $event->edulevel);
-        $this->assertSame('tool_muprog_program', $event->objecttable);
-        $description = $event->get_description();
-        $programurl = new \core\url('/admin/tool/muprog/management/program.php', ['id' => $program->id]);
-        $this->assertSame($programurl->out(false), $event->get_url()->out(false));
-    }
 }
