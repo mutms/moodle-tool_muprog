@@ -220,7 +220,7 @@ final class allocation {
                   JOIN {tool_muprog_item} pi ON pi.courseid = c.id
                   JOIN {tool_muprog_program} p ON p.id = pi.programid
              LEFT JOIN {enrol} e ON e.courseid = c.id AND e.enrol = 'muprog' AND e.customint1 = pi.programid
-                 WHERE e.id IS NULL $programselect
+                 WHERE e.id IS NULL AND p.draft = 0 $programselect
               ORDER BY pi.programid ASC";
         $rs = $DB->get_recordset_sql($sql, $params);
         foreach ($rs as $course) {
@@ -314,7 +314,7 @@ final class allocation {
                   JOIN {tool_muprog_program} p ON p.id = pi.programid
              LEFT JOIN {tool_muprog_group} pg ON pg.programid = p.id AND pg.courseid = pi.courseid
              LEFT JOIN {groups} g ON g.id = pg.groupid
-                 WHERE p.archived = 0 AND p.creategroups = 1 AND pi.courseid IS NOT NULL
+                 WHERE p.archived = 0 AND p.draft = 0 AND p.creategroups = 1 AND pi.courseid IS NOT NULL
                        AND (pg.id IS NULL OR g.id IS NULL)
                        $programselect
               ORDER BY pi.id ASC";

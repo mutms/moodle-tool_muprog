@@ -107,6 +107,9 @@ final class source_manual_allocate_users extends external_api {
         if ($program->archived) {
             throw new invalid_parameter_exception('Program is archived');
         }
+        if ($program->draft) {
+            throw new invalid_parameter_exception('Program is draft');
+        }
 
         if (!manual::is_valid_dateoverrides($program, $dateoverrides)) {
             throw new invalid_parameter_exception('Invalid program allocation dates');

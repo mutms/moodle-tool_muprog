@@ -1078,7 +1078,7 @@ final class program_test extends \advanced_testcase {
 
         $program1 = $generator->create_program(['fullname' => 'Prvni']);
         $program2 = $generator->create_program(['fullname' => 'Druhy']);
-        $program3 = $generator->create_program(['fullname' => 'Treti', 'archived' => 1, 'sources' => ['manual' => []]]);
+        $program3 = $generator->create_program(['fullname' => 'Treti', 'sources' => ['manual' => []]]);
         $source3 = $DB->get_record('tool_muprog_source', ['programid' => $program3->id, 'type' => 'manual'], '*', MUST_EXIST);
         $program4 = $generator->create_program(['fullname' => 'Ctvrty', 'contextid' => $catcontext1->id]);
         $program5 = $generator->create_program(['fullname' => 'Paty']);
@@ -1099,6 +1099,8 @@ final class program_test extends \advanced_testcase {
         $cataloggenerator->create_item(['sectionid' => $section1->id, 'type' => 'program', 'referenceid' => $program3->id]);
         $cataloggenerator->create_item(['sectionid' => $section2->id, 'type' => 'program', 'referenceid' => $program4->id]);
         $cataloggenerator->create_item(['sectionid' => $section1->id, 'type' => 'program', 'referenceid' => $program5->id]);
+        // Archived programs cannot be added to catalogue.
+        $program3 = program::archive($program3->id);
 
         foreach ([$program1, $program2, $program3, $program4, $program6] as $program) {
             \core_tag_tag::set_item_tags('tool_muprog', 'tool_muprog_program', $program->id, $syscontext, ['Tag A']);
@@ -1154,5 +1156,108 @@ final class program_test extends \advanced_testcase {
 
         $result = program::get_tagged_programs($tagb->id + 1000, true, 0, 10);
         $this->assertSame(['content' => '', 'totalcount' => 0], $result);
+    }
+
+    public function test_create_draft(): void {
+        global $DB;
+
+        /** @var \tool_muprog_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
+
+        $syscontext = \context_system::instance();
+        $program = program::create((object)[
+            'fullname' => 'Some program',
+            'idnumber' => 'SP1',
+            'contextid' => $syscontext->id,
+        ]);
+        $this->assertSame('0', $program->draft);
+
+        $program = program::create((object)[
+            'fullname' => 'Draft program',
+            'idnumber' => 'SP2',
+            'contextid' => $syscontext->id,
+            'draft' => 1,
+            'creategroups' => 1,
+        ]);
+        $this->assertSame('1', $program->draft);
+        $this->assertSame('0', $program->archived);
+
+        $course = $this->getDataGenerator()->create_course();
+        $generator->create_program_item(['programid' => $program->id, 'courseid' => $course->id]);
+        $this->assertFalse($DB->record_exists('enrol', ['courseid' => $course->id, 'enrol' => 'muprog']));
+        $this->assertFalse($DB->record_exists('tool_muprog_group', ['programid' => $program->id]));
+
+        $this->assertNull(program::get_catalogue_item($program));
+
+        // Draft flag cannot be changed when updating.
+        $program = program::update_general((object)['id' => $program->id, 'draft' => 0]);
+        $this->assertDebuggingCalled('Use program::release() to remove draft flag, programs cannot be returned to draft');
+        $this->assertSame('1', $program->draft);
+
+        $program = program::archive($program->id);
+        $this->assertSame('1', $program->draft);
+        $this->assertSame('1', $program->archived);
+        $program = program::restore($program->id);
+        $this->assertSame('1', $program->draft);
+        $this->assertSame('0', $program->archived);
+        $this->assertFalse($DB->record_exists('enrol', ['courseid' => $course->id, 'enrol' => 'muprog']));
+    }
+
+    public function test_release(): void {
+        global $DB;
+
+        /** @var \tool_muprog_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
+
+        $user = $this->getDataGenerator()->create_user();
+        $cohort = $this->getDataGenerator()->create_cohort();
+        \cohort_add_member($cohort->id, $user->id);
+        $course = $this->getDataGenerator()->create_course();
+
+        $program = $generator->create_program(['draft' => 1, 'creategroups' => 1, 'sources' => ['cohort' => ['cohortids' => [$cohort->id]]]]);
+        $generator->create_program_item(['programid' => $program->id, 'courseid' => $course->id]);
+        \tool_muprog\local\allocation::fix_allocation_sources(null, null);
+        \tool_muprog\local\allocation::fix_enrol_instances(null);
+        $this->assertSame('1', $program->draft);
+        $this->assertFalse($DB->record_exists('tool_muprog_allocation', ['programid' => $program->id]));
+        $this->assertFalse($DB->record_exists('enrol', ['courseid' => $course->id, 'enrol' => 'muprog']));
+        $this->assertFalse($DB->record_exists('tool_muprog_group', ['programid' => $program->id]));
+
+        $sink = $this->redirectEvents();
+        $program = program::release($program->id);
+        $events = array_filter($sink->get_events(), fn($event) => $event instanceof \tool_muprog\event\program_released);
+        $sink->close();
+        $this->assertSame('0', $program->draft);
+        $this->assertCount(1, $events);
+        $event = reset($events);
+        $this->assertSame($program->id, (string)$event->objectid);
+        $this->assertTrue($DB->record_exists('tool_muprog_allocation', ['programid' => $program->id, 'userid' => $user->id]));
+        $this->assertTrue($DB->record_exists('enrol', ['courseid' => $course->id, 'enrol' => 'muprog', 'customint1' => $program->id]));
+        $this->assertTrue($DB->record_exists('tool_muprog_group', ['programid' => $program->id, 'courseid' => $course->id]));
+
+        // Releasing of non-draft program does nothing.
+        $sink = $this->redirectEvents();
+        $program = program::release($program->id);
+        $this->assertCount(0, $sink->get_events());
+        $sink->close();
+        $this->assertSame('0', $program->draft);
+
+        // Released programs cannot be returned to draft.
+        $program = program::update_general((object)['id' => $program->id, 'draft' => 1]);
+        $this->assertDebuggingCalled('Use program::release() to remove draft flag, programs cannot be returned to draft');
+        $this->assertSame('0', $program->draft);
+
+        // Archived drafts must be restored first.
+        $program2 = $generator->create_program(['draft' => 1, 'archived' => 1]);
+        try {
+            program::release($program2->id);
+            $this->fail('Exception expected');
+        } catch (\core\exception\moodle_exception $ex) {
+            $this->assertInstanceOf(\core\exception\coding_exception::class, $ex);
+        }
+        $program2 = program::restore($program2->id);
+        $this->assertSame('1', $program2->draft);
+        $program2 = program::release($program2->id);
+        $this->assertSame('0', $program2->draft);
     }
 }

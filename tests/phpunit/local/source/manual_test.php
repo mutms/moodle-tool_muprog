@@ -780,4 +780,31 @@ final class manual_test extends \advanced_testcase {
         $this->assertSame($source1->auxint4, $source2->auxint4);
         $this->assertSame($source1->auxint5, $source2->auxint5);
     }
+
+    public function test_draft_program(): void {
+        global $DB;
+
+        /** @var \tool_muprog_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
+
+        $user = $this->getDataGenerator()->create_user();
+
+        $program = $generator->create_program(['draft' => 1, 'sources' => ['manual' => []]]);
+        $source = $DB->get_record('tool_muprog_source', ['programid' => $program->id, 'type' => 'manual'], '*', MUST_EXIST);
+        $this->assertFalse(manual::is_allocation_possible($program, $source));
+
+        try {
+            manual::allocate_users($program->id, $source->id, [$user->id]);
+            $this->fail('Exception expected');
+        } catch (\core\exception\moodle_exception $ex) {
+            $this->assertInstanceOf(\core\exception\coding_exception::class, $ex);
+            $this->assertStringContainsString('Users cannot be allocated to draft programs', $ex->getMessage());
+        }
+        $this->assertFalse($DB->record_exists('tool_muprog_allocation', ['programid' => $program->id]));
+
+        $program = program::release($program->id);
+        $this->assertTrue(manual::is_allocation_possible($program, $source));
+        manual::allocate_users($program->id, $source->id, [$user->id]);
+        $this->assertTrue($DB->record_exists('tool_muprog_allocation', ['programid' => $program->id, 'userid' => $user->id]));
+    }
 }

@@ -66,7 +66,7 @@ if (isguestuser($user)) {
 }
 
 $program = $DB->get_record('tool_muprog_program', ['id' => $id]);
-if (!$program || $program->archived) {
+if (!$program || $program->archived || $program->draft) {
     if ($program) {
         $context = context::instance_by_id($program->contextid);
     } else {

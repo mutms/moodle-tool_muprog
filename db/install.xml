@@ -14,6 +14,7 @@
         <FIELD NAME="descriptionformat" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="presentationjson" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Visual presentation of program, such as image files"/>
         <FIELD NAME="archived" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Archived programs are hidden, non-mutable and mostly ignored, program must be archived before deletion"/>
+        <FIELD NAME="draft" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Draft programs were never released: no allocations, not usable outside of programs, ignored by cron"/>
         <FIELD NAME="creategroups" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Create course groups for each course in program"/>
         <FIELD NAME="timeallocationstart" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Restriction for allocations- allocations allowed from this date forward if set"/>
         <FIELD NAME="timeallocationend" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Restriction for allocations - allocations not allowed after this date if set"/>

@@ -61,6 +61,7 @@ $handler = handler::from_request();
 $current = [
     'contextid' => $context->id,
     'creategroups' => 0,
+    'draft' => (int)(bool)get_config('tool_muprog', 'program_draftdefault'),
     'descriptionformat' => FORMAT_HTML,
     'descriptionfilearea' => new file_area(context_system::instance(), 'tool_muprog', 'description', null),
 ];

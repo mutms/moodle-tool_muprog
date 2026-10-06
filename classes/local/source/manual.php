@@ -108,7 +108,7 @@ final class manual extends base {
      * @return bool
      */
     public static function is_allocation_possible(\stdClass $program, \stdClass $source): bool {
-        if ($program->archived) {
+        if ($program->archived || $program->draft) {
             return false;
         }
         if ($program->timeallocationstart && $program->timeallocationstart > time()) {

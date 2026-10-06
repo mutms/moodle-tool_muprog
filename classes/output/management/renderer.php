@@ -100,6 +100,9 @@ class renderer extends \plugin_renderer_base {
             $archived .= $this->output->render($action);
         }
         $details->add(get_string('archived', 'tool_muprog'), $archived);
+        if ($program->draft) {
+            $details->add(get_string('draft', 'tool_muprog'), get_string('yes'));
+        }
 
         $handler = \tool_muprog\customfield\program_handler::create();
         foreach ($handler->get_instance_data($program->id) as $data) {

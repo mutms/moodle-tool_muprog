@@ -303,5 +303,16 @@ function xmldb_tool_muprog_upgrade($oldversion): bool {
         upgrade_plugin_savepoint(true, 2026100553, 'tool', 'muprog');
     }
 
+    if ($oldversion < 2026100653) {
+        $table = new xmldb_table('tool_muprog_program');
+
+        $field = new xmldb_field('draft', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'archived');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026100653, 'tool', 'muprog');
+    }
+
     return true;
 }

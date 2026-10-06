@@ -66,7 +66,7 @@ final class extdb extends base {
         if ($query) {
             $result .= ' (' . s($query->name) . ')';
             $context = \context::instance_by_id($program->contextid);
-            if (!$program->archived && has_capability('tool/muprog:allocate', $context)) {
+            if (!$program->archived && !$program->draft && has_capability('tool/muprog:allocate', $context)) {
                 $label = get_string('source_extdb_sync', 'tool_muprog');
                 $editurl = new \core\url('/admin/tool/muprog/management/source_extdb_sync.php', ['sourceid' => $source->id]);
                 $editbutton = new \tool_mulib\output\muform\dialog\icon($editurl, $label, 'i/reload');
@@ -134,7 +134,7 @@ final class extdb extends base {
 
         $sql = "SELECT s.*
                   FROM {tool_muprog_source} s
-                  JOIN {tool_muprog_program} p ON p.id = s.programid AND p.archived = 0
+                  JOIN {tool_muprog_program} p ON p.id = s.programid AND p.archived = 0 AND p.draft = 0
                   JOIN {tool_mulib_extdb_query} q ON q.id = s.auxint1
                  WHERE s.type = 'extdb' AND (s.auxint4 IS NULL OR s.auxint4 < :timedout)
               ORDER BY s.id ASC";
@@ -176,7 +176,7 @@ final class extdb extends base {
         raise_memory_limit(MEMORY_EXTRA);
 
         $program = $DB->get_record('tool_muprog_program', ['id' => $source->programid]);
-        if (!$program || $program->archived) {
+        if (!$program || $program->archived || $program->draft) {
             return false;
         }
         $context = \context::instance_by_id($program->contextid);

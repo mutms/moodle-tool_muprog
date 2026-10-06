@@ -34,7 +34,7 @@ final class util {
     public static function fix_muprog_active(): void {
         global $DB;
 
-        $active = (int)$DB->record_exists('tool_muprog_program', ['archived' => 0]);
+        $active = (int)$DB->record_exists('tool_muprog_program', ['archived' => 0, 'draft' => 0]);
         set_config('active', $active, 'tool_muprog');
     }
 

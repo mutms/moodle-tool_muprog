@@ -289,3 +289,48 @@ Feature: General programs management tests
     Then "PR01" row "Courses" column of "reportbuilder-table" table should contain "Missing courses: 2"
     And "PR02" row "Courses" column of "reportbuilder-table" table should contain "Missing courses: 1"
     And "PR03" row "Courses" column of "reportbuilder-table" table should not contain "Missing courses"
+
+  @javascript
+  Scenario: Manager may create, release and delete draft programs
+    Given I log in as "manager1"
+    And I am on the "tool_muprog > All programs management" page
+    And I click on "Add program" "button"
+    And the following muform fields in the "dialog[open]" "css_element" match:
+      | Draft | No |
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program name | Program 001 |
+      | Program ID   | PR01        |
+      | Draft        | Yes         |
+    And I click on "Add program" "button" in the "dialog[open]" "css_element"
+    And I should see "Yes" in the "Draft" definition list item
+    And I should see "No" in the "Archived" definition list item
+
+    When I click on "Release program" "button"
+    And I click on "Release program" "button" in the "dialog[open]" "css_element"
+    Then I should not see "Release program"
+    And I should see "No" in the "Archived" definition list item
+    And I should see "Program 001" in the "Program name" definition list item
+
+    When I am on the "tool_muprog > All programs management" page
+    And I click on "Add program" "button"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Program name | Program 002 |
+      | Program ID   | PR02        |
+      | Draft        | Yes         |
+    And I click on "Add program" "button" in the "dialog[open]" "css_element"
+    And I should see "Yes" in the "Draft" definition list item
+    And I click on "Delete program" action from "Program actions" dropdown
+    And I click on "Delete program" "button" in the "dialog[open]" "css_element"
+    Then I should see "Program 001"
+    And I should not see "Program 002"
+
+  @javascript
+  Scenario: New programs may be drafts by default
+    Given the following config values are set as admin:
+      | program_draftdefault | 1 | tool_muprog |
+    And I log in as "manager1"
+    And I am on the "tool_muprog > All programs management" page
+
+    When I click on "Add program" "button"
+    Then the following muform fields in the "dialog[open]" "css_element" match:
+      | Draft | Yes |

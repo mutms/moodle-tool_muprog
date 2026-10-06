@@ -151,8 +151,8 @@ abstract class base extends \tool_mulib\local\notification\notificationtype {
 
         $notificationtype = static::get_notificationtype();
 
-        if ($program->archived) {
-            // Never send notifications for archived program.
+        if ($program->archived || $program->draft) {
+            // Never send notifications for archived and draft programs.
             return;
         }
 

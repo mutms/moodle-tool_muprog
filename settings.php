@@ -66,6 +66,13 @@ if ($ADMIN->fulltree) {
     }
 
     $settings->add(new admin_setting_configcheckbox(
+        'tool_muprog/program_draftdefault',
+        new lang_string('program_draftdefault', 'tool_muprog'),
+        new lang_string('program_draftdefault_desc', 'tool_muprog'),
+        0
+    ));
+
+    $settings->add(new admin_setting_configcheckbox(
         'tool_muprog/source_approval_allownew',
         new lang_string('source_approval_allownew', 'tool_muprog'),
         new lang_string('source_approval_allownew_desc', 'tool_muprog'),

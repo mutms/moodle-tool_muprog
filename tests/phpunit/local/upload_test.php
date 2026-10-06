@@ -467,4 +467,22 @@ final class upload_test extends \advanced_testcase {
         $this->assertEquals($currentprograms, $rawprograms);
         $this->process_and_delete_programs($rawprograms);
     }
+
+    public function test_process_draft(): void {
+        global $DB;
+        $this->setAdminUser();
+
+        $syscontext = \context_system::instance();
+
+        $rawprograms = [
+            (object)['idnumber' => 'UP1', 'fullname' => 'Upload 1', 'contextid' => $syscontext->id, 'errors' => []],
+            (object)['idnumber' => 'UP2', 'fullname' => 'Upload 2', 'contextid' => $syscontext->id, 'draft' => 1, 'errors' => []],
+            (object)['idnumber' => 'UP3', 'fullname' => 'Upload 3', 'contextid' => $syscontext->id, 'draft' => 0, 'errors' => []],
+        ];
+        \tool_muprog\local\upload::process((object)['usecategory' => 1, 'encoding' => 'UTF-8'], $rawprograms);
+
+        $this->assertSame('0', $DB->get_field('tool_muprog_program', 'draft', ['idnumber' => 'UP1'], MUST_EXIST));
+        $this->assertSame('1', $DB->get_field('tool_muprog_program', 'draft', ['idnumber' => 'UP2'], MUST_EXIST));
+        $this->assertSame('0', $DB->get_field('tool_muprog_program', 'draft', ['idnumber' => 'UP3'], MUST_EXIST));
+    }
 }

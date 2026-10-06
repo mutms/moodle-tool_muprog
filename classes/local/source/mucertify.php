@@ -329,7 +329,7 @@ final class mucertify extends base {
                   JOIN {tool_mucertify_assignment} ca ON ca.userid = u.id AND ca.certificationid = c.id
                   JOIN {tool_muprog_program} p ON p.id = cp.programid
                   JOIN {tool_muprog_source} ps ON ps.programid = p.id AND ps.type = 'mucertify'
-                 WHERE c.archived = 0 AND ca.archived = 0 AND p.archived = 0
+                 WHERE c.archived = 0 AND ca.archived = 0 AND p.archived = 0 AND p.draft = 0
                        AND cp.allocationid IS NULL AND cp.timecertified IS NULL AND cp.timerevoked IS NULL
                        AND cp.timewindowstart < :soon
                        AND (cp.timewindowend IS NULL OR cp.timewindowend > :now1)

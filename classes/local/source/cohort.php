@@ -221,7 +221,7 @@ final class cohort extends base {
                   JOIN {tool_muprog_program} p ON p.id = s.programid
              LEFT JOIN {tool_muprog_allocation} pa ON pa.programid = p.id AND pa.userid = cm.userid
                  WHERE (pa.id IS NULL OR (pa.archived = 1 AND pa.sourceid = s.id))
-                       AND p.archived = 0
+                       AND p.archived = 0 AND p.draft = 0
                        AND (p.timeallocationstart IS NULL OR p.timeallocationstart <= :now1)
                        AND (p.timeallocationend IS NULL OR p.timeallocationend > :now2)
                        $programselect $userselect

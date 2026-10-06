@@ -71,7 +71,7 @@ final class approval extends base {
             throw new \coding_exception('invalid source parameter');
         }
 
-        if ($program->archived) {
+        if ($program->archived || $program->draft) {
             return false;
         }
 

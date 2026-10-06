@@ -52,6 +52,7 @@ final class upload {
                 'description' => $rawprogram->description ?? '',
                 'descriptionformat' => $rawprogram->descriptionformat ?? FORMAT_HTML,
                 'archived' => 0,
+                'draft' => $rawprogram->draft ?? 0,
                 'creategroups' => $rawprogram->creategroups ?? 0,
                 'timeallocationstart' => self::parse_date($rawprogram->allocationstart ?? null),
                 'timeallocationend' => self::parse_date($rawprogram->allocationend ?? null),
@@ -782,7 +783,7 @@ final class upload {
                     continue;
                 }
                 $value = $row[$ci];
-                if (in_array($colname, ['descriptionformat', 'creategroups'])) {
+                if (in_array($colname, ['descriptionformat', 'creategroups', 'draft'])) {
                     $value = intval($value);
                 } else if (in_array($colname, ['allocationstart', 'allocationend'])) {
                     if ($value === '') {

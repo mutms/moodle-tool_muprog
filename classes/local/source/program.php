@@ -155,7 +155,7 @@ final class program extends base {
              LEFT JOIN {tool_muprog_allocation} pa ON pa.programid = p.id AND pa.userid = opa.userid
                  WHERE opa.timecompleted <= :now3
                        AND pa.id IS NULL
-                       AND p.archived = 0
+                       AND p.archived = 0 AND p.draft = 0
                        AND (p.timeallocationstart IS NULL OR p.timeallocationstart <= :now1)
                        AND (p.timeallocationend IS NULL OR p.timeallocationend > :now2)
                        $programselect $userselect
@@ -202,7 +202,7 @@ final class program extends base {
                   FROM {tool_muprog_source} s
                   JOIN {tool_muprog_program} p ON p.id = s.programid
              LEFT JOIN {tool_muprog_allocation} pa ON pa.programid = p.id AND pa.userid = :userid
-                 WHERE s.type = 'program' AND s.auxint1 = :programid AND p.archived = 0
+                 WHERE s.type = 'program' AND s.auxint1 = :programid AND p.archived = 0 AND p.draft = 0
                        AND pa.id IS NULL
         ";
         $params = ['userid' => $allocation->userid, 'programid' => $allocation->programid];

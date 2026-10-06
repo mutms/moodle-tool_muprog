@@ -80,6 +80,9 @@ $string['deleteattendance'] = 'Delete offline attendance';
 $string['deletecourse'] = 'Remove course';
 $string['deletecredits'] = 'Remove credits';
 $string['deleteset'] = 'Delete set';
+$string['draft'] = 'Draft';
+$string['draft_cataloguenotice'] = 'Draft programs cannot be added to catalogue, release the program first.';
+$string['draft_help'] = 'Draft programs can be configured the same way as other programs, but users cannot be allocated and the program cannot be used in catalogue or certifications until it is released. Released program cannot be returned to draft.';
 $string['duedate'] = 'Due date';
 $string['enrolrole'] = 'Course role';
 $string['enrolrole_desc'] = 'Select role that will be used by programs for course enrolment';
@@ -103,6 +106,7 @@ $string['event_allocation_viewed'] = 'Program allocation viewed';
 $string['event_program_archived'] = 'Program archived';
 $string['event_program_created'] = 'Program created';
 $string['event_program_deleted'] = 'Program deleted';
+$string['event_program_released'] = 'Program released';
 $string['event_program_restored'] = 'Program restored';
 $string['event_program_updated'] = 'Program updated';
 $string['event_program_viewed'] = 'Program viewed';
@@ -325,7 +329,17 @@ Archiving is a required step before program can be deleted.';
 $string['program_create'] = 'Add program';
 $string['program_delete'] = 'Delete program';
 $string['program_delete_info'] = 'During program deletion all program data is deleted and users are unenrolled from program courses.';
+$string['program_draftdefault'] = 'New programs are drafts';
+$string['program_draftdefault_desc'] = 'Default value of the Draft setting when adding new programs manually.';
 $string['program_move'] = 'Move program';
+$string['program_release'] = 'Release program';
+$string['program_release_info'] = 'Releasing of draft program:
+
+* allows allocation of users using enabled allocation sources,
+* adds program enrolment methods to program courses,
+* allows adding of program to catalogue and certifications.
+
+Released program cannot be returned to draft.';
 $string['program_restore'] = 'Restore program';
 $string['program_restore_info'] = 'Restoring of program reverts changes done during program archiving.
 

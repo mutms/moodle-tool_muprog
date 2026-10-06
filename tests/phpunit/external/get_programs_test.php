@@ -286,4 +286,32 @@ final class get_programs_test extends \advanced_testcase {
         $this->assertEquals($program2->id, $results[0]['id']);
         $this->assertEquals($program3->id, $results[1]['id']);
     }
+
+    public function test_execute_draft(): void {
+        /** @var \tool_muprog_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
+
+        $program1 = $generator->create_program([]);
+        $program2 = $generator->create_program(['draft' => 1]);
+
+        $this->setAdminUser();
+
+        $response = get_programs::execute([]);
+        $results = get_programs::clean_returnvalue(get_programs::execute_returns(), $response);
+        $this->assertCount(2, $results);
+        $this->assertSame((int)$program1->id, $results[0]['id']);
+        $this->assertSame(false, $results[0]['draft']);
+        $this->assertSame((int)$program2->id, $results[1]['id']);
+        $this->assertSame(true, $results[1]['draft']);
+
+        $response = get_programs::execute([['field' => 'draft', 'value' => 1]]);
+        $results = get_programs::clean_returnvalue(get_programs::execute_returns(), $response);
+        $this->assertCount(1, $results);
+        $this->assertSame((int)$program2->id, $results[0]['id']);
+
+        $response = get_programs::execute([['field' => 'draft', 'value' => 0]]);
+        $results = get_programs::clean_returnvalue(get_programs::execute_returns(), $response);
+        $this->assertCount(1, $results);
+        $this->assertSame((int)$program1->id, $results[0]['id']);
+    }
 }

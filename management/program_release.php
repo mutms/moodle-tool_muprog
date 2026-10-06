@@ -18,12 +18,10 @@
 // phpcs:disable moodle.Files.LineLength.TooLong
 
 /**
- * Delete program.
+ * Restore program.
  *
  * @package    tool_muprog
- * @copyright  2022 Open LMS (https://www.openlms.net/)
  * @copyright  2025 Petr Skoda
- * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -44,21 +42,21 @@ require_login();
 
 $program = $DB->get_record('tool_muprog_program', ['id' => $id], '*', MUST_EXIST);
 $context = context::instance_by_id($program->contextid);
-require_capability('tool/muprog:delete', $context);
+require_capability('tool/muprog:edit', $context);
 
-$currenturl = new core\url('/admin/tool/muprog/management/program_delete.php', ['id' => $program->id]);
+$currenturl = new core\url('/admin/tool/muprog/management/program_release.php', ['id' => $program->id]);
 $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
-$title = get_string('program_delete', 'tool_muprog');
+$title = get_string('program_release', 'tool_muprog');
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
 
 $handler = handler::from_request();
 
-$form = new \tool_muprog\local\form\program_delete($currenturl, $program);
+$form = new \tool_muprog\local\form\program_release($currenturl, $program);
 $returnurl = new core\url('/admin/tool/muprog/management/program.php', ['id' => $program->id]);
 
-if (!$program->archived && !$program->draft) {
+if (!$program->draft || $program->archived) {
     redirect($returnurl);
 }
 
@@ -67,8 +65,7 @@ if ($form->is_cancelled()) {
 }
 
 if ($data = $form->get_data()) {
-    program::delete($program->id);
-    $returnurl = new core\url('/admin/tool/muprog/management/index.php', ['contextid' => $program->contextid]);
+    program::release($program->id);
     $handler->submitted($returnurl);
 }
 

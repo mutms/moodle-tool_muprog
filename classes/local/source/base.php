@@ -129,7 +129,7 @@ abstract class base {
         ) {
             throw new \coding_exception('invalid parameters');
         }
-        if ($program->archived) {
+        if ($program->archived || $program->draft) {
             return false;
         }
         if ($allocation->archived) {
@@ -154,7 +154,7 @@ abstract class base {
         ) {
             throw new \coding_exception('invalid parameters');
         }
-        if ($program->archived) {
+        if ($program->archived || $program->draft) {
             return false;
         }
         if ($allocation->archived) {
@@ -179,7 +179,7 @@ abstract class base {
         ) {
             throw new \coding_exception('invalid parameters');
         }
-        if ($program->archived) {
+        if ($program->archived || $program->draft) {
             return false;
         }
         if (!$allocation->archived) {
@@ -204,7 +204,7 @@ abstract class base {
         ) {
             throw new \coding_exception('invalid parameters');
         }
-        if ($program->archived) {
+        if ($program->archived || $program->draft) {
             return false;
         }
         if (!$allocation->archived) {
@@ -282,6 +282,9 @@ abstract class base {
 
         if ($userid <= 0 || isguestuser($userid)) {
             throw new \coding_exception('Only real users can be allocated to programs');
+        }
+        if ($program->draft) {
+            throw new \coding_exception('Users cannot be allocated to draft programs');
         }
 
         $user = $DB->get_record('user', ['id' => $userid, 'deleted' => 0, 'confirmed' => 1], '*', MUST_EXIST);

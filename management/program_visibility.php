@@ -66,6 +66,10 @@ echo $OUTPUT->header();
 
 echo $managementoutput->render_program_visibility($program);
 
+if ($program->draft) {
+    echo $OUTPUT->notification(get_string('draft_cataloguenotice', 'tool_muprog'), \core\output\notification::NOTIFY_INFO, false);
+}
+
 $addbutton = \tool_mucatalog\local\management::get_reference_add_button('program', $program->id, $currenturl);
 if ($addbutton) {
     echo $OUTPUT->box($OUTPUT->render($addbutton), 'buttons');

@@ -264,3 +264,30 @@ Feature: Program visibility management tests
     Then I should see "Public section"
     And "Add to catalogue section" "button" should not exist
     And I should not see "Catalogue actions"
+
+  @javascript
+  Scenario: Draft program cannot be added to catalogue section before it is released
+    Given the following "permission overrides" exist:
+      | capability                | permission | role     | contextlevel | reference |
+      | tool/mucatalog:manage     | Allow      | pmanager | System       |           |
+      | tool/mucatalog:addprogram | Allow      | pmanager | System       |           |
+    And the following "tool_muprog > programs" exist:
+      | fullname    | idnumber | draft |
+      | Program 000 | PR0      | 1     |
+    And the following "tool_mucatalog > sections" exist:
+      | name             | status   | guestvisible | uservisible | contextlevel | reference |
+      | Public section   | active   | 0            | 1           |              |           |
+    And I log in as "manager1"
+    And I am on the "tool_muprog > All programs management" page
+
+    When I follow "Program 000"
+    And I follow "Catalogue visibility"
+    Then I should see "Draft programs cannot be added to catalogue"
+    And "Add to catalogue section" "button" should not exist
+
+    When I follow "General"
+    And I click on "Release program" "button"
+    And I click on "Release program" "button" in the "dialog[open]" "css_element"
+    And I follow "Catalogue visibility"
+    Then I should not see "Draft programs cannot be added to catalogue"
+    And "Add to catalogue section" "button" should exist

@@ -75,6 +75,7 @@ final class source_program_edit_programid extends \tool_mulib\muform\autocomplet
     private function get_where(): sql {
         return sql::join(' AND ', array_filter([
             new sql('p.id <> ?', [$this->programid]),
+            new sql('p.draft = 0'),
             self::get_program_tenant_where($this->context, true),
         ]));
     }

@@ -147,6 +147,17 @@ final class program extends base {
             ->set_callback([format::class, 'boolean_as_text']);
 
         $columns[] = (new column(
+            'draft',
+            new lang_string('draft', 'tool_muprog'),
+            $this->get_entity_name()
+        ))
+            ->add_joins($this->get_joins())
+            ->set_type(column::TYPE_BOOLEAN)
+            ->add_fields("{$programalias}.draft")
+            ->set_is_sortable(true)
+            ->set_callback([format::class, 'boolean_as_text']);
+
+        $columns[] = (new column(
             'creategroups',
             new lang_string('creategroups', 'tool_muprog'),
             $this->get_entity_name()
@@ -281,6 +292,15 @@ final class program extends base {
             new lang_string('archived', 'tool_muprog'),
             $this->get_entity_name(),
             "{$programalias}.archived"
+        ))
+            ->add_joins($this->get_joins());
+
+        $filters[] = (new filter(
+            boolean_select::class,
+            'draft',
+            new lang_string('draft', 'tool_muprog'),
+            $this->get_entity_name(),
+            "{$programalias}.draft"
         ))
             ->add_joins($this->get_joins());
 

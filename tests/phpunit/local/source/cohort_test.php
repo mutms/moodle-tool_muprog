@@ -416,4 +416,23 @@ final class cohort_test extends \advanced_testcase {
         $cohortids = $DB->get_fieldset_sql($sql, [$program3->id]);
         $this->assertSame([$cohort1->id, $cohort2->id, $cohort3->id], $cohortids);
     }
+
+    public function test_draft_program(): void {
+        global $DB;
+
+        /** @var \tool_muprog_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
+
+        $user = $this->getDataGenerator()->create_user();
+        $cohort = $this->getDataGenerator()->create_cohort();
+        \cohort_add_member($cohort->id, $user->id);
+
+        $program = $generator->create_program(['draft' => 1, 'sources' => ['cohort' => ['cohortids' => [$cohort->id]]]]);
+        \tool_muprog\local\source\cohort::fix_allocations($program->id, null);
+        \tool_muprog\local\source\cohort::fix_allocations(null, null);
+        $this->assertFalse($DB->record_exists('tool_muprog_allocation', ['programid' => $program->id]));
+
+        \tool_muprog\local\program::release($program->id);
+        $this->assertTrue($DB->record_exists('tool_muprog_allocation', ['programid' => $program->id, 'userid' => $user->id]));
+    }
 }

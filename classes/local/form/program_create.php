@@ -66,6 +66,10 @@ final class program_create extends form {
         $creategroups->add_help_button('creategroups', 'tool_muprog');
         $this->add($creategroups);
 
+        $draft = new yesno('draft', get_string('draft', 'tool_muprog'));
+        $draft->add_help_button('draft', 'tool_muprog');
+        $this->add($draft);
+
         $this->add(new tags('tags', get_string('tags'), new program_tagarea($programid, $contextid)));
 
         $this->add(new filemanager('image', get_string('programimage', 'tool_muprog'), 1, ['.jpg', '.jpeg', '.jpe', '.png']));

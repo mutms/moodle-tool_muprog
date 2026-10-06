@@ -125,6 +125,7 @@ final class program {
 
         unset($data->publicaccess); // Legacy catalogue visibility.
         $data->archived = isset($data->archived) ? (int)(bool)$data->archived : 0;
+        $data->draft = isset($data->draft) ? (int)(bool)$data->draft : 0;
         $data->creategroups = isset($data->creategroups) ? (int)(bool)$data->creategroups : 0;
         if (empty($data->timeallocationstart)) {
             $data->timeallocationstart = null;
@@ -343,6 +344,10 @@ final class program {
         // Do not change archived flag here!
         if (isset($data->archived) && $data->archived != $oldprogram->archived) {
             debugging('Use program::archive() and program::restore() to change archived flag', DEBUG_DEVELOPER);
+        }
+        // Draft flag is set when creating program and it can be only removed by releasing!
+        if (isset($data->draft) && $data->draft != $oldprogram->draft) {
+            debugging('Use program::release() to remove draft flag, programs cannot be returned to draft', DEBUG_DEVELOPER);
         }
         if (isset($data->creategroups)) {
             $record->creategroups = (int)(bool)$data->creategroups;
@@ -601,6 +606,48 @@ final class program {
         $program = $DB->get_record('tool_muprog_program', ['id' => $program->id], '*', MUST_EXIST);
 
         \tool_muprog\event\program_restored::create_from_program($program)->trigger();
+
+        $trans->allow_commit();
+
+        util::fix_muprog_active();
+
+        allocation::fix_allocation_sources($program->id, null);
+        allocation::fix_enrol_instances($program->id);
+        allocation::fix_user_enrolments($program->id, null);
+        calendar::fix_program_events($program);
+
+        return $program;
+    }
+
+    /**
+     * Release draft program.
+     *
+     * NOTE: released program cannot be returned to draft.
+     *
+     * @param int $programid
+     * @return stdClass
+     */
+    public static function release(int $programid): stdClass {
+        global $DB;
+
+        $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
+
+        if (!$program->draft) {
+            return $program;
+        }
+        if ($program->archived) {
+            throw new \core\exception\coding_exception('Archived draft program cannot be released');
+        }
+
+        $trans = $DB->start_delegated_transaction();
+
+        $DB->set_field('tool_muprog_program', 'draft', '0', ['id' => $program->id]);
+
+        self::fix_itemscount($program->id);
+
+        $program = $DB->get_record('tool_muprog_program', ['id' => $program->id], '*', MUST_EXIST);
+
+        \tool_muprog\event\program_released::create_from_program($program)->trigger();
 
         $trans->allow_commit();
 
@@ -1035,7 +1082,7 @@ final class program {
             $userid = (int)$USER->id;
         }
 
-        if ($program->archived) {
+        if ($program->archived || $program->draft) {
             return null;
         }
 
@@ -1114,7 +1161,7 @@ final class program {
                FROM {tool_muprog_program} p
                JOIN {tag_instance} tt ON tt.itemid = p.id AND tt.itemtype = 'tool_muprog_program' AND tt.tagid = :tagid AND tt.component = 'tool_muprog'
           LEFT JOIN {tool_muprog_allocation} pa ON pa.programid = p.id AND pa.userid = :userid AND pa.archived = 0
-              WHERE p.archived = 0
+              WHERE p.archived = 0 AND p.draft = 0
                     AND (pa.id IS NOT NULL OR EXISTS (
                          SELECT 'x'
                            FROM {tool_mucatalog_item} ci

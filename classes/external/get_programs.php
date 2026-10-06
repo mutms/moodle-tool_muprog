@@ -38,7 +38,7 @@ use core\exception\invalid_parameter_exception;
  */
 final class get_programs extends external_api {
     /** @var string[] */
-    public const SEARCH_FIELDS = ['id', 'contextid', 'fullname', 'idnumber', 'archived', 'tenantid'];
+    public const SEARCH_FIELDS = ['id', 'contextid', 'fullname', 'idnumber', 'archived', 'draft', 'tenantid'];
 
     /**
      * Describes the external function arguments.
@@ -51,7 +51,7 @@ final class get_programs extends external_api {
                 new external_single_structure(
                     [
                         'field' => new external_value(PARAM_ALPHANUM, 'The name of the field to be searched by list of'
-                            . ' acceptable fields is : id, contextid, fullname, idnumber, archived, tenantid'),
+                            . ' acceptable fields is : id, contextid, fullname, idnumber, archived, draft, tenantid'),
                         'value' => new external_value(PARAM_RAW, 'Value of the field to be searched, NULL allowed only for tenantid'),
                     ]
                 ),
@@ -155,6 +155,7 @@ final class get_programs extends external_api {
                 'descriptionformat' => new external_value(PARAM_INT, 'Program description text format'),
                 'presentationjson' => new external_value(PARAM_RAW, 'Presentation json (not stable internal API data)'),
                 'archived' => new external_value(PARAM_BOOL, 'Archived flag (archived programs should not change)'),
+                'draft' => new external_value(PARAM_BOOL, 'Draft flag (draft programs were not released yet)'),
                 'creategroups' => new external_value(PARAM_BOOL, 'Create course groups flag'),
                 'timeallocationstart' => new external_value(PARAM_INT, 'Allocation start date'),
                 'timeallocationend' => new external_value(PARAM_INT, 'Allocation end date'),
