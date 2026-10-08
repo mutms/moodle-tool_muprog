@@ -43,14 +43,34 @@ final class source_manual_allocate extends form {
     protected function definition(): void {
         $programid = (int)$this->get_extra_data()['program']->id;
 
-        $this->add(new autocompletemany('users', get_string('users'), new source_manual_allocate_users($programid)));
+        $users = new autocompletemany('users', get_string('users'), new source_manual_allocate_users($programid));
+        $users->set_required_marker(true);
+        $this->add($users);
 
-        $this->add(new autocomplete('cohortid', get_string('cohort', 'cohort'), new source_manual_allocate_cohortid($programid)));
+        $cohortid = new autocomplete('cohortid', get_string('cohort', 'cohort'), new source_manual_allocate_cohortid($programid));
+        $cohortid->set_required_marker(true);
+        $this->add($cohortid);
+
+        // Either users or cohort is required, the other one is hidden when not needed.
+        $this->get_display_manager()->hide_if('cohortid', 'users', 'notempty');
+        $this->get_display_manager()->hide_if('users', 'cohortid', 'notempty');
 
         $this->add(new customfields('customfields', allocation_handler::create(), null));
 
         $this->add(new buttons('buttons'));
         $this->add(new submit('submit', get_string('source_manual_allocateusers', 'tool_muprog')), 'buttons');
         $this->add(new cancel(), 'buttons');
+    }
+
+    #[\Override]
+    protected function validation(array $data, array &$allerrors): void {
+        if (!$data['users'] && !$data['cohortid']) {
+            $allerrors['users'][] = get_string('required');
+            $allerrors['cohortid'][] = get_string('required');
+        }
+        if ($data['users'] && $data['cohortid']) {
+            // Hiding of fields is cosmetic only, never allocate a cohort that the user cannot see in the form.
+            $allerrors['cohortid'][] = get_string('error');
+        }
     }
 }
