@@ -42,7 +42,7 @@ final class source_cohort_get_cohorts extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'programid' => new external_value(PARAM_INT, 'Program id'),
+            'programid' => new external_value(PARAM_INT, 'Program id', VALUE_REQUIRED, null, NULL_NOT_ALLOWED),
         ]);
     }
 

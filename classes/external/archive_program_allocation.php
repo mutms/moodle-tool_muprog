@@ -41,8 +41,8 @@ final class archive_program_allocation extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'programid' => new external_value(PARAM_INT, 'Program id'),
-            'userid' => new external_value(PARAM_INT, 'User id'),
+            'programid' => new external_value(PARAM_INT, 'Program id', VALUE_REQUIRED, null, NULL_NOT_ALLOWED),
+            'userid' => new external_value(PARAM_INT, 'User id', VALUE_REQUIRED, null, NULL_NOT_ALLOWED),
         ]);
     }
 

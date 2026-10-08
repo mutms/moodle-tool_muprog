@@ -42,8 +42,8 @@ final class source_cohort_delete_cohort extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'programid' => new external_value(PARAM_INT, 'Program id'),
-            'cohortid' => new external_value(PARAM_INT, 'Cohort id'),
+            'programid' => new external_value(PARAM_INT, 'Program id', VALUE_REQUIRED, null, NULL_NOT_ALLOWED),
+            'cohortid' => new external_value(PARAM_INT, 'Cohort id', VALUE_REQUIRED, null, NULL_NOT_ALLOWED),
         ]);
     }
 

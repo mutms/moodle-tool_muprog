@@ -45,7 +45,7 @@ final class source_manual_allocate_users extends external_api {
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters([
-            'programid' => new external_value(PARAM_INT, 'Program id'),
+            'programid' => new external_value(PARAM_INT, 'Program id', VALUE_REQUIRED, null, NULL_NOT_ALLOWED),
             'userids' => new external_multiple_structure(
                 new external_value(PARAM_INT, 'User id'),
                 'User ids to be allocated the program',
