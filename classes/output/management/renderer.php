@@ -66,8 +66,10 @@ class renderer extends \plugin_renderer_base {
         $details->add(get_string('programname', 'tool_muprog'), format_string($program->fullname));
         $details->add(get_string('programidnumber', 'tool_muprog'), s($program->idnumber));
 
+        $canedit = (has_capability('tool/muprog:edit', $context) && !management::is_program_frozen($program));
+
         $category = $context->get_context_name(false);
-        if (has_capability('tool/muprog:edit', $context)) {
+        if ($canedit) {
             $url = new url('/admin/tool/muprog/management/program_move.php', ['id' => $program->id]);
             $action = new \tool_mulib\output\muform\dialog\icon($url, get_string('program_move', 'tool_muprog'), 'i/edit');
             $category .= $this->output->render($action);
@@ -88,7 +90,7 @@ class renderer extends \plugin_renderer_base {
         }
         $details->add(get_string('description'), $description);
         $archived = $program->archived ? get_string('yes') : get_string('no');
-        if (has_capability('tool/muprog:edit', $context)) {
+        if ($canedit) {
             if ($program->archived) {
                 $url = new url('/admin/tool/muprog/management/program_restore.php', ['id' => $program->id]);
                 $action = new \tool_mulib\output\muform\dialog\icon($url, get_string('program_restore', 'tool_muprog'), 'i/settings');
@@ -209,7 +211,7 @@ class renderer extends \plugin_renderer_base {
 
         $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
         $context = \context::instance_by_id($program->contextid);
-        if ($program->archived) {
+        if ($program->archived || management::is_program_frozen($program)) {
             $canedit = false;
         } else {
             $canedit = has_capability('tool/muprog:edit', $context);

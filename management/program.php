@@ -60,13 +60,20 @@ if (has_capability('tool/muprog:export', $context)) {
     $url = new core\url('/admin/tool/muprog/management/export.php', ['id' => $program->id]);
     $actions->get_dropdown()->add_item(get_string('export', 'tool_muprog'), $url, new \core\output\pix_icon('i/export', ''));
 }
-if ($program->draft && !$program->archived && has_capability('tool/muprog:edit', $context)) {
+$frozen = management::is_program_frozen($program);
+if ($program->draft && !$program->archived && !$frozen && has_capability('tool/muprog:edit', $context)) {
     $url = new core\url('/admin/tool/muprog/management/program_release.php', ['id' => $program->id]);
     $button = new tool_mulib\output\muform\dialog\button($url, get_string('program_release', 'tool_muprog'), true);
     $button->set_form_size('sm');
     $actions->add_button($button);
 }
-if (($program->archived || $program->draft) && has_capability('tool/muprog:delete', $context)) {
+if (\tool_muprog\local\operation\base::did_operation_fail($program->id) && has_capability('tool/muprog:admin', $context)) {
+    $url = new core\url('/admin/tool/muprog/management/program_operation_dismiss.php', ['id' => $program->id]);
+    $button = new tool_mulib\output\muform\dialog\button($url, get_string('program_operation_dismiss', 'tool_muprog'));
+    $actions->add_button($button);
+}
+$candelete = (($program->archived || $program->draft) && !management::is_program_frozen($program, true));
+if ($candelete && has_capability('tool/muprog:delete', $context)) {
     $url = new core\url('/admin/tool/muprog/management/program_delete.php', ['id' => $program->id]);
     $link = new tool_mulib\output\muform\dialog\link($url, get_string('program_delete', 'tool_muprog'), 'i/delete');
     $link->add_class('text-danger');
@@ -81,7 +88,7 @@ if ($actions->has_items()) {
 echo $OUTPUT->header();
 
 $buttons = [];
-if (has_capability('tool/muprog:edit', $context)) {
+if (!$frozen && has_capability('tool/muprog:edit', $context)) {
     $url = new core\url('/admin/tool/muprog/management/program_update.php', ['id' => $program->id]);
     $editbutton = new tool_mulib\output\muform\dialog\button($url, get_string('edit'));
     $buttons[] = $OUTPUT->render($editbutton);

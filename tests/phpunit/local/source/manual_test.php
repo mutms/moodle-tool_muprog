@@ -758,27 +758,57 @@ final class manual_test extends \advanced_testcase {
     }
 
     public function test_import_source_data(): void {
+        global $DB;
+
         /** @var \tool_muprog_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
 
         $program1 = $generator->create_program(['sources' => ['manual' => []]]);
         $program2 = $generator->create_program(['sources' => []]);
+        $program3 = $generator->create_program(['sources' => []]);
 
         $source1 = manual::update_source((object)[
             'programid' => $program1->id,
             'type' => 'manual',
             'enable' => 1,
         ]);
+        // Auxiliary fields are not used by this source, they must never be copied.
+        $junk = ['auxint1' => 11, 'auxint2' => 22, 'auxint3' => 33, 'auxint4' => 44, 'auxint5' => 55];
+        $DB->update_record('tool_muprog_source', (object)(['id' => $source1->id] + $junk));
 
+        // Source is enabled in target, there are no settings to copy.
         $source2 = manual::import_source_data($program1->id, $program2->id);
         $this->assertSame($program2->id, $source2->programid);
         $this->assertSame('manual', $source2->type);
-        $this->assertSame($source1->datajson, $source2->datajson);
-        $this->assertSame($source1->auxint1, $source2->auxint1);
-        $this->assertSame($source1->auxint2, $source2->auxint2);
-        $this->assertSame($source1->auxint3, $source2->auxint3);
-        $this->assertSame($source1->auxint4, $source2->auxint4);
-        $this->assertSame($source1->auxint5, $source2->auxint5);
+        $this->assertSame('[]', $source2->datajson);
+        $this->assertNull($source2->auxint1);
+        $this->assertNull($source2->auxint2);
+        $this->assertNull($source2->auxint3);
+        $this->assertNull($source2->auxint4);
+        $this->assertNull($source2->auxint5);
+        $this->assertSame(1, $DB->count_records('tool_muprog_source', ['programid' => $program2->id]));
+
+        // Existing source in target is not changed in any way.
+        $DB->update_record('tool_muprog_source', (object)['id' => $source2->id, 'datajson' => '{"x":1}', 'auxint1' => 1, 'auxint5' => 5]);
+        $expected = $DB->get_record('tool_muprog_source', ['id' => $source2->id], '*', MUST_EXIST);
+        $source2 = manual::import_source_data($program1->id, $program2->id);
+        $this->assertEquals($expected, $source2);
+        $this->assertEquals($expected, $DB->get_record('tool_muprog_source', ['id' => $source2->id]));
+        $this->assertSame(1, $DB->count_records('tool_muprog_source', ['programid' => $program2->id]));
+
+        // Original is not changed.
+        $source1 = $DB->get_record('tool_muprog_source', ['id' => $source1->id], '*', MUST_EXIST);
+        $this->assertSame('11', $source1->auxint1);
+        $this->assertSame('55', $source1->auxint5);
+
+        // Source must be enabled in the original.
+        try {
+            manual::import_source_data($program3->id, $program2->id);
+            $this->fail('Exception expected');
+        } catch (\core\exception\moodle_exception $ex) {
+            $this->assertInstanceOf(\dml_missing_record_exception::class, $ex);
+        }
+        $this->assertSame(0, $DB->count_records('tool_muprog_source', ['programid' => $program3->id]));
     }
 
     public function test_draft_program(): void {

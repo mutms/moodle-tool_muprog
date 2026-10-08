@@ -160,6 +160,8 @@ final class management {
         $PAGE->set_title($programname . \moodle_page::TITLE_SEPARATOR . get_string('management', 'tool_muprog'));
         $PAGE->set_heading($programname);
 
+        self::add_program_operation_info($program);
+
         $secondarynav = new \tool_muprog\navigation\views\program_secondary($PAGE, $program);
         $PAGE->set_secondarynav($secondarynav);
         $PAGE->set_secondary_active_tab($secondarytab);
@@ -183,5 +185,92 @@ final class management {
 
         $url = new url('/admin/tool/muprog/management/program.php', ['id' => $program->id]);
         $PAGE->navbar->add($programname, $url);
+    }
+
+    /**
+     * Is the program frozen by an unfinished operation?
+     *
+     * Program with running operation cannot be modified in any way,
+     * program with failed operation can be deleted, or the failure can be dismissed
+     * to fix the program manually.
+     *
+     * @param stdClass $program
+     * @param bool $allowfailed true means program with failed operation is not considered to be frozen
+     * @return bool
+     */
+    public static function is_program_frozen(stdClass $program, bool $allowfailed = false): bool {
+        // Any pending operation freezes the program, its actual state matters only if failed is allowed.
+        $operation = operation\base::get_pending_operation($program->id, $allowfailed);
+        if (!$operation) {
+            return false;
+        }
+        if ($allowfailed && $operation->timefailed) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Stop if program is frozen by an unfinished operation.
+     *
+     * @param stdClass $program
+     * @param bool $allowfailed true means program with failed operation is not considered to be frozen
+     * @return void
+     */
+    public static function require_program_not_frozen(stdClass $program, bool $allowfailed = false): void {
+        if (self::is_program_frozen($program, $allowfailed)) {
+            throw new \core\exception\moodle_exception('errorprogramfrozen', 'tool_muprog');
+        }
+    }
+
+    /**
+     * Tell user about unfinished operation on program management pages.
+     *
+     * @param stdClass $program
+     * @return void
+     */
+    protected static function add_program_operation_info(stdClass $program): void {
+        global $DB;
+
+        // The info tells if the operation is still running or if it failed.
+        $operation = operation\base::get_pending_operation($program->id, true);
+        if (!$operation) {
+            return;
+        }
+        $state = operation\base::decode_state($operation);
+
+        $a = new stdClass();
+        $a->started = userdate($operation->timestarted);
+        $a->error = s($state['error'] ?? '');
+        $a->done = 0;
+        $a->total = 0;
+        $courses = [];
+        foreach (($state['courses'] ?? []) as $course) {
+            $a->total++;
+            if ($course['status'] === 'done') {
+                $a->done++;
+            }
+            if (empty($course['newid'])) {
+                continue;
+            }
+            $record = $DB->get_record('course', ['id' => $course['newid']], 'id, fullname');
+            if (!$record) {
+                continue;
+            }
+            $url = new url('/course/view.php', ['id' => $record->id]);
+            $courses[] = \core\output\html_writer::link($url, format_string($record->fullname));
+        }
+
+        if ($operation->timefailed) {
+            $message = get_string('operation_failed', 'tool_muprog', $a);
+            $type = \core\notification::ERROR;
+        } else {
+            $message = get_string('operation_running', 'tool_muprog', $a);
+            $type = \core\notification::WARNING;
+        }
+        if ($courses) {
+            $message .= ' ' . get_string('operation_courses', 'tool_muprog', implode(', ', $courses));
+        }
+        \core\notification::add($message, $type);
     }
 }

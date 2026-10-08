@@ -48,6 +48,7 @@ require_login();
 $targetprogram = $DB->get_record('tool_muprog_program', ['id' => $id], '*', MUST_EXIST);
 $context = context::instance_by_id($targetprogram->contextid);
 require_capability('tool/muprog:edit', $context);
+\tool_muprog\local\management::require_program_not_frozen($targetprogram);
 
 $currenturl = new core\url('/admin/tool/muprog/management/program_content_import.php', ['id' => $targetprogram->id]);
 $PAGE->set_context($context);

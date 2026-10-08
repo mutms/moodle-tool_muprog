@@ -81,6 +81,37 @@ final class selfallocation extends base {
     }
 
     /**
+     * Import source data from one program to another.
+     *
+     * Sign up settings including the sign up key and maximum number of users are copied.
+     *
+     * @param int $fromprogramid
+     * @param int $targetprogramid
+     * @return stdClass created or updated source record
+     */
+    #[\Override]
+    public static function import_source_data(int $fromprogramid, int $targetprogramid): stdClass {
+        global $DB;
+
+        $fromsource = $DB->get_record('tool_muprog_source', ['programid' => $fromprogramid, 'type' => 'selfallocation'], '*', MUST_EXIST);
+
+        // All settings of this source are stored in datajson, auxiliary fields are not used.
+        $targetsource = $DB->get_record('tool_muprog_source', ['programid' => $targetprogramid, 'type' => 'selfallocation']);
+        if ($targetsource) {
+            $DB->set_field('tool_muprog_source', 'datajson', $fromsource->datajson, ['id' => $targetsource->id]);
+            $targetsourceid = $targetsource->id;
+        } else {
+            $record = new stdClass();
+            $record->programid = $targetprogramid;
+            $record->type = 'selfallocation';
+            $record->datajson = $fromsource->datajson;
+            $targetsourceid = $DB->insert_record('tool_muprog_source', $record);
+        }
+
+        return $DB->get_record('tool_muprog_source', ['id' => $targetsourceid], '*', MUST_EXIST);
+    }
+
+    /**
      * Is it possible to manually delete user allocation?
      *
      * @param stdClass $program

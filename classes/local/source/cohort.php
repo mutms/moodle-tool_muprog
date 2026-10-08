@@ -78,7 +78,18 @@ final class cohort extends base {
     public static function import_source_data(int $fromprogramid, int $targetprogramid): stdClass {
         global $DB;
 
-        $targetsource = parent::import_source_data($fromprogramid, $targetprogramid);
+        $DB->get_record('tool_muprog_source', ['programid' => $fromprogramid, 'type' => 'cohort'], '*', MUST_EXIST);
+
+        // The only settings are the cohorts, they are added to cohorts of the target program.
+        $targetsource = $DB->get_record('tool_muprog_source', ['programid' => $targetprogramid, 'type' => 'cohort']);
+        if (!$targetsource) {
+            $record = new stdClass();
+            $record->programid = $targetprogramid;
+            $record->type = 'cohort';
+            $record->datajson = \tool_muprog\local\util::json_encode([]);
+            $record->id = $DB->insert_record('tool_muprog_source', $record);
+            $targetsource = $DB->get_record('tool_muprog_source', ['id' => $record->id], '*', MUST_EXIST);
+        }
 
         $sql = "SELECT fc.*
                   FROM {tool_muprog_src_cohort} fc

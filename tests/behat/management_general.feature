@@ -334,3 +334,57 @@ Feature: General programs management tests
     When I click on "Add program" "button"
     Then the following muform fields in the "dialog[open]" "css_element" match:
       | Draft | Yes |
+
+  @javascript
+  Scenario: Program with failed duplication is frozen until deleted or dismissed
+    Given the following "tool_muprog > programs" exist:
+      | fullname    | idnumber | draft |
+      | Program 001 | PR01     | 1     |
+      | Program 002 | PR02     | 1     |
+      | Program 003 | PR03     | 1     |
+    And the following "tool_muprog > program_operations" exist:
+      | program     | failed | error               | courses |
+      | Program 001 | 1      | Something went bad. | C1      |
+      | Program 003 | 1      | Something went bad. | C2      |
+    And I log in as "manager1"
+    And I am on the "tool_muprog > All programs management" page
+
+    When I follow "Program 002"
+    Then I should see "Release program"
+    And "Edit" "button" should exist
+    And I should not see "Duplication of this program"
+
+    When I am on the "tool_muprog > All programs management" page
+    And I follow "Program 001"
+    Then I should see "Duplication of this program started on"
+    And I should see "failed after copying 1 of 1 courses: Something went bad."
+    And I should see "Created courses: Course 1"
+    And I should not see "Release program"
+    And "Edit" "button" should not exist
+    And I follow "Content"
+    And I should see "Duplication of this program started on"
+
+    When I follow "General"
+    And I click on "Delete program" action from "Program actions" dropdown
+    And I click on "Delete program" "button" in the "dialog[open]" "css_element"
+    Then I should see "Program 002"
+    And I should not see "Program 001"
+
+    # Managers without admin capability cannot dismiss the failure.
+    When I follow "Program 003"
+    Then I should see "Duplication of this program started on"
+    And I should not see "Dismiss failed operation"
+    And I log out
+
+    When I log in as "editor1"
+    And I am on the "tool_muprog > All programs management" page
+    And I follow "Program 003"
+    And I should not see "Release program"
+    And I click on "Dismiss failed operation" "button"
+    And I should see "Something went bad." in the "dialog[open]" "css_element"
+    And I should see "Course 2" in the "dialog[open]" "css_element"
+    And I click on "Dismiss failed operation" "button" in the "dialog[open]" "css_element"
+    Then I should not see "Duplication of this program started on"
+    And I should not see "Dismiss failed operation"
+    And I should see "Release program"
+    And "Edit" "button" should exist

@@ -59,6 +59,7 @@ $PAGE->set_docs_path('https://github.com/mutms/moodle-tool_muprog/wiki/Program-c
 
 if ($autofix && !$program->archived) {
     require_sesskey();
+    management::require_program_not_frozen($program);
 
     $top = program::load_content($program->id);
     $top->autorepair();
@@ -67,6 +68,7 @@ if ($autofix && !$program->archived) {
 }
 if ($moveitem && $movetoparent && !$program->archived) {
     require_sesskey();
+    management::require_program_not_frozen($program);
 
     $top = program::load_content($program->id);
     $top->move_item($moveitem, $movetoparent, $moveposition);

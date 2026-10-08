@@ -48,6 +48,7 @@ require_capability('tool/muprog:edit', $context);
 if ($program->archived) {
     require_capability('tool/muprog:admin', $context);
 }
+\tool_muprog\local\management::require_program_not_frozen($program);
 
 $PAGE->set_context($context);
 

@@ -66,6 +66,16 @@ class provider implements
         );
 
         $collection->add_database_table(
+            'tool_muprog_operation',
+            [
+                'programid' => 'privacy:metadata:field:programid',
+                'userid' => 'privacy:metadata:field:userid',
+                'timestarted' => 'privacy:metadata:field:timestarted',
+            ],
+            'privacy:metadata:table:tool_muprog_operation'
+        );
+
+        $collection->add_database_table(
             'tool_muprog_cert_issue',
             [
                 'programid' => 'privacy:metadata:field:programid',

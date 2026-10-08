@@ -89,6 +89,35 @@ final class manual extends base {
     }
 
     /**
+     * Import source data from one program to another.
+     *
+     * Manual allocation has no settings, the source is only enabled in the target program.
+     *
+     * @param int $fromprogramid
+     * @param int $targetprogramid
+     * @return stdClass created or existing source record
+     */
+    #[\Override]
+    public static function import_source_data(int $fromprogramid, int $targetprogramid): stdClass {
+        global $DB;
+
+        $DB->get_record('tool_muprog_source', ['programid' => $fromprogramid, 'type' => 'manual'], '*', MUST_EXIST);
+
+        $targetsource = $DB->get_record('tool_muprog_source', ['programid' => $targetprogramid, 'type' => 'manual']);
+        if ($targetsource) {
+            return $targetsource;
+        }
+
+        $record = new stdClass();
+        $record->programid = $targetprogramid;
+        $record->type = 'manual';
+        $record->datajson = \tool_muprog\local\util::json_encode([]);
+        $record->id = $DB->insert_record('tool_muprog_source', $record);
+
+        return $DB->get_record('tool_muprog_source', ['id' => $record->id], '*', MUST_EXIST);
+    }
+
+    /**
      * Is it possible to manually delete user allocation?
      *
      * @param stdClass $program

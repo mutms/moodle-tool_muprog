@@ -332,4 +332,52 @@ class tool_muprog_generator extends component_generator_base {
         }
         return \tool_mulib\local\notification\util::notification_create($data);
     }
+
+    /**
+     * Create program operation record, the operation is not locked by any process.
+     *
+     * @param mixed $record
+     * @return \stdClass operation record
+     */
+    public function create_program_operation($record): stdClass {
+        global $DB, $USER;
+
+        $record = (object)(array)$record;
+
+        if (!empty($record->programid)) {
+            $program = $DB->get_record('tool_muprog_program', ['id' => $record->programid], '*', MUST_EXIST);
+        } else {
+            $program = $DB->get_record('tool_muprog_program', ['fullname' => $record->program], '*', MUST_EXIST);
+        }
+
+        $state = ['courses' => [], 'error' => null];
+        if (isset($record->error) && $record->error !== '') {
+            $state['error'] = $record->error;
+        }
+        if (!empty($record->courses)) {
+            $courses = is_array($record->courses) ? $record->courses : explode(',', $record->courses);
+            foreach ($courses as $shortname) {
+                $course = $DB->get_record('course', ['shortname' => trim($shortname)], '*', MUST_EXIST);
+                $state['courses'][] = [
+                    'sourceid' => null,
+                    'newid' => (int)$course->id,
+                    'fullname' => $course->fullname,
+                    'shortname' => $course->shortname,
+                    'status' => 'done',
+                ];
+            }
+        }
+
+        $now = time();
+        $operation = new stdClass();
+        $operation->programid = $program->id;
+        $operation->type = $record->type ?? 'programduplicate';
+        $operation->timestarted = $now;
+        $operation->timefailed = empty($record->failed) ? null : $now;
+        $operation->userid = empty($USER->id) ? get_admin()->id : $USER->id;
+        $operation->statejson = \tool_muprog\local\util::json_encode($state);
+        $operation->id = $DB->insert_record('tool_muprog_operation', $operation);
+
+        return $DB->get_record('tool_muprog_operation', ['id' => $operation->id], '*', MUST_EXIST);
+    }
 }

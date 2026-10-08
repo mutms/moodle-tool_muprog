@@ -18,16 +18,13 @@
 // phpcs:disable moodle.Files.LineLength.TooLong
 
 /**
- * Program management interface.
+ * Dismiss failed operation of program.
  *
  * @package    tool_muprog
- * @copyright  2022 Open LMS (https://www.openlms.net/)
- * @copyright  2025 Petr Skoda
- * @author     Petr Skoda
+ * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use tool_muprog\local\program;
 use tool_mulib\muform\handler;
 
 /** @var moodle_database $DB */
@@ -44,33 +41,30 @@ require_login();
 
 $program = $DB->get_record('tool_muprog_program', ['id' => $id], '*', MUST_EXIST);
 $context = context::instance_by_id($program->contextid);
-require_capability('tool/muprog:edit', $context);
-\tool_muprog\local\management::require_program_not_frozen($program);
+require_capability('tool/muprog:admin', $context);
 
-$currenturl = new core\url('/admin/tool/muprog/management/program_allocations_edit.php', ['id' => $id]);
+$currenturl = new core\url('/admin/tool/muprog/management/program_operation_dismiss.php', ['id' => $program->id]);
 $PAGE->set_context($context);
 $PAGE->set_url($currenturl);
-$title = get_string('program_allocations_edit', 'tool_muprog');
+$title = get_string('program_operation_dismiss', 'tool_muprog');
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
 
 $handler = handler::from_request();
 
-$current = [
-    'timeallocationstart' => $program->timeallocationstart,
-    'timeallocationend' => $program->timeallocationend,
-];
-$form = new \tool_muprog\local\form\program_allocations_edit($currenturl, $current);
+$form = new \tool_muprog\local\form\program_operation_dismiss($currenturl, $program);
+$returnurl = new core\url('/admin/tool/muprog/management/program.php', ['id' => $program->id]);
 
-$returnurl = new core\url('/admin/tool/muprog/management/program_allocation.php', ['id' => $program->id]);
+if (!\tool_muprog\local\operation\base::did_operation_fail($program->id)) {
+    redirect($returnurl);
+}
 
 if ($form->is_cancelled()) {
     $handler->cancelled($returnurl);
 }
 
 if ($data = $form->get_data()) {
-    $data->id = $program->id;
-    program::update_allocation($data);
+    \tool_muprog\local\operation\base::dismiss_failed($program->id);
     $handler->submitted($returnurl);
 }
 

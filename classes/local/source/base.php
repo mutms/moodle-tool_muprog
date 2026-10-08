@@ -19,6 +19,7 @@
 
 namespace tool_muprog\local\source;
 
+use core\exception\coding_exception;
 use tool_muprog\local\allocation;
 use tool_mulib\output\header_actions;
 use stdClass;
@@ -392,40 +393,16 @@ abstract class base {
     /**
      * Import source data from one program to another.
      *
+     * There is no default implementation: only the source knows what its data means
+     * and what makes sense to copy. Sources that return true from is_import_allowed()
+     * have to override this, they must copy only their own settings.
+     *
      * @param int $fromprogramid
      * @param int $targetprogramid
      * @return stdClass created or updated source record
      */
     public static function import_source_data(int $fromprogramid, int $targetprogramid): stdClass {
-        global $DB;
-
-        $fromsource = $DB->get_record(
-            'tool_muprog_source',
-            ['programid' => $fromprogramid, 'type' => static::get_type()],
-            '*',
-            MUST_EXIST
-        );
-        $targetsource = $DB->get_record(
-            'tool_muprog_source',
-            ['programid' => $targetprogramid, 'type' => static::get_type()]
-        );
-
-        if ($targetsource) {
-            $fromsource->id = $targetsource->id;
-            $fromsource->programid = $targetprogramid;
-            $DB->update_record('tool_muprog_source', $fromsource);
-        } else {
-            unset($fromsource->id);
-            $fromsource->programid = $targetprogramid;
-            $DB->insert_record('tool_muprog_source', $fromsource);
-        }
-
-        return $DB->get_record(
-            'tool_muprog_source',
-            ['programid' => $targetprogramid, 'type' => static::get_type()],
-            '*',
-            MUST_EXIST
-        );
+        throw new coding_exception('source does not support importing');
     }
 
     /**

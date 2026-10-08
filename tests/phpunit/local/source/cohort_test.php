@@ -406,15 +406,48 @@ final class cohort_test extends \advanced_testcase {
         $cohortids = $DB->get_fieldset_sql($sql, [$program3->id]);
         $this->assertSame([], $cohortids);
 
+        // Auxiliary fields are not used by this source, they must never be copied.
+        $DB->execute("UPDATE {tool_muprog_source} SET auxint1 = 11, auxint2 = 22, auxint3 = 33, auxint4 = 44, auxint5 = 55 WHERE type = 'cohort'");
+
+        // New source in target gets the cohorts only.
         $source3 = \tool_muprog\local\source\cohort::import_source_data($program1->id, $program3->id);
         $cohortids = $DB->get_fieldset_sql($sql, [$program3->id]);
         $this->assertSame([$cohort1->id], $cohortids);
         $this->assertSame($program3->id, $source3->programid);
         $this->assertSame('cohort', $source3->type);
+        $this->assertSame('[]', $source3->datajson);
+        $this->assertNull($source3->auxint1);
+        $this->assertNull($source3->auxint2);
+        $this->assertNull($source3->auxint3);
+        $this->assertNull($source3->auxint4);
+        $this->assertNull($source3->auxint5);
 
-        \tool_muprog\local\source\cohort::import_source_data($program2->id, $program3->id);
+        // Cohorts are added to existing source in target, nothing else is touched.
+        $DB->update_record('tool_muprog_source', (object)['id' => $source3->id, 'datajson' => '{"x":1}', 'auxint1' => 1, 'auxint5' => 5]);
+        $expected = $DB->get_record('tool_muprog_source', ['id' => $source3->id], '*', MUST_EXIST);
+        $source3x = \tool_muprog\local\source\cohort::import_source_data($program2->id, $program3->id);
         $cohortids = $DB->get_fieldset_sql($sql, [$program3->id]);
         $this->assertSame([$cohort1->id, $cohort2->id, $cohort3->id], $cohortids);
+        $this->assertEquals($expected, $source3x);
+        $this->assertSame(1, $DB->count_records('tool_muprog_source', ['programid' => $program3->id]));
+
+        // Importing again does not duplicate cohorts.
+        \tool_muprog\local\source\cohort::import_source_data($program2->id, $program3->id);
+        $this->assertSame([$cohort1->id, $cohort2->id, $cohort3->id], $DB->get_fieldset_sql($sql, [$program3->id]));
+
+        // Originals are not changed.
+        $this->assertSame([$cohort1->id], $DB->get_fieldset_sql($sql, [$program1->id]));
+        $this->assertSame([$cohort2->id, $cohort3->id], $DB->get_fieldset_sql($sql, [$program2->id]));
+
+        // Source must be enabled in the original.
+        $program4 = $generator->create_program(['sources' => []]);
+        try {
+            \tool_muprog\local\source\cohort::import_source_data($program4->id, $program3->id);
+            $this->fail('Exception expected');
+        } catch (\core\exception\moodle_exception $ex) {
+            $this->assertInstanceOf(\dml_missing_record_exception::class, $ex);
+        }
+        $this->assertSame(0, $DB->count_records('tool_muprog_source', ['programid' => $program4->id]));
     }
 
     public function test_draft_program(): void {

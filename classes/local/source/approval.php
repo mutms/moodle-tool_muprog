@@ -418,6 +418,37 @@ final class approval extends base {
     }
 
     /**
+     * Import source data from one program to another.
+     *
+     * The setting that allows new requests is copied, existing requests are not.
+     *
+     * @param int $fromprogramid
+     * @param int $targetprogramid
+     * @return stdClass created or updated source record
+     */
+    #[\Override]
+    public static function import_source_data(int $fromprogramid, int $targetprogramid): stdClass {
+        global $DB;
+
+        $fromsource = $DB->get_record('tool_muprog_source', ['programid' => $fromprogramid, 'type' => 'approval'], '*', MUST_EXIST);
+
+        // All settings of this source are stored in datajson, auxiliary fields are not used.
+        $targetsource = $DB->get_record('tool_muprog_source', ['programid' => $targetprogramid, 'type' => 'approval']);
+        if ($targetsource) {
+            $DB->set_field('tool_muprog_source', 'datajson', $fromsource->datajson, ['id' => $targetsource->id]);
+            $targetsourceid = $targetsource->id;
+        } else {
+            $record = new stdClass();
+            $record->programid = $targetprogramid;
+            $record->type = 'approval';
+            $record->datajson = $fromsource->datajson;
+            $targetsourceid = $DB->insert_record('tool_muprog_source', $record);
+        }
+
+        return $DB->get_record('tool_muprog_source', ['id' => $targetsourceid], '*', MUST_EXIST);
+    }
+
+    /**
      * Render details about this enabled source in a programs management ui.
      *
      * @param stdClass $program

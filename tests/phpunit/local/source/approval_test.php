@@ -322,12 +322,15 @@ final class approval_test extends \advanced_testcase {
     }
 
     public function test_import_source_data(): void {
+        global $DB;
+
         /** @var \tool_muprog_generator $generator */
         $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
 
         $program1 = $generator->create_program(['sources' => ['approval' => []]]);
         $program2 = $generator->create_program(['sources' => ['approval' => []]]);
         $program3 = $generator->create_program(['sources' => []]);
+        $program4 = $generator->create_program(['sources' => []]);
 
         $source1 = \tool_muprog\local\source\approval::update_source((object)[
             'programid' => $program1->id,
@@ -341,25 +344,59 @@ final class approval_test extends \advanced_testcase {
             'enable' => 1,
             'approval_allowrequest' => 1,
         ]);
+        $this->assertNotSame($source1->datajson, $source2->datajson);
+        // Auxiliary fields are not used by this source, they must never be copied.
+        $junk = ['auxint1' => 11, 'auxint2' => 22, 'auxint3' => 33, 'auxint4' => 44, 'auxint5' => 55];
+        $DB->update_record('tool_muprog_source', (object)(['id' => $source1->id] + $junk));
+        $DB->update_record('tool_muprog_source', (object)(['id' => $source2->id] + $junk));
 
+        // New source in target gets the settings only.
         $source3 = \tool_muprog\local\source\approval::import_source_data($program1->id, $program3->id);
         $this->assertSame($program3->id, $source3->programid);
         $this->assertSame('approval', $source3->type);
         $this->assertSame($source1->datajson, $source3->datajson);
-        $this->assertSame($source1->auxint1, $source3->auxint1);
-        $this->assertSame($source1->auxint2, $source3->auxint2);
-        $this->assertSame($source1->auxint3, $source3->auxint3);
-        $this->assertSame($source1->auxint4, $source3->auxint4);
-        $this->assertSame($source1->auxint5, $source3->auxint5);
+        $this->assertNull($source3->auxint1);
+        $this->assertNull($source3->auxint2);
+        $this->assertNull($source3->auxint3);
+        $this->assertNull($source3->auxint4);
+        $this->assertNull($source3->auxint5);
+        $this->assertSame(1, $DB->count_records('tool_muprog_source', ['programid' => $program3->id]));
 
-        $source3 = \tool_muprog\local\source\approval::import_source_data($program2->id, $program3->id);
-        $this->assertSame($program3->id, $source3->programid);
-        $this->assertSame('approval', $source3->type);
-        $this->assertSame($source2->datajson, $source3->datajson);
-        $this->assertSame($source2->auxint1, $source3->auxint1);
-        $this->assertSame($source2->auxint2, $source3->auxint2);
-        $this->assertSame($source2->auxint3, $source3->auxint3);
-        $this->assertSame($source2->auxint4, $source3->auxint4);
-        $this->assertSame($source2->auxint5, $source3->auxint5);
+        // Settings of existing source in target are replaced, nothing else is touched.
+        $DB->update_record('tool_muprog_source', (object)['id' => $source3->id, 'auxint1' => 1, 'auxint2' => 2, 'auxint3' => 3, 'auxint4' => 4, 'auxint5' => 5]);
+        $source3x = \tool_muprog\local\source\approval::import_source_data($program2->id, $program3->id);
+        $this->assertSame($source3->id, $source3x->id);
+        $this->assertSame($program3->id, $source3x->programid);
+        $this->assertSame('approval', $source3x->type);
+        $this->assertSame($source2->datajson, $source3x->datajson);
+        $this->assertSame('1', $source3x->auxint1);
+        $this->assertSame('2', $source3x->auxint2);
+        $this->assertSame('3', $source3x->auxint3);
+        $this->assertSame('4', $source3x->auxint4);
+        $this->assertSame('5', $source3x->auxint5);
+        $this->assertSame(1, $DB->count_records('tool_muprog_source', ['programid' => $program3->id]));
+
+        // Originals are not changed.
+        $this->assertSame($source1->datajson, $DB->get_field('tool_muprog_source', 'datajson', ['id' => $source1->id]));
+        $this->assertSame($source2->datajson, $DB->get_field('tool_muprog_source', 'datajson', ['id' => $source2->id]));
+        $this->assertSame('11', $DB->get_field('tool_muprog_source', 'auxint1', ['id' => $source1->id]));
+
+        // Source must be enabled in the original.
+        try {
+            \tool_muprog\local\source\approval::import_source_data($program4->id, $program3->id);
+            $this->fail('Exception expected');
+        } catch (\core\exception\moodle_exception $ex) {
+            $this->assertInstanceOf(\dml_missing_record_exception::class, $ex);
+        }
+        $this->assertSame(0, $DB->count_records('tool_muprog_source', ['programid' => $program4->id]));
+
+        // Requests are not copied.
+        $user = $this->getDataGenerator()->create_user();
+        $DB->insert_record('tool_muprog_request', (object)[
+            'sourceid' => $source1->id, 'userid' => $user->id, 'timerequested' => time(), 'datajson' => '[]',
+        ]);
+        \tool_muprog\local\source\approval::import_source_data($program1->id, $program3->id);
+        $this->assertSame(0, $DB->count_records('tool_muprog_request', ['sourceid' => $source3->id]));
+        $this->assertSame(1, $DB->count_records('tool_muprog_request', ['sourceid' => $source1->id]));
     }
 }

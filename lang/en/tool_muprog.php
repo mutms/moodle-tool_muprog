@@ -96,6 +96,7 @@ $string['errornomyprograms'] = 'You are not allocated to any programs.';
 $string['errornoprograms'] = 'No programs found.';
 $string['errornorequests'] = 'No program requests found';
 $string['errornotenabled'] = 'Programs plugin is not enabled';
+$string['errorprogramfrozen'] = 'Program cannot be modified, it is frozen by an unfinished operation.';
 $string['event_allocation_archived'] = 'User allocation archived';
 $string['event_allocation_completed'] = 'User completed program';
 $string['event_allocation_created'] = 'User allocated to program';
@@ -277,6 +278,10 @@ $string['notification_start_description'] = 'Notification sent to users when the
 $string['notification_start_subject'] = 'Program started';
 $string['notificationdates'] = 'Notification dates';
 $string['notset'] = 'Not set';
+$string['operation_aborted'] = 'Operation was aborted before it finished.';
+$string['operation_courses'] = 'Created courses: {$a}';
+$string['operation_failed'] = 'Duplication of this program started on {$a->started} and failed after copying {$a->done} of {$a->total} courses: {$a->error} The program is frozen. Either delete it together with the courses created for it and duplicate the original program again, or dismiss the failed operation and fix the program manually.';
+$string['operation_running'] = 'This program is being duplicated since {$a->started}, {$a->done} of {$a->total} courses are copied. The program cannot be modified until the duplication finishes.';
 $string['plugindisabled'] = 'Program enrolment plugin is disabled, programs will not be functional.
 
 [Enable plugin now]({$a->url})';
@@ -307,12 +312,14 @@ $string['privacy:metadata:field:timeend'] = 'End date';
 $string['privacy:metadata:field:timerejected'] = 'Rejection date';
 $string['privacy:metadata:field:timerequested'] = 'Request date';
 $string['privacy:metadata:field:timestart'] = 'Start date';
+$string['privacy:metadata:field:timestarted'] = 'Date the operation was started';
 $string['privacy:metadata:field:userid'] = 'User id';
 $string['privacy:metadata:table:tool_muprog_allocation'] = 'Information about program allocations';
 $string['privacy:metadata:table:tool_muprog_attendance'] = 'Offline attendance';
 $string['privacy:metadata:table:tool_muprog_cert_issue'] = 'Program allocation certificate issues';
 $string['privacy:metadata:table:tool_muprog_completion'] = 'Program allocation completions';
 $string['privacy:metadata:table:tool_muprog_evidence'] = 'Information about other completion evidences';
+$string['privacy:metadata:table:tool_muprog_operation'] = 'Lengthy program operations, such as duplication of programs, and the users who started them';
 $string['privacy:metadata:table:tool_muprog_request'] = 'Information about allocation request';
 $string['program'] = 'Program';
 $string['program_actions'] = 'Program actions';
@@ -332,6 +339,13 @@ $string['program_delete_info'] = 'During program deletion all program data is de
 $string['program_draftdefault'] = 'New programs are drafts';
 $string['program_draftdefault_desc'] = 'Default value of the Draft setting when adding new programs manually.';
 $string['program_move'] = 'Move program';
+$string['program_operation_dismiss'] = 'Dismiss failed operation';
+$string['program_operation_dismiss_info'] = 'The operation did not finish, the program and its courses are incomplete:
+
+* some courses may be missing or only partially copied,
+* program content may be missing.
+
+After dismissing the failed operation the program can be modified again. Fix everything manually before releasing the program.';
 $string['program_release'] = 'Release program';
 $string['program_release_info'] = 'Releasing of draft program:
 

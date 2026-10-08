@@ -268,5 +268,21 @@
         <INDEX NAME="sourceid-cohortid" UNIQUE="true" FIELDS="sourceid, cohortid"/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="tool_muprog_operation" COMMENT="Unfinished lengthy operations with programs, such as duplication of program with courses - program with operation is frozen in management UI, the record is deleted when operation finishes successfully or when failed operation is dismissed">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="programid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="Type of operation, matches class name in tool_muprog\local\operation namespace"/>
+        <FIELD NAME="timestarted" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timefailed" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Non-empty value means operation failed, the program stays frozen until the failure is dismissed or the program is deleted"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="User that started the operation"/>
+        <FIELD NAME="statejson" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Operation parameters, progress and optionally error"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="programid" TYPE="foreign-unique" FIELDS="programid" REFTABLE="tool_muprog_program" REFFIELDS="id" COMMENT="Only one operation per program is allowed"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
   </TABLES>
 </XMLDB>

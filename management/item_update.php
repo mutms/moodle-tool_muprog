@@ -51,6 +51,7 @@ require_capability('tool/muprog:edit', $context);
 if ($program->archived) {
     require_capability('tool/muprog:admin', $context);
 }
+\tool_muprog\local\management::require_program_not_frozen($program);
 
 $currenturl = new url('/admin/tool/muprog/management/item_update.php', ['id' => $record->id]);
 $PAGE->set_context($context);

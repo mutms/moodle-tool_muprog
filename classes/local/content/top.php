@@ -992,9 +992,11 @@ final class top extends set {
      * Import content from another program.
      *
      * @param \stdClass $data from \tool_muprog\local\form\program_content_import_confirmation
+     * @param array|null $coursemap optional replacement of courses [old course id => new course id],
+     *      courses that are not in the map are skipped
      * @return void
      */
-    public function content_import(\stdClass $data) {
+    public function content_import(\stdClass $data, ?array $coursemap = null) {
         if ($data->fromprogram == $this->programid) {
             throw new \coding_exception('invalid parameters');
         }
@@ -1012,23 +1014,30 @@ final class top extends set {
                 'completiondelay' => $topfrom->get_completiondelay(),
             ]);
         }
-        $copyfunction = function (item $item, set $newparent, top $top) use (&$copyfunction) {
+        $copyfunction = function (item $item, set $newparent, top $top) use (&$copyfunction, $coursemap) {
             global $DB;
             if ($item instanceof course) {
-                if (!$DB->record_exists('course', ['id' => $item->get_courseid()])) {
+                $courseid = $item->get_courseid();
+                if ($coursemap !== null) {
+                    if (!isset($coursemap[$courseid])) {
+                        return;
+                    }
+                    $courseid = $coursemap[$courseid];
+                }
+                if (!$DB->record_exists('course', ['id' => $courseid])) {
                     return;
                 }
                 if ($newparent === $top) {
                     // Prevent duplicate course at the top level.
                     foreach ($top->get_children() as $tch) {
                         if ($tch instanceof course) {
-                            if ($tch->get_courseid() == $item->get_courseid()) {
+                            if ($tch->get_courseid() == $courseid) {
                                 return;
                             }
                         }
                     }
                 }
-                $top->append_course($newparent, $item->get_courseid(), [
+                $top->append_course($newparent, $courseid, [
                     'points' => $item->get_points(),
                     'completiondelay' => $item->get_completiondelay(),
                 ]);

@@ -1499,4 +1499,28 @@ final class mucertify_test extends \advanced_testcase {
         $this->assertCount(1, $DB->get_records('tool_muprog_allocation', []));
         $this->assertCount(1, $DB->get_records('tool_muprog_allocation', ['userid' => $user3->id]));
     }
+
+    public function test_import_source_data(): void {
+        global $DB;
+
+        /** @var \tool_muprog_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
+
+        $program1 = $generator->create_program();
+        $program2 = $generator->create_program();
+        $DB->insert_record('tool_muprog_source', (object)[
+            'programid' => $program1->id, 'type' => 'mucertify', 'datajson' => '[]', 'auxint1' => 11,
+        ]);
+
+        // This source does not support importing.
+        $this->assertFalse(\tool_muprog\local\source\mucertify::is_import_allowed($program1, $program2));
+        try {
+            \tool_muprog\local\source\mucertify::import_source_data($program1->id, $program2->id);
+            $this->fail('Exception expected');
+        } catch (\core\exception\moodle_exception $ex) {
+            $this->assertInstanceOf(\core\exception\coding_exception::class, $ex);
+            $this->assertStringContainsString('source does not support importing', $ex->getMessage());
+        }
+        $this->assertSame(0, $DB->count_records('tool_muprog_source', ['programid' => $program2->id]));
+    }
 }

@@ -48,6 +48,11 @@ class behat_tool_muprog_generator extends behat_generator_base {
                 'datagenerator' => 'program_allocation',
                 'required' => [],
             ],
+            'program_operations' => [
+                'singular' => 'program_operation',
+                'datagenerator' => 'program_operation',
+                'required' => [],
+            ],
         ];
     }
 }

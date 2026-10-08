@@ -1033,6 +1033,7 @@ final class program {
 
         $DB->delete_records('tool_muprog_cert_issue', ['programid' => $program->id]);
         $DB->delete_records('tool_muprog_cert', ['programid' => $program->id]);
+        $DB->delete_records('tool_muprog_operation', ['programid' => $program->id]);
 
         // Program details last.
         \core_tag_tag::remove_all_item_tags('tool_muprog', 'tool_muprog_program', $program->id);

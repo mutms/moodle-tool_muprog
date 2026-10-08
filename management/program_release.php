@@ -18,10 +18,10 @@
 // phpcs:disable moodle.Files.LineLength.TooLong
 
 /**
- * Restore program.
+ * Release draft program.
  *
  * @package    tool_muprog
- * @copyright  2025 Petr Skoda
+ * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -43,6 +43,7 @@ require_login();
 $program = $DB->get_record('tool_muprog_program', ['id' => $id], '*', MUST_EXIST);
 $context = context::instance_by_id($program->contextid);
 require_capability('tool/muprog:edit', $context);
+\tool_muprog\local\management::require_program_not_frozen($program);
 
 $currenturl = new core\url('/admin/tool/muprog/management/program_release.php', ['id' => $program->id]);
 $PAGE->set_context($context);

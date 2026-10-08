@@ -6,6 +6,10 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 
 ## [Unreleased]
 
+### Added
+
+- CLI script for duplication of programs with courses
+
 ### Changed
 
 - program catalogue was replaced by Universal catalogue plugin, public programs are migrated

@@ -50,6 +50,7 @@ $itemrecord = $DB->get_record('tool_muprog_item', ['id' => $id], '*', MUST_EXIST
 $program = $DB->get_record('tool_muprog_program', ['id' => $itemrecord->programid], '*', MUST_EXIST);
 $context = context::instance_by_id($program->contextid);
 require_capability('tool/muprog:edit', $context);
+\tool_muprog\local\management::require_program_not_frozen($program);
 
 $currenturl = new core\url('/admin/tool/muprog/management/item_delete.php', ['id' => $itemrecord->id]);
 $PAGE->set_context($context);

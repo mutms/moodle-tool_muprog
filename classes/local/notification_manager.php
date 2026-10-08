@@ -125,6 +125,10 @@ final class notification_manager extends \tool_mulib\local\notification\manager 
             return false;
         }
 
+        if (management::is_program_frozen($program)) {
+            return false;
+        }
+
         $context = \context::instance_by_id($program->contextid);
         return has_capability('tool/muprog:edit', $context);
     }

@@ -40,6 +40,7 @@ require_login();
 $program = $DB->get_record('tool_muprog_program', ['id' => $id], '*', MUST_EXIST);
 $context = context::instance_by_id($program->contextid);
 require_capability('tool/muprog:edit', $context);
+\tool_muprog\local\management::require_program_not_frozen($program);
 
 $currenturl = new core\url('/admin/tool/muprog/management/program_move.php', ['id' => $program->id]);
 $PAGE->set_context($context);
