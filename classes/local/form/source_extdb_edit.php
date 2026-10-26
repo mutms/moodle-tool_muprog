@@ -22,8 +22,9 @@ use tool_mulib\muform\element\autocomplete;
 use tool_mulib\muform\element\buttons;
 use tool_mulib\muform\element\cancel;
 use tool_mulib\muform\element\checkbox;
+use tool_mulib\muform\element\info;
+use tool_mulib\muform\element\radiocards;
 use tool_mulib\muform\element\submit;
-use tool_mulib\muform\element\yesno;
 use tool_mulib\muform\form;
 use tool_muprog\muform\autocomplete\source_extdb_edit_queryid;
 
@@ -40,9 +41,19 @@ final class source_extdb_edit extends form {
         $source = $this->get_extra_data()['source'];
         $dm = $this->get_display_manager();
 
-        $enable = new yesno('enable', get_string('active'));
+        // Users allocated through the source keep it active, it cannot be deactivated.
+        $options = [1 => get_string('active')];
+        $descriptions = [1 => get_string('source_extdb_active_desc', 'tool_muprog')];
+        if (!$source->hasallocations) {
+            $options = [0 => get_string('inactive')] + $options;
+            $descriptions[0] = get_string('source_extdb_inactive_desc', 'tool_muprog');
+        }
+        $enable = new radiocards('enable', get_string('status'), $options, $descriptions);
         $enable->set_frozen($source->hasallocations);
         $this->add($enable);
+        if ($source->hasallocations) {
+            $this->add(new info('enableinfo', '', get_string('source_active_locked', 'tool_muprog')));
+        }
 
         $programid = (int)$this->get_extra_data()['program']->id;
         $auxint1 = new autocomplete(

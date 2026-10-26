@@ -34,7 +34,7 @@ Feature: External database query program allocation tests
     When I click on "Allocation settings" "link" in the ".secondary-navigation" "css_element"
     And I click on "Update External database allocation" "link"
     And I set the following muform fields in the "dialog[open]" "css_element":
-      | Active                  | Yes          |
+      | Status                  | Active          |
       | External database query | Test query 1 |
       | Archive missing users   | 1            |
     And I click on "Update" "button" in the "dialog[open]" "css_element"

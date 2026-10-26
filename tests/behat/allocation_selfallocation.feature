@@ -86,7 +86,7 @@ Feature: Program selfallocation tests
     And I follow "Allocation settings"
     And I click on "Update Self allocation" "link"
     And I set the following muform fields in the "dialog[open]" "css_element":
-      | Active             | Yes |
+      | Status             | Active |
       | Allow new sign ups | No  |
     And I click on "Update" "button" in the "dialog[open]" "css_element"
     Then I should see "Active; Sign ups are not allowed" in the "Self allocation" definition list item
@@ -132,7 +132,7 @@ Feature: Program selfallocation tests
 
     When I click on "Update Self allocation" "link"
     And I set the following muform fields in the "dialog[open]" "css_element":
-      | Active      | Yes   |
+      | Status      | Active   |
       | Sign up key | heslo |
     And I click on "Update" "button" in the "dialog[open]" "css_element"
     Then I should see "Active; Sign up key is required; Sign ups are allowed" in the "Self allocation" definition list item
@@ -163,7 +163,7 @@ Feature: Program selfallocation tests
 
     When I click on "Update Self allocation" "link"
     And I set the following muform fields in the "dialog[open]" "css_element":
-      | Active    | Yes |
+      | Status    | Active |
       | Max users | 2   |
     And I click on "Update" "button" in the "dialog[open]" "css_element"
     Then I should see "Active; Users 0/2; Sign ups are allowed" in the "Self allocation" definition list item
@@ -196,7 +196,7 @@ Feature: Program selfallocation tests
     And I follow "Allocation settings"
     And I click on "Update Self allocation" "link"
     And I set the following muform fields in the "dialog[open]" "css_element":
-      | Active | Yes |
+      | Status | Active |
     And I click on "Update" "button" in the "dialog[open]" "css_element"
     And I should see "Active; Sign ups are allowed" in the "Self allocation" definition list item
     And I log out
@@ -222,7 +222,7 @@ Feature: Program selfallocation tests
     And I follow "Allocation settings"
     And I click on "Update Self allocation" "link"
     And I set the following muform fields in the "dialog[open]" "css_element":
-      | Active | Yes |
+      | Status | Active |
     And I click on "Update" "button" in the "dialog[open]" "css_element"
     And I log out
     And I log in as "admin"

@@ -20,8 +20,9 @@ namespace tool_muprog\local\form;
 
 use tool_mulib\muform\element\buttons;
 use tool_mulib\muform\element\cancel;
+use tool_mulib\muform\element\info;
+use tool_mulib\muform\element\radiocards;
 use tool_mulib\muform\element\submit;
-use tool_mulib\muform\element\yesno;
 use tool_mulib\muform\form;
 
 /**
@@ -38,9 +39,19 @@ final class source_manual_edit extends form {
     protected function definition(): void {
         $source = $this->get_extra_data()['source'];
 
-        $enable = new yesno('enable', get_string('active'));
+        // Users allocated through the source keep it active, it cannot be deactivated.
+        $options = [1 => get_string('active')];
+        $descriptions = [1 => get_string('source_manual_active_desc', 'tool_muprog')];
+        if (!$source->hasallocations) {
+            $options = [0 => get_string('inactive')] + $options;
+            $descriptions[0] = get_string('source_manual_inactive_desc', 'tool_muprog');
+        }
+        $enable = new radiocards('enable', get_string('status'), $options, $descriptions);
         $enable->set_frozen($source->hasallocations);
         $this->add($enable);
+        if ($source->hasallocations) {
+            $this->add(new info('enableinfo', '', get_string('source_active_locked', 'tool_muprog')));
+        }
 
         $this->add(new buttons('buttons'));
         $this->add(new submit('submit', get_string('update')), 'buttons');

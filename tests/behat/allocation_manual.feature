@@ -78,7 +78,7 @@ Feature: Manual program allocation tests
     And I follow "Allocation settings"
     And I click on "Update Manual allocation" "link"
     And I set the following muform fields in the "dialog[open]" "css_element":
-      | Active | Yes |
+      | Status | Active |
     And I click on "Update" "button" in the "dialog[open]" "css_element"
     And I should see "Active" in the "Manual allocation" definition list item
     And I follow "Users"
@@ -131,7 +131,7 @@ Feature: Manual program allocation tests
     And I follow "Allocation settings"
     And I click on "Update Manual allocation" "link"
     And I set the following muform fields in the "dialog[open]" "css_element":
-      | Active | Yes |
+      | Status | Active |
     And I click on "Update" "button" in the "dialog[open]" "css_element"
     And I should see "Active" in the "Manual allocation" definition list item
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
@@ -146,7 +146,7 @@ Feature: Manual program allocation tests
     And I follow "Allocation settings"
     And I click on "Update Manual allocation" "link"
     And I set the following muform fields in the "dialog[open]" "css_element":
-      | Active | Yes |
+      | Status | Active |
     And I click on "Update" "button" in the "dialog[open]" "css_element"
     And I should see "Active" in the "Manual allocation" definition list item
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
@@ -190,7 +190,7 @@ Feature: Manual program allocation tests
     And I follow "Allocation settings"
     And I click on "Update Manual allocation" "link"
     And I set the following muform fields in the "dialog[open]" "css_element":
-      | Active | Yes |
+      | Status | Active |
     And I click on "Update" "button" in the "dialog[open]" "css_element"
     And I should see "Active" in the "Manual allocation" definition list item
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
@@ -263,7 +263,7 @@ Feature: Manual program allocation tests
     And I follow "Allocation settings"
     And I click on "Update Manual allocation" "link"
     And I set the following muform fields in the "dialog[open]" "css_element":
-      | Active | Yes |
+      | Status | Active |
     And I click on "Update" "button" in the "dialog[open]" "css_element"
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
 
@@ -311,7 +311,7 @@ Feature: Manual program allocation tests
     And I click on "Update scheduling" "button" in the "dialog[open]" "css_element"
     And I click on "Update Manual allocation" "link"
     And I set the following muform fields in the "dialog[open]" "css_element":
-      | Active | Yes |
+      | Status | Active |
     And I click on "Update" "button" in the "dialog[open]" "css_element"
     And I should see "Active" in the "Manual allocation" definition list item
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
@@ -381,7 +381,7 @@ Feature: Manual program allocation tests
     And I click on "Allocation settings" "link" in the ".secondary-navigation" "css_element"
     And I click on "Update Manual allocation" "link"
     And I set the following muform fields in the "dialog[open]" "css_element":
-      | Active | Yes |
+      | Status | Active |
     And I click on "Update" "button" in the "dialog[open]" "css_element"
     And I should see "Active" in the "Manual allocation" definition list item
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"

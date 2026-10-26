@@ -81,21 +81,21 @@ Feature: Import allocation settings
     And I click on "Update scheduling" "button" in the "dialog[open]" "css_element"
     And I click on "Update Automatic cohort allocation" "link"
     And I set the following muform fields in the "dialog[open]" "css_element":
-      | Active           | Yes                |
+      | Status           | Active                |
       | Allocate cohorts | Cohort 1, Cohort 2 |
     And I click on "Update" "button" in the "dialog[open]" "css_element"
     And I click on "Update Requests with approval" "link"
     And I set the following muform fields in the "dialog[open]" "css_element":
-      | Active             | Yes |
+      | Status             | Active |
       | Allow new requests | No  |
     And I click on "Update" "button" in the "dialog[open]" "css_element"
     And I click on "Update Manual allocation" "link"
     And I set the following muform fields in the "dialog[open]" "css_element":
-      | Active | Yes |
+      | Status | Active |
     And I click on "Update" "button" in the "dialog[open]" "css_element"
     And I click on "Update Self allocation" "link"
     And I set the following muform fields in the "dialog[open]" "css_element":
-      | Active             | Yes |
+      | Status             | Active |
       | Allow new sign ups | No  |
     And I click on "Update" "button" in the "dialog[open]" "css_element"
     And I should see "Thursday, 5 November 2020, 9:00" in the "Allocation start" definition list item

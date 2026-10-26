@@ -54,7 +54,7 @@ Feature: Completed programs allocation tests
     And I click on "Allocation settings" "link" in the ".secondary-navigation" "css_element"
     And I click on "Update Completed program" "link"
     And I set the following muform fields in the "dialog[open]" "css_element":
-      | Active              | Yes         |
+      | Status              | Active         |
       | Program to complete | Program 000 |
     And I click on "Update" "button" in the "dialog[open]" "css_element"
     Then I should see "Active" in the "Completed program" definition list item

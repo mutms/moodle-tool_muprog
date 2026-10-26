@@ -76,7 +76,7 @@ Feature: Visible cohorts program allocation tests
     And I click on "Allocation settings" "link" in the ".secondary-navigation" "css_element"
     And I click on "Update Automatic cohort allocation" "link"
     And I set the following muform fields in the "dialog[open]" "css_element":
-      | Active           | Yes                |
+      | Status           | Active                |
       | Allocate cohorts | Cohort 1, Cohort 2 |
     And I click on "Update" "button" in the "dialog[open]" "css_element"
     Then I should see "Active (Cohort 1, Cohort 2)" in the "Automatic cohort allocation" definition list item
@@ -131,6 +131,6 @@ Feature: Visible cohorts program allocation tests
     And I click on "Allocation settings" "link" in the ".secondary-navigation" "css_element"
     And I click on "Update Automatic cohort allocation" "link"
     And I set the following muform fields in the "dialog[open]" "css_element":
-      | Active | No |
+      | Status | Inactive |
     And I click on "Update" "button" in the "dialog[open]" "css_element"
     Then I should see "Inactive" in the "Automatic cohort allocation" definition list item

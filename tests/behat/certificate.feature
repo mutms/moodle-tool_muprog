@@ -110,7 +110,7 @@ Feature: Issuing of certificates for program completion
     And I follow "Allocation settings"
     And I click on "Update Manual allocation" "link"
     And I set the following muform fields in the "dialog[open]" "css_element":
-      | Active | Yes |
+      | Status | Active |
     And I click on "Update" "button" in the "dialog[open]" "css_element"
     And I should see "Active" in the "Manual allocation" definition list item
     And I follow "Users"
