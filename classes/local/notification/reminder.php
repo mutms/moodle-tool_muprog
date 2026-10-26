@@ -83,25 +83,13 @@ final class reminder extends base {
                   JOIN {tool_muprog_program} p ON p.id = pa.programid
                   JOIN {tool_mulib_notification} n
                        ON n.component = 'tool_muprog' AND n.notificationtype = 'reminder' AND n.instanceid = p.id AND n.enabled = 1
-                 WHERE p.archived = 0 AND pa.archived = 0
-                       AND pa.timecompleted IS NULL
-                       AND pa.timestart <= :cutoff1
-                       AND pa.timestart >= :maxcutoff
-                       AND (pa.timeend IS NULL OR pa.timeend > :now)
-                       AND (
-                           NOT EXISTS (
-                               SELECT 1
-                                 FROM {tool_mulib_notification_user} un1
-                                WHERE un1.notificationid = n.id AND un1.userid = pa.userid AND un1.otherid1 = pa.id
-                           )
-                           OR
-                           (
-                               SELECT MAX(un2.timenotified)
-                                 FROM {tool_mulib_notification_user} un2
-                                WHERE un2.notificationid = n.id AND un2.userid = pa.userid AND un2.otherid1 = pa.id
-                           ) <= :cutoff2
-                       )
+             LEFT JOIN {tool_mulib_notification_user} un
+                       ON un.notificationid = n.id AND un.userid = pa.userid AND un.otherid1 = pa.id AND un.timenotified > :cutoff1
+                 WHERE un.id IS NULL AND p.archived = 0 AND pa.archived = 0
                        $programselect $userselect
+                       AND pa.timecompleted IS NULL
+                       AND pa.timestart <= :cutoff2 AND pa.timestart >= :maxcutoff
+                       AND (pa.timeend IS NULL OR pa.timeend > :now)
               ORDER BY p.id, s.id, pa.userid";
         $rs = $DB->get_recordset_sql($sql, $params);
         foreach ($rs as $allocation) {

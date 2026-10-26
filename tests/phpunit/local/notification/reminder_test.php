@@ -150,4 +150,101 @@ final class reminder_test extends \advanced_testcase {
         $sink->close();
         $this->assertCount(0, $messages);
     }
+
+    public function test_notify_users_filtering(): void {
+        global $DB;
+
+        /** @var \tool_muprog_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $user3 = $this->getDataGenerator()->create_user();
+        $user4 = $this->getDataGenerator()->create_user();
+        $user5 = $this->getDataGenerator()->create_user();
+        $user6 = $this->getDataGenerator()->create_user();
+
+        $program1 = $generator->create_program(['sources' => ['manual' => []]]);
+        $source1 = $DB->get_record('tool_muprog_source', ['programid' => $program1->id, 'type' => 'manual'], '*', MUST_EXIST);
+        $program2 = $generator->create_program(['sources' => ['manual' => []]]);
+        $source2 = $DB->get_record('tool_muprog_source', ['programid' => $program2->id, 'type' => 'manual'], '*', MUST_EXIST);
+        $program3 = $generator->create_program(['sources' => ['manual' => []]]);
+        $source3 = $DB->get_record('tool_muprog_source', ['programid' => $program3->id, 'type' => 'manual'], '*', MUST_EXIST);
+        manual::allocate_users($program1->id, $source1->id, [$user1->id, $user2->id, $user3->id, $user4->id, $user5->id, $user6->id]);
+        manual::allocate_users($program2->id, $source2->id, [$user1->id]);
+        manual::allocate_users($program3->id, $source3->id, [$user1->id]);
+
+        $now = time();
+        $DB->set_field('tool_muprog_allocation', 'timestart', $now - reminder::TIME_INTERVAL - 100, []);
+
+        // User 2: suspended user.
+        $DB->set_field('user', 'suspended', 1, ['id' => $user2->id]);
+        // User 3: archived allocation.
+        $DB->set_field('tool_muprog_allocation', 'archived', 1, ['programid' => $program1->id, 'userid' => $user3->id]);
+        // User 4: program ends in the future, start just inside TIME_MAX.
+        $allocation4 = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user4->id], '*', MUST_EXIST);
+        $allocation4->timestart = $now - reminder::TIME_MAX + 100;
+        $allocation4->timeend = $now + 1000;
+        $DB->update_record('tool_muprog_allocation', $allocation4);
+        // User 6: program not started yet.
+        $DB->set_field('tool_muprog_allocation', 'timestart', $now + 1000, ['programid' => $program1->id, 'userid' => $user6->id]);
+        // Program 3 is archived.
+        $DB->set_field('tool_muprog_program', 'archived', 1, ['id' => $program3->id]);
+
+        $notification1 = $generator->create_program_notification(['notificationtype' => 'reminder', 'programid' => $program1->id]);
+        $notification2 = $generator->create_program_notification(['notificationtype' => 'reminder', 'programid' => $program2->id]);
+        $generator->create_program_notification(['notificationtype' => 'reminder', 'programid' => $program3->id]);
+        $DB->set_field('tool_mulib_notification', 'enabled', 0, ['id' => $notification2->id]);
+
+        // User 5: multiple old reminders, must be notified only once.
+        $allocation5 = $DB->get_record('tool_muprog_allocation', ['programid' => $program1->id, 'userid' => $user5->id], '*', MUST_EXIST);
+        foreach ([3, 2] as $weeks) {
+            $DB->insert_record('tool_mulib_notification_user', [
+                'notificationid' => $notification1->id,
+                'userid' => $user5->id,
+                'otherid1' => $allocation5->id,
+                'timenotified' => $now - ($weeks * reminder::TIME_INTERVAL),
+            ]);
+        }
+
+        // User filter: only program 1 for user 1, program 2 is disabled and program 3 archived.
+        $sink = $this->redirectMessages();
+        reminder::notify_users(null, $user1);
+        $messages = $sink->get_messages();
+        $sink->close();
+        $this->assertCount(1, $messages);
+        $this->assertSame($user1->id, $messages[0]->useridto);
+        $this->assertSame($program1->fullname, $messages[0]->contexturlname);
+
+        // Program filter: remaining eligible users 4 and 5.
+        $sink = $this->redirectMessages();
+        reminder::notify_users($program1, null);
+        $messages = $sink->get_messages();
+        $sink->close();
+        $this->assertCount(2, $messages);
+        $this->assertSame($user4->id, $messages[0]->useridto);
+        $this->assertSame($user5->id, $messages[1]->useridto);
+        $count = $DB->count_records(
+            'tool_mulib_notification_user',
+            ['notificationid' => $notification1->id, 'userid' => $user5->id]
+        );
+        $this->assertSame(3, $count);
+
+        // Enabled notification is processed.
+        $DB->set_field('tool_mulib_notification', 'enabled', 1, ['id' => $notification2->id]);
+        $sink = $this->redirectMessages();
+        reminder::notify_users(null, null);
+        $messages = $sink->get_messages();
+        $sink->close();
+        $this->assertCount(1, $messages);
+        $this->assertSame($user1->id, $messages[0]->useridto);
+        $this->assertSame($program2->fullname, $messages[0]->contexturlname);
+
+        // Nothing more to send.
+        $sink = $this->redirectMessages();
+        reminder::notify_users(null, null);
+        $messages = $sink->get_messages();
+        $sink->close();
+        $this->assertCount(0, $messages);
+    }
 }

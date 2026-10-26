@@ -172,7 +172,7 @@ $string['messageprovider:duesoon_notification'] = 'Program due date soon notific
 $string['messageprovider:endcompleted_notification'] = 'Completed program ended notification';
 $string['messageprovider:endfailed_notification'] = 'Failed program ended notification';
 $string['messageprovider:endsoon_notification'] = 'Program end date soon notification';
-$string['messageprovider:reminder_notification'] = 'Weekly reminder notification';
+$string['messageprovider:reminder_notification'] = 'Program weekly reminder notification';
 $string['messageprovider:reset_notification'] = 'Program reset notification';
 $string['messageprovider:start_notification'] = 'Program started notification';
 $string['moveafter'] = 'Move "{$a->item}" after "{$a->target}"';
@@ -269,7 +269,7 @@ $string['notification_reminder_body'] = 'Hello {$a->user_fullname},
 
 this is a reminder that you have not yet completed program "{$a->program_fullname}".
 ';
-$string['notification_reminder_description'] = 'Weekly notification sent to users who have not yet completed the program.';
+$string['notification_reminder_description'] = 'Weekly notification sent to users who have not yet completed the program, for up to 3 months after the program start date.';
 $string['notification_reminder_subject'] = 'Reminder: program completion pending';
 $string['notification_reset'] = 'User progress reset';
 $string['notification_reset_body'] = 'Hello {$a->user_fullname},
