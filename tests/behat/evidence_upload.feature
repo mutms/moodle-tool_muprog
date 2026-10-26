@@ -81,17 +81,12 @@ Feature: Upload program completion evidence using csv
     And I should not see "Upload completion evidences"
 
     And I click on "Upload allocations" "link"
-    And I upload "admin/tool/muprog/tests/fixtures/evidence1.csv" file to "csvfile" muform filemanager
-    And I set the following muform fields in the "dialog[open]" "css_element":
-      | CSV separator | ,     |
-      | Encoding      | UTF-8 |
-    And I click on "Continue" "button" in the "dialog[open]" "css_element"
-    And the following muform fields in the "dialog[open]" "css_element" match:
-      | User identification column | username |
-      | User mapping via           | Username |
-      | First line is header       | 1        |
-    And I click on "Upload allocations" "button" in the "dialog[open]" "css_element"
-    And I should see "5 users were allocated to program."
+    And I upload "admin/tool/muprog/tests/fixtures/evidence1.csv" file to "sourcefile" muform filemanager
+    And I press "Continue"
+    And I press "Continue"
+    And I should see "Ready to allocate: 5. Skipped: 1. Problems: 0."
+    And I press "Upload allocations"
+    And I should see "Allocated 5 users, skipped 1."
     And I click on "Users actions" "button"
     And I should see "Upload completion evidences"
 
@@ -101,22 +96,25 @@ Feature: Upload program completion evidence using csv
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
 
     When I click on "Upload completion evidences" action from "Users actions" dropdown
-    And I upload "admin/tool/muprog/tests/fixtures/evidence1.csv" file to "csvfile" muform filemanager
-    And I set the following muform fields in the "dialog[open]" "css_element":
-      | CSV separator | ,     |
-      | Encoding      | UTF-8 |
-    And I click on "Continue" "button" in the "dialog[open]" "css_element"
-    And I set the following muform fields in the "dialog[open]" "css_element":
-      | User identification column | username  |
-      | User mapping via           | Username  |
-      | First line is header       | 1         |
-      | Completion date            | completed |
-      | Details                    | evidence  |
-      | Default details            | EvidenceX |
-    And I click on "Upload completion evidences" "button" in the "dialog[open]" "css_element"
-    Then I should see "Completion evidence updated for 2 users"
-    And I should see "2 rows skipped"
-    And I should see "2 invalid rows detected"
+    And I upload "admin/tool/muprog/tests/fixtures/evidence1.csv" file to "sourcefile" muform filemanager
+    And I press "Continue"
+    Then I should see "7 rows were read"
+    And the following muform fields match:
+      | headers  | 1             |
+      | column_0 | username      |
+      | column_3 | timecompleted |
+      | column_4 | details       |
+    And I press "Continue"
+    And I set the following muform fields:
+      | Default details | EvidenceX |
+    And I press "Refresh preview"
+    And I should see "Ready to update: 2. Skipped: 4. Problems: 0."
+    And I should see "The user allocation is archived."
+    And I should see "Invalid date \"13/13/23\"."
+    And I should see "The completion date is missing."
+    And I should see "No user matches \"studentz\"."
+    And I press "Upload completion evidences"
+    Then I should see "Completion evidence updated for 2 users, skipped 4."
     And the following should exist in the "reportbuilder-table" table:
       | First name             | Program status |
       | Student 1              | Completed      |
@@ -140,26 +138,20 @@ Feature: Upload program completion evidence using csv
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
 
     When I click on "Upload completion evidences" action from "Users actions" dropdown
-    And I upload "admin/tool/muprog/tests/fixtures/evidence2.csv" file to "csvfile" muform filemanager
-    And I set the following muform fields in the "dialog[open]" "css_element":
-      | CSV separator | ,     |
-      | Encoding      | UTF-8 |
-    And I click on "Continue" "button" in the "dialog[open]" "css_element"
-    And I set the following muform fields in the "dialog[open]" "css_element":
-      | User identification column | email         |
-      | User mapping via           | Email address |
-      | First line is header       | 1             |
-      | Completion date            | completed     |
-    And I click on "Upload completion evidences" "button" in the "dialog[open]" "css_element"
-    And I set the following muform fields in the "dialog[open]" "css_element":
-      | User identification column | email     |
-      | User mapping via           | email     |
-      | First line is header       | 1         |
-      | Completion date            | completed |
-      | Default details            | EvidenceY |
-    And I click on "Upload completion evidences" "button" in the "dialog[open]" "css_element"
-    Then I should see "Completion evidence updated for 2 users"
-    And I should see "1 rows skipped"
+    And I upload "admin/tool/muprog/tests/fixtures/evidence2.csv" file to "sourcefile" muform filemanager
+    And I press "Continue"
+    And I set the following muform fields:
+      | column_0 | Not used      |
+      | column_1 | Email address |
+    And I press "Continue"
+    And I should see "Ready to update: 2. Skipped: 1. Problems: 0."
+    # Default details are required without a details column.
+    And I press "Upload completion evidences"
+    And I should see "Required"
+    And I set the following muform fields:
+      | Default details | EvidenceY |
+    And I press "Upload completion evidences"
+    Then I should see "Completion evidence updated for 2 users, skipped 1."
 
     And I follow "Student 1"
     And I should see "12 July 2023, 12:00" in the "Program completion date" definition list item

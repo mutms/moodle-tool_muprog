@@ -15,31 +15,38 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
-// phpcs:disable moodle.Files.LineLength.TooLong
 
 /**
- * Uploads program evidence.
+ * Upload or copy/paste program completion evidence via CSV format.
+ *
+ * The page walks through three stages: source, column meaning, options with a dry run.
+ * The parsed rows and the answers live in the muform wizard state between stages, the
+ * current stage is always decided from that state.
  *
  * @package    tool_muprog
  * @copyright  2024 Open LMS (https://www.openlms.net/)
+ * @copyright  2026 Petr Skoda
  * @author     Farhan Karmali
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use tool_muprog\local\form\program_evidence_upload_file;
+use tool_muprog\local\evidence_upload;
+use tool_muprog\local\form\program_evidence_upload_columns;
 use tool_muprog\local\form\program_evidence_upload_options;
-use tool_mulib\muform\handler;
+use tool_muprog\local\form\program_evidence_upload_source;
+use tool_muprog\local\management;
+use tool_mulib\muform\wizard;
 
+// phpcs:disable moodle.Commenting.InlineComment.TypeHintingMatch
 /** @var moodle_database $DB */
 /** @var moodle_page $PAGE */
 /** @var core_renderer $OUTPUT */
 /** @var stdClass $CFG */
-/** @var stdClass $COURSE */
+// phpcs:enable moodle.Commenting.InlineComment.TypeHintingMatch
 
 require('../../../../config.php');
 
 $programid = required_param('programid', PARAM_INT);
-$csvfile = optional_param('csvfile', 0, PARAM_INT);
 
 require_login();
 
@@ -47,12 +54,10 @@ $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUS
 $context = context::instance_by_id($program->contextid);
 require_capability('tool/muprog:manageevidence', $context);
 
-$currenturl = new core\url('/admin/tool/muprog/management/program_evidence_upload.php', ['programid' => $program->id]);
-$PAGE->set_context($context);
-$PAGE->set_url($currenturl);
+$pageurl = new core\url('/admin/tool/muprog/management/program_evidence_upload.php', ['programid' => $program->id]);
+management::setup_program_page($pageurl, $context, $program, 'program_users');
 $title = get_string('evidenceupload', 'tool_muprog');
-$PAGE->set_title($title);
-$PAGE->set_heading($title);
+$PAGE->navbar->add($title);
 
 $returnurl = new core\url('/admin/tool/muprog/management/program_users.php', ['id' => $program->id]);
 
@@ -60,55 +65,88 @@ if ($program->archived) {
     redirect($returnurl);
 }
 
-$handler = handler::from_request();
-
-// Rows parsed in the first step are stored in the user's upload area.
-$filedata = \tool_muprog\local\util::get_uploaded_data($csvfile);
-
-if (!$filedata) {
-    $form = new program_evidence_upload_file($currenturl, []);
-    if ($form->is_cancelled()) {
-        $handler->cancelled($returnurl);
-    }
-    if ($data = $form->get_data()) {
-        $nexturl = new core\url($currenturl, ['csvfile' => $data->csvfile]);
-        if ($handler->is_dialog()) {
-            // The dialog continues with the second step, the page gets it from the next URL.
-            $filedata = \tool_muprog\local\util::get_uploaded_data((int)$data->csvfile);
-            $handler->render(new program_evidence_upload_options($nexturl, [], ['filedata' => $filedata]));
-        }
-        redirect($nexturl);
-    }
-    $handler->render($form);
+// The state belongs to this program, it cannot be replayed against another one.
+$wizardname = 'tool_muprog_evidence_upload:' . $program->id;
+$wizard = wizard::load($wizardname, optional_param(wizard::PARAM, 0, PARAM_INT));
+if (!$wizard) {
+    $wizard = wizard::start($wizardname);
+    redirect($wizard->get_url($pageurl));
 }
 
-$PAGE->set_url(new core\url($currenturl, ['csvfile' => $csvfile]));
-$form = new program_evidence_upload_options($PAGE->url, [], ['filedata' => $filedata]);
+// The stored state is validated again on every request, each stage fills one part of it.
+$state = $wizard->get_data();
+$csvdata = evidence_upload::validate($state);
+$sourcedata = is_array($state['source'] ?? null) ? $state['source'] : [];
+
+$labels = [
+    'source' => get_string('evidenceupload_source', 'tool_muprog'),
+    'columns' => get_string('evidenceupload_columns', 'tool_muprog'),
+    'options' => get_string('evidenceupload_options', 'tool_muprog'),
+];
+$isvalid = fn(string $stage): bool => match ($stage) {
+    'source' => !evidence_upload::is_source_stage($csvdata),
+    'columns' => !evidence_upload::is_columns_stage($csvdata),
+    'options' => !evidence_upload::is_options_stage($csvdata),
+};
+$requested = optional_param(wizard::STAGE_PARAM, null, PARAM_ALPHA);
+$stages = wizard::resolve_stages($labels, $isvalid, $requested);
+$stage = wizard::current_stage($stages);
+
+if ($requested === null && $isvalid('options')) {
+    // Everything was answered, update the evidence.
+    $counts = evidence_upload::import($program, $csvdata, (object)$csvdata->options);
+    $wizard->delete();
+    if ($counts[evidence_upload::RESULT_ERROR]) {
+        \core\notification::error(get_string('evidenceupload_failed', 'tool_muprog', (object)$counts));
+    } else {
+        \core\notification::success(get_string('evidenceupload_done', 'tool_muprog', (object)$counts));
+    }
+    redirect($returnurl);
+}
+
+$formurl = $wizard->get_url($pageurl, $stage);
+if ($stage === 'source') {
+    $form = new program_evidence_upload_source($formurl, $sourcedata);
+} else if ($stage === 'columns') {
+    $current = [];
+    if ($csvdata->columns) {
+        $current['headers'] = (int)$csvdata->columns['headers'];
+        foreach ($csvdata->columns['map'] as $index => $value) {
+            $current['column_' . $index] = $value;
+        }
+    }
+    $form = new program_evidence_upload_columns($formurl, $current, ['rows' => $csvdata->rows]);
+} else {
+    // Options of an earlier confirmation are only defaults of the form.
+    $form = new program_evidence_upload_options($formurl, $csvdata->options, ['program' => $program, 'csvdata' => $csvdata]);
+}
 
 if ($form->is_cancelled()) {
-    $handler->cancelled($returnurl);
+    $wizard->delete();
+    redirect($returnurl);
 }
-
+if ($stage !== 'source' && $form->is_reloaded() && $form->get_element('back')->get_value()) {
+    redirect($wizard->get_url($pageurl, $stage === 'options' ? 'columns' : 'source'));
+}
 if ($data = $form->get_data()) {
-    $data->programid = $program->id;
-    // The uploaded file and parsed rows are deleted after processing.
-    $data->csvfile = $csvfile;
-    $result = \tool_muprog\local\allocation::process_evidence_uploaded_data($data, $filedata);
-
-    if ($result['updated']) {
-        $message = get_string('evidenceupload_updated', 'tool_muprog', $result['updated']);
-        \core\notification::add($message, \core\output\notification::NOTIFY_SUCCESS);
+    if ($stage === 'source') {
+        $csvdata = evidence_upload::save_source($form->get_source_content(), $data->encoding, $data->delimiter_name);
+        $sourcedata = [
+            'sourcefile' => (int)$data->sourcefile,
+            'csvtext' => $data->csvtext,
+            'encoding' => $data->encoding,
+            'delimiter_name' => $data->delimiter_name,
+        ];
+    } else if ($stage === 'columns') {
+        $csvdata = evidence_upload::save_columns($csvdata, $data);
+    } else {
+        $csvdata = evidence_upload::save_options($csvdata, $data);
     }
-    if ($result['skipped']) {
-        $message = get_string('evidenceupload_skipped', 'tool_muprog', $result['skipped']);
-        \core\notification::add($message, \core\output\notification::NOTIFY_INFO);
-    }
-    if ($result['errors']) {
-        $message = get_string('evidenceupload_errors', 'tool_muprog', $result['errors']);
-        \core\notification::add($message, \core\output\notification::NOTIFY_WARNING);
-    }
-
-    $handler->submitted($returnurl);
+    $wizard->set_data((array)$csvdata + ['source' => $sourcedata]);
+    redirect($wizard->get_url($pageurl));
 }
 
-$handler->render($form);
+echo $OUTPUT->header();
+echo $OUTPUT->heading($title, 2, 'mb-3');
+echo $wizard->render($OUTPUT, $stages, $pageurl, $form);
+echo $OUTPUT->footer();

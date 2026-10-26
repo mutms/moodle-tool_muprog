@@ -196,60 +196,103 @@ Feature: Manual program allocation tests
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
 
     When I click on "Upload allocations" action from "Users actions" dropdown
-    And I upload "admin/tool/muprog/tests/fixtures/upload1.csv" file to "csvfile" muform filemanager
-    And I set the following muform fields in the "dialog[open]" "css_element":
-      | CSV separator | ,     |
-      | Encoding      | UTF-8 |
-    And I click on "Continue" "button" in the "dialog[open]" "css_element"
-    And the following muform fields in the "dialog[open]" "css_element" match:
-      | User identification column | username |
-      | User mapping via           | Username |
-      | First line is header       | 1        |
-    And I click on "Upload allocations" "button" in the "dialog[open]" "css_element"
-    Then I should see "3 users were allocated to program."
+    And I upload "admin/tool/muprog/tests/fixtures/upload1.csv" file to "sourcefile" muform filemanager
+    And I press "Continue"
+    Then I should see "4 rows were read"
+    And the following muform fields match:
+      | headers  | 1        |
+      | column_0 | username |
+      | column_1 |          |
+    And I press "Continue"
+    And I should see "Ready to allocate: 3. Skipped: 0. Problems: 0."
+    And I press "Upload allocations"
+    Then I should see "Allocated 3 users, skipped 0."
     And "Student 1" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
     And "Student 2" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
     And "Student 3" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
 
     When I click on "Upload allocations" action from "Users actions" dropdown
-    And I upload "admin/tool/muprog/tests/fixtures/upload2.csv" file to "csvfile" muform filemanager
-    And I set the following muform fields in the "dialog[open]" "css_element":
-      | CSV separator | ,     |
-      | Encoding      | UTF-8 |
-    And I click on "Continue" "button" in the "dialog[open]" "css_element"
-    And the following muform fields in the "dialog[open]" "css_element" match:
-      | User identification column | student1@example.com |
-      | User mapping via           | Username             |
-      | First line is header       | 0                    |
-    And I set the following muform fields in the "dialog[open]" "css_element":
-      | User mapping via | Email address |
-    And I click on "Upload allocations" "button" in the "dialog[open]" "css_element"
-    Then I should see "1 users were allocated to program."
-    And I should see "2 users were already allocated to program."
-    And I should see "1 errors detected when allocating programs."
+    And I upload "admin/tool/muprog/tests/fixtures/upload2.csv" file to "sourcefile" muform filemanager
+    And I press "Continue"
+    Then I should see "4 rows were read"
+    And the following muform fields match:
+      | headers  | 0     |
+      | column_0 | email |
+    And I press "Continue"
+    And I should see "Ready to allocate: 1. Skipped: 3. Problems: 0."
+    # Problems stop the upload unless they are skipped.
+    And I set the following muform fields:
+      | Skip rows without a matching user | 0 |
+    And I press "Refresh preview"
+    And I should see "Ready to allocate: 1. Skipped: 2. Problems: 1."
+    And I should see "No user matches \"student9@example.com\"."
+    And "Upload allocations" "button" should not exist
+    And I set the following muform fields:
+      | Skip rows without a matching user | 1 |
+    And I press "Refresh preview"
+    And I press "Upload allocations"
+    Then I should see "Allocated 1 users, skipped 3."
     And "Student 1" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
     And "Student 2" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
     And "Student 3" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
     And "Student 4" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
 
     When I click on "Upload allocations" action from "Users actions" dropdown
-    And I upload "admin/tool/muprog/tests/fixtures/upload3.csv" file to "csvfile" muform filemanager
-    And I set the following muform fields in the "dialog[open]" "css_element":
-      | CSV separator | ;     |
-      | Encoding      | UTF-8 |
-    And I click on "Continue" "button" in the "dialog[open]" "css_element"
-    And the following muform fields in the "dialog[open]" "css_element" match:
-      | User identification column | idnumber  |
-      | User mapping via           | ID number |
-      | First line is header       | 1         |
-    And I click on "Upload allocations" "button" in the "dialog[open]" "css_element"
-    Then I should see "1 users were allocated to program."
-    And I should see "1 users were already allocated to program."
+    And I upload "admin/tool/muprog/tests/fixtures/upload3.csv" file to "sourcefile" muform filemanager
+    And I press "Continue"
+    Then I should see "3 rows were read"
+    And the following muform fields match:
+      | headers  | 1        |
+      | column_0 | idnumber |
+      | column_1 |          |
+    And I press "Continue"
+    And I should see "Ready to allocate: 1. Skipped: 1. Problems: 0."
+    And I press "Upload allocations"
+    Then I should see "Allocated 1 users, skipped 1."
     And "Student 1" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
     And "Student 2" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
     And "Student 3" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
     And "Student 4" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
     And "Student 5" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
+
+  @javascript
+  Scenario: Manager may paste users to allocate
+    Given I log in as "manager1"
+    And I am on the "tool_muprog > All programs management" page
+    And I follow "Program 000"
+    And I follow "Allocation settings"
+    And I click on "Update Manual allocation" "link"
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | Active | Yes |
+    And I click on "Update" "button" in the "dialog[open]" "css_element"
+    And I click on "Users" "link" in the ".secondary-navigation" "css_element"
+
+    When I click on "Upload allocations" action from "Users actions" dropdown
+    And I set the following muform fields:
+      | csvtext | student1\nSTUDENT2 |
+    And I press "Continue"
+    Then I should see "2 rows were read"
+    And the following muform fields match:
+      | headers  | 0        |
+      | column_0 | username |
+    And I press "Continue"
+    And I should see "Ready to allocate: 2. Skipped: 0. Problems: 0."
+    # Back keeps the answers, Cancel throws everything away.
+    And I press "Back"
+    And the following muform fields match:
+      | column_0 | username |
+    And I press "Cancel"
+    And I should not see "Student 1"
+
+    When I click on "Upload allocations" action from "Users actions" dropdown
+    And I set the following muform fields:
+      | csvtext | student1\nSTUDENT2 |
+    And I press "Continue"
+    And I press "Continue"
+    And I press "Upload allocations"
+    Then I should see "Allocated 2 users, skipped 0."
+    And "Student 1" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
+    And "Student 2" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
 
   @javascript @_file_upload
   Scenario: Manager may upload CSV file with manual allocations including program dates
@@ -274,21 +317,19 @@ Feature: Manual program allocation tests
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
 
     When I click on "Upload allocations" action from "Users actions" dropdown
-    And I upload "admin/tool/muprog/tests/fixtures/upload4.csv" file to "csvfile" muform filemanager
-    And I set the following muform fields in the "dialog[open]" "css_element":
-      | CSV separator | ,     |
-      | Encoding      | UTF-8 |
-    And I click on "Continue" "button" in the "dialog[open]" "css_element"
-    And the following muform fields in the "dialog[open]" "css_element" match:
-      | User identification column | username |
-      | User mapping via           | Username |
-    And I set the following muform fields in the "dialog[open]" "css_element":
-      | Time start column | startdate |
-      | Time due column   | duedate   |
-      | Time end column   | enddate   |
-    And I click on "Upload allocations" "button" in the "dialog[open]" "css_element"
-    Then I should see "3 users were allocated to program."
-    And I should see "3 errors detected when allocating programs."
+    And I upload "admin/tool/muprog/tests/fixtures/upload4.csv" file to "sourcefile" muform filemanager
+    And I press "Continue"
+    Then the following muform fields match:
+      | headers  | 1         |
+      | column_0 | username  |
+      | column_1 | timestart |
+      | column_2 | timedue   |
+      | column_3 | timeend   |
+    And I press "Continue"
+    And I should see "Ready to allocate: 3. Skipped: 3. Problems: 0."
+    And I should see "Program dates are not valid."
+    And I press "Upload allocations"
+    Then I should see "Allocated 3 users, skipped 3."
     Then the following should exist in the "reportbuilder-table" table:
       | First name          | Program start   | Due date        | Program end     | Source            |
       | Student 1           | 5/11/22, 09:00  | 22/01/23, 09:00 | 31/12/23, 09:00 | Manual allocation |

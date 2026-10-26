@@ -165,9 +165,11 @@ final class manual extends base {
             $actions->add_button($button);
 
             $url = new \core\url('/admin/tool/muprog/management/source_manual_upload.php', ['sourceid' => $source->id]);
-            $link = new \tool_mulib\output\muform\dialog\link($url, get_string('source_manual_uploadusers', 'tool_muprog'), 'i/publish');
-            $link->set_form_size('xl');
-            $actions->get_dropdown()->add_dialog($link);
+            $actions->get_dropdown()->add_item(
+                get_string('source_manual_uploadusers', 'tool_muprog'),
+                $url,
+                new \core\output\pix_icon('i/publish', '')
+            );
         }
     }
 
@@ -240,99 +242,19 @@ final class manual extends base {
     }
 
     /**
-     * Returns preprocessed user allocation upload file contents.
+     * Allocate users from a checked upload.
      *
-     * NOTE: data.json file is deleted.
-     *
-     * @param stdClass $data form submission data
-     * @param array $filedata decoded data.json file
-     * @return array with keys 'assigned', 'skipped' and 'errors'
+     * @param stdClass $program
+     * @param stdClass $source
+     * @param array $allocations user id => date overrides
+     * @return void
      */
-    public static function process_uploaded_data(stdClass $data, array $filedata): array {
-        global $DB, $USER;
-
-        if (
-            $data->usermapping !== 'username'
-            && $data->usermapping !== 'email'
-            && $data->usermapping !== 'idnumber'
-        ) {
-            // We need to prevent SQL injections in get_record later!
-            throw new \coding_exception('Invalid usermapping value');
+    public static function allocate_uploaded_users(stdClass $program, stdClass $source, array $allocations): void {
+        foreach ($allocations as $userid => $dateoverrides) {
+            self::allocation_create($program, $source, $userid, [], $dateoverrides);
+            \tool_muprog\local\allocation::fix_user_enrolments($program->id, $userid);
+            \tool_muprog\local\notification_manager::trigger_notifications($program->id, $userid);
         }
-
-        $result = [
-            'assigned' => 0,
-            'skipped' => 0,
-            'errors' => 0,
-        ];
-
-        $source = $DB->get_record('tool_muprog_source', ['id' => $data->sourceid, 'type' => 'manual'], '*', MUST_EXIST);
-        $program = $DB->get_record('tool_muprog_program', ['id' => $source->programid], '*', MUST_EXIST);
-
-        if ($data->hasheaders) {
-            unset($filedata[0]);
-        }
-
-        $datefields = ['timestartcolumn' => 'timestart', 'timeduecolumn' => 'timedue', 'timeendcolumn' => 'timeend'];
-        $datecolumns = [];
-        foreach ($datefields as $key => $value) {
-            if (isset($data->{$key}) && $data->{$key} != -1) {
-                $datecolumns[$value] = $data->{$key};
-            }
-        }
-
-        $userids = [];
-        foreach ($filedata as $i => $row) {
-            $userident = $row[$data->usercolumn];
-            if (!$userident) {
-                $result['errors']++;
-                continue;
-            }
-            $users = $DB->get_records('user', [$data->usermapping => $userident, 'deleted' => 0, 'confirmed' => 1]);
-            if (count($users) !== 1) {
-                $result['errors']++;
-                continue;
-            }
-            $user = reset($users);
-            if (isguestuser($user->id)) {
-                $result['errors']++;
-                continue;
-            }
-            if ($DB->record_exists('tool_muprog_allocation', ['programid' => $program->id, 'userid' => $user->id])) {
-                $result['skipped']++;
-                continue;
-            }
-
-            $dateoverrides = [];
-            foreach ($datecolumns as $key => $value) {
-                if (!empty($row[$value])) {
-                    $dateoverrides[$key] = strtotime($row[$value]);
-                    if ($dateoverrides[$key] === false) {
-                        $result['errors']++;
-                        continue 2;
-                    }
-                }
-            }
-            if (!base::is_valid_dateoverrides($program, $dateoverrides)) {
-                $result['errors']++;
-                continue;
-            }
-            self::allocation_create($program, $source, $user->id, [], $dateoverrides);
-            \tool_muprog\local\allocation::fix_user_enrolments($program->id, $user->id);
-            \tool_muprog\local\notification_manager::trigger_notifications($program->id, $user->id);
-            $userids[] = $user->id;
-        }
-
-        $result['assigned'] = count($userids);
-
-        if (!empty($data->csvfile)) {
-            $fs = get_file_storage();
-            $context = \context_user::instance($USER->id);
-            $fs->delete_area_files($context->id, 'user', 'draft', $data->csvfile);
-            $fs->delete_area_files($context->id, 'tool_muprog', 'upload', $data->csvfile);
-        }
-
-        return $result;
     }
 
     /**

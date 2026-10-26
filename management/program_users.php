@@ -70,8 +70,11 @@ $canmanageevidence = has_capability('tool/muprog:manageevidence', $context);
 $totalcount = $DB->count_records('tool_muprog_allocation', ['programid' => $program->id]);
 if ($totalcount && !$program->archived && $canmanageevidence) {
     $url = new \core\url('/admin/tool/muprog/management/program_evidence_upload.php', ['programid' => $id]);
-    $link = new \tool_mulib\output\muform\dialog\link($url, get_string('evidenceupload', 'tool_muprog'), 'i/upload');
-    $actions->get_dropdown()->add_dialog($link);
+    $actions->get_dropdown()->add_item(
+        get_string('evidenceupload', 'tool_muprog'),
+        $url,
+        new \core\output\pix_icon('i/upload', '')
+    );
 }
 if ($actions->has_items()) {
     $PAGE->add_header_action($OUTPUT->render($actions));

@@ -24,6 +24,8 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 - migration to new forms library
 - program scheduling delays are entered as intervals with a single time unit
 - cohort names link to cohort management, the advanced cohort management page is used when installed
+- allocation and completion evidence uploads are wizards that accept pasted data and show a dry run,
+  rows with problems block the upload unless they are skipped
 
 ### Fixed
 

@@ -50,7 +50,7 @@ final class program_create extends form {
         $contextid = (int)$this->get_current_data()['contextid'];
         $programid = null;
 
-        $fullname = new text('fullname', get_string('programname', 'tool_muprog'), ['maxlength' => 254]);
+        $fullname = new text('fullname', get_string('programname', 'tool_muprog'), ['maxlength' => 254, 'width' => 'full']);
         $fullname->set_required(true);
         $this->add($fullname);
 

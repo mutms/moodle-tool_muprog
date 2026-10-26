@@ -48,7 +48,7 @@ final class program_update extends form {
         $contextid = (int)$current['contextid'];
         $programid = (int)$current['id'];
 
-        $fullname = new text('fullname', get_string('programname', 'tool_muprog'), ['maxlength' => 254]);
+        $fullname = new text('fullname', get_string('programname', 'tool_muprog'), ['maxlength' => 254, 'width' => 'full']);
         $fullname->set_required(true);
         $this->add($fullname);
 

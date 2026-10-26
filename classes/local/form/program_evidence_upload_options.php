@@ -18,92 +18,138 @@
 
 namespace tool_muprog\local\form;
 
+use tool_muprog\local\evidence_upload;
 use tool_mulib\muform\element\buttons;
 use tool_mulib\muform\element\cancel;
 use tool_mulib\muform\element\checkbox;
+use tool_mulib\muform\element\info;
 use tool_mulib\muform\element\inforawhtml;
-use tool_mulib\muform\element\select;
+use tool_mulib\muform\element\reload;
 use tool_mulib\muform\element\submit;
 use tool_mulib\muform\element\textarea;
 use tool_mulib\muform\form;
 
 /**
- * Allocate users via file upload.
+ * Completion evidence upload, stage three: options and the dry run result.
  *
  * @package    tool_muprog
  * @copyright  2024 Open LMS (https://www.openlms.net/)
+ * @copyright  2026 Petr Skoda
  * @author     Farhan Karmali
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class program_evidence_upload_options extends form {
     #[\Override]
     protected function definition(): void {
-        $filedata = $this->get_extra_data()['filedata'];
+        $extra = $this->get_extra_data();
+        $program = $extra['program'];
+        $csvdata = $extra['csvdata'];
 
-        $preview = new \html_table();
-        $preview->data = [];
-        foreach (array_values($filedata) as $i => $row) {
-            if ($i >= 5) {
-                $preview->data[] = array_fill(0, count($row), '...');
-                break;
-            }
-            $preview->data[] = array_map('s', $row);
+        $this->add(new info('skipinfo', '', get_string('evidenceupload_skip_info', 'tool_muprog')));
+        foreach (evidence_upload::get_skip_menu() as $name => $label) {
+            $skip = (new checkbox($name, $label))
+                ->set_default(1);
+            $this->add($skip);
         }
-        $this->add(new inforawhtml('preview', get_string('preview'), \html_writer::table($preview)));
 
-        $fileoptions = array_map('strval', reset($filedata));
-        $this->add(new select('usercolumn', get_string('source_manual_usercolumn', 'tool_muprog'), $fileoptions));
-
-        $mappings = [
-            'username' => get_string('username'),
-            'idnumber' => get_string('idnumber'),
-            'email' => get_string('email'),
-        ];
-        $usermapping = new select('usermapping', get_string('source_manual_usermapping', 'tool_muprog'), $mappings);
-        $firstcolumn = reset($fileoptions);
-        if (isset($mappings[$firstcolumn])) {
-            $usermapping->set_default($firstcolumn);
+        $details = new textarea('details', get_string('evidence_detailsdefault', 'tool_muprog'), ['rows' => 3]);
+        if (!evidence_upload::has_details_column($csvdata)) {
+            $details->set_required(true);
         }
-        $this->add($usermapping);
+        $this->add($details);
 
-        $hasheaders = new checkbox('hasheaders', get_string('source_manual_hasheaders', 'tool_muprog'));
-        $hasheaders->set_default(isset($mappings[$firstcolumn]) ? 1 : 0);
-        $this->add($hasheaders);
+        // The preview always shows what the options in the form would do right now.
+        $options = (object)[];
+        foreach (evidence_upload::get_option_names() as $name) {
+            $options->$name = (int)$this->get_element($name)->get_value();
+        }
+        $options->details = (string)$this->get_element('details')->get_value();
+        $outcomes = evidence_upload::check($program, $csvdata, $options);
 
-        $timecompletedcolumn = new select(
-            'timecompletedcolumn',
-            get_string('completiondate', 'tool_muprog'),
-            ['' => get_string('choose')] + $fileoptions
-        );
-        $timecompletedcolumn->set_required(true);
-        $this->add($timecompletedcolumn);
+        $this->add(new inforawhtml('preview', '', $this->render_preview($outcomes)));
 
-        $options = [-1 => get_string('choose')] + $fileoptions;
-        $detailscolumn = new select('detailscolumn', get_string('evidence_details', 'tool_muprog'), $options);
-        $detailscolumn->set_default(-1);
-        $this->add($detailscolumn);
-
-        $this->add(new textarea('details', get_string('evidence_detailsdefault', 'tool_muprog')));
-
+        // The upload button comes first so that Enter never skips the dry run of other options.
         $this->add(new buttons('buttons'));
-        $this->add(new submit('submit', get_string('evidenceupload', 'tool_muprog')), 'buttons');
+        if (self::is_importable($outcomes)) {
+            $this->add(new submit('submit', get_string('evidenceupload', 'tool_muprog')), 'buttons');
+        }
+        $this->add(new reload('refresh', get_string('evidenceupload_refresh', 'tool_muprog')), 'buttons');
+        $this->add(new reload('back', get_string('muform_back', 'tool_mulib')), 'buttons');
         $this->add(new cancel(), 'buttons');
     }
 
-    #[\Override]
-    protected function validation(array $data, array &$allerrors): void {
-        $usedfields = [];
-        $columns = ['usercolumn', 'timecompletedcolumn', 'detailscolumn'];
-        foreach ($columns as $column) {
-            if ($data[$column] != -1 && in_array($data[$column], $usedfields)) {
-                $allerrors[$column][] = get_string('columnusedalready', 'tool_muprog');
-            } else {
-                $usedfields[] = $data[$column];
+    /**
+     * May the upload run with the outcomes of the dry run?
+     *
+     * @param array $outcomes
+     * @return bool
+     */
+    private static function is_importable(array $outcomes): bool {
+        $updated = 0;
+        foreach ($outcomes as $outcome) {
+            if ($outcome->result === evidence_upload::RESULT_ERROR) {
+                return false;
+            }
+            if ($outcome->result === evidence_upload::RESULT_UPDATED) {
+                $updated++;
             }
         }
+        return (bool)$updated;
+    }
 
-        if ($data['detailscolumn'] == -1 && trim($data['details']) === '') {
-            $allerrors['details'][] = get_string('required');
+    /**
+     * Counts of the dry run and the first rows of its result.
+     *
+     * @param array $outcomes
+     * @return string html
+     */
+    private function render_preview(array $outcomes): string {
+        global $OUTPUT;
+
+        $counts = [
+            evidence_upload::RESULT_UPDATED => 0,
+            evidence_upload::RESULT_SKIPPED => 0,
+            evidence_upload::RESULT_ERROR => 0,
+        ];
+        foreach ($outcomes as $outcome) {
+            $counts[$outcome->result]++;
         }
+
+        $message = get_string('evidenceupload_counts', 'tool_muprog', (object)$counts);
+        $style = $counts[evidence_upload::RESULT_ERROR] ? 'error' : 'info';
+        $html = $OUTPUT->notification($message, $style, false);
+
+        $labels = [
+            evidence_upload::RESULT_UPDATED => get_string('evidenceupload_result_updated', 'tool_muprog'),
+            evidence_upload::RESULT_SKIPPED => get_string('evidenceupload_result_skipped', 'tool_muprog'),
+            evidence_upload::RESULT_ERROR => get_string('evidenceupload_result_error', 'tool_muprog'),
+        ];
+        $table = new \html_table();
+        $table->attributes['class'] = 'generaltable mb-0';
+        $table->head = [
+            get_string('user'),
+            get_string('status'),
+            get_string('description'),
+        ];
+
+        // Problems come first, long uploads are not read row by row, the counts above say the rest.
+        $ready = fn($outcome) => $outcome->result === evidence_upload::RESULT_UPDATED;
+        usort($outcomes, fn($a, $b) => $ready($a) <=> $ready($b));
+        $shown = array_slice($outcomes, 0, evidence_upload::PREVIEW_ROWS);
+        foreach ($shown as $outcome) {
+            $class = $outcome->result === evidence_upload::RESULT_ERROR ? 'text-danger' : '';
+            $table->data[] = [
+                s($outcome->identifier),
+                \core\output\html_writer::span($labels[$outcome->result], $class),
+                s($outcome->message),
+            ];
+        }
+        $html .= \core\output\html_writer::table($table);
+        if (count($outcomes) > count($shown)) {
+            $more = count($outcomes) - count($shown);
+            $html .= \core\output\html_writer::div(get_string('evidenceupload_more_rows', 'tool_muprog', $more), 'text-muted');
+        }
+
+        return $html;
     }
 }
