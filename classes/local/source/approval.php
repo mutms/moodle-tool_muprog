@@ -191,7 +191,7 @@ final class approval extends base {
         if (isset($formdata->approval_allowrequest)) {
             $data['allowrequest'] = (int)(bool)$formdata->approval_allowrequest;
         }
-        return \tool_muprog\local\util::json_encode($data);
+        return \tool_mulib\local\mulib::json_encode($data);
     }
 
     /**
@@ -231,7 +231,7 @@ final class approval extends base {
         $record->sourceid = $source->id;
         $record->userid = $user->id;
         $record->timerequested = time();
-        $record->datajson = util::json_encode([]);
+        $record->datajson = \tool_mulib\local\mulib::json_encode([]);
         $record->id = $DB->insert_record('tool_muprog_request', $record);
 
         // Send notification.

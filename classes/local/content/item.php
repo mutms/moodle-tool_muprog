@@ -350,7 +350,7 @@ abstract class item {
             'creditframeworkid' => ($this->creditframeworkid ? (string)$this->creditframeworkid : null),
             'previtemid' => ($this->previous ? (string)$this->previous->id : null),
             'fullname' => $this->fullname,
-            'sequencejson' => util::json_encode([]),
+            'sequencejson' => \tool_mulib\local\mulib::json_encode([]),
             'minprerequisites' => null,
             'points' => (string)$this->points,
             'minpoints' => null,

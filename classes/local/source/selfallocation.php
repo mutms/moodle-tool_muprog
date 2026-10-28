@@ -296,7 +296,7 @@ final class selfallocation extends base {
         if (isset($formdata->selfallocation_allowsignup)) {
             $data['allowsignup'] = (int)(bool)$formdata->selfallocation_allowsignup;
         }
-        return \tool_muprog\local\util::json_encode($data);
+        return \tool_mulib\local\mulib::json_encode($data);
     }
 
     /**

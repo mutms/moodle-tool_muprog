@@ -1150,7 +1150,7 @@ final class allocation {
         $evidence = $DB->get_record('tool_muprog_evidence', ['userid' => $allocation->userid, 'itemid' => $item->id]);
 
         if ($data->evidencetimecompleted) {
-            $evidencejson = util::json_encode(['details' => $data->evidencedetails ?? '']);
+            $evidencejson = \tool_mulib\local\mulib::json_encode(['details' => $data->evidencedetails ?? '']);
             if ($evidence) {
                 $evidence->timecompleted = $data->evidencetimecompleted;
                 $evidence->evidencejson = $evidencejson;

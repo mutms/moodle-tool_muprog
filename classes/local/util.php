@@ -39,16 +39,6 @@ final class util {
     }
 
     /**
-     * Encode JSON date in a consistent way.
-     *
-     * @param mixed $data
-     * @return string
-     */
-    public static function json_encode($data): string {
-        return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-    }
-
-    /**
      * Normalise delays used in allocation settings.
      *
      * NOTE: for now only simple P22M, P22D and PT22H formats are supported,
@@ -213,7 +203,7 @@ final class util {
 
         $fs->delete_area_files($context->id, 'tool_muprog', 'upload', $draftid);
 
-        $content = json_encode($filedata, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        $content = \tool_mulib\local\mulib::json_encode($filedata);
         $record = [
             'contextid' => $context->id,
             'component' => 'tool_muprog',

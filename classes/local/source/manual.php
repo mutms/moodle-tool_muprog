@@ -111,7 +111,7 @@ final class manual extends base {
         $record = new stdClass();
         $record->programid = $targetprogramid;
         $record->type = 'manual';
-        $record->datajson = \tool_muprog\local\util::json_encode([]);
+        $record->datajson = \tool_mulib\local\mulib::json_encode([]);
         $record->id = $DB->insert_record('tool_muprog_source', $record);
 
         return $DB->get_record('tool_muprog_source', ['id' => $record->id], '*', MUST_EXIST);

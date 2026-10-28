@@ -683,9 +683,9 @@ final class program_test extends \advanced_testcase {
         ];
         $program = program::update_scheduling($data);
         $this->assertInstanceOf('stdClass', $program);
-        $this->assertSame(\tool_muprog\local\util::json_encode(['type' => 'allocation']), $program->startdatejson);
-        $this->assertSame(\tool_muprog\local\util::json_encode(['type' => 'notset']), $program->duedatejson);
-        $this->assertSame(\tool_muprog\local\util::json_encode(['type' => 'notset']), $program->enddatejson);
+        $this->assertSame(\tool_mulib\local\mulib::json_encode(['type' => 'allocation']), $program->startdatejson);
+        $this->assertSame(\tool_mulib\local\mulib::json_encode(['type' => 'notset']), $program->duedatejson);
+        $this->assertSame(\tool_mulib\local\mulib::json_encode(['type' => 'notset']), $program->enddatejson);
 
         $data = (object)[
             'id' => $oldprogram->id,
@@ -698,9 +698,9 @@ final class program_test extends \advanced_testcase {
         ];
         $program = program::update_scheduling($data);
         $this->assertInstanceOf('stdClass', $program);
-        $this->assertSame(\tool_muprog\local\util::json_encode(['type' => 'date', 'date' => $data->programstart_date]), $program->startdatejson);
-        $this->assertSame(\tool_muprog\local\util::json_encode(['type' => 'date', 'date' => $data->programdue_date]), $program->duedatejson);
-        $this->assertSame(\tool_muprog\local\util::json_encode(['type' => 'date', 'date' => $data->programend_date]), $program->enddatejson);
+        $this->assertSame(\tool_mulib\local\mulib::json_encode(['type' => 'date', 'date' => $data->programstart_date]), $program->startdatejson);
+        $this->assertSame(\tool_mulib\local\mulib::json_encode(['type' => 'date', 'date' => $data->programdue_date]), $program->duedatejson);
+        $this->assertSame(\tool_mulib\local\mulib::json_encode(['type' => 'date', 'date' => $data->programend_date]), $program->enddatejson);
 
         $data = (object)[
             'id' => $oldprogram->id,
@@ -713,9 +713,9 @@ final class program_test extends \advanced_testcase {
         ];
         $program = program::update_scheduling($data);
         $this->assertInstanceOf('stdClass', $program);
-        $this->assertSame(\tool_muprog\local\util::json_encode(['type' => 'delay', 'delay' => 'PT3H']), $program->startdatejson);
-        $this->assertSame(\tool_muprog\local\util::json_encode(['type' => 'delay', 'delay' => 'P6D']), $program->duedatejson);
-        $this->assertSame(\tool_muprog\local\util::json_encode(['type' => 'delay', 'delay' => 'P2M']), $program->enddatejson);
+        $this->assertSame(\tool_mulib\local\mulib::json_encode(['type' => 'delay', 'delay' => 'PT3H']), $program->startdatejson);
+        $this->assertSame(\tool_mulib\local\mulib::json_encode(['type' => 'delay', 'delay' => 'P6D']), $program->duedatejson);
+        $this->assertSame(\tool_mulib\local\mulib::json_encode(['type' => 'delay', 'delay' => 'P2M']), $program->enddatejson);
     }
 
     public function test_delete(): void {

@@ -120,7 +120,7 @@ final class program {
             $data->descriptionformat = FORMAT_HTML;
         }
 
-        $data->presentationjson = util::json_encode([]);
+        $data->presentationjson = \tool_mulib\local\mulib::json_encode([]);
         unset($data->presentation);
 
         unset($data->publicaccess); // Legacy catalogue visibility.
@@ -155,7 +155,7 @@ final class program {
         } else {
             $json = ['type' => 'allocation'];
         }
-        $data->startdatejson = util::json_encode($json);
+        $data->startdatejson = \tool_mulib\local\mulib::json_encode($json);
 
         if (isset($data->duedate)) {
             $data->duedate = (array)$data->duedate;
@@ -178,7 +178,7 @@ final class program {
         } else {
             $json = ['type' => 'notset'];
         }
-        $data->duedatejson = util::json_encode($json);
+        $data->duedatejson = \tool_mulib\local\mulib::json_encode($json);
 
         if (isset($data->enddate)) {
             $data->enddate = (array)$data->enddate;
@@ -201,7 +201,7 @@ final class program {
         } else {
             $json = ['type' => 'notset'];
         }
-        $data->enddatejson = util::json_encode($json);
+        $data->enddatejson = \tool_mulib\local\mulib::json_encode($json);
 
         $data->timecreated = time();
         $data->id = $DB->insert_record('tool_muprog_program', $data);
@@ -239,7 +239,7 @@ final class program {
         $item->topitem = 1;
         $item->courseid = null;
         $item->fullname = $data->fullname;
-        $item->sequencejson = util::json_encode($sequence);
+        $item->sequencejson = \tool_mulib\local\mulib::json_encode($sequence);
         $item->minprerequisites = 1; // Prevent completion.
         $item->points = 1;
         $item->minpoints = null;
@@ -491,7 +491,7 @@ final class program {
             } else {
                 unset($presenation['image']);
             }
-            $DB->set_field('tool_muprog_program', 'presentationjson', util::json_encode($presenation), ['id' => $program->id]);
+            $DB->set_field('tool_muprog_program', 'presentationjson', \tool_mulib\local\mulib::json_encode($presenation), ['id' => $program->id]);
             $program = $DB->get_record('tool_muprog_program', ['id' => $data->id], '*', MUST_EXIST);
         }
 
@@ -944,7 +944,7 @@ final class program {
         } else if ($data->programstart_type === 'delay') {
             $json['delay'] = self::process_submitted_program_allocation_delay('start', $data);
         }
-        $record->startdatejson = util::json_encode($json);
+        $record->startdatejson = \tool_mulib\local\mulib::json_encode($json);
 
         $types = self::get_program_duedate_types();
         if (!isset($types[$data->programdue_type])) {
@@ -956,7 +956,7 @@ final class program {
         } else if ($data->programdue_type === 'delay') {
             $json['delay'] = self::process_submitted_program_allocation_delay('due', $data);
         }
-        $record->duedatejson = util::json_encode($json);
+        $record->duedatejson = \tool_mulib\local\mulib::json_encode($json);
 
         $types = self::get_program_enddate_types();
         if (!isset($types[$data->programend_type])) {
@@ -968,7 +968,7 @@ final class program {
         } else if ($data->programend_type === 'delay') {
             $json['delay'] = self::process_submitted_program_allocation_delay('end', $data);
         }
-        $record->enddatejson = util::json_encode($json);
+        $record->enddatejson = \tool_mulib\local\mulib::json_encode($json);
 
         $DB->update_record('tool_muprog_program', $record);
 

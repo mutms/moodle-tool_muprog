@@ -324,7 +324,7 @@ class set extends item {
             'creditframeworkid' => null,
             'previtemid' => null,
             'fullname' => $this->fullname,
-            'sequencejson' => util::json_encode($sequence),
+            'sequencejson' => \tool_mulib\local\mulib::json_encode($sequence),
             'minprerequisites' => isset($this->minprerequisites) ? (string)$this->minprerequisites : null,
             'points' => (string)$this->points,
             'minpoints' => isset($this->minpoints) ? (string)$this->minpoints : null,

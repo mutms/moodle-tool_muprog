@@ -297,7 +297,7 @@ abstract class base {
         $record->userid = $userid;
         $record->sourceid = $source->id;
         $record->archived = 0;
-        $record->sourcedatajson = \tool_muprog\local\util::json_encode($sourcedata);
+        $record->sourcedatajson = \tool_mulib\local\mulib::json_encode($sourcedata);
         $record->sourceinstanceid = $sourceinstanceid;
         $record->timeallocated = empty($dateoverrides['timeallocated']) ? $now : $dateoverrides['timeallocated'];
         $record->timecreated = $now;
@@ -350,7 +350,7 @@ abstract class base {
      */
     public static function encode_datajson(stdClass $formdata): string {
         // Override if necessary.
-        return \tool_muprog\local\util::json_encode([]);
+        return \tool_mulib\local\mulib::json_encode([]);
     }
 
     /**

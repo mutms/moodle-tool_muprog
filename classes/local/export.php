@@ -301,7 +301,7 @@ final class export {
             'programs' => $exportedprograms,
         ];
 
-        $json = json_encode($export, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+        $json = \tool_mulib\local\mulib::json_encode($export, true);
         file_put_contents("$dir/$jsonfile", $json);
 
         $packer = get_file_packer('application/zip');

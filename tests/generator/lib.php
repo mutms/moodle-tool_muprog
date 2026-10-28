@@ -139,7 +139,7 @@ class tool_muprog_generator extends component_generator_base {
             $DB->set_field(
                 'tool_muprog_program',
                 'presentationjson',
-                \tool_muprog\local\util::json_encode($presenation),
+                \tool_mulib\local\mulib::json_encode($presenation),
                 ['id' => $program->id]
             );
             $program = $DB->get_record('tool_muprog_program', ['id' => $program->id], '*', MUST_EXIST);
@@ -375,7 +375,7 @@ class tool_muprog_generator extends component_generator_base {
         $operation->timestarted = $now;
         $operation->timefailed = empty($record->failed) ? null : $now;
         $operation->userid = empty($USER->id) ? get_admin()->id : $USER->id;
-        $operation->statejson = \tool_muprog\local\util::json_encode($state);
+        $operation->statejson = \tool_mulib\local\mulib::json_encode($state);
         $operation->id = $DB->insert_record('tool_muprog_operation', $operation);
 
         return $DB->get_record('tool_muprog_operation', ['id' => $operation->id], '*', MUST_EXIST);

@@ -81,7 +81,7 @@ abstract class base {
         $record->timestarted = time();
         $record->timefailed = null;
         $record->userid = $USER->id;
-        $record->statejson = util::json_encode($state);
+        $record->statejson = \tool_mulib\local\mulib::json_encode($state);
         $record->id = $DB->insert_record('tool_muprog_operation', $record);
 
         $lock = self::get_lock_factory()->get_lock(self::get_lock_resource($record->id), 0, WEEKSECS);
@@ -136,7 +136,7 @@ abstract class base {
         global $DB;
 
         $record = $this->get_record();
-        $record->statejson = util::json_encode($state);
+        $record->statejson = \tool_mulib\local\mulib::json_encode($state);
         $DB->set_field('tool_muprog_operation', 'statejson', $record->statejson, ['id' => $record->id]);
     }
 
@@ -152,7 +152,7 @@ abstract class base {
         $record = $this->get_record();
         $state = $this->get_state();
         $state['error'] = $error;
-        $record->statejson = util::json_encode($state);
+        $record->statejson = \tool_mulib\local\mulib::json_encode($state);
         $record->timefailed = time();
         $DB->update_record('tool_muprog_operation', $record);
 
@@ -219,7 +219,7 @@ abstract class base {
         // The process that started the operation is gone.
         $state = self::decode_state($operation);
         $state['error'] = get_string('operation_aborted', 'tool_muprog');
-        $operation->statejson = util::json_encode($state);
+        $operation->statejson = \tool_mulib\local\mulib::json_encode($state);
         $operation->timefailed = time();
         $DB->update_record('tool_muprog_operation', $operation);
         $lock->release();
