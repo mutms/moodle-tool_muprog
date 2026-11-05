@@ -24,13 +24,15 @@ use tool_muprog\local\allocation;
 use tool_muprog\local\management;
 use tool_muprog\local\program;
 use tool_muprog\local\util;
-use tool_muprog\local\content\item,
-    tool_muprog\local\content\top,
-    tool_muprog\local\content\set,
-    tool_muprog\local\content\course,
-    tool_muprog\local\content\attendance,
-    tool_muprog\local\content\credits;
-use stdClass, html_writer, core\url;
+use tool_muprog\local\content\item;
+use tool_muprog\local\content\top;
+use tool_muprog\local\content\set;
+use tool_muprog\local\content\course;
+use tool_muprog\local\content\attendance;
+use tool_muprog\local\content\credits;
+use stdClass;
+use html_writer;
+use core\url;
 
 /**
  * Program management renderer.

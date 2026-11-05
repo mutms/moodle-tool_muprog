@@ -23,7 +23,8 @@ use tool_muprog\local\content\course;
 use tool_muprog\local\content\item;
 use tool_muprog\local\content\set;
 use tool_muprog\local\content\top;
-use core\url, stdClass;
+use core\url;
+use stdClass;
 use tool_mulib\local\sql;
 use tool_mulib\local\mulib;
 
