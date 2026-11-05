@@ -91,7 +91,7 @@ final class evidence_upload_test extends \advanced_testcase {
         $delimiter = \tool_mulib\local\import_util::DELIMITER_AUTO;
         $csvdata = evidence_upload::save_source("username,completed\nuser1,02/12/23", 'UTF-8', $delimiter);
         $this->assertSame($rows, $csvdata->rows);
-        $this->assertTrue(evidence_upload::is_columns_stage($csvdata));
+        $this->assertFalse(evidence_upload::is_columns_valid($csvdata));
 
         // The completion date column is required.
         $this->assertSame(
@@ -104,14 +104,14 @@ final class evidence_upload_test extends \advanced_testcase {
         );
 
         $csvdata = evidence_upload::save_columns($csvdata, (object)['headers' => 1, 'column_0' => 'username', 'column_1' => 'timecompleted']);
-        $this->assertFalse(evidence_upload::is_columns_stage($csvdata));
-        $this->assertTrue(evidence_upload::is_options_stage($csvdata));
+        $this->assertTrue(evidence_upload::is_columns_valid($csvdata));
+        $this->assertFalse(evidence_upload::is_options_valid($csvdata));
 
         // Without details column the default details are required.
         $csvdata = evidence_upload::save_options($csvdata, (object)['skipmissing' => 1, 'details' => ' ']);
-        $this->assertTrue(evidence_upload::is_options_stage($csvdata));
+        $this->assertFalse(evidence_upload::is_options_valid($csvdata));
         $csvdata = evidence_upload::save_options($csvdata, (object)['skipmissing' => 1, 'details' => ' Some details ']);
-        $this->assertFalse(evidence_upload::is_options_stage($csvdata));
+        $this->assertTrue(evidence_upload::is_options_valid($csvdata));
         $this->assertSame('Some details', $csvdata->options['details']);
         $this->assertEquals($csvdata, evidence_upload::validate(json_decode(json_encode($csvdata), true)));
 
@@ -120,7 +120,7 @@ final class evidence_upload_test extends \advanced_testcase {
         $csvdata = $this->csvdata($rows, ['username', 'timecompleted', 'details']);
         $this->assertTrue(evidence_upload::has_details_column($csvdata));
         $csvdata = evidence_upload::save_options($csvdata, (object)[]);
-        $this->assertFalse(evidence_upload::is_options_stage($csvdata));
+        $this->assertTrue(evidence_upload::is_options_valid($csvdata));
     }
 
     public function test_guesses(): void {

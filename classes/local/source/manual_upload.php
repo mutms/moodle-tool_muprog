@@ -234,46 +234,46 @@ final class manual_upload {
     }
 
     /**
-     * Is the wizard still waiting for the data itself?
+     * Is the data of the source stage valid?
      *
      * @param stdClass $csvdata
      * @return bool
      */
-    public static function is_source_stage(stdClass $csvdata): bool {
-        return self::check_rows($csvdata->rows) !== null;
+    public static function is_source_valid(stdClass $csvdata): bool {
+        return self::check_rows($csvdata->rows) === null;
     }
 
     /**
-     * Is the wizard waiting for the meaning of the columns?
-     *
-     * Only for data that passed the source stage.
+     * Is the meaning of the columns valid, only for valid source data?
      *
      * @param stdClass $csvdata
      * @return bool
      */
-    public static function is_columns_stage(stdClass $csvdata): bool {
-        return !$csvdata->columns || (bool)self::check_columns($csvdata->rows, $csvdata->columns);
+    public static function is_columns_valid(stdClass $csvdata): bool {
+        if (!$csvdata->columns) {
+            return false;
+        }
+        return self::check_columns($csvdata->rows, $csvdata->columns) === [];
     }
 
     /**
-     * Is the wizard waiting for the upload options?
+     * Are the options confirmed and complete, only for valid columns?
      *
-     * The wizard moves on only when the options were confirmed, which is what the preview flag records.
-     * Only for data that passed the columns stage.
+     * The preview flag records that the options were confirmed.
      *
      * @param stdClass $csvdata
      * @return bool
      */
-    public static function is_options_stage(stdClass $csvdata): bool {
+    public static function is_options_valid(stdClass $csvdata): bool {
         if (($csvdata->options['preview'] ?? true) !== false) {
-            return true;
+            return false;
         }
         foreach (self::get_option_names() as $name) {
             if (!array_key_exists($name, $csvdata->options)) {
-                return true;
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     /**

@@ -67,9 +67,14 @@ if ($program->archived) {
 
 // The state belongs to this program, it cannot be replayed against another one.
 $wizardname = 'tool_muprog_evidence_upload:' . $program->id;
-$wizard = wizard::load($wizardname, optional_param(wizard::PARAM, 0, PARAM_INT));
+$stages = [
+    'source' => get_string('evidenceupload_source', 'tool_muprog'),
+    'columns' => get_string('evidenceupload_columns', 'tool_muprog'),
+    'options' => get_string('evidenceupload_options', 'tool_muprog'),
+];
+$wizard = wizard::load($wizardname, $stages);
 if (!$wizard) {
-    $wizard = wizard::start($wizardname);
+    $wizard = wizard::start($wizardname, $stages);
     redirect($wizard->get_url($pageurl));
 }
 
@@ -78,21 +83,16 @@ $state = $wizard->get_data();
 $csvdata = evidence_upload::validate($state);
 $sourcedata = is_array($state['source'] ?? null) ? $state['source'] : [];
 
-$labels = [
-    'source' => get_string('evidenceupload_source', 'tool_muprog'),
-    'columns' => get_string('evidenceupload_columns', 'tool_muprog'),
-    'options' => get_string('evidenceupload_options', 'tool_muprog'),
-];
-$isvalid = fn(string $stage): bool => match ($stage) {
-    'source' => !evidence_upload::is_source_stage($csvdata),
-    'columns' => !evidence_upload::is_columns_stage($csvdata),
-    'options' => !evidence_upload::is_options_stage($csvdata),
+$isvalid = function (string $stage) use ($csvdata): bool {
+    return match ($stage) {
+        'source' => evidence_upload::is_source_valid($csvdata),
+        'columns' => evidence_upload::is_columns_valid($csvdata),
+        'options' => evidence_upload::is_options_valid($csvdata),
+    };
 };
-$requested = optional_param(wizard::STAGE_PARAM, null, PARAM_ALPHA);
-$stages = $wizard->resolve_stages($labels, $isvalid, $requested);
-$stage = wizard::current_stage($stages);
+$stage = $wizard->resolve_stages($isvalid);
 
-if ($requested === null && wizard::is_finished($stages)) {
+if ($wizard->is_finished()) {
     // Everything was answered, update the evidence.
     $counts = evidence_upload::import($program, $csvdata, (object)$csvdata->options);
     $wizard->delete();
@@ -125,8 +125,8 @@ if ($form->is_cancelled()) {
     $wizard->delete();
     redirect($returnurl);
 }
-if ($stage !== 'source' && $form->is_reloaded() && $form->get_element('back')->get_value()) {
-    redirect($wizard->get_url($pageurl, $stage === 'options' ? 'columns' : 'source'));
+if ($form->is_reloaded() && $wizard->get_previous_stage() !== null && $form->get_element('back')->get_value()) {
+    redirect($wizard->get_url($pageurl, $wizard->get_previous_stage()));
 }
 if ($data = $form->get_data()) {
     if ($stage === 'source') {
@@ -148,5 +148,5 @@ if ($data = $form->get_data()) {
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading($title, 2, 'mb-3');
-echo $wizard->render($OUTPUT, $stages, $pageurl, $form);
+echo $wizard->render($OUTPUT, $pageurl, $form);
 echo $OUTPUT->footer();

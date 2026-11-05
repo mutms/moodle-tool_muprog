@@ -91,27 +91,27 @@ final class manual_upload_test extends \advanced_testcase {
         foreach ([[], ['rows' => 'x'], ['rows' => [['a'], ['b', 'c']]]] as $stored) {
             $csvdata = manual_upload::validate($stored);
             $this->assertSame([], $csvdata->rows);
-            $this->assertTrue(manual_upload::is_source_stage($csvdata));
+            $this->assertFalse(manual_upload::is_source_valid($csvdata));
         }
 
         $delimiter = \tool_mulib\local\import_util::DELIMITER_AUTO;
         $csvdata = manual_upload::save_source("username,startdate\nuser1,", 'UTF-8', $delimiter);
         $this->assertSame($rows, $csvdata->rows);
-        $this->assertFalse(manual_upload::is_source_stage($csvdata));
-        $this->assertTrue(manual_upload::is_columns_stage($csvdata));
+        $this->assertTrue(manual_upload::is_source_valid($csvdata));
+        $this->assertFalse(manual_upload::is_columns_valid($csvdata));
         $this->assertEquals($csvdata, manual_upload::validate(json_decode(json_encode($csvdata), true)));
 
         $csvdata = manual_upload::save_columns($csvdata, (object)['headers' => 1, 'column_0' => 'username', 'column_1' => 'timestart']);
         $this->assertSame($columns, $csvdata->columns);
-        $this->assertFalse(manual_upload::is_columns_stage($csvdata));
-        $this->assertTrue(manual_upload::is_options_stage($csvdata));
+        $this->assertTrue(manual_upload::is_columns_valid($csvdata));
+        $this->assertFalse(manual_upload::is_options_valid($csvdata));
 
         // Confirmed options have to be confirmed again after the columns changed.
         $csvdata = manual_upload::save_options($csvdata, (object)['skipallocated' => 1]);
-        $this->assertFalse(manual_upload::is_options_stage($csvdata));
+        $this->assertTrue(manual_upload::is_options_valid($csvdata));
         $this->assertEquals($csvdata, manual_upload::validate(json_decode(json_encode($csvdata), true)));
         $csvdata = manual_upload::save_columns($csvdata, (object)['headers' => 1, 'column_0' => 'username', 'column_1' => 'timestart']);
-        $this->assertTrue(manual_upload::is_options_stage($csvdata));
+        $this->assertFalse(manual_upload::is_options_valid($csvdata));
         $this->assertSame(1, $csvdata->options['skipallocated']);
         $this->assertSame(0, $csvdata->options['skipmissing']);
     }

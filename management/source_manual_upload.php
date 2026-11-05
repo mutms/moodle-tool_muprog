@@ -69,9 +69,14 @@ if (!manual::is_allocation_possible($program, $source)) {
 
 // The state belongs to this allocation source, it cannot be replayed against another one.
 $wizardname = 'tool_muprog_source_manual_upload:' . $source->id;
-$wizard = wizard::load($wizardname, optional_param(wizard::PARAM, 0, PARAM_INT));
+$stages = [
+    'source' => get_string('source_manual_upload_source', 'tool_muprog'),
+    'columns' => get_string('source_manual_upload_columns', 'tool_muprog'),
+    'options' => get_string('source_manual_upload_options', 'tool_muprog'),
+];
+$wizard = wizard::load($wizardname, $stages);
 if (!$wizard) {
-    $wizard = wizard::start($wizardname);
+    $wizard = wizard::start($wizardname, $stages);
     redirect($wizard->get_url($pageurl));
 }
 
@@ -80,21 +85,16 @@ $state = $wizard->get_data();
 $csvdata = manual_upload::validate($state);
 $sourcedata = is_array($state['source'] ?? null) ? $state['source'] : [];
 
-$labels = [
-    'source' => get_string('source_manual_upload_source', 'tool_muprog'),
-    'columns' => get_string('source_manual_upload_columns', 'tool_muprog'),
-    'options' => get_string('source_manual_upload_options', 'tool_muprog'),
-];
-$isvalid = fn(string $stage): bool => match ($stage) {
-    'source' => !manual_upload::is_source_stage($csvdata),
-    'columns' => !manual_upload::is_columns_stage($csvdata),
-    'options' => !manual_upload::is_options_stage($csvdata),
+$isvalid = function (string $stage) use ($csvdata): bool {
+    return match ($stage) {
+        'source' => manual_upload::is_source_valid($csvdata),
+        'columns' => manual_upload::is_columns_valid($csvdata),
+        'options' => manual_upload::is_options_valid($csvdata),
+    };
 };
-$requested = optional_param(wizard::STAGE_PARAM, null, PARAM_ALPHA);
-$stages = $wizard->resolve_stages($labels, $isvalid, $requested);
-$stage = wizard::current_stage($stages);
+$stage = $wizard->resolve_stages($isvalid);
 
-if ($requested === null && wizard::is_finished($stages)) {
+if ($wizard->is_finished()) {
     // Everything was answered, allocate the users.
     $counts = manual_upload::import($program, $source, $csvdata, (object)$csvdata->options);
     $wizard->delete();
@@ -127,8 +127,8 @@ if ($form->is_cancelled()) {
     $wizard->delete();
     redirect($returnurl);
 }
-if ($stage !== 'source' && $form->is_reloaded() && $form->get_element('back')->get_value()) {
-    redirect($wizard->get_url($pageurl, $stage === 'options' ? 'columns' : 'source'));
+if ($form->is_reloaded() && $wizard->get_previous_stage() !== null && $form->get_element('back')->get_value()) {
+    redirect($wizard->get_url($pageurl, $wizard->get_previous_stage()));
 }
 if ($data = $form->get_data()) {
     if ($stage === 'source') {
@@ -150,5 +150,5 @@ if ($data = $form->get_data()) {
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading($title, 2, 'mb-3');
-echo $wizard->render($OUTPUT, $stages, $pageurl, $form);
+echo $wizard->render($OUTPUT, $pageurl, $form);
 echo $OUTPUT->footer();
