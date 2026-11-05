@@ -91,10 +91,10 @@ $isvalid = fn(string $stage): bool => match ($stage) {
     'options' => !manual_upload::is_options_stage($csvdata),
 };
 $requested = optional_param(wizard::STAGE_PARAM, null, PARAM_ALPHA);
-$stages = wizard::resolve_stages($labels, $isvalid, $requested);
+$stages = $wizard->resolve_stages($labels, $isvalid, $requested);
 $stage = wizard::current_stage($stages);
 
-if ($requested === null && $isvalid('options')) {
+if ($requested === null && wizard::is_finished($stages)) {
     // Everything was answered, allocate the users.
     $counts = manual_upload::import($program, $source, $csvdata, (object)$csvdata->options);
     $wizard->delete();
@@ -144,7 +144,7 @@ if ($data = $form->get_data()) {
     } else {
         $csvdata = manual_upload::save_options($csvdata, $data);
     }
-    $wizard->set_data((array)$csvdata + ['source' => $sourcedata]);
+    $wizard->complete_stage($stage, (array)$csvdata + ['source' => $sourcedata]);
     redirect($wizard->get_url($pageurl));
 }
 
