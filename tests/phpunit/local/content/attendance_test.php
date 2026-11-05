@@ -22,17 +22,18 @@
 namespace tool_muprog\phpunit\local\content;
 
 use tool_muprog\local\content\attendance;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Program offline attendance test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\local\content\attendance
  */
+#[CoversClass(\tool_muprog\local\content\attendance::class)]
+#[Group('MuTMS')]
 final class attendance_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

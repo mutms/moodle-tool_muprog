@@ -20,17 +20,18 @@ namespace tool_muprog\phpunit\muform\autocomplete;
 
 use tool_muprog\muform\autocomplete\source_extdb_edit_queryid;
 use tool_mulib\local\mulib;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * External database allocation query autocomplete source test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\muform\autocomplete\source_extdb_edit_queryid
  */
+#[CoversClass(\tool_muprog\muform\autocomplete\source_extdb_edit_queryid::class)]
+#[Group('MuTMS')]
 final class source_extdb_edit_queryid_test extends \advanced_testcase {
     #[\Override]
     public function setUp(): void {

@@ -23,18 +23,19 @@ namespace tool_muprog\phpunit\local\notification;
 use tool_muprog\local\notification_manager;
 use tool_muprog\local\notification\reminder;
 use tool_muprog\local\source\manual;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Weekly reminder notification test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2026 CNW Co.
  * @author     Szabolcs Varhegyi
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\local\notification\reminder
  */
+#[CoversClass(\tool_muprog\local\notification\reminder::class)]
+#[Group('MuTMS')]
 final class reminder_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

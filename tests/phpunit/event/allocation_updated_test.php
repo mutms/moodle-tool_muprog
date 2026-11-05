@@ -18,16 +18,18 @@
 
 namespace tool_muprog\phpunit\event;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * User allocation updated event test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2025 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\event\allocation_updated
  */
+#[CoversClass(\tool_muprog\event\allocation_updated::class)]
+#[Group('MuTMS')]
 final class allocation_updated_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

@@ -22,19 +22,20 @@ namespace tool_muprog\phpunit\local\notification;
 
 use tool_muprog\local\notification_manager;
 use tool_muprog\local\source\manual;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Program due notification test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2023 Open LMS (https://www.openlms.net/)
  * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\local\notification\due
  */
+#[CoversClass(\tool_muprog\local\notification\due::class)]
+#[Group('MuTMS')]
 final class due_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

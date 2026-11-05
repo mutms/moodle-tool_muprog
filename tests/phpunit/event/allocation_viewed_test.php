@@ -19,16 +19,18 @@
 
 namespace tool_muprog\phpunit\event;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * User allocation viewed event test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\event\allocation_viewed
  */
+#[CoversClass(\tool_muprog\event\allocation_viewed::class)]
+#[Group('MuTMS')]
 final class allocation_viewed_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

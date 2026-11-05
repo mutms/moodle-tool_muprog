@@ -20,19 +20,20 @@
 namespace tool_muprog\phpunit\external;
 
 use tool_muprog\external\source_cohort_delete_cohort;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * External API for removing cohort from the list or cohorts that are synced with the program.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2023 Open LMS (https://www.openlms.net/)
  * @copyright  2025 Petr Skoda
  * @author     Farhan Karmali
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\external\source_cohort_delete_cohort
  */
+#[CoversClass(\tool_muprog\external\source_cohort_delete_cohort::class)]
+#[Group('MuTMS')]
 final class source_cohort_delete_cohort_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

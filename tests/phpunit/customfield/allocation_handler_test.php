@@ -20,17 +20,18 @@
 namespace tool_muprog\phpunit\customfield;
 
 use tool_muprog\customfield\allocation_handler;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Program allocation custom fields test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2025 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\customfield\allocation_handler
  */
+#[CoversClass(\tool_muprog\customfield\allocation_handler::class)]
+#[Group('MuTMS')]
 final class allocation_handler_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

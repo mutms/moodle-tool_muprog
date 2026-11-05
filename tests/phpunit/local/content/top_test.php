@@ -28,21 +28,22 @@ use tool_muprog\local\content\set;
 use tool_muprog\local\content\top;
 use tool_muprog\local\content\credits;
 use tool_mulib\local\mulib;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Program content test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
  * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\local\content\top
- * @covers \tool_muprog\local\content\course
- * @covers \tool_muprog\local\content\set
  */
+#[CoversClass(\tool_muprog\local\content\top::class)]
+#[CoversClass(\tool_muprog\local\content\course::class)]
+#[CoversClass(\tool_muprog\local\content\set::class)]
+#[Group('MuTMS')]
 final class top_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

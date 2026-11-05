@@ -21,17 +21,18 @@
 namespace tool_muprog\phpunit\local\source;
 
 use stdClass;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Completed program allocation source test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2025 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\local\source\program
  */
+#[CoversClass(\tool_muprog\local\source\program::class)]
+#[Group('MuTMS')]
 final class program_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

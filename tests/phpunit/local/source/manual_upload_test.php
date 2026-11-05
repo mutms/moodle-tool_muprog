@@ -22,17 +22,18 @@ namespace tool_muprog\phpunit\local\source;
 
 use tool_muprog\local\program;
 use tool_muprog\local\source\manual_upload;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Allocation upload tests.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\local\source\manual_upload
  */
+#[CoversClass(\tool_muprog\local\source\manual_upload::class)]
+#[Group('MuTMS')]
 final class manual_upload_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

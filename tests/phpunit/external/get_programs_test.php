@@ -21,19 +21,20 @@ namespace tool_muprog\phpunit\external;
 
 use tool_mulib\local\mulib;
 use tool_muprog\external\get_programs;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * External API for get program list
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2023 Open LMS (https://www.openlms.net/)
  * @copyright  2025 Petr Skoda
  * @author     Farhan Karmali
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\external\get_programs
  */
+#[CoversClass(\tool_muprog\external\get_programs::class)]
+#[Group('MuTMS')]
 final class get_programs_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

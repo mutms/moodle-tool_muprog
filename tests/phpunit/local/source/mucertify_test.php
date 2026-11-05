@@ -27,19 +27,20 @@ use tool_mucertify\local\source\manual;
 use tool_muprog\local\course_reset;
 use tool_muprog\local\program;
 use tool_muprog\local\source\mucertify;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Certifications program source test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2023 Open LMS (https://www.openlms.net/)
  * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\local\source\mucertify
  */
+#[CoversClass(\tool_muprog\local\source\mucertify::class)]
+#[Group('MuTMS')]
 final class mucertify_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

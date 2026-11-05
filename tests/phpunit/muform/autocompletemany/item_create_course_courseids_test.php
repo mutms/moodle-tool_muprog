@@ -20,17 +20,18 @@ namespace tool_muprog\phpunit\muform\autocompletemany;
 
 use tool_muprog\muform\autocompletemany\item_create_course_courseids;
 use tool_mulib\local\mulib;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Program course items autocomplete source test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\muform\autocompletemany\item_create_course_courseids
  */
+#[CoversClass(\tool_muprog\muform\autocompletemany\item_create_course_courseids::class)]
+#[Group('MuTMS')]
 final class item_create_course_courseids_test extends \advanced_testcase {
     #[\Override]
     public function setUp(): void {

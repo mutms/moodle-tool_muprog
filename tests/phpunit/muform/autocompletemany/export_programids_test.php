@@ -19,18 +19,20 @@
 namespace tool_muprog\phpunit\muform\autocompletemany;
 
 use tool_muprog\muform\autocompletemany\export_programids;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Export programs autocomplete source test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\muform\autocompletemany\export_programids
- * @covers \tool_muprog\muform\util\autocomplete\program_trait
  */
+#[CoversClass(\tool_muprog\muform\autocompletemany\export_programids::class)]
+#[CoversTrait(\tool_muprog\muform\util\autocomplete\program_trait::class)]
+#[Group('MuTMS')]
 final class export_programids_test extends \advanced_testcase {
     #[\Override]
     public function setUp(): void {

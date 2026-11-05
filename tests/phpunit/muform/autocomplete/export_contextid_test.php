@@ -20,17 +20,18 @@ namespace tool_muprog\phpunit\muform\autocomplete;
 
 use tool_muprog\muform\autocomplete\export_contextid;
 use tool_mulib\local\mulib;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Program export context autocomplete source test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\muform\autocomplete\export_contextid
  */
+#[CoversClass(\tool_muprog\muform\autocomplete\export_contextid::class)]
+#[Group('MuTMS')]
 final class export_contextid_test extends \advanced_testcase {
     #[\Override]
     public function setUp(): void {

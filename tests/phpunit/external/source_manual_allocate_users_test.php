@@ -21,19 +21,20 @@ namespace tool_muprog\phpunit\external;
 
 use tool_mulib\local\mulib;
 use tool_muprog\external\source_manual_allocate_users;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests for external source manual allocate users.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2023 Open LMS (https://www.openlms.net/)
  * @copyright  2025 Petr Skoda
  * @author     Farhan Karmali
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\external\source_manual_allocate_users
  */
+#[CoversClass(\tool_muprog\external\source_manual_allocate_users::class)]
+#[Group('MuTMS')]
 final class source_manual_allocate_users_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

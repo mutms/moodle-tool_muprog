@@ -22,17 +22,18 @@ namespace tool_muprog\phpunit\local;
 
 use tool_muprog\local\evidence_upload;
 use tool_muprog\local\source\manual;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Completion evidence upload tests.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\local\evidence_upload
  */
+#[CoversClass(\tool_muprog\local\evidence_upload::class)]
+#[Group('MuTMS')]
 final class evidence_upload_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

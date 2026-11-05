@@ -23,19 +23,20 @@ namespace tool_muprog\phpunit\local\notification;
 use tool_muprog\local\allocation;
 use tool_muprog\local\notification\base;
 use tool_muprog\local\source\manual;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Program notifications base test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2023 Open LMS (https://www.openlms.net/)
  * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\local\notification\base
  */
+#[CoversClass(\tool_muprog\local\notification\base::class)]
+#[Group('MuTMS')]
 final class base_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

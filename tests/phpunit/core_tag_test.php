@@ -20,23 +20,24 @@
 
 namespace tool_muprog\phpunit;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Core tag tests.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2025 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[CoversClass(\core\task\tag_cron_task::class)]
+#[Group('MuTMS')]
 final class core_tag_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
     }
 
-    /**
-     * @covers \core\task\tag_cron_task::cleanup
-     */
     public function test_tag_cron_task(): void {
         $syscontext = \context_system::instance();
 

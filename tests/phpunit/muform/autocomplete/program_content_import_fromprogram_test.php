@@ -20,18 +20,20 @@ namespace tool_muprog\phpunit\muform\autocomplete;
 
 use tool_muprog\muform\autocomplete\program_content_import_fromprogram;
 use tool_mulib\local\mulib;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Content import program autocomplete source test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\muform\autocomplete\program_content_import_fromprogram
- * @covers \tool_muprog\muform\util\autocomplete\program_trait
  */
+#[CoversClass(\tool_muprog\muform\autocomplete\program_content_import_fromprogram::class)]
+#[CoversTrait(\tool_muprog\muform\util\autocomplete\program_trait::class)]
+#[Group('MuTMS')]
 final class program_content_import_fromprogram_test extends \advanced_testcase {
     #[\Override]
     public function setUp(): void {

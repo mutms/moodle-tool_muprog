@@ -21,19 +21,22 @@
 namespace tool_muprog\phpunit\local\source;
 
 use tool_muprog\local\program;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversFunction;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Visible cohort allocation source test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
  * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\local\source\cohort
  */
+#[CoversClass(\tool_muprog\local\source\cohort::class)]
+#[CoversFunction('tool_muprog\local\event_observer')]
+#[Group('MuTMS')]
 final class cohort_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();
@@ -261,9 +264,6 @@ final class cohort_test extends \advanced_testcase {
 
     /**
      * @return void
-     *
-     * @covers \tool_muprog\local\event_observer::cohort_member_added()
-     * @covers \tool_muprog\local\event_observer::cohort_member_removed()
      */
     public function test_cohort_observers(): void {
         global $DB;

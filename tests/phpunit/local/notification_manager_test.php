@@ -21,19 +21,21 @@
 namespace tool_muprog\phpunit\local;
 
 use tool_muprog\local\notification_manager;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Program notification manager test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2023 Open LMS (https://www.openlms.net/)
  * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\local\notification_manager
  */
+#[CoversClass(\tool_muprog\local\notification_manager::class)]
+#[CoversClass(\tool_mulib\local\notification\util::class)]
+#[Group('MuTMS')]
 final class notification_manager_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();
@@ -337,16 +339,10 @@ final class notification_manager_test extends \advanced_testcase {
         $this->assertNull(notification_manager::get_timenotified($user2->id, $program1->id, 'completion'));
     }
 
-    /**
-     * @covers ::is_import_supported
-     */
     public function test_is_notification_supported(): void {
         $this->assertTrue(notification_manager::is_import_supported());
     }
 
-    /**
-     * @covers \tool_mulib\local\notification\util::notification_import
-     */
     public function test_notification_util_notification_import(): void {
         global $DB;
 

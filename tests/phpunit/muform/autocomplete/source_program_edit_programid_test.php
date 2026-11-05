@@ -20,18 +20,20 @@ namespace tool_muprog\phpunit\muform\autocomplete;
 
 use tool_muprog\muform\autocomplete\source_program_edit_programid;
 use tool_mulib\local\mulib;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversTrait;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Program completion allocation source program autocomplete source test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\muform\autocomplete\source_program_edit_programid
- * @covers \tool_muprog\muform\util\autocomplete\program_trait
  */
+#[CoversClass(\tool_muprog\muform\autocomplete\source_program_edit_programid::class)]
+#[CoversTrait(\tool_muprog\muform\util\autocomplete\program_trait::class)]
+#[Group('MuTMS')]
 final class source_program_edit_programid_test extends \advanced_testcase {
     #[\Override]
     public function setUp(): void {

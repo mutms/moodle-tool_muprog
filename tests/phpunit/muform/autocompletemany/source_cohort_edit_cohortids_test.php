@@ -20,17 +20,18 @@ namespace tool_muprog\phpunit\muform\autocompletemany;
 
 use tool_muprog\muform\autocompletemany\source_cohort_edit_cohortids;
 use tool_mulib\local\mulib;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Cohort allocation source cohorts autocomplete source test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\muform\autocompletemany\source_cohort_edit_cohortids
  */
+#[CoversClass(\tool_muprog\muform\autocompletemany\source_cohort_edit_cohortids::class)]
+#[Group('MuTMS')]
 final class source_cohort_edit_cohortids_test extends \advanced_testcase {
     #[\Override]
     public function setUp(): void {

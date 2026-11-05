@@ -18,16 +18,18 @@
 
 namespace tool_muprog\phpunit\task;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * External allocation ad-hoc sync task test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2025 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\task\extdb_sync
  */
+#[CoversClass(\tool_muprog\task\extdb_sync::class)]
+#[Group('MuTMS')]
 final class extdb_sync_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

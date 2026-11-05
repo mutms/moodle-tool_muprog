@@ -19,19 +19,20 @@
 namespace tool_muprog\phpunit\task;
 
 use tool_muprog\local\program;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Programs cron test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
  * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\task\cron
  */
+#[CoversClass(\tool_muprog\task\cron::class)]
+#[Group('MuTMS')]
 final class cron_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

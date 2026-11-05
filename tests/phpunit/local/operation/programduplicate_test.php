@@ -22,18 +22,19 @@ namespace tool_muprog\phpunit\local\operation;
 use tool_muprog\local\operation\base;
 use tool_muprog\local\operation\programduplicate;
 use tool_muprog\local\program;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Program duplication test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\local\operation\programduplicate
- * @covers \tool_muprog\local\operation\base
  */
+#[CoversClass(\tool_muprog\local\operation\programduplicate::class)]
+#[CoversClass(\tool_muprog\local\operation\base::class)]
+#[Group('MuTMS')]
 final class programduplicate_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

@@ -21,17 +21,18 @@
 namespace tool_muprog\phpunit\callback;
 
 use tool_muprog\callback\tool_mucohort;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests of tool_mucohort hook callbacks.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\callback\tool_mucohort
  */
+#[CoversClass(\tool_muprog\callback\tool_mucohort::class)]
+#[Group('MuTMS')]
 final class tool_mucohort_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

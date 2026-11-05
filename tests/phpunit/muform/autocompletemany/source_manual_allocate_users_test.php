@@ -20,17 +20,18 @@ namespace tool_muprog\phpunit\muform\autocompletemany;
 
 use tool_muprog\muform\autocompletemany\source_manual_allocate_users;
 use tool_mulib\local\mulib;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Manual allocation users autocomplete source test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\muform\autocompletemany\source_manual_allocate_users
  */
+#[CoversClass(\tool_muprog\muform\autocompletemany\source_manual_allocate_users::class)]
+#[Group('MuTMS')]
 final class source_manual_allocate_users_test extends \advanced_testcase {
     #[\Override]
     public function setUp(): void {

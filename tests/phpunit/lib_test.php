@@ -22,26 +22,28 @@ namespace tool_muprog\phpunit;
 
 use tool_muprog\local\calendar;
 use tool_muprog\local\source\manual;
+use PHPUnit\Framework\Attributes\CoversFunction;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Program lib.php tests.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
  * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+#[CoversFunction('tool_muprog_pre_course_category_delete')]
+#[CoversFunction('tool_muprog_core_calendar_provide_event_action')]
+#[CoversFunction('tool_muprog_get_tagged_programs')]
+#[Group('MuTMS')]
 final class lib_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
     }
 
-    /**
-     * @covers \tool_muprog_pre_course_category_delete()
-     */
     public function test_tool_muprog_pre_course_category_delete(): void {
         global $DB;
 
@@ -71,9 +73,6 @@ final class lib_test extends \advanced_testcase {
         $this->assertSame('0', $program1->archived);
     }
 
-    /**
-     * @covers \tool_muprog_core_calendar_provide_event_action()
-     */
     public function test_tool_muprog_core_calendar_provide_event_action(): void {
         global $DB, $CFG;
         require_once($CFG->dirroot . '/admin/tool/muprog/lib.php');
@@ -103,9 +102,6 @@ final class lib_test extends \advanced_testcase {
         $this->assertSame(1, $result->get_item_count());
     }
 
-    /**
-     * @covers \tool_muprog_get_tagged_programs()
-     */
     public function test_tool_muprog_get_tagged_programs(): void {
         global $CFG;
         require_once($CFG->dirroot . '/admin/tool/muprog/lib.php');

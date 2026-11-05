@@ -19,19 +19,20 @@
 namespace tool_muprog\phpunit\event;
 
 use tool_muprog\local\program;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Program viewed event test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
  * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\event\program_viewed
  */
+#[CoversClass(\tool_muprog\event\program_viewed::class)]
+#[Group('MuTMS')]
 final class program_viewed_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

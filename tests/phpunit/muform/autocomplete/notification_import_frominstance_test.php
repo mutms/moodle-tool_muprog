@@ -20,18 +20,19 @@
 namespace tool_muprog\phpunit\muform\autocomplete;
 
 use tool_muprog\muform\autocomplete\notification_import_frominstance;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * External API for form import program notification
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2024 Open LMS (https://www.openlms.net/)
  * @author     Farhan Karmali
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\muform\autocomplete\notification_import_frominstance
  */
+#[CoversClass(\tool_muprog\muform\autocomplete\notification_import_frominstance::class)]
+#[Group('MuTMS')]
 final class notification_import_frominstance_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

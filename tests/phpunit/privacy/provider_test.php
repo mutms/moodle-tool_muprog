@@ -26,18 +26,19 @@ use core_privacy\local\request\writer;
 use stdClass;
 use tool_muprog\local\certificate;
 use tool_muprog\privacy\provider;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Privacy provider tests for tool_muprog.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
  * @author     Chris Tranel
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\privacy\provider
  */
+#[CoversClass(\tool_muprog\privacy\provider::class)]
+#[Group('MuTMS')]
 final class provider_test extends \core_privacy\tests\provider_testcase {
     /** @var stdClass A user who is not enrolled in any program. */
     protected $user0;

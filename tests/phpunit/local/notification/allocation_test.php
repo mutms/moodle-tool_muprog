@@ -23,19 +23,20 @@ namespace tool_muprog\phpunit\local\notification;
 use tool_muprog\local\notification_manager;
 use tool_muprog\local\source\manual;
 use tool_mulib\local\mulib;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Program allocation notifications test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2023 Open LMS (https://www.openlms.net/)
  * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\local\notification\allocation
  */
+#[CoversClass(\tool_muprog\local\notification\allocation::class)]
+#[Group('MuTMS')]
 final class allocation_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

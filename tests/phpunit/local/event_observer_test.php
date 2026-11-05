@@ -21,18 +21,20 @@
 namespace tool_muprog\phpunit\local;
 
 use tool_muprog\local\source\manual;
+use PHPUnit\Framework\Attributes\CoversFunction;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Program helper test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
  * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
  */
+#[CoversFunction('tool_muprog\local\event_observer')]
+#[Group('MuTMS')]
 final class event_observer_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();
@@ -41,8 +43,6 @@ final class event_observer_test extends \advanced_testcase {
 
     /**
      * @return void
-     *
-     * @covers \tool_muprog\local\event_observer::course_updated()
      */
     public function test_course_updated(): void {
         global $CFG;
@@ -73,8 +73,6 @@ final class event_observer_test extends \advanced_testcase {
 
     /**
      * @return void
-     *
-     * @covers \tool_muprog\local\event_observer::course_deleted()
      */
     public function test_course_deleted(): void {
         global $CFG;
@@ -103,8 +101,6 @@ final class event_observer_test extends \advanced_testcase {
 
     /**
      * @return void
-     *
-     * @covers \tool_muprog\local\event_observer::course_category_deleted()
      */
     public function test_course_category_deleted(): void {
         global $CFG, $DB;
@@ -148,8 +144,6 @@ final class event_observer_test extends \advanced_testcase {
 
     /**
      * @return void
-     *
-     * @covers \tool_muprog\local\event_observer::user_deleted()
      */
     public function test_user_deleted(): void {
         global $DB;
@@ -197,8 +191,6 @@ final class event_observer_test extends \advanced_testcase {
 
     /**
      * @return void
-     *
-     * @covers \tool_muprog\local\event_observer::course_completed()
      */
     public function test_course_completed(): void {
         global $DB, $CFG;
@@ -261,8 +253,6 @@ final class event_observer_test extends \advanced_testcase {
 
     /**
      * @return void
-     *
-     * @covers \tool_muprog\local\event_observer::group_deleted()
      */
     public function test_group_deleted(): void {
         global $DB;

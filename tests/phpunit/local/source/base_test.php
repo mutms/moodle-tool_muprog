@@ -21,19 +21,20 @@
 namespace tool_muprog\phpunit\local\source;
 
 use tool_muprog\local\program;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Allocation source base test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
  * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\local\source\base
  */
+#[CoversClass(\tool_muprog\local\source\base::class)]
+#[Group('MuTMS')]
 final class base_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

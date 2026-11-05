@@ -19,17 +19,18 @@
 namespace tool_muprog\phpunit\event;
 
 use tool_muprog\local\program;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Program restored event test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2025 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\event\program_restored
  */
+#[CoversClass(\tool_muprog\event\program_restored::class)]
+#[Group('MuTMS')]
 final class program_restored_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

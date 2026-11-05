@@ -22,17 +22,18 @@
 namespace tool_muprog\phpunit\local\content;
 
 use tool_muprog\local\content\credits;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Program credits test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\local\content\credits
  */
+#[CoversClass(\tool_muprog\local\content\credits::class)]
+#[Group('MuTMS')]
 final class credits_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

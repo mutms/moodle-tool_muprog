@@ -22,17 +22,18 @@ namespace tool_muprog\phpunit\local\extdb\query;
 
 use tool_muprog\local\extdb\query\allocation;
 use tool_mulib\local\extdb\pdb;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * External database program allocation query test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2025 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\local\extdb\query\allocation
  */
+#[CoversClass(\tool_muprog\local\extdb\query\allocation::class)]
+#[Group('MuTMS')]
 final class allocation_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

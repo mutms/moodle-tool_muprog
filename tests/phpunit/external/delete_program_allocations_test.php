@@ -20,19 +20,20 @@
 namespace tool_muprog\phpunit\external;
 
 use tool_muprog\local\source\selfallocation;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests for external source delete program allocation users.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2023 Open LMS (https://www.openlms.net/)
  * @copyright  2025 Petr Skoda
  * @author     Farhan Karmali
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\external\delete_program_allocations_test
  */
+#[CoversClass(\tool_muprog\external\delete_program_allocations::class)]
+#[Group('MuTMS')]
 final class delete_program_allocations_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

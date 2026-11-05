@@ -20,19 +20,20 @@
 namespace tool_muprog\phpunit\external;
 
 use tool_muprog\external\update_program_allocation;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * External API for updating of program allocations
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2023 Open LMS (https://www.openlms.net/)
  * @copyright  2025 Petr Skoda
  * @author     Farhan Karmali
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\external\update_program_allocation
  */
+#[CoversClass(\tool_muprog\external\update_program_allocation::class)]
+#[Group('MuTMS')]
 final class update_program_allocation_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

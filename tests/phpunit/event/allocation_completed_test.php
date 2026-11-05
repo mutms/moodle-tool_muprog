@@ -18,18 +18,20 @@
 
 namespace tool_muprog\phpunit\event;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Program completed event test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2022 Open LMS (https://www.openlms.net/)
  * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\event\allocation_completed
  */
+#[CoversClass(\tool_muprog\event\allocation_completed::class)]
+#[Group('MuTMS')]
 final class allocation_completed_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

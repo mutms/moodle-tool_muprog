@@ -22,17 +22,18 @@ namespace tool_muprog\phpunit\external;
 use tool_muprog\external\restore_program_allocation;
 use core\exception\invalid_parameter_exception;
 use core\exception\moodle_exception;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Program allocation restoring web services tests.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\external\restore_program_allocation
  */
+#[CoversClass(\tool_muprog\external\restore_program_allocation::class)]
+#[Group('MuTMS')]
 final class restore_program_allocation_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

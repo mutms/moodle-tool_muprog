@@ -24,19 +24,20 @@ use tool_muprog\local\content\set;
 use tool_muprog\local\content\top;
 use tool_mulib\local\mulib;
 use tool_muprog\local\export;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Program export helper test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2024 Open LMS (https://www.openlms.net/)
  * @copyright  2025 Petr Skoda
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\local\export
  */
+#[CoversClass(\tool_muprog\local\export::class)]
+#[Group('MuTMS')]
 final class export_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();

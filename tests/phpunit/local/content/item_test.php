@@ -22,17 +22,18 @@
 namespace tool_muprog\phpunit\local\content;
 
 use tool_muprog\local\content\item;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Program content item test.
  *
- * @group      MuTMS
  * @package    tool_muprog
  * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- *
- * @covers \tool_muprog\local\content\item
  */
+#[CoversClass(\tool_muprog\local\content\item::class)]
+#[Group('MuTMS')]
 final class item_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();
