@@ -114,7 +114,7 @@ final class upload_test extends \advanced_testcase {
 
         $sql = export::get_export_sql((object)['contextid' => $syscontext->id, 'includesubcontexts' => 1]);
         $rawprograms = export::export_programs($sql);
-        $oldprograms = unserialize(serialize($rawprograms));
+        $oldprograms = fullclone($rawprograms);
         $this->assertCount(3, $rawprograms);
 
         \tool_muprog\local\program::delete($program0->id);
@@ -442,7 +442,7 @@ final class upload_test extends \advanced_testcase {
         $this->assertStringContainsString('"publicaccess"', $content);
         $this->assertStringNotContainsString('"public"', $content);
         $rawprograms = \tool_muprog\local\upload::decode_json_file("$fixturesdir/programs_legacy_publicaccess.json", 'UTF-8');
-        $legacyprograms = unserialize(serialize($rawprograms));
+        $legacyprograms = fullclone($rawprograms);
         $this->process_and_delete_programs($rawprograms);
 
         // The only difference from the current format is the ignored flag.
