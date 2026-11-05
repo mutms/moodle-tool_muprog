@@ -70,8 +70,6 @@ final class source_extdb_edit extends form {
         $this->add($auxint2);
         $dm->hide_if('auxint2', 'enable', 'eq', '0');
 
-        // TODO: add more aux settings.
-
         $this->add(new buttons('buttons'));
         $this->add(new submit('submit', get_string('update')), 'buttons');
         $this->add(new cancel(), 'buttons');
