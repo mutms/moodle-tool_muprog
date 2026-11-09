@@ -61,11 +61,9 @@ Feature: Programs navigation behat steps test
     And I should see "Program 002"
     And I should see "Program 003"
 
-    When I click on "Filters" "button"
-    And I set the following fields in the "Exclude sub-categories" "core_reportbuilder > Filter" to these values:
-      | Exclude sub-categories operator | Yes |
-    And I click on "Apply" "button" in the "[data-region='report-filters']" "css_element"
-    And I click on "Filters" "button"
+    When I press "+ Add filter"
+    And I click on "Exclude sub-categories" "button" in the ".tool_mulib-report-filter-bar-popover" "css_element"
+    And I click on "Yes" "button" in the ".tool_mulib-report-filter-bar-popover" "css_element"
     Then I should see "Programs"
     And I should see "Program 000"
     And I should not see "Program 001"

@@ -89,6 +89,7 @@ $report = \core_reportbuilder\system_report_factory::create(
     \tool_muprog\reportbuilder\local\systemreports\programs::class,
     $context
 );
+echo $OUTPUT->render(new \tool_mulib\output\report_filter_bar($report));
 echo $report->output();
 
 echo $OUTPUT->footer();

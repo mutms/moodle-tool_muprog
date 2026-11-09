@@ -26,6 +26,7 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 - cohort names link to cohort management, the advanced cohort management page is used when installed
 - allocation and completion evidence uploads are wizards that accept pasted data and show a dry run,
   rows with problems block the upload unless they are skipped
+- reports have an always visible filter bar, the standard filters form is available as Advanced filtering
 
 ### Fixed
 

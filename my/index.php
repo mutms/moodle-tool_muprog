@@ -97,6 +97,7 @@ $report = \core_reportbuilder\system_report_factory::create(
     \tool_muprog\reportbuilder\local\systemreports\allocations_user::class,
     $usercontext
 );
+echo $OUTPUT->render(new \tool_mulib\output\report_filter_bar($report));
 echo $report->output();
 
 echo $OUTPUT->footer();
