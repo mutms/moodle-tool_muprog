@@ -23,9 +23,6 @@
  * model and has not yet been reviewed by a human translator. Corrections are
  * welcome.
  *
- * HINWEIS: Diese deutsche Übersetzung wurde automatisch von einem KI-Sprachmodell
- * erstellt und noch nicht von einem Menschen geprüft. Korrekturen sind willkommen.
- *
  * @package    tool_muprog
  * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
