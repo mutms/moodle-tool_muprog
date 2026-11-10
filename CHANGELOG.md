@@ -6,7 +6,9 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 
 ## [Unreleased](https://github.com/mutms/moodle-tool_muprog/compare/v5.0.11.01...MOODLE_500_STABLE)
 
-- No changes
+### Added
+
+- Czech translation and AI-produced previews of German, French, Italian, Portuguese and Spanish translations
 
 ## [v5.0.11.01](https://github.com/mutms/moodle-tool_muprog/compare/v5.0.10.03...v5.0.11.01) - 2026-09-20
 
