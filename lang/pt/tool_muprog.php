@@ -122,7 +122,7 @@ $string['event_program_viewed'] = 'Programa visualizado';
 $string['evidence'] = 'Outro comprovativo';
 $string['evidence_details'] = 'Detalhes';
 $string['evidence_detailsdefault'] = 'Detalhes predefinidos';
-$string['evidencedate'] = 'Data de conclusão do comprovativo';
+$string['evidencedate'] = 'Data de conclusão segundo o comprovativo';
 $string['evidenceupdate'] = 'Editar outro comprovativo';
 $string['evidenceupload'] = 'Carregar comprovativos de conclusão';
 $string['evidenceupload_csvfile'] = 'Ficheiro CSV';
@@ -242,7 +242,7 @@ $string['notification_due_body'] = 'Olá {$a->user_fullname},
 a conclusão do programa "{$a->program_fullname}" era esperada antes de {$a->program_duedate}.
 ';
 $string['notification_due_description'] = 'Notificação enviada aos utilizadores quando a conclusão do seu programa está em atraso.';
-$string['notification_due_subject'] = 'A conclusão do programa era esperada';
+$string['notification_due_subject'] = 'A conclusão do programa está em atraso';
 $string['notification_duesoon'] = 'Data limite do programa próxima';
 $string['notification_duesoon_body'] = 'Olá {$a->user_fullname},
 

@@ -242,7 +242,7 @@ $string['notification_due_body'] = 'Hallo {$a->user_fullname},
 der Abschluss des Programms „{$a->program_fullname}“ wurde vor dem {$a->program_duedate} erwartet.
 ';
 $string['notification_due_description'] = 'Benachrichtigung, die an Nutzer/innen gesendet wird, wenn der Abschluss ihres Programms überfällig ist.';
-$string['notification_due_subject'] = 'Programmabschluss wurde erwartet';
+$string['notification_due_subject'] = 'Programmabschluss ist überfällig';
 $string['notification_duesoon'] = 'Fälligkeitsdatum des Programms steht bevor';
 $string['notification_duesoon_body'] = 'Hallo {$a->user_fullname},
 

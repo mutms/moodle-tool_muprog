@@ -238,7 +238,7 @@ $string['notification_due_body'] = 'Dobrý den, {$a->user_fullname},
 dokončení programu „{$a->program_fullname}“ se očekávalo do {$a->program_duedate}.
 ';
 $string['notification_due_description'] = 'Oznámení odesílané uživatelům, když je dokončení jejich programu po termínu.';
-$string['notification_due_subject'] = 'Dokončení programu se očekávalo';
+$string['notification_due_subject'] = 'Dokončení programu je po termínu';
 $string['notification_duesoon'] = 'Blíží se termín splnění programu';
 $string['notification_duesoon_body'] = 'Dobrý den, {$a->user_fullname},
 
