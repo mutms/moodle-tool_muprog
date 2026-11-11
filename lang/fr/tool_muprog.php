@@ -271,7 +271,7 @@ $string['notification_due_body'] = 'Bonjour {$a->user_fullname},
 l’achèvement du programme « {$a->program_fullname} » était attendu avant le {$a->program_duedate}.
 ';
 $string['notification_due_description'] = 'Notification envoyée aux utilisateurs lorsque l’achèvement de leur programme est en retard.';
-$string['notification_due_subject'] = 'L’achèvement du programme était attendu';
+$string['notification_due_subject'] = 'L’achèvement du programme est en retard';
 $string['notification_duesoon'] = 'Date limite du programme proche';
 $string['notification_duesoon_body'] = 'Bonjour {$a->user_fullname},
 

@@ -114,9 +114,9 @@ $string['event_program_viewed'] = 'Program viewed';
 $string['evidence'] = 'Other evidence';
 $string['evidence_details'] = 'Details';
 $string['evidence_detailsdefault'] = 'Default details';
-$string['evidencedate'] = 'Evidence completion date';
+$string['evidencedate'] = 'Completion date in evidence';
 $string['evidenceupdate'] = 'Update other evidence';
-$string['evidenceupload'] = 'Upload completion evidences';
+$string['evidenceupload'] = 'Upload completion evidence';
 $string['evidenceupload_column_ignore'] = 'Not used';
 $string['evidenceupload_column_number'] = 'Column {$a}';
 $string['evidenceupload_columns'] = 'Column meaning';
@@ -269,7 +269,7 @@ $string['notification_due_body'] = 'Hello {$a->user_fullname},
 completion of program "{$a->program_fullname}" was expected before {$a->program_duedate}.
 ';
 $string['notification_due_description'] = 'Notification sent to users when their program completion is overdue.';
-$string['notification_due_subject'] = 'Program completion was expected';
+$string['notification_due_subject'] = 'Program completion is overdue';
 $string['notification_duesoon'] = 'Program due date soon';
 $string['notification_duesoon_body'] = 'Hello {$a->user_fullname},
 
@@ -361,7 +361,7 @@ $string['privacy:metadata:table:tool_muprog_allocation'] = 'Information about pr
 $string['privacy:metadata:table:tool_muprog_attendance'] = 'Offline attendance';
 $string['privacy:metadata:table:tool_muprog_cert_issue'] = 'Program allocation certificate issues';
 $string['privacy:metadata:table:tool_muprog_completion'] = 'Program allocation completions';
-$string['privacy:metadata:table:tool_muprog_evidence'] = 'Information about other completion evidences';
+$string['privacy:metadata:table:tool_muprog_evidence'] = 'Information about other completion evidence';
 $string['privacy:metadata:table:tool_muprog_operation'] = 'Lengthy program operations, such as duplication of programs, and the users who started them';
 $string['privacy:metadata:table:tool_muprog_request'] = 'Information about allocation request';
 $string['program'] = 'Program';

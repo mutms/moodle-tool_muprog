@@ -88,7 +88,7 @@ final class due_test extends \advanced_testcase {
         $sink->close();
         $this->assertCount(1, $messages);
         $message = $messages[0];
-        $this->assertSame('Program completion was expected', $message->subject);
+        $this->assertSame('Program completion is overdue', $message->subject);
         $this->assertSame('-10', $message->useridfrom);
         $this->assertSame($user1->id, $message->useridto);
         $this->assertSame('tool_muprog', $message->component);
@@ -104,7 +104,7 @@ final class due_test extends \advanced_testcase {
         $sink->close();
         $this->assertCount(1, $messages);
         $message = $messages[0];
-        $this->assertSame('Program completion was expected', $message->subject);
+        $this->assertSame('Program completion is overdue', $message->subject);
         $this->assertSame('-10', $message->useridfrom);
         $this->assertSame($user1->id, $message->useridto);
         $this->assertSame('tool_muprog', $message->component);
@@ -120,7 +120,7 @@ final class due_test extends \advanced_testcase {
         $sink->close();
         $this->assertCount(1, $messages);
         $message = $messages[0];
-        $this->assertSame('Program completion was expected', $message->subject);
+        $this->assertSame('Program completion is overdue', $message->subject);
         $this->assertSame('-10', $message->useridfrom);
         $this->assertSame($user2->id, $message->useridto);
         $this->assertSame('tool_muprog', $message->component);

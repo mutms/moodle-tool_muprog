@@ -271,7 +271,7 @@ $string['notification_due_body'] = 'Buongiorno {$a->user_fullname},
 il completamento del programma "{$a->program_fullname}" era previsto entro {$a->program_duedate}.
 ';
 $string['notification_due_description'] = 'Notifica inviata agli utenti quando il completamento del loro programma è in ritardo.';
-$string['notification_due_subject'] = 'Il completamento del programma era previsto';
+$string['notification_due_subject'] = 'Il completamento del programma è in ritardo';
 $string['notification_duesoon'] = 'Data limite del programma imminente';
 $string['notification_duesoon_body'] = 'Buongiorno {$a->user_fullname},
 

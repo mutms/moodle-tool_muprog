@@ -78,7 +78,7 @@ Feature: Upload program completion evidence using csv
     And I should see "Active" in the "Manual allocation" definition list item
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
     And I click on "Users actions" "button"
-    And I should not see "Upload completion evidences"
+    And I should not see "Upload completion evidence"
 
     And I click on "Upload allocations" "link"
     And I upload "admin/tool/muprog/tests/fixtures/evidence1.csv" file to "sourcefile" muform filemanager
@@ -88,14 +88,14 @@ Feature: Upload program completion evidence using csv
     And I press "Upload allocations"
     And I should see "Allocated 5 users, skipped 1."
     And I click on "Users actions" "button"
-    And I should see "Upload completion evidences"
+    And I should see "Upload completion evidence"
 
     And I follow "Student 3"
     And I click on "Archive" "link"
     And I click on "Archive" "button" in the "dialog[open]" "css_element"
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
 
-    When I click on "Upload completion evidences" action from "Users actions" dropdown
+    When I click on "Upload completion evidence" action from "Users actions" dropdown
     And I upload "admin/tool/muprog/tests/fixtures/evidence1.csv" file to "sourcefile" muform filemanager
     And I press "Continue"
     Then I should see "7 rows were read"
@@ -113,7 +113,7 @@ Feature: Upload program completion evidence using csv
     And I should see "Invalid date \"13/13/23\"."
     And I should see "The completion date is missing."
     And I should see "No user matches \"studentz\"."
-    And I press "Upload completion evidences"
+    And I press "Upload completion evidence"
     Then I should see "Completion evidence updated for 2 users, skipped 4."
     And the following should exist in the "reportbuilder-table" table:
       | First name             | Program status |
@@ -137,7 +137,7 @@ Feature: Upload program completion evidence using csv
       | 12/03/23, 00:00 | EvidenceX      |
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
 
-    When I click on "Upload completion evidences" action from "Users actions" dropdown
+    When I click on "Upload completion evidence" action from "Users actions" dropdown
     And I upload "admin/tool/muprog/tests/fixtures/evidence2.csv" file to "sourcefile" muform filemanager
     And I press "Continue"
     And I set the following muform fields:
@@ -146,11 +146,11 @@ Feature: Upload program completion evidence using csv
     And I press "Continue"
     And I should see "Ready to update: 2. Skipped: 1. Problems: 0."
     # Default details are required without a details column.
-    And I press "Upload completion evidences"
+    And I press "Upload completion evidence"
     And I should see "Required"
     And I set the following muform fields:
       | Default details | EvidenceY |
-    And I press "Upload completion evidences"
+    And I press "Upload completion evidence"
     Then I should see "Completion evidence updated for 2 users, skipped 1."
 
     And I follow "Student 1"
