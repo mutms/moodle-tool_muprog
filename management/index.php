@@ -89,7 +89,15 @@ $report = \core_reportbuilder\system_report_factory::create(
     \tool_muprog\reportbuilder\local\systemreports\programs::class,
     $context
 );
-echo $OUTPUT->render(new \tool_mulib\output\report_filter_bar($report));
+echo $OUTPUT->render(new \tool_mulib\output\report_filter_bar($report, pinned: [
+    'program:fullname' => null,
+    'program:currentcontextonly' => null,
+    'program:draft' => null,
+    'program:archived' => null,
+], defaults: [
+    'program:archived' => ['operator' => \core_reportbuilder\local\filters\boolean_select::NOT_CHECKED],
+]));
 echo $report->output();
+echo $OUTPUT->render(new \tool_mulib\output\report_pager($report));
 
 echo $OUTPUT->footer();
