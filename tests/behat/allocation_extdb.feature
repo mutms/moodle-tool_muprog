@@ -80,6 +80,7 @@ Feature: External database query program allocation tests
     And I should see "External database allocation ad-hoc task created"
     And I run all ad-hoc tasks
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
+    And I click on "Remove filter: Archived" "button"
     Then "Student 1" row "Source" column of "reportbuilder-table" table should contain "External database allocation"
     And "Student 1" row "Program status" column of "reportbuilder-table" table should contain "Open"
     And "Student 2" row "Source" column of "reportbuilder-table" table should contain "External database allocation"

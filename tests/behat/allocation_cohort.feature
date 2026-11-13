@@ -98,6 +98,7 @@ Feature: Visible cohorts program allocation tests
     And I click on "Update" "button" in the "dialog[open]" "css_element"
     Then I should see "Active (Cohort 1)" in the "Automatic cohort allocation" definition list item
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
+    And I click on "Remove filter: Archived" "button"
     And "Student 1" row "Source" column of "reportbuilder-table" table should contain "Automatic cohort allocation"
     And "Student 1" row "Program status" column of "reportbuilder-table" table should contain "Open"
     And "Student 2" row "Source" column of "reportbuilder-table" table should contain "Automatic cohort allocation"
