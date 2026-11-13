@@ -59,6 +59,7 @@ Feature: Programs navigation behat steps test
     And I should see "Program 000"
     And I should see "Program 001"
     And I should see "Program 002"
+    And I click on "Remove filter: Archived" "button"
     And I should see "Program 003"
 
     When I click on "Exclude sub-categories: Any" "button"
@@ -91,6 +92,7 @@ Feature: Programs navigation behat steps test
     And I should see "Program 000"
     And I should see "Program 001"
     And I should see "Program 002"
+    And I click on "Remove filter: Archived" "button"
     And I should see "Program 003"
 
     When I follow "Cat 1"
@@ -108,6 +110,7 @@ Feature: Programs navigation behat steps test
     And I should see "Program 000"
     And I should see "Program 001"
     And I should see "Program 002"
+    And I click on "Remove filter: Archived" "button"
     And I should see "Program 003"
 
     When I am on the "system" "tool_muprog > Program management" page
@@ -132,6 +135,7 @@ Feature: Programs navigation behat steps test
     And I should see "Program 000"
     And I should see "Program 001"
     And I should see "Program 002"
+    And I click on "Remove filter: Archived" "button"
     And I should see "Program 003"
 
     When I follow "Cat 1"
@@ -162,6 +166,7 @@ Feature: Programs navigation behat steps test
     And I should see "Program 000"
     And I should see "Program 001"
     And I should see "Program 002"
+    And I click on "Remove filter: Archived" "button"
     And I should see "Program 003"
 
     When I am on the "system" "tool_muprog > Program management" page
@@ -198,6 +203,7 @@ Feature: Programs navigation behat steps test
     And I should see "Program 000"
     And I should see "Program 001"
     And I should see "Program 002"
+    And I click on "Remove filter: Archived" "button"
     And I should see "Program 003"
     And I should see "Program 003"
 
