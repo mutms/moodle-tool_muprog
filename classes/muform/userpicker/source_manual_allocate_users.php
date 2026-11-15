@@ -16,10 +16,10 @@
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace tool_muprog\muform\autocompletemany;
+namespace tool_muprog\muform\userpicker;
 
+use core\context;
 use tool_mulib\local\sql;
-use tool_mulib\muform\util\autocomplete\user_trait;
 
 /**
  * Users that may be allocated to a program manually.
@@ -28,11 +28,9 @@ use tool_mulib\muform\util\autocomplete\user_trait;
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class source_manual_allocate_users extends \tool_mulib\muform\autocompletemany\base {
-    use user_trait;
-
-    /** @var \context program context */
-    private \context $context;
+final class source_manual_allocate_users extends \tool_mulib\muform\userpicker\base {
+    /** @var context program context */
+    private context $context;
 
     /**
      * Constructor.
@@ -45,7 +43,7 @@ final class source_manual_allocate_users extends \tool_mulib\muform\autocomplete
     ) {
         global $DB;
         $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
-        $this->context = \context::instance_by_id($program->contextid);
+        $this->context = context::instance_by_id($program->contextid);
         require_capability('tool/muprog:allocate', $this->context);
     }
 
@@ -55,26 +53,17 @@ final class source_manual_allocate_users extends \tool_mulib\muform\autocomplete
     }
 
     #[\Override]
-    public function search(string $query, int $maxitems, array $exclude): ?array {
-        return $this->search_users($this->context, $query, $maxitems, $exclude, $this->get_where());
-    }
-
-    #[\Override]
-    public function labels(array $values): array {
-        return $this->user_labels($this->context, $values, $this->get_where());
-    }
-
-    #[\Override]
-    public function validate(array $values): array {
-        return $this->validate_users($values);
+    protected function get_context(): context {
+        return $this->context;
     }
 
     /**
      * Users already allocated are not candidates.
      *
-     * @return sql
+     * @return sql|null
      */
-    private function get_where(): sql {
+    #[\Override]
+    protected function get_candidates_sql(): ?sql {
         return new sql(
             "NOT EXISTS (SELECT 'x' FROM {tool_muprog_allocation} pa WHERE pa.userid = u.id AND pa.programid = :aprogid)",
             ['aprogid' => $this->programid]

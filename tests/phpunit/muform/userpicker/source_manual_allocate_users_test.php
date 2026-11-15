@@ -16,27 +16,40 @@
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace tool_muprog\phpunit\muform\autocompletemany;
+namespace tool_muprog\phpunit\muform\userpicker;
 
-use tool_muprog\muform\autocompletemany\source_manual_allocate_users;
+use tool_muprog\muform\userpicker\source_manual_allocate_users;
 use tool_mulib\local\mulib;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
- * Manual allocation users autocomplete source test.
+ * Manual allocation users picker source test.
  *
  * @package    tool_muprog
  * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-#[CoversClass(\tool_muprog\muform\autocompletemany\source_manual_allocate_users::class)]
+#[CoversClass(\tool_muprog\muform\userpicker\source_manual_allocate_users::class)]
 #[Group('MuTMS')]
 final class source_manual_allocate_users_test extends \advanced_testcase {
     #[\Override]
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
+    }
+
+    /**
+     * Users on the first page of the panel.
+     *
+     * @param source_manual_allocate_users $source
+     * @param string $query
+     * @param string[] $exclude
+     * @return array user id => label html
+     */
+    private function search(source_manual_allocate_users $source, string $query, array $exclude = []): array {
+        $result = $source->search($query, $exclude, 0);
+        return array_combine(array_column($result['rows'], 'id'), array_column($result['rows'], 'label'));
     }
 
     public function test_search(): void {
@@ -71,7 +84,7 @@ final class source_manual_allocate_users_test extends \advanced_testcase {
         $source = new source_manual_allocate_users((int)$program1->id);
         $this->assertSame([(int)$program1->id], $source->get_args());
 
-        $result = $source->search('', 10, []);
+        $result = $this->search($source, '', []);
         $this->assertCount(4, $result); // Admin is included.
         foreach ($result as $userid => $label) {
             if ($userid == $user3->id) {
@@ -86,9 +99,9 @@ final class source_manual_allocate_users_test extends \advanced_testcase {
                 $this->fail('Unexpected user returned: ' . $label);
             }
         }
-        $this->assertNull($source->search('', 3, []));
+        $this->assertSame(4, $source->search('', [], 0)['total']);
 
-        $result = $source->search('Prijmeni', 10, []);
+        $result = $this->search($source, 'Prijmeni', []);
         $this->assertCount(3, $result); // Admin is NOT included.
         foreach ($result as $userid => $label) {
             if ($userid == $user3->id) {
@@ -102,7 +115,7 @@ final class source_manual_allocate_users_test extends \advanced_testcase {
             }
         }
 
-        $result = $source->search('Prijmeni', 10, [(string)$user3->id, (string)$user4->id]);
+        $result = $this->search($source, 'Prijmeni', [(string)$user3->id, (string)$user4->id]);
         $this->assertSame([(int)$user5->id], array_keys($result));
 
         $this->setUser($user5);
@@ -119,7 +132,7 @@ final class source_manual_allocate_users_test extends \advanced_testcase {
 
         $this->setUser($user5);
         $source = new source_manual_allocate_users((int)$program2->id);
-        $result = $source->search('', 10, []);
+        $result = $this->search($source, '', []);
         $this->assertCount(6, $result);
     }
 
@@ -161,26 +174,26 @@ final class source_manual_allocate_users_test extends \advanced_testcase {
         $source = new source_manual_allocate_users((int)$program0->id);
         $this->assertSame(
             [(int)$user0->id, (int)$user1->id, (int)$user2->id, (int)$admin->id],
-            array_keys($source->search('', 50, []))
+            array_keys($this->search($source, '', []))
         );
 
         $source = new source_manual_allocate_users((int)$program1->id);
-        $this->assertSame([(int)$user1->id], array_keys($source->search('', 50, [])));
+        $this->assertSame([(int)$user1->id], array_keys($this->search($source, '', [])));
         $this->assertSame([(int)$user1->id], array_keys($source->labels([(string)$user1->id, (string)$user2->id])));
 
         $source = new source_manual_allocate_users((int)$program2->id);
-        $this->assertSame([(int)$user2->id], array_keys($source->search('', 50, [])));
+        $this->assertSame([(int)$user2->id], array_keys($this->search($source, '', [])));
 
         \tool_mutenancy\local\tenancy::force_current_tenantid($tenant1->id);
 
         $source = new source_manual_allocate_users((int)$program0->id);
-        $this->assertSame([(int)$user1->id], array_keys($source->search('', 50, [])));
+        $this->assertSame([(int)$user1->id], array_keys($this->search($source, '', [])));
 
         $source = new source_manual_allocate_users((int)$program1->id);
-        $this->assertSame([(int)$user1->id], array_keys($source->search('', 50, [])));
+        $this->assertSame([(int)$user1->id], array_keys($this->search($source, '', [])));
 
         $source = new source_manual_allocate_users((int)$program2->id);
-        $this->assertSame([(int)$user2->id], array_keys($source->search('', 50, [])));
+        $this->assertSame([(int)$user2->id], array_keys($this->search($source, '', [])));
     }
 
     public function test_labels_validate(): void {

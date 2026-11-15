@@ -19,15 +19,15 @@
 namespace tool_muprog\local\form;
 
 use tool_mulib\muform\element\autocomplete;
-use tool_mulib\muform\element\autocompletemany;
 use tool_mulib\muform\element\buttons;
 use tool_mulib\muform\element\cancel;
 use tool_mulib\muform\element\customfields;
 use tool_mulib\muform\element\submit;
+use tool_mulib\muform\element\userpickermany;
 use tool_mulib\muform\form;
 use tool_muprog\customfield\allocation_handler;
 use tool_muprog\muform\autocomplete\source_manual_allocate_cohortid;
-use tool_muprog\muform\autocompletemany\source_manual_allocate_users;
+use tool_muprog\muform\userpicker\source_manual_allocate_users;
 
 /**
  * Allocate users and cohorts manually.
@@ -43,7 +43,7 @@ final class source_manual_allocate extends form {
     protected function definition(): void {
         $programid = (int)$this->get_extra_data()['program']->id;
 
-        $users = new autocompletemany('users', get_string('users'), new source_manual_allocate_users($programid));
+        $users = new userpickermany('users', get_string('users'), new source_manual_allocate_users($programid));
         $users->set_required_marker(true);
         $this->add($users);
 
