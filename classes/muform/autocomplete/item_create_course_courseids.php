@@ -16,7 +16,7 @@
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace tool_muprog\muform\autocompletemany;
+namespace tool_muprog\muform\autocomplete;
 
 use tool_mulib\local\search_util;
 use tool_mulib\local\context_map;
@@ -30,7 +30,7 @@ use tool_mulib\local\sql;
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class item_create_course_courseids extends \tool_mulib\muform\autocompletemany\base {
+final class item_create_course_courseids extends \tool_mulib\muform\autocomplete\base {
     /** @var string capability required in the course context */
     private const string CAPABILITY = 'tool/muprog:addcourse';
 

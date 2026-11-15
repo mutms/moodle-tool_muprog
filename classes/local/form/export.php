@@ -27,7 +27,7 @@ use tool_mulib\muform\element\download;
 use tool_mulib\muform\element\select;
 use tool_mulib\muform\form;
 use tool_muprog\muform\autocomplete\export_contextid;
-use tool_muprog\muform\autocompletemany\export_programids;
+use tool_muprog\muform\autocomplete\export_programids;
 
 defined('MOODLE_INTERNAL') || die();
 

@@ -120,36 +120,47 @@ final class source_extdb_edit_queryid_test extends \advanced_testcase {
 
         $source = new source_extdb_edit_queryid((int)$program0->id);
         $this->assertSame([(int)$program0->id], $source->get_args());
-        $this->assertSame([(int)$query0->id => 'System query'], $source->search('', 50));
-        $this->assertSame('System query', $source->label((string)$query0->id));
-        $this->assertNull($source->label((string)$query1->id));
-        $this->assertNull($source->label((string)$query3->id));
-        $this->assertNull($source->label((string)($query3->id + 100)));
-        $this->assertNull($source->label('abc'));
+        $this->assertSame([(int)$query0->id => 'System query'], $source->search('', 50, []));
+        $value = (string)$query0->id;
+        $this->assertSame('System query', $source->labels([$value])[$value] ?? null);
+        $value = (string)$query1->id;
+        $this->assertNull($source->labels([$value])[$value] ?? null);
+        $value = (string)$query3->id;
+        $this->assertNull($source->labels([$value])[$value] ?? null);
+        $value = (string)($query3->id + 100);
+        $this->assertNull($source->labels([$value])[$value] ?? null);
+        $this->assertNull($source->labels(['abc'])['abc'] ?? null);
 
         $source = new source_extdb_edit_queryid((int)$program1->id);
         $this->assertSame(
             [(int)$query1->id => 'Category 1 query', (int)$query0->id => 'System query'],
-            $source->search('', 50)
+            $source->search('', 50, [])
         );
-        $this->assertNull($source->search('', 1));
-        $this->assertSame([(int)$query0->id => 'System query'], $source->search('System', 50));
-        $this->assertSame([(int)$query1->id => 'Category 1 query'], $source->search('argh', 50));
-        $this->assertSame('System query', $source->label((string)$query0->id));
-        $this->assertSame('Category 1 query', $source->label((string)$query1->id));
-        $this->assertNull($source->label((string)$query2->id));
-        $this->assertNull($source->validate((string)$query1->id));
+        $this->assertNull($source->search('', 1, []));
+        $this->assertSame([(int)$query0->id => 'System query'], $source->search('System', 50, []));
+        $this->assertSame([(int)$query1->id => 'Category 1 query'], $source->search('argh', 50, []));
+        $value = (string)$query0->id;
+        $this->assertSame('System query', $source->labels([$value])[$value] ?? null);
+        $value = (string)$query1->id;
+        $this->assertSame('Category 1 query', $source->labels([$value])[$value] ?? null);
+        $value = (string)$query2->id;
+        $this->assertNull($source->labels([$value])[$value] ?? null);
+        $value = (string)$query1->id;
+        $this->assertNull($source->validate([$value])[$value] ?? null);
 
         $this->setUser($user1);
 
         $source = new source_extdb_edit_queryid((int)$program1->id);
-        $this->assertSame([(int)$query1->id => 'Category 1 query'], $source->search('', 50));
-        $this->assertSame('Category 1 query', $source->label((string)$query1->id));
-        $this->assertNull($source->label((string)$query0->id));
+        $this->assertSame([(int)$query1->id => 'Category 1 query'], $source->search('', 50, []));
+        $value = (string)$query1->id;
+        $this->assertSame('Category 1 query', $source->labels([$value])[$value] ?? null);
+        $value = (string)$query0->id;
+        $this->assertNull($source->labels([$value])[$value] ?? null);
 
         $source = new source_extdb_edit_queryid((int)$program2->id);
-        $this->assertSame([], $source->search('', 50));
-        $this->assertNull($source->label((string)$query2->id));
+        $this->assertSame([], $source->search('', 50, []));
+        $value = (string)$query2->id;
+        $this->assertNull($source->labels([$value])[$value] ?? null);
 
         // Current value is always allowed.
         $DB->insert_record('tool_muprog_source', (object)[
@@ -158,8 +169,10 @@ final class source_extdb_edit_queryid_test extends \advanced_testcase {
             'datajson' => '{}',
             'auxint1' => $query2->id,
         ]);
-        $this->assertSame('Kategoie 2 query', $source->label((string)$query2->id));
-        $this->assertNull($source->label((string)$query0->id));
+        $value = (string)$query2->id;
+        $this->assertSame('Kategoie 2 query', $source->labels([$value])[$value] ?? null);
+        $value = (string)$query0->id;
+        $this->assertNull($source->labels([$value])[$value] ?? null);
 
         $this->setUser($user2);
 
@@ -242,15 +255,15 @@ final class source_extdb_edit_queryid_test extends \advanced_testcase {
         $this->setUser($user0);
 
         $source = new source_extdb_edit_queryid((int)$program0->id);
-        $this->assertSame([(int)$query0->id => 'System query'], $source->search('', 50));
+        $this->assertSame([(int)$query0->id => 'System query'], $source->search('', 50, []));
 
         $source = new source_extdb_edit_queryid((int)$program1->id);
         $this->assertSame(
             [(int)$query1->id => 'Category 1 query', (int)$query0->id => 'System query'],
-            $source->search('', 50)
+            $source->search('', 50, [])
         );
-        $this->assertSame([(int)$query0->id => 'System query'], $source->search('System', 50));
-        $this->assertSame([(int)$query1->id => 'Category 1 query'], $source->search('argh', 50));
+        $this->assertSame([(int)$query0->id => 'System query'], $source->search('System', 50, []));
+        $this->assertSame([(int)$query1->id => 'Category 1 query'], $source->search('argh', 50, []));
 
         // Queries from other tenants are not allowed, not even the current value.
         $DB->insert_record('tool_muprog_source', (object)[
@@ -259,7 +272,9 @@ final class source_extdb_edit_queryid_test extends \advanced_testcase {
             'datajson' => '{}',
             'auxint1' => $query2->id,
         ]);
-        $this->assertNull($source->label((string)$query2->id));
-        $this->assertSame('Category 1 query', $source->label((string)$query1->id));
+        $value = (string)$query2->id;
+        $this->assertNull($source->labels([$value])[$value] ?? null);
+        $value = (string)$query1->id;
+        $this->assertSame('Category 1 query', $source->labels([$value])[$value] ?? null);
     }
 }

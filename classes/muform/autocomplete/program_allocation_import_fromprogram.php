@@ -58,12 +58,12 @@ final class program_allocation_import_fromprogram extends \tool_mulib\muform\aut
     }
 
     #[\Override]
-    public function search(string $query, int $maxitems): ?array {
+    public function search(string $query, int $maxitems, array $exclude): ?array {
         return $this->search_programs(self::CAPABILITY, $query, $maxitems, [], $this->get_where());
     }
 
     #[\Override]
-    public function label(string $value): ?string {
+    protected function label_value(string $value): ?string {
         return $this->program_label(self::CAPABILITY, $value, $this->get_where());
     }
 

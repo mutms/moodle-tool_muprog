@@ -52,12 +52,12 @@ final class program_contextid extends \tool_mulib\muform\autocomplete\base {
     }
 
     #[\Override]
-    public function search(string $query, int $maxitems): ?array {
+    public function search(string $query, int $maxitems, array $exclude): ?array {
         return $this->search_category_contexts(self::CAPABILITY, $query, $maxitems);
     }
 
     #[\Override]
-    public function label(string $value): ?string {
+    protected function label_value(string $value): ?string {
         return $this->category_context_label(self::CAPABILITY, $value, $this->currentcontextid);
     }
 }

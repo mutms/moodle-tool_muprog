@@ -333,6 +333,6 @@ final class notification_manager extends \tool_mulib\local\notification\manager 
             return false;
         }
         $source = new \tool_muprog\muform\autocomplete\notification_import_frominstance($instanceid);
-        return $source->label((string)$frominstanceid) !== null;
+        return (bool)$source->labels([(string)$frominstanceid]);
     }
 }

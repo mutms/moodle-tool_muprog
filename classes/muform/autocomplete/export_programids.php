@@ -16,7 +16,7 @@
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace tool_muprog\muform\autocompletemany;
+namespace tool_muprog\muform\autocomplete;
 
 use tool_muprog\muform\util\autocomplete\program_trait;
 
@@ -27,7 +27,7 @@ use tool_muprog\muform\util\autocomplete\program_trait;
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class export_programids extends \tool_mulib\muform\autocompletemany\base {
+final class export_programids extends \tool_mulib\muform\autocomplete\base {
     use program_trait;
 
     /** @var string capability required in program contexts */

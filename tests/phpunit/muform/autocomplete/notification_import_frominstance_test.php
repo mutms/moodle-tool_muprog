@@ -100,12 +100,14 @@ final class notification_import_frominstance_test extends \advanced_testcase {
         $this->setUser($user1);
         $source = new notification_import_frominstance($program1->id);
         $this->assertSame([(int)$program1->id], $source->get_args());
-        $this->assertSame([(string)$program2->id => 'Pokus', (string)$program3->id => 'Prog3'], $source->search('', 50));
-        $this->assertSame([(string)$program3->id => 'Prog3'], $source->search('Prog3', 50));
-        $this->assertNull($source->search('', 1));
-        $this->assertSame('Pokus', $source->label((string)$program2->id));
-        $this->assertNull($source->label((string)$program1->id));
-        $this->assertNull($source->label('999999'));
+        $this->assertSame([(string)$program2->id => 'Pokus', (string)$program3->id => 'Prog3'], $source->search('', 50, []));
+        $this->assertSame([(string)$program3->id => 'Prog3'], $source->search('Prog3', 50, []));
+        $this->assertNull($source->search('', 1, []));
+        $value = (string)$program2->id;
+        $this->assertSame('Pokus', $source->labels([$value])[$value] ?? null);
+        $value = (string)$program1->id;
+        $this->assertNull($source->labels([$value])[$value] ?? null);
+        $this->assertNull($source->labels(['999999'])['999999'] ?? null);
         $this->assertTrue(\tool_muprog\local\notification_manager::validate_import_frominstance($program1->id, $program2->id));
         $this->assertFalse(\tool_muprog\local\notification_manager::validate_import_frominstance($program1->id, $program1->id));
         $this->assertFalse(\tool_muprog\local\notification_manager::validate_import_frominstance($program1->id, 0));
@@ -114,8 +116,9 @@ final class notification_import_frominstance_test extends \advanced_testcase {
         role_assign($cloneroleid, $user2->id, $catcontext1->id);
         $this->setUser($user2);
         $source = new notification_import_frominstance($program1->id);
-        $this->assertSame([(string)$program2->id => 'Pokus'], $source->search('', 50));
-        $this->assertNull($source->label((string)$program3->id));
+        $this->assertSame([(string)$program2->id => 'Pokus'], $source->search('', 50, []));
+        $value = (string)$program3->id;
+        $this->assertNull($source->labels([$value])[$value] ?? null);
         $this->assertFalse(\tool_muprog\local\notification_manager::validate_import_frominstance($program1->id, $program3->id));
 
         $this->setUser($user3);

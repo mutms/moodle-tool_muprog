@@ -19,7 +19,7 @@
 
 namespace tool_muprog\local\form;
 
-use tool_muprog\muform\autocompletemany\item_create_course_courseids;
+use tool_muprog\muform\autocomplete\item_create_course_courseids;
 use tool_mulib\muform\element\autocompletemany;
 use tool_mulib\muform\element\buttons;
 use tool_mulib\muform\element\cancel;

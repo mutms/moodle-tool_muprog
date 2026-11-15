@@ -26,7 +26,7 @@ use tool_mulib\muform\element\radiocards;
 use tool_mulib\muform\element\submit;
 use tool_mulib\muform\form;
 use tool_muprog\local\source\cohort;
-use tool_muprog\muform\autocompletemany\source_cohort_edit_cohortids;
+use tool_muprog\muform\autocomplete\source_cohort_edit_cohortids;
 
 /**
  * Edit cohort allocation settings.

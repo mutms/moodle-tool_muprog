@@ -67,7 +67,7 @@ $handler = handler::from_request();
 
 // The program selected in the first step must be one the user may import from.
 $fromprogram = null;
-if ($fromprogramid && (new program_content_import_fromprogram($targetprogram->id))->label((string)$fromprogramid) !== null) {
+if ($fromprogramid && (new program_content_import_fromprogram($targetprogram->id))->labels([(string)$fromprogramid])) {
     $fromprogram = $DB->get_record('tool_muprog_program', ['id' => $fromprogramid], '*', MUST_EXIST);
 }
 

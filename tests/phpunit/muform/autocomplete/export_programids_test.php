@@ -16,9 +16,9 @@
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace tool_muprog\phpunit\muform\autocompletemany;
+namespace tool_muprog\phpunit\muform\autocomplete;
 
-use tool_muprog\muform\autocompletemany\export_programids;
+use tool_muprog\muform\autocomplete\export_programids;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\Group;
@@ -30,7 +30,7 @@ use PHPUnit\Framework\Attributes\Group;
  * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-#[CoversClass(\tool_muprog\muform\autocompletemany\export_programids::class)]
+#[CoversClass(\tool_muprog\muform\autocomplete\export_programids::class)]
 #[CoversTrait(\tool_muprog\muform\util\autocomplete\program_trait::class)]
 #[Group('MuTMS')]
 final class export_programids_test extends \advanced_testcase {

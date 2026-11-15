@@ -53,7 +53,7 @@ final class notification_import_frominstance extends \tool_mulib\muform\autocomp
     }
 
     #[\Override]
-    public function search(string $query, int $maxitems): ?array {
+    public function search(string $query, int $maxitems, array $exclude): ?array {
         global $DB, $USER;
 
         $context = \context::instance_by_id($this->program->contextid);
@@ -104,7 +104,7 @@ final class notification_import_frominstance extends \tool_mulib\muform\autocomp
     }
 
     #[\Override]
-    public function label(string $value): ?string {
+    protected function label_value(string $value): ?string {
         global $DB;
 
         $program = $DB->get_record('tool_muprog_program', ['id' => (int)$value]);

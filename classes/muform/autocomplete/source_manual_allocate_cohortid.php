@@ -54,12 +54,12 @@ final class source_manual_allocate_cohortid extends \tool_mulib\muform\autocompl
     }
 
     #[\Override]
-    public function search(string $query, int $maxitems): ?array {
+    public function search(string $query, int $maxitems, array $exclude): ?array {
         return $this->search_cohorts($this->context, $query, $maxitems);
     }
 
     #[\Override]
-    public function label(string $value): ?string {
+    protected function label_value(string $value): ?string {
         return $this->cohort_labels($this->context, [$value])[$value] ?? null;
     }
 }

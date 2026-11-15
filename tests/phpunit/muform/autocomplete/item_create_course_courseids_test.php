@@ -16,9 +16,9 @@
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace tool_muprog\phpunit\muform\autocompletemany;
+namespace tool_muprog\phpunit\muform\autocomplete;
 
-use tool_muprog\muform\autocompletemany\item_create_course_courseids;
+use tool_muprog\muform\autocomplete\item_create_course_courseids;
 use tool_mulib\local\mulib;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -30,7 +30,7 @@ use PHPUnit\Framework\Attributes\Group;
  * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-#[CoversClass(\tool_muprog\muform\autocompletemany\item_create_course_courseids::class)]
+#[CoversClass(\tool_muprog\muform\autocomplete\item_create_course_courseids::class)]
 #[Group('MuTMS')]
 final class item_create_course_courseids_test extends \advanced_testcase {
     #[\Override]

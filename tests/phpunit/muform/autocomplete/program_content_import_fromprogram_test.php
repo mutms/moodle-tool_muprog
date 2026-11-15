@@ -92,17 +92,22 @@ final class program_content_import_fromprogram_test extends \advanced_testcase {
         $this->assertSame([(int)$program1->id], $source->get_args());
         $this->assertSame(
             [(int)$program2->id => 'pokus', (int)$program3->id => 'Prog3', (int)$program4->id => 'Prog4'],
-            $source->search('', 50)
+            $source->search('', 50, [])
         );
-        $this->assertSame([(int)$program2->id => 'pokus'], $source->search('desc 2', 50));
-        $this->assertSame([(int)$program3->id => 'Prog3'], $source->search('p3', 50));
-        $this->assertNull($source->search('', 2));
-        $this->assertSame('pokus', $source->label((string)$program2->id));
-        $this->assertSame('Prog3', $source->label((string)$program3->id));
-        $this->assertNull($source->label((string)$program1->id));
-        $this->assertNull($source->label((string)($program4->id + 100)));
-        $this->assertNull($source->label('abc'));
-        $this->assertNull($source->validate((string)$program2->id));
+        $this->assertSame([(int)$program2->id => 'pokus'], $source->search('desc 2', 50, []));
+        $this->assertSame([(int)$program3->id => 'Prog3'], $source->search('p3', 50, []));
+        $this->assertNull($source->search('', 2, []));
+        $value = (string)$program2->id;
+        $this->assertSame('pokus', $source->labels([$value])[$value] ?? null);
+        $value = (string)$program3->id;
+        $this->assertSame('Prog3', $source->labels([$value])[$value] ?? null);
+        $value = (string)$program1->id;
+        $this->assertNull($source->labels([$value])[$value] ?? null);
+        $value = (string)($program4->id + 100);
+        $this->assertNull($source->labels([$value])[$value] ?? null);
+        $this->assertNull($source->labels(['abc'])['abc'] ?? null);
+        $value = (string)$program2->id;
+        $this->assertNull($source->validate([$value])[$value] ?? null);
 
         $this->setUser($user1);
         try {
@@ -118,10 +123,13 @@ final class program_content_import_fromprogram_test extends \advanced_testcase {
 
         $this->setUser($user2);
         $source = new program_content_import_fromprogram((int)$program2->id);
-        $this->assertSame([(int)$program4->id => 'Prog4'], $source->search('', 50));
-        $this->assertSame('Prog4', $source->label((string)$program4->id));
-        $this->assertNull($source->label((string)$program1->id));
-        $this->assertNull($source->label((string)$program2->id));
+        $this->assertSame([(int)$program4->id => 'Prog4'], $source->search('', 50, []));
+        $value = (string)$program4->id;
+        $this->assertSame('Prog4', $source->labels([$value])[$value] ?? null);
+        $value = (string)$program1->id;
+        $this->assertNull($source->labels([$value])[$value] ?? null);
+        $value = (string)$program2->id;
+        $this->assertNull($source->labels([$value])[$value] ?? null);
     }
 
     public function test_search_tenant(): void {
@@ -167,17 +175,20 @@ final class program_content_import_fromprogram_test extends \advanced_testcase {
         $source = new program_content_import_fromprogram((int)$program0->id);
         $this->assertSame(
             [(int)$program1->id => 'prg1', (int)$program2->id => 'prg2', (int)$program3->id => 'prg3'],
-            $source->search('', 50)
+            $source->search('', 50, [])
         );
-        $this->assertSame('prg2', $source->label((string)$program2->id));
+        $value = (string)$program2->id;
+        $this->assertSame('prg2', $source->labels([$value])[$value] ?? null);
 
         $source = new program_content_import_fromprogram((int)$program1->id);
         $this->assertSame(
             [(int)$program0->id => 'prg0', (int)$program3->id => 'prg3'],
-            $source->search('', 50)
+            $source->search('', 50, [])
         );
-        $this->assertSame('prg0', $source->label((string)$program0->id));
-        $this->assertNull($source->label((string)$program2->id));
+        $value = (string)$program0->id;
+        $this->assertSame('prg0', $source->labels([$value])[$value] ?? null);
+        $value = (string)$program2->id;
+        $this->assertNull($source->labels([$value])[$value] ?? null);
 
         $this->setUser($user0);
         try {
@@ -193,8 +204,10 @@ final class program_content_import_fromprogram_test extends \advanced_testcase {
 
         $this->setUser($user1);
         $source = new program_content_import_fromprogram((int)$program1->id);
-        $this->assertSame([(int)$program3->id => 'prg3'], $source->search('', 50));
-        $this->assertSame('prg3', $source->label((string)$program3->id));
-        $this->assertNull($source->label((string)$program0->id));
+        $this->assertSame([(int)$program3->id => 'prg3'], $source->search('', 50, []));
+        $value = (string)$program3->id;
+        $this->assertSame('prg3', $source->labels([$value])[$value] ?? null);
+        $value = (string)$program0->id;
+        $this->assertNull($source->labels([$value])[$value] ?? null);
     }
 }

@@ -58,7 +58,7 @@ final class item_create_credits_creditframeworkid extends \tool_mulib\muform\aut
     }
 
     #[\Override]
-    public function search(string $query, int $maxitems): ?array {
+    public function search(string $query, int $maxitems, array $exclude): ?array {
         global $DB, $USER;
 
         $sql = (
@@ -109,7 +109,7 @@ final class item_create_credits_creditframeworkid extends \tool_mulib\muform\aut
     }
 
     #[\Override]
-    public function label(string $value): ?string {
+    protected function label_value(string $value): ?string {
         global $DB;
 
         if (!preg_match('/^[1-9][0-9]*$/D', $value)) {

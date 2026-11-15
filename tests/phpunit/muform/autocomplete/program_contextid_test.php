@@ -59,21 +59,26 @@ final class program_contextid_test extends \advanced_testcase {
         $this->setAdminUser();
         $source = new program_contextid((int)$syscontext->id);
         $this->assertSame([(int)$syscontext->id], $source->get_args());
-        $result = $source->search('', 50);
+        $result = $source->search('', 50, []);
         $this->assertSame('System', $result[$syscontext->id]);
         $this->assertSame('Kategorie A', $result[$catcontext1->id]);
         $this->assertSame('Kategorie B', $result[$catcontext2->id]);
         $this->assertSame('Kategorie A / Kategorie C', $result[$catcontext3->id]);
-        $this->assertSame([(int)$catcontext2->id => 'Kategorie B'], $source->search('Kategorie B', 50));
-        $this->assertNull($source->search('Kategorie', 2));
+        $this->assertSame([(int)$catcontext2->id => 'Kategorie B'], $source->search('Kategorie B', 50, []));
+        $this->assertNull($source->search('Kategorie', 2, []));
 
-        $this->assertSame('System', $source->label((string)$syscontext->id));
-        $this->assertSame('Kategorie A', $source->label((string)$catcontext1->id));
-        $this->assertSame('Kategorie A / Kategorie C', $source->label((string)$catcontext3->id));
-        $this->assertNull($source->label((string)$coursecontext->id));
-        $this->assertNull($source->label('abc'));
-        $this->assertNull($source->label('0'));
-        $this->assertNull($source->validate((string)$catcontext1->id));
+        $value = (string)$syscontext->id;
+        $this->assertSame('System', $source->labels([$value])[$value] ?? null);
+        $value = (string)$catcontext1->id;
+        $this->assertSame('Kategorie A', $source->labels([$value])[$value] ?? null);
+        $value = (string)$catcontext3->id;
+        $this->assertSame('Kategorie A / Kategorie C', $source->labels([$value])[$value] ?? null);
+        $value = (string)$coursecontext->id;
+        $this->assertNull($source->labels([$value])[$value] ?? null);
+        $this->assertNull($source->labels(['abc'])['abc'] ?? null);
+        $this->assertNull($source->labels(['0'])['0'] ?? null);
+        $value = (string)$catcontext1->id;
+        $this->assertNull($source->validate([$value])[$value] ?? null);
 
         $this->setUser($user1);
         try {
@@ -85,12 +90,16 @@ final class program_contextid_test extends \advanced_testcase {
         $source = new program_contextid((int)$catcontext1->id);
         $this->assertSame(
             [(int)$catcontext1->id => 'Kategorie A', (int)$catcontext3->id => 'Kategorie A / Kategorie C'],
-            $source->search('', 50)
+            $source->search('', 50, [])
         );
-        $this->assertSame('Kategorie A', $source->label((string)$catcontext1->id));
-        $this->assertSame('Kategorie A / Kategorie C', $source->label((string)$catcontext3->id));
-        $this->assertNull($source->label((string)$syscontext->id));
-        $this->assertNull($source->label((string)$catcontext2->id));
+        $value = (string)$catcontext1->id;
+        $this->assertSame('Kategorie A', $source->labels([$value])[$value] ?? null);
+        $value = (string)$catcontext3->id;
+        $this->assertSame('Kategorie A / Kategorie C', $source->labels([$value])[$value] ?? null);
+        $value = (string)$syscontext->id;
+        $this->assertNull($source->labels([$value])[$value] ?? null);
+        $value = (string)$catcontext2->id;
+        $this->assertNull($source->labels([$value])[$value] ?? null);
 
         $this->setUser($user2);
         try {
@@ -119,13 +128,13 @@ final class program_contextid_test extends \advanced_testcase {
 
         $this->setAdminUser();
         $source = new program_contextid((int)$syscontext->id);
-        $result = $source->search('', 50);
+        $result = $source->search('', 50, []);
         $this->assertArrayHasKey($syscontext->id, $result);
         $this->assertArrayHasKey($tenant1catcontext->id, $result);
         $this->assertArrayHasKey($tenant2catcontext->id, $result);
 
         \tool_mutenancy\local\tenancy::force_current_tenantid($tenant1->id);
-        $result = $source->search('', 50);
+        $result = $source->search('', 50, []);
         $this->assertArrayHasKey($syscontext->id, $result);
         $this->assertArrayHasKey($tenant1catcontext->id, $result);
         $this->assertArrayNotHasKey($tenant2catcontext->id, $result);

@@ -77,13 +77,16 @@ final class source_program_edit_programid_test extends \advanced_testcase {
         $this->setAdminUser();
         $source = new source_program_edit_programid((int)$program1->id);
         $this->assertSame([(int)$program1->id], $source->get_args());
-        $this->assertSame([(int)$program2->id => 'pokus', (int)$program3->id => 'Prog3'], $source->search('', 50));
-        $this->assertSame([(int)$program3->id => 'Prog3'], $source->search('p3', 50));
-        $this->assertNull($source->search('', 1));
-        $this->assertSame('pokus', $source->label((string)$program2->id));
-        $this->assertNull($source->label((string)$program1->id));
-        $this->assertNull($source->label((string)($program3->id + 100)));
-        $this->assertNull($source->label('abc'));
+        $this->assertSame([(int)$program2->id => 'pokus', (int)$program3->id => 'Prog3'], $source->search('', 50, []));
+        $this->assertSame([(int)$program3->id => 'Prog3'], $source->search('p3', 50, []));
+        $this->assertNull($source->search('', 1, []));
+        $value = (string)$program2->id;
+        $this->assertSame('pokus', $source->labels([$value])[$value] ?? null);
+        $value = (string)$program1->id;
+        $this->assertNull($source->labels([$value])[$value] ?? null);
+        $value = (string)($program3->id + 100);
+        $this->assertNull($source->labels([$value])[$value] ?? null);
+        $this->assertNull($source->labels(['abc'])['abc'] ?? null);
 
         $this->setUser($user1);
         try {
@@ -99,9 +102,11 @@ final class source_program_edit_programid_test extends \advanced_testcase {
 
         $this->setUser($user2);
         $source = new source_program_edit_programid((int)$program1->id);
-        $this->assertSame([(int)$program2->id => 'pokus'], $source->search('', 50));
-        $this->assertSame('pokus', $source->label((string)$program2->id));
-        $this->assertNull($source->label((string)$program3->id));
+        $this->assertSame([(int)$program2->id => 'pokus'], $source->search('', 50, []));
+        $value = (string)$program2->id;
+        $this->assertSame('pokus', $source->labels([$value])[$value] ?? null);
+        $value = (string)$program3->id;
+        $this->assertNull($source->labels([$value])[$value] ?? null);
     }
 
     public function test_search_tenant(): void {
@@ -138,22 +143,27 @@ final class source_program_edit_programid_test extends \advanced_testcase {
 
         $this->setAdminUser();
         $source = new source_program_edit_programid((int)$program1->id);
-        $this->assertSame([(int)$program2->id => $program2->fullname], $source->search('', 50));
-        $this->assertSame($program2->fullname, $source->label((string)$program2->id));
-        $this->assertNull($source->label((string)$program3->id));
+        $this->assertSame([(int)$program2->id => $program2->fullname], $source->search('', 50, []));
+        $value = (string)$program2->id;
+        $this->assertSame($program2->fullname, $source->labels([$value])[$value] ?? null);
+        $value = (string)$program3->id;
+        $this->assertNull($source->labels([$value])[$value] ?? null);
 
         $source = new source_program_edit_programid((int)$program3->id);
-        $this->assertSame([(int)$program4->id => $program4->fullname], $source->search('', 50));
-        $this->assertSame($program4->fullname, $source->label((string)$program4->id));
-        $this->assertNull($source->label((string)$program1->id));
-        $this->assertNull($source->label((string)$program5->id));
+        $this->assertSame([(int)$program4->id => $program4->fullname], $source->search('', 50, []));
+        $value = (string)$program4->id;
+        $this->assertSame($program4->fullname, $source->labels([$value])[$value] ?? null);
+        $value = (string)$program1->id;
+        $this->assertNull($source->labels([$value])[$value] ?? null);
+        $value = (string)$program5->id;
+        $this->assertNull($source->labels([$value])[$value] ?? null);
 
         $source = new source_program_edit_programid((int)$program5->id);
-        $this->assertSame([], $source->search('', 50));
+        $this->assertSame([], $source->search('', 50, []));
 
         $this->setUser($user1);
         $source = new source_program_edit_programid((int)$program3->id);
-        $this->assertSame([(int)$program4->id => $program4->fullname], $source->search('', 50));
+        $this->assertSame([(int)$program4->id => $program4->fullname], $source->search('', 50, []));
         try {
             new source_program_edit_programid((int)$program1->id);
             $this->fail('Exception excepted');

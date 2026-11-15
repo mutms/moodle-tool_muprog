@@ -117,18 +117,23 @@ final class item_create_credits_creditframeworkid_test extends \advanced_testcas
             (int)$framework2->id => $framework2->name,
             (int)$framework1->id => $framework1->name,
         ];
-        $this->assertSame($expected, $source->search('', 50));
-        $this->assertSame($expected, $source->search('framework', 50));
-        $this->assertNull($source->search('framework', 2));
-        $this->assertSame([(int)$framework3->id => $framework3->name], $source->search('Another', 50));
-        $this->assertSame([(int)$framework2->id => $framework2->name], $source->search('fr2', 50));
-        $this->assertSame([], $source->search('xxx', 50));
-        $this->assertSame($framework1->name, $source->label((string)$framework1->id));
-        $this->assertSame($framework3->name, $source->label((string)$framework3->id));
-        $this->assertNull($source->label((string)$framework4->id));
-        $this->assertNull($source->label((string)($framework4->id + 100)));
-        $this->assertNull($source->label('abc'));
-        $this->assertNull($source->validate((string)$framework1->id));
+        $this->assertSame($expected, $source->search('', 50, []));
+        $this->assertSame($expected, $source->search('framework', 50, []));
+        $this->assertNull($source->search('framework', 2, []));
+        $this->assertSame([(int)$framework3->id => $framework3->name], $source->search('Another', 50, []));
+        $this->assertSame([(int)$framework2->id => $framework2->name], $source->search('fr2', 50, []));
+        $this->assertSame([], $source->search('xxx', 50, []));
+        $value = (string)$framework1->id;
+        $this->assertSame($framework1->name, $source->labels([$value])[$value] ?? null);
+        $value = (string)$framework3->id;
+        $this->assertSame($framework3->name, $source->labels([$value])[$value] ?? null);
+        $value = (string)$framework4->id;
+        $this->assertNull($source->labels([$value])[$value] ?? null);
+        $value = (string)($framework4->id + 100);
+        $this->assertNull($source->labels([$value])[$value] ?? null);
+        $this->assertNull($source->labels(['abc'])['abc'] ?? null);
+        $value = (string)$framework1->id;
+        $this->assertNull($source->validate([$value])[$value] ?? null);
 
         $this->setUser($user2);
         $source = new item_create_credits_creditframeworkid((int)$program1->id);
@@ -136,9 +141,11 @@ final class item_create_credits_creditframeworkid_test extends \advanced_testcas
             (int)$framework2->id => $framework2->name,
             (int)$framework1->id => $framework1->name,
         ];
-        $this->assertSame($expected, $source->search('', 50));
-        $this->assertSame($framework1->name, $source->label((string)$framework1->id));
-        $this->assertNull($source->label((string)$framework3->id));
+        $this->assertSame($expected, $source->search('', 50, []));
+        $value = (string)$framework1->id;
+        $this->assertSame($framework1->name, $source->labels([$value])[$value] ?? null);
+        $value = (string)$framework3->id;
+        $this->assertNull($source->labels([$value])[$value] ?? null);
 
         $this->setUser($user3);
         $source = new item_create_credits_creditframeworkid((int)$program2->id);
@@ -146,7 +153,7 @@ final class item_create_credits_creditframeworkid_test extends \advanced_testcas
             (int)$framework2->id => $framework2->name,
             (int)$framework1->id => $framework1->name,
         ];
-        $this->assertSame($expected, $source->search('', 50));
+        $this->assertSame($expected, $source->search('', 50, []));
 
         $this->setUser($user1);
         $generator->create_program_item([
@@ -158,8 +165,9 @@ final class item_create_credits_creditframeworkid_test extends \advanced_testcas
             (int)$framework3->id => $framework3->name,
             (int)$framework2->id => $framework2->name,
         ];
-        $this->assertSame($expected, $source->search('', 50));
-        $this->assertNull($source->label((string)$framework1->id));
+        $this->assertSame($expected, $source->search('', 50, []));
+        $value = (string)$framework1->id;
+        $this->assertNull($source->labels([$value])[$value] ?? null);
 
         $this->setUser($user3);
         try {
@@ -235,28 +243,32 @@ final class item_create_credits_creditframeworkid_test extends \advanced_testcas
             (int)$framework1->id => $framework1->name,
             (int)$framework2->id => $framework2->name,
         ];
-        $this->assertSame($expected, $source->search('', 50));
-        $this->assertSame($framework2->name, $source->label((string)$framework2->id));
+        $this->assertSame($expected, $source->search('', 50, []));
+        $value = (string)$framework2->id;
+        $this->assertSame($framework2->name, $source->labels([$value])[$value] ?? null);
 
         $source = new item_create_credits_creditframeworkid((int)$program1->id);
         $expected = [
             (int)$framework0->id => $framework0->name,
             (int)$framework1->id => $framework1->name,
         ];
-        $this->assertSame($expected, $source->search('', 50));
-        $this->assertSame($framework0->name, $source->label((string)$framework0->id));
-        $this->assertSame($framework1->name, $source->label((string)$framework1->id));
-        $this->assertNull($source->label((string)$framework2->id));
+        $this->assertSame($expected, $source->search('', 50, []));
+        $value = (string)$framework0->id;
+        $this->assertSame($framework0->name, $source->labels([$value])[$value] ?? null);
+        $value = (string)$framework1->id;
+        $this->assertSame($framework1->name, $source->labels([$value])[$value] ?? null);
+        $value = (string)$framework2->id;
+        $this->assertNull($source->labels([$value])[$value] ?? null);
 
         $source = new item_create_credits_creditframeworkid((int)$program2->id);
         $expected = [
             (int)$framework0->id => $framework0->name,
             (int)$framework2->id => $framework2->name,
         ];
-        $this->assertSame($expected, $source->search('', 50));
+        $this->assertSame($expected, $source->search('', 50, []));
 
         $this->setUser($user2);
         $source = new item_create_credits_creditframeworkid((int)$program2->id);
-        $this->assertSame($expected, $source->search('', 50));
+        $this->assertSame($expected, $source->search('', 50, []));
     }
 }
