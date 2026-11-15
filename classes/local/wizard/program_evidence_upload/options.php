@@ -16,9 +16,8 @@
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace tool_muprog\local\form;
+namespace tool_muprog\local\wizard\program_evidence_upload;
 
-use tool_muprog\local\evidence_upload;
 use tool_mulib\muform\element\buttons;
 use tool_mulib\muform\element\cancel;
 use tool_mulib\muform\element\checkbox;
@@ -27,7 +26,9 @@ use tool_mulib\muform\element\inforawhtml;
 use tool_mulib\muform\element\reload;
 use tool_mulib\muform\element\submit;
 use tool_mulib\muform\element\textarea;
+use tool_mulib\muform\element\wizardback;
 use tool_mulib\muform\form;
+use tool_muprog\local\evidence_upload;
 
 /**
  * Completion evidence upload, stage three: options and the dry run result.
@@ -38,7 +39,7 @@ use tool_mulib\muform\form;
  * @author     Farhan Karmali
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class program_evidence_upload_options extends form {
+final class options extends form {
     #[\Override]
     protected function definition(): void {
         $extra = $this->get_extra_data();
@@ -74,7 +75,7 @@ final class program_evidence_upload_options extends form {
             $this->add(new submit('submit', get_string('evidenceupload', 'tool_muprog')), 'buttons');
         }
         $this->add(new reload('refresh', get_string('evidenceupload_refresh', 'tool_muprog')), 'buttons');
-        $this->add(new reload('back', get_string('muform_back', 'tool_mulib')), 'buttons');
+        $this->add(new wizardback(validate: false), 'buttons');
         $this->add(new cancel(), 'buttons');
     }
 

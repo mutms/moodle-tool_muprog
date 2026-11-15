@@ -16,9 +16,8 @@
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace tool_muprog\local\form;
+namespace tool_muprog\local\wizard\source_manual_upload;
 
-use tool_muprog\local\source\manual_upload;
 use tool_mulib\muform\element\buttons;
 use tool_mulib\muform\element\cancel;
 use tool_mulib\muform\element\checkbox;
@@ -26,7 +25,9 @@ use tool_mulib\muform\element\info;
 use tool_mulib\muform\element\inforawhtml;
 use tool_mulib\muform\element\reload;
 use tool_mulib\muform\element\submit;
+use tool_mulib\muform\element\wizardback;
 use tool_mulib\muform\form;
+use tool_muprog\local\source\manual_upload;
 
 /**
  * Allocation upload, stage three: options and the dry run result.
@@ -37,7 +38,7 @@ use tool_mulib\muform\form;
  * @author     Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class source_manual_upload_options extends form {
+final class options extends form {
     #[\Override]
     protected function definition(): void {
         $extra = $this->get_extra_data();
@@ -66,7 +67,7 @@ final class source_manual_upload_options extends form {
             $this->add(new submit('submit', get_string('source_manual_uploadusers', 'tool_muprog')), 'buttons');
         }
         $this->add(new reload('refresh', get_string('source_manual_upload_refresh', 'tool_muprog')), 'buttons');
-        $this->add(new reload('back', get_string('muform_back', 'tool_mulib')), 'buttons');
+        $this->add(new wizardback(validate: false), 'buttons');
         $this->add(new cancel(), 'buttons');
     }
 
