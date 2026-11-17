@@ -208,6 +208,7 @@ $string['messageprovider:duesoon_notification'] = 'Systemnachricht zum baldigen 
 $string['messageprovider:endcompleted_notification'] = 'Systemnachricht zum Ende eines abgeschlossenen Programms';
 $string['messageprovider:endfailed_notification'] = 'Systemnachricht zum Ende eines nicht bestandenen Programms';
 $string['messageprovider:endsoon_notification'] = 'Systemnachricht zum baldigen Programmende';
+$string['messageprovider:endverysoon_notification'] = 'Systemnachricht zur letzten Warnung vor dem Programmende';
 $string['messageprovider:reminder_notification'] = 'Wöchentliche Erinnerung zum Programm';
 $string['messageprovider:reset_notification'] = 'Systemnachricht zum Zurücksetzen des Programms';
 $string['messageprovider:start_notification'] = 'Systemnachricht zum Programmbeginn';
@@ -302,6 +303,16 @@ das Programm „{$a->program_fullname}“ endet am {$a->program_enddate}.
 $string['notification_endsoon_description'] = 'Benachrichtigung, die an Nutzer/innen vor dem Programmende gesendet wird, sofern das Programm noch nicht abgeschlossen ist. Die Zeit vor dem Programmende ist einstellbar, der Standardwert beträgt 3 Tage.';
 $string['notification_endsoon_interval'] = 'Zeit vor dem Programmende';
 $string['notification_endsoon_subject'] = 'Programm endet bald';
+$string['notification_endverysoon'] = 'Letzte Warnung vor dem Programmende';
+$string['notification_endverysoon_body'] = 'Hallo {$a->user_fullname},
+
+**dies ist die letzte Warnung**, das Programm „{$a->program_fullname}“ endet am {$a->program_enddate} und Sie haben es noch nicht abgeschlossen.
+
+Schließen Sie das Programm umgehend ab, nach dem Programmende ist dies nicht mehr möglich.
+';
+$string['notification_endverysoon_description'] = 'Letzte Warnung, die an Nutzer/innen kurz vor dem Programmende gesendet wird, sofern das Programm noch nicht abgeschlossen ist. Die Zeit vor dem Programmende ist einstellbar, der Standardwert beträgt 1 Tag.';
+$string['notification_endverysoon_interval'] = 'Zeit vor dem Programmende';
+$string['notification_endverysoon_subject'] = 'Dringend: Schließen Sie das Programm vor dem Ende ab';
 $string['notification_reminder'] = 'Wöchentliche Erinnerung';
 $string['notification_reminder_body'] = 'Hallo {$a->user_fullname},
 

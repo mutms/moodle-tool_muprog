@@ -24,7 +24,7 @@ use stdClass;
 /**
  * Configurable interval of notifications sent ahead of a date.
  *
- * The interval is stored in auxint1 as a number of seconds, null means default self::TIME_SOON.
+ * The interval is stored in auxint1 as a number of seconds, null means default interval.
  * The label is the lang string notification_TYPE_interval.
  *
  * @package    tool_muprog
@@ -33,6 +33,15 @@ use stdClass;
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 trait soon_interval_trait {
+    /**
+     * Returns default interval used when notification interval is not set.
+     *
+     * @return int number of seconds
+     */
+    public static function get_default_interval(): int {
+        return self::TIME_SOON;
+    }
+
     /**
      * Add interval element to notification update form.
      *
@@ -59,7 +68,7 @@ trait soon_interval_trait {
     #[\Override]
     public static function prepare_update_form_data(array $current): array {
         if (empty($current['auxint1'])) {
-            $current['auxint1'] = self::TIME_SOON;
+            $current['auxint1'] = static::get_default_interval();
         }
         return $current;
     }
@@ -99,7 +108,7 @@ trait soon_interval_trait {
     #[\Override]
     public static function get_aux_details(stdClass $notification): array {
         return [
-            get_string('notification_' . static::get_notificationtype() . '_interval', 'tool_muprog') => format_time($notification->auxint1 ?: self::TIME_SOON),
+            get_string('notification_' . static::get_notificationtype() . '_interval', 'tool_muprog') => format_time($notification->auxint1 ?: static::get_default_interval()),
         ];
     }
 }

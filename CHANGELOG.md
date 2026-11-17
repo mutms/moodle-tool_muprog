@@ -15,6 +15,7 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 - weekly reminder notification for programs
 - configurable time before due date in "Program due date soon" notification, the default is 3 days
 - configurable time before end date in "Program end date soon" notification, the default is 3 days
+- "Last warning before program end" notification with configurable time before end date, the default is 1 day
 
 ### Changed
 

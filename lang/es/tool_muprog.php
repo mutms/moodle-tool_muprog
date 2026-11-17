@@ -208,6 +208,7 @@ $string['messageprovider:duesoon_notification'] = 'Notificación de fecha límit
 $string['messageprovider:endcompleted_notification'] = 'Notificación de fin de programa finalizado';
 $string['messageprovider:endfailed_notification'] = 'Notificación de fin de programa no superado';
 $string['messageprovider:endsoon_notification'] = 'Notificación de fecha de fin de programa próxima';
+$string['messageprovider:endverysoon_notification'] = 'Notificación de último aviso antes del fin del programa';
 $string['messageprovider:reminder_notification'] = 'Notificación de recordatorio semanal de programa';
 $string['messageprovider:reset_notification'] = 'Notificación de reinicio de programa';
 $string['messageprovider:start_notification'] = 'Notificación de inicio de programa';
@@ -302,6 +303,16 @@ el programa "{$a->program_fullname}" termina el {$a->program_enddate}.
 $string['notification_endsoon_description'] = 'Notificación enviada a los usuarios antes de la fecha de fin de su programa, salvo que el programa ya esté finalizado. El tiempo antes de la fecha de fin es configurable, el valor predeterminado es de 3 días.';
 $string['notification_endsoon_interval'] = 'Tiempo antes de la fecha de fin';
 $string['notification_endsoon_subject'] = 'El programa termina pronto';
+$string['notification_endverysoon'] = 'Último aviso antes del fin del programa';
+$string['notification_endverysoon_body'] = 'Hola, {$a->user_fullname}:
+
+**este es el último aviso**, el programa "{$a->program_fullname}" termina el {$a->program_enddate} y todavía no lo ha finalizado.
+
+Finalice el programa de inmediato, no será posible después de la fecha de fin.
+';
+$string['notification_endverysoon_description'] = 'Último aviso enviado a los usuarios poco antes de la fecha de fin de su programa, salvo que el programa ya esté finalizado. El tiempo antes de la fecha de fin es configurable, el valor predeterminado es de 1 día.';
+$string['notification_endverysoon_interval'] = 'Tiempo antes de la fecha de fin';
+$string['notification_endverysoon_subject'] = 'Urgente: finalice el programa antes de que termine';
 $string['notification_reminder'] = 'Recordatorio semanal';
 $string['notification_reminder_body'] = 'Hola, {$a->user_fullname}:
 

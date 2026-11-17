@@ -35,6 +35,9 @@ abstract class base extends \tool_mulib\local\notification\notificationtype {
     /** @var int "soon" means in 3 days from now */
     public const TIME_SOON = (60 * 60 * 24 * 3);
 
+    /** @var int "very soon" means in 1 day from now */
+    public const TIME_VERY_SOON = (60 * 60 * 24 * 1);
+
     /** @var int any due notification that was missed by more than 2 days is ignored */
     public const TIME_CUTOFF = (60 * 60 * 24 * 2);
 

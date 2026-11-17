@@ -208,6 +208,7 @@ $string['messageprovider:duesoon_notification'] = 'Notificação de data limite 
 $string['messageprovider:endcompleted_notification'] = 'Notificação de fim de programa concluído';
 $string['messageprovider:endfailed_notification'] = 'Notificação de fim de programa falhado';
 $string['messageprovider:endsoon_notification'] = 'Notificação de data de fim do programa próxima';
+$string['messageprovider:endverysoon_notification'] = 'Notificação de último aviso antes do fim do programa';
 $string['messageprovider:reminder_notification'] = 'Notificação de lembrete semanal do programa';
 $string['messageprovider:reset_notification'] = 'Notificação de reinício do programa';
 $string['messageprovider:start_notification'] = 'Notificação de início do programa';
@@ -302,6 +303,16 @@ o programa "{$a->program_fullname}" termina em {$a->program_enddate}.
 $string['notification_endsoon_description'] = 'Notificação enviada aos utilizadores antes da data de fim do seu programa, exceto se o programa já estiver concluído. O tempo antes da data de fim é configurável, o valor predefinido é de 3 dias.';
 $string['notification_endsoon_interval'] = 'Tempo antes da data de fim';
 $string['notification_endsoon_subject'] = 'O programa termina em breve';
+$string['notification_endverysoon'] = 'Último aviso antes do fim do programa';
+$string['notification_endverysoon_body'] = 'Olá {$a->user_fullname},
+
+**este é o último aviso**, o programa "{$a->program_fullname}" termina em {$a->program_enddate} e ainda não o concluiu.
+
+Conclua o programa de imediato, não será possível depois da data de fim.
+';
+$string['notification_endverysoon_description'] = 'Último aviso enviado aos utilizadores pouco antes da data de fim do seu programa, exceto se o programa já estiver concluído. O tempo antes da data de fim é configurável, o valor predefinido é de 1 dia.';
+$string['notification_endverysoon_interval'] = 'Tempo antes da data de fim';
+$string['notification_endverysoon_subject'] = 'Urgente: conclua o programa antes de este terminar';
 $string['notification_reminder'] = 'Lembrete semanal';
 $string['notification_reminder_body'] = 'Olá {$a->user_fullname},
 

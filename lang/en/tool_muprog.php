@@ -206,6 +206,7 @@ $string['messageprovider:duesoon_notification'] = 'Program due date soon notific
 $string['messageprovider:endcompleted_notification'] = 'Completed program ended notification';
 $string['messageprovider:endfailed_notification'] = 'Failed program ended notification';
 $string['messageprovider:endsoon_notification'] = 'Program end date soon notification';
+$string['messageprovider:endverysoon_notification'] = 'Program last warning before end notification';
 $string['messageprovider:reminder_notification'] = 'Program weekly reminder notification';
 $string['messageprovider:reset_notification'] = 'Program reset notification';
 $string['messageprovider:start_notification'] = 'Program started notification';
@@ -300,6 +301,16 @@ program "{$a->program_fullname}" is ending on {$a->program_enddate}.
 $string['notification_endsoon_description'] = 'Notification sent to users ahead of their program end date unless program is already completed. The time before end date is configurable, the default is 3 days.';
 $string['notification_endsoon_interval'] = 'Time before end date';
 $string['notification_endsoon_subject'] = 'Program ends soon';
+$string['notification_endverysoon'] = 'Last warning before program end';
+$string['notification_endverysoon_body'] = 'Hello {$a->user_fullname},
+
+**this is the last warning**, program "{$a->program_fullname}" is ending on {$a->program_enddate} and you have not completed it yet.
+
+Complete the program immediately, it will not be possible after the end date.
+';
+$string['notification_endverysoon_description'] = 'Last warning sent to users shortly before their program end date unless program is already completed. The time before end date is configurable, the default is 1 day.';
+$string['notification_endverysoon_interval'] = 'Time before end date';
+$string['notification_endverysoon_subject'] = 'Urgent: complete your program before it ends';
 $string['notification_reminder'] = 'Weekly reminder';
 $string['notification_reminder_body'] = 'Hello {$a->user_fullname},
 
