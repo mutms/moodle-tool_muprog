@@ -16,22 +16,20 @@
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace tool_muprog\muform\autocomplete;
+namespace tool_muprog\muform\cohortpicker;
 
-use tool_mulib\muform\util\autocomplete\cohort_trait;
+use core\context;
 
 /**
- * Cohort whose members are allocated to a program manually.
+ * Cohorts of the cohort allocation source.
  *
  * @package     tool_muprog
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class source_manual_allocate_cohortid extends \tool_mulib\muform\autocomplete\base {
-    use cohort_trait;
-
-    /** @var \context program context */
-    private \context $context;
+final class source_cohort_edit_cohortids extends \tool_mulib\muform\cohortpicker\base {
+    /** @var context program context */
+    private context $context;
 
     /**
      * Constructor.
@@ -44,8 +42,8 @@ final class source_manual_allocate_cohortid extends \tool_mulib\muform\autocompl
     ) {
         global $DB;
         $program = $DB->get_record('tool_muprog_program', ['id' => $programid], '*', MUST_EXIST);
-        $this->context = \context::instance_by_id($program->contextid);
-        require_capability('tool/muprog:allocate', $this->context);
+        $this->context = context::instance_by_id($program->contextid);
+        require_capability('tool/muprog:edit', $this->context);
     }
 
     #[\Override]
@@ -54,12 +52,22 @@ final class source_manual_allocate_cohortid extends \tool_mulib\muform\autocompl
     }
 
     #[\Override]
-    public function search(string $query, int $maxitems, array $exclude): ?array {
-        return $this->search_cohorts($this->context, $query, $maxitems);
+    protected function get_context(): context {
+        return $this->context;
     }
 
+    /**
+     * Cohorts already allocated stay valid.
+     *
+     * @return int[]
+     */
     #[\Override]
-    protected function label_value(string $value): ?string {
-        return $this->cohort_labels($this->context, [$value])[$value] ?? null;
+    protected function get_current_cohortids(): array {
+        global $DB;
+        $source = $DB->get_record('tool_muprog_source', ['programid' => $this->programid, 'type' => 'cohort']);
+        if (!$source) {
+            return [];
+        }
+        return array_map('intval', $DB->get_fieldset('tool_muprog_src_cohort', 'cohortid', ['sourceid' => $source->id]));
     }
 }

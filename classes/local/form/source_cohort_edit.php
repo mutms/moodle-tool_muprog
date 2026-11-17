@@ -18,7 +18,7 @@
 
 namespace tool_muprog\local\form;
 
-use tool_mulib\muform\element\autocompletemany;
+use tool_mulib\muform\element\cohortpickermany;
 use tool_mulib\muform\element\buttons;
 use tool_mulib\muform\element\cancel;
 use tool_mulib\muform\element\info;
@@ -26,7 +26,7 @@ use tool_mulib\muform\element\radiocards;
 use tool_mulib\muform\element\submit;
 use tool_mulib\muform\form;
 use tool_muprog\local\source\cohort;
-use tool_muprog\muform\autocomplete\source_cohort_edit_cohortids;
+use tool_muprog\muform\cohortpicker\source_cohort_edit_cohortids;
 
 /**
  * Edit cohort allocation settings.
@@ -57,7 +57,7 @@ final class source_cohort_edit extends form {
         }
 
         $programid = (int)$this->get_extra_data()['program']->id;
-        $cohortids = new autocompletemany(
+        $cohortids = new cohortpickermany(
             'cohortids',
             get_string('source_cohort_cohortstoallocate', 'tool_muprog'),
             new source_cohort_edit_cohortids($programid)
