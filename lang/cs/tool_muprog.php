@@ -295,7 +295,8 @@ $string['notification_endsoon_body'] = 'Dobrý den, {$a->user_fullname},
 
 program „{$a->program_fullname}“ končí {$a->program_enddate}.
 ';
-$string['notification_endsoon_description'] = 'Oznámení odesílané uživatelům před datem konce jejich programu, pokud už program není dokončený.';
+$string['notification_endsoon_description'] = 'Oznámení odesílané uživatelům před datem konce jejich programu, pokud už program není dokončený. Dobu před koncem programu lze nastavit, výchozí hodnota jsou 3 dny.';
+$string['notification_endsoon_interval'] = 'Doba před koncem programu';
 $string['notification_endsoon_subject'] = 'Program brzy končí';
 $string['notification_reminder'] = 'Týdenní připomínka';
 $string['notification_reminder_body'] = 'Dobrý den, {$a->user_fullname},

@@ -299,7 +299,8 @@ $string['notification_endsoon_body'] = 'Olá {$a->user_fullname},
 
 o programa "{$a->program_fullname}" termina em {$a->program_enddate}.
 ';
-$string['notification_endsoon_description'] = 'Notificação enviada aos utilizadores antes da data de fim do seu programa, exceto se o programa já estiver concluído.';
+$string['notification_endsoon_description'] = 'Notificação enviada aos utilizadores antes da data de fim do seu programa, exceto se o programa já estiver concluído. O tempo antes da data de fim é configurável, o valor predefinido é de 3 dias.';
+$string['notification_endsoon_interval'] = 'Tempo antes da data de fim';
 $string['notification_endsoon_subject'] = 'O programa termina em breve';
 $string['notification_reminder'] = 'Lembrete semanal';
 $string['notification_reminder_body'] = 'Olá {$a->user_fullname},

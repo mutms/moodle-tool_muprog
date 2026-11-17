@@ -135,4 +135,72 @@ final class endsoon_test extends \advanced_testcase {
         $sink->close();
         $this->assertCount(0, $messages);
     }
+
+    public function test_notify_users_custom_interval(): void {
+        global $DB;
+
+        /** @var \tool_muprog_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $user3 = $this->getDataGenerator()->create_user();
+        $program1 = $generator->create_program(['sources' => ['manual' => []]]);
+        $source1 = $DB->get_record('tool_muprog_source', ['programid' => $program1->id, 'type' => 'manual'], '*', MUST_EXIST);
+        manual::allocate_users($program1->id, $source1->id, [$user1->id, $user2->id, $user3->id]);
+
+        $now = time();
+        $DB->set_field('tool_muprog_allocation', 'timeend', $now + DAYSECS * 14, ['userid' => $user1->id]);
+        $DB->set_field('tool_muprog_allocation', 'timeend', $now + DAYSECS * 16, ['userid' => $user2->id]);
+        $DB->set_field('tool_muprog_allocation', 'timeend', $now + DAYSECS * 50, ['userid' => $user3->id]);
+
+        $notification = $generator->create_program_notification([
+            'notificationtype' => 'endsoon',
+            'programid' => $program1->id,
+            'auxint1' => DAYSECS * 15,
+        ]);
+        $this->assertSame((string)(DAYSECS * 15), $notification->auxint1);
+
+        $sink = $this->redirectMessages();
+        \tool_muprog\local\notification\endsoon::notify_users(null, null);
+        $messages = $sink->get_messages();
+        $sink->close();
+        $this->assertCount(1, $messages);
+        $this->assertSame($user1->id, $messages[0]->useridto);
+
+        // Longer interval includes more users, but nobody is notified twice.
+        $notification = \tool_mulib\local\notification\util::notification_update([
+            'id' => $notification->id,
+            'auxint1' => DAYSECS * 30,
+        ]);
+        $this->assertSame((string)(DAYSECS * 30), $notification->auxint1);
+
+        $sink = $this->redirectMessages();
+        \tool_muprog\local\notification\endsoon::notify_users(null, null);
+        $messages = $sink->get_messages();
+        $sink->close();
+        $this->assertCount(1, $messages);
+        $this->assertSame($user2->id, $messages[0]->useridto);
+
+        // Null means default interval.
+        $notification = \tool_mulib\local\notification\util::notification_update([
+            'id' => $notification->id,
+            'auxint1' => null,
+        ]);
+        $this->assertNull($notification->auxint1);
+        $current = \tool_muprog\local\notification\endsoon::prepare_update_form_data((array)$notification);
+        $this->assertSame(\tool_muprog\local\notification\endsoon::TIME_SOON, $current['auxint1']);
+        $details = \tool_muprog\local\notification\endsoon::get_aux_details($notification);
+        $this->assertSame(['Time before end date' => '3 days'], $details);
+
+        try {
+            \tool_mulib\local\notification\util::notification_update([
+                'id' => $notification->id,
+                'auxint1' => DAYSECS - 1,
+            ]);
+            $this->fail('Exception expected');
+        } catch (\core\exception\moodle_exception $ex) {
+            $this->assertInstanceOf(\core\exception\invalid_parameter_exception::class, $ex);
+        }
+    }
 }

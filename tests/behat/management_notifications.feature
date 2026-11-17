@@ -91,6 +91,14 @@ Feature: Program notifications management tests
     And I follow "Weekly reminder"
     And I press "Back"
     And I follow "Program end date soon"
+    And I should see "3 days" in the "Time before end date" definition list item
+    And I press "Update notification"
+    And the following muform fields match:
+      | auxint1 | 259200 |
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | auxint1 | 1296000 |
+    And I click on "Update notification" "button" in the "dialog[open]" "css_element"
+    And I should see "15 days" in the "Time before end date" definition list item
     And I press "Back"
     And I follow "Completed program ended"
     And I press "Back"

@@ -24,6 +24,9 @@ use stdClass;
 /**
  * Program ends soon notification.
  *
+ * Meaning of aux fields:
+ * - auxint1: number of seconds before the end date when notification is sent, null means default self::TIME_SOON
+ *
  * @package    tool_muprog
  * @copyright  2023 Open LMS (https://www.openlms.net/)
  * @copyright  2025 Petr Skoda
@@ -31,6 +34,8 @@ use stdClass;
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class endsoon extends base {
+    use soon_interval_trait;
+
     /**
      * Send notifications.
      *
@@ -67,7 +72,8 @@ final class endsoon extends base {
             $params['userid'] = $user->id;
         }
         $params['now'] = time();
-        $params['soon'] = $params['now'] + self::TIME_SOON;
+        $params['now2'] = $params['now'];
+        $params['soon'] = self::TIME_SOON;
 
         $sql = "SELECT pa.*
                   FROM {tool_muprog_allocation} pa
@@ -80,7 +86,7 @@ final class endsoon extends base {
                        ON un.notificationid = n.id AND un.userid = pa.userid AND un.otherid1 = pa.id
                  WHERE un.id IS NULL AND p.archived = 0 AND pa.archived = 0
                        $programselect $userselect
-                       AND pa.timecompleted IS NULL AND pa.timeend > :now AND pa.timeend < :soon
+                       AND pa.timecompleted IS NULL AND pa.timeend > :now AND pa.timeend < :now2 + COALESCE(n.auxint1, :soon)
               ORDER BY p.id, s.id, pa.userid";
         $rs = $DB->get_recordset_sql($sql, $params);
         foreach ($rs as $allocation) {

@@ -34,49 +34,7 @@ use stdClass;
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class duesoon extends base {
-    #[\Override]
-    public static function add_update_form_elements(\tool_mulib\muform\form $form, stdClass $notification): void {
-        $element = (new \tool_mulib\muform\element\duration(
-            'auxint1',
-            get_string('notification_duesoon_interval', 'tool_muprog'),
-            ['d']
-        ))->set_required(true);
-        $form->add($element);
-    }
-
-    #[\Override]
-    public static function prepare_update_form_data(array $current): array {
-        if (empty($current['auxint1'])) {
-            $current['auxint1'] = self::TIME_SOON;
-        }
-        return $current;
-    }
-
-    #[\Override]
-    public static function normalise_aux_data(stdClass $data, ?stdClass $oldrecord): void {
-        unset($data->auxjson);
-        unset($data->auxint2);
-
-        if (!property_exists($data, 'auxint1')) {
-            return;
-        }
-        if ($data->auxint1 === null || $data->auxint1 === '') {
-            // Use default.
-            $data->auxint1 = null;
-            return;
-        }
-        $data->auxint1 = (int)$data->auxint1;
-        if ($data->auxint1 < DAYSECS) {
-            throw new \core\exception\invalid_parameter_exception('Due soon interval must be at least one day');
-        }
-    }
-
-    #[\Override]
-    public static function get_aux_details(stdClass $notification): array {
-        return [
-            get_string('notification_duesoon_interval', 'tool_muprog') => format_time($notification->auxint1 ?: self::TIME_SOON),
-        ];
-    }
+    use soon_interval_trait;
 
     /**
      * Send notifications.

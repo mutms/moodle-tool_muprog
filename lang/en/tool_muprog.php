@@ -297,7 +297,8 @@ $string['notification_endsoon_body'] = 'Hello {$a->user_fullname},
 
 program "{$a->program_fullname}" is ending on {$a->program_enddate}.
 ';
-$string['notification_endsoon_description'] = 'Notification sent to users ahead of their program end date unless program is already completed.';
+$string['notification_endsoon_description'] = 'Notification sent to users ahead of their program end date unless program is already completed. The time before end date is configurable, the default is 3 days.';
+$string['notification_endsoon_interval'] = 'Time before end date';
 $string['notification_endsoon_subject'] = 'Program ends soon';
 $string['notification_reminder'] = 'Weekly reminder';
 $string['notification_reminder_body'] = 'Hello {$a->user_fullname},
