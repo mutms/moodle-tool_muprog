@@ -277,7 +277,8 @@ $string['notification_duesoon_body'] = 'Hallo {$a->user_fullname},
 
 der Abschluss des Programms „{$a->program_fullname}“ wird am {$a->program_duedate} erwartet.
 ';
-$string['notification_duesoon_description'] = 'Benachrichtigung, die an Nutzer/innen vor dem Fälligkeitsdatum ihres Programms gesendet wird, sofern das Programm noch nicht abgeschlossen ist.';
+$string['notification_duesoon_description'] = 'Benachrichtigung, die an Nutzer/innen vor dem Fälligkeitsdatum ihres Programms gesendet wird, sofern das Programm noch nicht abgeschlossen ist. Die Zeit vor dem Fälligkeitsdatum ist einstellbar, der Standardwert beträgt 3 Tage.';
+$string['notification_duesoon_interval'] = 'Zeit vor dem Fälligkeitsdatum';
 $string['notification_duesoon_subject'] = 'Programmabschluss wird bald erwartet';
 $string['notification_endcompleted'] = 'Abgeschlossenes Programm beendet';
 $string['notification_endcompleted_body'] = 'Hallo {$a->user_fullname},

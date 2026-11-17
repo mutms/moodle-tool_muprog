@@ -135,4 +135,101 @@ final class duesoon_test extends \advanced_testcase {
         $sink->close();
         $this->assertCount(0, $messages);
     }
+
+    public function test_notify_users_custom_interval(): void {
+        global $DB;
+
+        /** @var \tool_muprog_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $user3 = $this->getDataGenerator()->create_user();
+        $program1 = $generator->create_program(['sources' => ['manual' => []]]);
+        $source1 = $DB->get_record('tool_muprog_source', ['programid' => $program1->id, 'type' => 'manual'], '*', MUST_EXIST);
+        manual::allocate_users($program1->id, $source1->id, [$user1->id, $user2->id, $user3->id]);
+
+        $now = time();
+        $DB->set_field('tool_muprog_allocation', 'timedue', $now + DAYSECS * 29, ['userid' => $user1->id]);
+        $DB->set_field('tool_muprog_allocation', 'timedue', $now + DAYSECS * 31, ['userid' => $user2->id]);
+        $DB->set_field('tool_muprog_allocation', 'timedue', $now + DAYSECS * 50, ['userid' => $user3->id]);
+
+        $notification = $generator->create_program_notification([
+            'notificationtype' => 'duesoon',
+            'programid' => $program1->id,
+            'auxint1' => DAYSECS * 30,
+        ]);
+        $this->assertSame((string)(DAYSECS * 30), $notification->auxint1);
+
+        $sink = $this->redirectMessages();
+        \tool_muprog\local\notification\duesoon::notify_users(null, null);
+        $messages = $sink->get_messages();
+        $sink->close();
+        $this->assertCount(1, $messages);
+        $this->assertSame($user1->id, $messages[0]->useridto);
+
+        // Longer interval includes more users, but nobody is notified twice.
+        $notification = \tool_mulib\local\notification\util::notification_update([
+            'id' => $notification->id,
+            'auxint1' => DAYSECS * 40,
+        ]);
+        $this->assertSame((string)(DAYSECS * 40), $notification->auxint1);
+
+        $sink = $this->redirectMessages();
+        \tool_muprog\local\notification\duesoon::notify_users(null, null);
+        $messages = $sink->get_messages();
+        $sink->close();
+        $this->assertCount(1, $messages);
+        $this->assertSame($user2->id, $messages[0]->useridto);
+
+        // Updates without interval keep the current value.
+        $notification = \tool_mulib\local\notification\util::notification_update([
+            'id' => $notification->id,
+            'enabled' => 1,
+        ]);
+        $this->assertSame((string)(DAYSECS * 40), $notification->auxint1);
+
+        // Null means default interval.
+        $notification = \tool_mulib\local\notification\util::notification_update([
+            'id' => $notification->id,
+            'auxint1' => null,
+        ]);
+        $this->assertNull($notification->auxint1);
+        $current = \tool_muprog\local\notification\duesoon::prepare_update_form_data((array)$notification);
+        $this->assertSame(\tool_muprog\local\notification\duesoon::TIME_SOON, $current['auxint1']);
+
+        try {
+            \tool_mulib\local\notification\util::notification_update([
+                'id' => $notification->id,
+                'auxint1' => DAYSECS - 1,
+            ]);
+            $this->fail('Exception expected');
+        } catch (\core\exception\moodle_exception $ex) {
+            $this->assertInstanceOf(\core\exception\invalid_parameter_exception::class, $ex);
+        }
+    }
+
+    public function test_aux_data_ignored_in_other_types(): void {
+        /** @var \tool_muprog_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
+
+        $program1 = $generator->create_program(['sources' => ['manual' => []]]);
+        $notification = $generator->create_program_notification([
+            'notificationtype' => 'due',
+            'programid' => $program1->id,
+            'auxint1' => DAYSECS * 30,
+            'auxint2' => 5,
+            'auxjson' => '{}',
+        ]);
+        $this->assertNull($notification->auxint1);
+        $this->assertNull($notification->auxint2);
+        $this->assertNull($notification->auxjson);
+
+        $notification = \tool_mulib\local\notification\util::notification_update([
+            'id' => $notification->id,
+            'enabled' => 0,
+            'auxint1' => DAYSECS * 30,
+        ]);
+        $this->assertNull($notification->auxint1);
+    }
 }

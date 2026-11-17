@@ -273,7 +273,8 @@ $string['notification_duesoon_body'] = 'Dobrý den, {$a->user_fullname},
 
 dokončení programu „{$a->program_fullname}“ se očekává {$a->program_duedate}.
 ';
-$string['notification_duesoon_description'] = 'Oznámení odesílané uživatelům před datem dokončení jejich programu, pokud už program není dokončený.';
+$string['notification_duesoon_description'] = 'Oznámení odesílané uživatelům před datem dokončení jejich programu, pokud už program není dokončený. Dobu před termínem splnění lze nastavit, výchozí hodnota jsou 3 dny.';
+$string['notification_duesoon_interval'] = 'Doba před termínem splnění';
 $string['notification_duesoon_subject'] = 'Brzy se očekává dokončení programu';
 $string['notification_endcompleted'] = 'Dokončený program skončil';
 $string['notification_endcompleted_body'] = 'Dobrý den, {$a->user_fullname},

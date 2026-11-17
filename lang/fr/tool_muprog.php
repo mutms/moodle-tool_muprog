@@ -277,7 +277,8 @@ $string['notification_duesoon_body'] = 'Bonjour {$a->user_fullname},
 
 l’achèvement du programme « {$a->program_fullname} » est attendu le {$a->program_duedate}.
 ';
-$string['notification_duesoon_description'] = 'Notification envoyée aux utilisateurs avant la date limite de leur programme, sauf si le programme est déjà terminé.';
+$string['notification_duesoon_description'] = 'Notification envoyée aux utilisateurs avant la date limite de leur programme, sauf si le programme est déjà terminé. Le délai avant la date limite est configurable, la valeur par défaut est de 3 jours.';
+$string['notification_duesoon_interval'] = 'Délai avant la date limite';
 $string['notification_duesoon_subject'] = 'L’achèvement du programme est attendu prochainement';
 $string['notification_endcompleted'] = 'Fin d’un programme terminé';
 $string['notification_endcompleted_body'] = 'Bonjour {$a->user_fullname},

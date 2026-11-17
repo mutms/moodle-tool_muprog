@@ -275,7 +275,8 @@ $string['notification_duesoon_body'] = 'Hello {$a->user_fullname},
 
 completion of program "{$a->program_fullname}" is expected on {$a->program_duedate}.
 ';
-$string['notification_duesoon_description'] = 'Notification sent to users ahead of their program completion date unless program is already completed.';
+$string['notification_duesoon_description'] = 'Notification sent to users ahead of their program completion date unless program is already completed. The time before due date is configurable, the default is 3 days.';
+$string['notification_duesoon_interval'] = 'Time before due date';
 $string['notification_duesoon_subject'] = 'Program completion is expected soon';
 $string['notification_endcompleted'] = 'Completed program ended';
 $string['notification_endcompleted_body'] = 'Hello {$a->user_fullname},

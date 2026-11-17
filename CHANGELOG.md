@@ -13,6 +13,7 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 - programs may be created as drafts, users cannot be allocated until the program is released
 - CLI script for duplication of programs with courses
 - weekly reminder notification for programs
+- configurable time before due date in "Program due date soon" notification, the default is 3 days
 
 ### Changed
 

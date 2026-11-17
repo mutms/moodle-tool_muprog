@@ -77,6 +77,14 @@ Feature: Program notifications management tests
     And I follow "Program completed"
     And I press "Back"
     And I follow "Program due date soon"
+    And I should see "3 days" in the "Time before due date" definition list item
+    And I press "Update notification"
+    And the following muform fields match:
+      | auxint1 | 259200 |
+    And I set the following muform fields in the "dialog[open]" "css_element":
+      | auxint1 | 2592000 |
+    And I click on "Update notification" "button" in the "dialog[open]" "css_element"
+    And I should see "30 days" in the "Time before due date" definition list item
     And I press "Back"
     And I follow "Program overdue"
     And I press "Back"

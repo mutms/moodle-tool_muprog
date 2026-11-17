@@ -24,6 +24,9 @@ use stdClass;
 /**
  * Program due soon notification.
  *
+ * Meaning of aux fields:
+ * - auxint1: number of seconds before the due date when notification is sent, null means default self::TIME_SOON
+ *
  * @package    tool_muprog
  * @copyright  2023 Open LMS (https://www.openlms.net/)
  * @copyright  2025 Petr Skoda
@@ -31,6 +34,50 @@ use stdClass;
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class duesoon extends base {
+    #[\Override]
+    public static function add_update_form_elements(\tool_mulib\muform\form $form, stdClass $notification): void {
+        $element = (new \tool_mulib\muform\element\duration(
+            'auxint1',
+            get_string('notification_duesoon_interval', 'tool_muprog'),
+            ['d']
+        ))->set_required(true);
+        $form->add($element);
+    }
+
+    #[\Override]
+    public static function prepare_update_form_data(array $current): array {
+        if (empty($current['auxint1'])) {
+            $current['auxint1'] = self::TIME_SOON;
+        }
+        return $current;
+    }
+
+    #[\Override]
+    public static function normalise_aux_data(stdClass $data, ?stdClass $oldrecord): void {
+        unset($data->auxjson);
+        unset($data->auxint2);
+
+        if (!property_exists($data, 'auxint1')) {
+            return;
+        }
+        if ($data->auxint1 === null || $data->auxint1 === '') {
+            // Use default.
+            $data->auxint1 = null;
+            return;
+        }
+        $data->auxint1 = (int)$data->auxint1;
+        if ($data->auxint1 < DAYSECS) {
+            throw new \core\exception\invalid_parameter_exception('Due soon interval must be at least one day');
+        }
+    }
+
+    #[\Override]
+    public static function get_aux_details(stdClass $notification): array {
+        return [
+            get_string('notification_duesoon_interval', 'tool_muprog') => format_time($notification->auxint1 ?: self::TIME_SOON),
+        ];
+    }
+
     /**
      * Send notifications.
      *
@@ -67,7 +114,8 @@ final class duesoon extends base {
             $params['userid'] = $user->id;
         }
         $params['now'] = time();
-        $params['soon'] = $params['now'] + self::TIME_SOON;
+        $params['now2'] = $params['now'];
+        $params['soon'] = self::TIME_SOON;
 
         $sql = "SELECT pa.*
                   FROM {tool_muprog_allocation} pa
@@ -80,7 +128,7 @@ final class duesoon extends base {
                        ON un.notificationid = n.id AND un.userid = pa.userid AND un.otherid1 = pa.id
                  WHERE un.id IS NULL AND p.archived = 0 AND pa.archived = 0
                        $programselect $userselect
-                       AND pa.timecompleted IS NULL AND pa.timedue > :now AND pa.timedue < :soon
+                       AND pa.timecompleted IS NULL AND pa.timedue > :now AND pa.timedue < :now2 + COALESCE(n.auxint1, :soon)
               ORDER BY p.id, s.id, pa.userid";
         $rs = $DB->get_recordset_sql($sql, $params);
         foreach ($rs as $allocation) {

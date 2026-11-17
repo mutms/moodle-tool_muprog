@@ -330,6 +330,11 @@ class tool_muprog_generator extends component_generator_base {
             $data['body'] = $record->body ?? '';
             $data['subject'] = $record->subject ?? '';
         }
+        foreach (['auxint1', 'auxint2', 'auxjson'] as $field) {
+            if (isset($record->$field) && $record->$field !== '') {
+                $data[$field] = $record->$field;
+            }
+        }
         return \tool_mulib\local\notification\util::notification_create($data);
     }
 
