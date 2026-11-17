@@ -53,7 +53,8 @@ final class source_cohort_add_cohort_test extends \advanced_testcase {
 
         $cohort1 = $this->getDataGenerator()->create_cohort(['contextid' => $catcontext1->id]);
         $cohort2 = $this->getDataGenerator()->create_cohort(['contextid' => $catcontext2->id]);
-        $cohort3 = $this->getDataGenerator()->create_cohort();
+        $cohort3 = $this->getDataGenerator()->create_cohort(['visible' => 0]);
+        $cohort4 = $this->getDataGenerator()->create_cohort();
 
         $program1 = $generator->create_program([
             'contextid' => $catcontext1->id,
@@ -111,6 +112,12 @@ final class source_cohort_add_cohort_test extends \advanced_testcase {
                 $ex->getMessage()
             );
         }
+
+        $result = source_cohort_add_cohort::clean_returnvalue(
+            source_cohort_add_cohort::execute_returns(),
+            source_cohort_add_cohort::execute($program1->id, $cohort4->id)
+        );
+        $this->assertCount(3, $result);
 
         try {
             source_cohort_add_cohort::execute($program2->id, $cohort1->id);

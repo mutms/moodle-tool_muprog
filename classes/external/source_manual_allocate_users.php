@@ -25,6 +25,7 @@ use core_external\external_function_parameters;
 use core_external\external_value;
 use core_external\external_multiple_structure;
 use core_external\external_single_structure;
+use tool_mulib\local\cohort_util;
 use tool_mulib\local\mulib;
 use core\exception\invalid_parameter_exception;
 
@@ -127,8 +128,14 @@ final class source_manual_allocate_users extends external_api {
         if ($cohortids) {
             foreach ($cohortids as $cohortid) {
                 $cohort = $DB->get_record('cohort', ['id' => $cohortid], '*', MUST_EXIST);
-                $cohortcontext = \context::instance_by_id($cohort->contextid);
-                require_capability('moodle/cohort:view', $cohortcontext);
+                if (!cohort_util::can_use($cohort)) {
+                    throw new \core\exception\required_capability_exception(
+                        \context::instance_by_id($cohort->contextid),
+                        'moodle/cohort:view',
+                        'nopermissions',
+                        ''
+                    );
+                }
                 $cohrotuserids = $DB->get_fieldset_select('cohort_members', 'userid', "cohortid = ?", [$cohort->id]);
                 foreach ($cohrotuserids as $userid) {
                     if ($DB->record_exists('tool_muprog_allocation', ['userid' => $userid, 'programid' => $program->id])) {
