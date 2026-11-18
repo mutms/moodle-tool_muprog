@@ -19,10 +19,6 @@
 /**
  * Strings for component 'tool_muprog', language 'it'.
  *
- * NOTE: This Italian translation was produced automatically by an AI language
- * model and has not yet been reviewed by a human translator. Corrections are
- * welcome.
- *
  * @package    tool_muprog
  * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -94,7 +90,7 @@ $string['errorcoursesmissing'] = 'Corsi mancanti: {$a}';
 $string['errordifferenttenant'] = 'Non è possibile accedere a un programma di un altro tenant';
 $string['errorinvalidoverridedates'] = 'Date sovrascritte non valide';
 $string['errornoallocations'] = 'Non sono state trovate allocazioni di utenti';
-$string['errornomyprograms'] = 'Non hai allocazioni a nessun programma.';
+$string['errornomyprograms'] = 'Non hai programmi allocati.';
 $string['errornoprograms'] = 'Non sono stati trovati programmi.';
 $string['errornorequests'] = 'Non sono state trovate richieste relative ai programmi';
 $string['errornotenabled'] = 'Il plugin Programmi non è abilitato';
@@ -137,7 +133,7 @@ $string['evidenceupload_error_headers'] = 'Indicare se la prima riga contiene i 
 $string['evidenceupload_error_missing'] = 'Nessun utente corrisponde a "{$a}".';
 $string['evidenceupload_error_nocompletion'] = 'Una colonna deve contenere la data di completamento.';
 $string['evidenceupload_error_nodatarows'] = 'Oltre ai nomi delle colonne non sono presenti dati.';
-$string['evidenceupload_error_nodate'] = 'La data di completamento è mancante.';
+$string['evidenceupload_error_nodate'] = 'Manca la data di completamento.';
 $string['evidenceupload_error_notallocated'] = 'L\'utente non è allocato.';
 $string['evidenceupload_error_nouser'] = 'Una colonna deve identificare l\'utente.';
 $string['evidenceupload_error_nouservalue'] = 'La riga non identifica un utente.';
@@ -151,7 +147,7 @@ $string['evidenceupload_result_skipped'] = 'Saltata';
 $string['evidenceupload_result_updated'] = 'Da aggiornare';
 $string['evidenceupload_skip_ambiguous'] = 'Salta le righe che corrispondono a più di un utente';
 $string['evidenceupload_skip_archived'] = 'Salta gli utenti con allocazione archiviata';
-$string['evidenceupload_skip_info'] = 'Le righe con un problema interrompono il caricamento, a meno che non vengano saltate qui. Nulla viene scritto finché i dati non sono stati controllati.';
+$string['evidenceupload_skip_info'] = 'Le righe con un problema bloccano il caricamento, a meno che non vengano saltate qui. Non viene scritto nulla finché i dati non sono stati verificati.';
 $string['evidenceupload_skip_invalid'] = 'Salta le righe con utente mancante, date non valide o utenti elencati più di una volta';
 $string['evidenceupload_skip_missing'] = 'Salta le righe senza un utente corrispondente';
 $string['evidenceupload_skip_nodate'] = 'Salta le righe senza data di completamento';
@@ -306,13 +302,13 @@ $string['notification_endsoon_subject'] = 'Il programma termina a breve';
 $string['notification_endverysoon'] = 'Ultimo avviso prima della fine del programma';
 $string['notification_endverysoon_body'] = 'Gentile {$a->user_fullname},
 
-**questo è l\'ultimo avviso**, il programma "{$a->program_fullname}" terminerà il {$a->program_enddate} e non lo ha ancora completato.
+**questo è l\'ultimo avviso**: il programma "{$a->program_fullname}" terminerà il {$a->program_enddate} e non lo hai ancora completato.
 
-Completi il programma immediatamente, non sarà più possibile dopo la data di fine.
+Completa subito il programma: dopo la data di fine non sarà più possibile farlo.
 ';
 $string['notification_endverysoon_description'] = 'Ultimo avviso inviato agli utenti poco prima della data di fine del loro programma, a meno che il programma non sia già completato. Il tempo prima della data di fine è configurabile, il valore predefinito è di 1 giorno.';
 $string['notification_endverysoon_interval'] = 'Tempo prima della data di fine';
-$string['notification_endverysoon_subject'] = 'Urgente: completi il programma prima che termini';
+$string['notification_endverysoon_subject'] = 'Urgente: completa il programma prima che termini';
 $string['notification_reminder'] = 'Promemoria settimanale';
 $string['notification_reminder_body'] = 'Gentile {$a->user_fullname},
 
@@ -351,7 +347,7 @@ $string['privacy:metadata:field:createdby'] = 'Attestazione creata da';
 $string['privacy:metadata:field:datajson'] = 'Informazioni sulla richiesta';
 $string['privacy:metadata:field:evidencejson'] = 'Informazioni sull\'attestazione di completamento';
 $string['privacy:metadata:field:explanation'] = 'Spiegazione';
-$string['privacy:metadata:field:issueid'] = 'ID del rilascio';
+$string['privacy:metadata:field:issueid'] = 'ID del certificato rilasciato';
 $string['privacy:metadata:field:itemid'] = 'ID dell\'elemento';
 $string['privacy:metadata:field:programid'] = 'ID del programma';
 $string['privacy:metadata:field:quantity'] = 'Quantità';
@@ -551,7 +547,7 @@ $string['source_manual_upload_result_error'] = 'Problema';
 $string['source_manual_upload_result_skipped'] = 'Saltata';
 $string['source_manual_upload_skip_allocated'] = 'Salta gli utenti già allocati o elencati più di una volta';
 $string['source_manual_upload_skip_ambiguous'] = 'Salta le righe che corrispondono a più di un utente';
-$string['source_manual_upload_skip_info'] = 'Le righe con un problema interrompono il caricamento, a meno che non vengano saltate qui. Nulla viene scritto finché i dati non sono stati controllati.';
+$string['source_manual_upload_skip_info'] = 'Le righe con un problema bloccano il caricamento, a meno che non vengano saltate qui. Non viene scritto nulla finché i dati non sono stati verificati.';
 $string['source_manual_upload_skip_invalid'] = 'Salta le righe con valori mancanti o date non valide';
 $string['source_manual_upload_skip_missing'] = 'Salta le righe senza un utente corrispondente';
 $string['source_manual_upload_source'] = 'Caricamento';
