@@ -66,7 +66,7 @@ $string['cohorts_help'] = 'I programmi non pubblici possono essere resi visibili
 Lo stato di visibilità non influisce sui programmi già allocati.';
 $string['columnusedalready'] = 'La colonna è già utilizzata';
 $string['completiondate'] = 'Data di completamento';
-$string['completiondelay'] = 'Ritardo del completamento';
+$string['completiondelay'] = 'Differimento del completamento';
 $string['completionoverride'] = 'Sovrascrivi completamento';
 $string['creategroups'] = 'Gruppi nei corsi';
 $string['creategroups_help'] = 'Se l\'impostazione è abilitata, in ogni corso aggiunto al programma verrà creato un gruppo e tutti gli utenti allocati ne diventeranno membri.';
