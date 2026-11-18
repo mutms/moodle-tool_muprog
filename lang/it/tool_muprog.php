@@ -19,10 +19,6 @@
 /**
  * Strings for component 'tool_muprog', language 'it'.
  *
- * NOTE: This Italian translation was produced automatically by an AI language
- * model and has not yet been reviewed by a human translator. Corrections are
- * welcome.
- *
  * @package    tool_muprog
  * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -101,7 +97,7 @@ $string['errordifferenttenant'] = 'Non è possibile accedere a un programma di u
 $string['errorinvalidoverridedates'] = 'Date sovrascritte non valide';
 $string['errornoallocation'] = 'Il programma non è allocato';
 $string['errornoallocations'] = 'Non sono state trovate allocazioni di utenti';
-$string['errornomyprograms'] = 'Non hai allocazioni a nessun programma.';
+$string['errornomyprograms'] = 'Non hai programmi allocati.';
 $string['errornoprograms'] = 'Non sono stati trovati programmi.';
 $string['errornorequests'] = 'Non sono state trovate richieste relative ai programmi';
 $string['errornotenabled'] = 'Il plugin Programmi non è abilitato';
@@ -298,7 +294,7 @@ $string['privacy:metadata:field:createdby'] = 'Attestazione creata da';
 $string['privacy:metadata:field:datajson'] = 'Informazioni sulla richiesta';
 $string['privacy:metadata:field:evidencejson'] = 'Informazioni sull\'attestazione di completamento';
 $string['privacy:metadata:field:explanation'] = 'Spiegazione';
-$string['privacy:metadata:field:issueid'] = 'ID del rilascio';
+$string['privacy:metadata:field:issueid'] = 'ID del certificato rilasciato';
 $string['privacy:metadata:field:itemid'] = 'ID dell\'elemento';
 $string['privacy:metadata:field:programid'] = 'ID del programma';
 $string['privacy:metadata:field:quantity'] = 'Quantità';
