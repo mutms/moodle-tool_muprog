@@ -19,6 +19,8 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
 
 ### Changed
 
+- My programs and My programs overview blocks are not required any more,
+  the blocks depend on this plugin instead
 - users are allocated manually in a users picker panel with identity columns and paging instead of an autocomplete
 - program catalogue was replaced by Universal catalogue plugin, public programs are migrated
   to active catalogue sections, programs visible to cohorts are migrated to draft sections

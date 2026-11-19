@@ -34,11 +34,11 @@ Required plugins:
 * [Additional tools library plugin](https://github.com/mutms/moodle-tool_mulib)
 * [Universal catalogue plugin](https://github.com/mutms/moodle-tool_mucatalog)
 * [Program enrolment plugin](https://github.com/mutms/moodle-enrol_muprog)
-* [My programs block](https://github.com/mutms/moodle-block_muprog_my)
-* [My programs overview page plugin](https://github.com/mutms/moodle-block_muprogmyoverview)
 
 Recommended plugins:
 
+* [My programs block](https://github.com/mutms/moodle-block_muprog_my)
+* [My programs overview block](https://github.com/mutms/moodle-block_muprogmyoverview)
 * [Supervisors and teams plugin](https://github.com/mutms/moodle-tool_murelation)
 * [Training credits plugin](https://github.com/mutms/moodle-tool_mutrain)
 * [Training credits custom field plugin](https://github.com/mutms/moodle-customfield_mutrain)
