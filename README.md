@@ -46,11 +46,6 @@ Recommended plugins:
 * [Program fields for Certificate plugin](https://github.com/mutms/moodle-certificateelement_muprog)
 * [Multi-tenancy plugin](https://github.com/mutms/moodle-tool_mutenancy)
 
-## Roadmap
-
-* Supervisor approval workflows via Supervisors and teams plugin
-* Script for migration from Programs by Open LMS
-
 ## Documentation
 
 See [online documentation](https://docs.mutms.org/muprog/) for more information.
