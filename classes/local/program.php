@@ -36,6 +36,22 @@ use tool_mulib\local\sql;
  */
 final class program {
     /**
+     * Tenant whose program allocations may only include members of that tenant and users without a tenant.
+     *
+     * @param stdClass $program
+     * @return int|null null when tenant rules do not apply
+     */
+    public static function get_restricted_tenantid(stdClass $program): ?int {
+        global $DB;
+
+        if (!\tool_mulib\local\mulib::is_mutenancy_active()) {
+            return null;
+        }
+        $tenantid = $DB->get_field('context', 'tenantid', ['id' => $program->contextid]);
+        return $tenantid ? (int)$tenantid : null;
+    }
+
+    /**
      * Options for editing of program descriptions.
      *
      * @return array

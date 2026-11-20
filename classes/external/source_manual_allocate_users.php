@@ -146,14 +146,12 @@ final class source_manual_allocate_users extends external_api {
             }
         }
 
-        if (mulib::is_mutenancy_active()) {
-            $programtenantid = $DB->get_field('context', 'tenantid', ['id' => $program->contextid]);
-            if ($programtenantid) {
-                foreach ($useridstoallocate as $userid) {
-                    $usertenantid = \tool_mutenancy\local\tenancy::get_user_tenantid($userid);
-                    if ($usertenantid && $usertenantid != $programtenantid) {
-                        throw new invalid_parameter_exception('Tenant mismatch');
-                    }
+        $programtenantid = \tool_muprog\local\program::get_restricted_tenantid($program);
+        if ($programtenantid) {
+            foreach ($useridstoallocate as $userid) {
+                $usertenantid = \tool_mutenancy\local\tenancy::get_user_tenantid($userid);
+                if ($usertenantid && $usertenantid != $programtenantid) {
+                    throw new invalid_parameter_exception('Tenant mismatch');
                 }
             }
         }

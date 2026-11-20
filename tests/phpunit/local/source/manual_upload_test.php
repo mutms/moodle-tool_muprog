@@ -220,6 +220,31 @@ final class manual_upload_test extends \advanced_testcase {
         $this->assertSame(1, $DB->count_records('tool_muprog_allocation', ['programid' => $program->id]));
     }
 
+    public function test_check_ignores_users_of_other_tenants(): void {
+        global $DB;
+        if (!\tool_mulib\local\mulib::is_mutenancy_available()) {
+            $this->markTestSkipped('tool_mutenancy is not installed');
+        }
+        /** @var \tool_mutenancy_generator $tenancygen */
+        $tenancygen = $this->getDataGenerator()->get_plugin_generator('tool_mutenancy');
+        $tenant1 = $tenancygen->create_tenant();
+        $tenant2 = $tenancygen->create_tenant();
+        $contextid = \context_coursecat::instance($tenant1->categoryid)->id;
+        $member = $this->getDataGenerator()->create_user(['username' => 'member', 'tenantid' => $tenant1->id]);
+        $global = $this->getDataGenerator()->create_user(['username' => 'global']);
+        $outsider = $this->getDataGenerator()->create_user(['username' => 'outsider', 'tenantid' => $tenant2->id]);
+        /** @var \tool_muprog_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
+        $program = $generator->create_program(['sources' => ['manual' => []], 'contextid' => $contextid]);
+
+        $csvdata = $this->csvdata([['member'], ['global'], ['outsider']], ['username']);
+        $outcomes = manual_upload::check($program, $csvdata, $this->get_options(false));
+        $this->assertEquals($member->id, $outcomes[0]->userid);
+        $this->assertEquals($global->id, $outcomes[1]->userid);
+        $this->assertSame(manual_upload::RESULT_ERROR, $outcomes[2]->result);
+        $this->assertNull($outcomes[2]->userid, 'users of other tenants are not found at all');
+    }
+
     public function test_import_writes_nothing_when_a_row_fails(): void {
         global $DB;
 

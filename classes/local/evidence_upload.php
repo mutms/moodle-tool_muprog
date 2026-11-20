@@ -391,6 +391,11 @@ final class evidence_upload {
             $select = $DB->sql_equal($field, ':value', $field !== 'email');
             $select .= ' AND deleted = 0 AND confirmed = 1 AND id <> :guestid';
             $params = ['value' => $value, 'guestid' => $CFG->siteguest];
+            $tenantid = \tool_muprog\local\program::get_restricted_tenantid($program);
+            if ($tenantid) {
+                $select .= ' AND (tenantid IS NULL OR tenantid = :tenantid)';
+                $params['tenantid'] = $tenantid;
+            }
             if ($field === 'username') {
                 $select .= ' AND mnethostid = :mnethostid';
                 $params['mnethostid'] = $CFG->mnet_localhost_id;
