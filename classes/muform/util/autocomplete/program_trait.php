@@ -89,6 +89,7 @@ trait program_trait {
         foreach ($programs as $program) {
             $result[(string)$program->id] = self::format_program_label($program);
         }
+        \core_collator::asort($result);
         return $result;
     }
 
