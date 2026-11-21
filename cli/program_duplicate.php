@@ -106,8 +106,8 @@ Options:
 -h, --help               Print out this help
 
 Examples:
-\$ php admin/tool/muprog/cli/program_duplicate.php --idnumber=ONB2026 --search=2026 --replace=2027
-\$ php admin/tool/muprog/cli/program_duplicate.php --idnumber=ONB2026 --search=2026 --replace=2027 --execute
+\$ php public/admin/tool/muprog/cli/program_duplicate.php --idnumber=ONB2026 --search=2026 --replace=2027
+\$ php public/admin/tool/muprog/cli/program_duplicate.php --idnumber=ONB2026 --search=2026 --replace=2027 --execute
 
 EOT;
     echo $help;
