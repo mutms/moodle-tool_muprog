@@ -127,7 +127,14 @@ jobs:
 
       - name: Grunt
         if: ${{ !cancelled() }}
-        run: moodle-plugin-ci grunt --max-lint-warnings 0
+        run: |
+          set -a && source ci/.env && set +a
+          cd "$MOODLE_DIR"
+          source "$NVM_DIR/nvm.sh" && nvm use
+          cd "$PLUGIN_DIR"
+          npx grunt stylelint gherkinlint
+          git status --porcelain
+          test -z "$(git status --porcelain)"
 
       - name: PHPUnit tests
         if: ${{ !cancelled() }}
