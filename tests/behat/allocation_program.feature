@@ -60,6 +60,7 @@ Feature: Completed programs allocation tests
     Then I should see "Active" in the "Completed program" definition list item
     And I should see "Program 000" in the "Completed program" definition list item
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
-    And "Student 1" row "Source" column of "reportbuilder-table" table should contain "Completed program"
-    And "Student 1" row "Program status" column of "reportbuilder-table" table should contain "Open"
+    And the following should exist in the mureport:
+      | Full name | Source            | Program status |
+      | Student 1 | Completed program | Open           |
     And I should not see "Student 2"

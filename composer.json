@@ -9,7 +9,8 @@
     "moodle/moodle": "5.3.*",
     "mutms/moodle-tool_mulib": "*",
     "mutms/moodle-tool_mucatalog": "*",
-    "mutms/moodle-enrol_muprog": "*"
+    "mutms/moodle-enrol_muprog": "*",
+    "mutms/moodle-tool_mureport": "*"
   },
   "support": {
     "issues": "https://github.com/mutms/moodle-tool_muprog/issues",

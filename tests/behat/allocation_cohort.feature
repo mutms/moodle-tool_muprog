@@ -54,6 +54,7 @@ Feature: Visible cohorts program allocation tests
       | tool/muprog:addcourse        | Allow      | pmanager | System       |           |
       | tool/muprog:allocate         | Allow      | pmanager | System       |           |
       | tool/muprog:manageallocation | Allow      | pmanager | System       |           |
+      | tool/muprog:deallocate       | Allow      | pmanager | System       |           |
       | moodle/cohort:view           | Allow      | pmanager | System       |           |
     And the following "role assigns" exist:
       | user      | role          | contextlevel | reference |
@@ -81,14 +82,12 @@ Feature: Visible cohorts program allocation tests
     And I click on "Update" "button" in the "dialog[open]" "css_element"
     Then I should see "Active (Cohort 1, Cohort 2)" in the "Automatic cohort allocation" definition list item
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
-    And "Student 1" row "Source" column of "reportbuilder-table" table should contain "Automatic cohort allocation"
-    And "Student 1" row "Program status" column of "reportbuilder-table" table should contain "Open"
-    And "Student 2" row "Source" column of "reportbuilder-table" table should contain "Automatic cohort allocation"
-    And "Student 2" row "Program status" column of "reportbuilder-table" table should contain "Open"
-    And "Student 3" row "Source" column of "reportbuilder-table" table should contain "Automatic cohort allocation"
-    And "Student 3" row "Program status" column of "reportbuilder-table" table should contain "Open"
-    And "Student 4" row "Source" column of "reportbuilder-table" table should contain "Automatic cohort allocation"
-    And "Student 4" row "Program status" column of "reportbuilder-table" table should contain "Open"
+    And the following should exist in the mureport:
+      | Full name | Source                      | Program status |
+      | Student 1 | Automatic cohort allocation | Open           |
+      | Student 2 | Automatic cohort allocation | Open           |
+      | Student 3 | Automatic cohort allocation | Open           |
+      | Student 4 | Automatic cohort allocation | Open           |
     And I should not see "Student 5"
 
     When I click on "Allocation settings" "link" in the ".secondary-navigation" "css_element"
@@ -98,15 +97,13 @@ Feature: Visible cohorts program allocation tests
     And I click on "Update" "button" in the "dialog[open]" "css_element"
     Then I should see "Active (Cohort 1)" in the "Automatic cohort allocation" definition list item
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
-    And I click on "Remove filter: Archived" "button"
-    And "Student 1" row "Source" column of "reportbuilder-table" table should contain "Automatic cohort allocation"
-    And "Student 1" row "Program status" column of "reportbuilder-table" table should contain "Open"
-    And "Student 2" row "Source" column of "reportbuilder-table" table should contain "Automatic cohort allocation"
-    And "Student 2" row "Program status" column of "reportbuilder-table" table should contain "Open"
-    And "Student 3" row "Source" column of "reportbuilder-table" table should contain "Automatic cohort allocation"
-    And "Student 3" row "Program status" column of "reportbuilder-table" table should contain "Open"
-    And "Student 4" row "Source" column of "reportbuilder-table" table should contain "Automatic cohort allocation"
-    And "Student 4" row "Program status" column of "reportbuilder-table" table should contain "Archived"
+    And I remove the "Archived" mureport filter
+    And the following should exist in the mureport:
+      | Full name | Source                      | Program status |
+      | Student 1 | Automatic cohort allocation | Open           |
+      | Student 2 | Automatic cohort allocation | Open           |
+      | Student 3 | Automatic cohort allocation | Open           |
+      | Student 4 | Automatic cohort allocation | Archived       |
     And I should not see "Student 5"
 
     When I click on "Allocation settings" "link" in the ".secondary-navigation" "css_element"
@@ -116,19 +113,15 @@ Feature: Visible cohorts program allocation tests
     And I click on "Update" "button" in the "dialog[open]" "css_element"
     And I should see "Active (Cohort 4)" in the "Automatic cohort allocation" definition list item
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
-    And I click on "Actions" "link" in the "Student 1" "table_row"
-    And I click on "Delete program allocation" "link" in the "Student 1" "table_row"
+    And I click on "Delete program allocation" action in the "Student 1" mureport row
     And I click on "Delete program allocation" "button" in the "dialog[open]" "css_element"
-    And I click on "Actions" "link" in the "Student 2" "table_row"
-    And I click on "Delete program allocation" "link" in the "Student 2" "table_row"
+    And I click on "Delete program allocation" action in the "Student 2" mureport row
     And I click on "Delete program allocation" "button" in the "dialog[open]" "css_element"
-    And I click on "Actions" "link" in the "Student 3" "table_row"
-    And I click on "Delete program allocation" "link" in the "Student 3" "table_row"
+    And I click on "Delete program allocation" action in the "Student 3" mureport row
     And I click on "Delete program allocation" "button" in the "dialog[open]" "css_element"
-    And I click on "Actions" "link" in the "Student 4" "table_row"
-    And I click on "Delete program allocation" "link" in the "Student 4" "table_row"
+    And I click on "Delete program allocation" action in the "Student 4" mureport row
     And I click on "Delete program allocation" "button" in the "dialog[open]" "css_element"
-    And I should see "No user allocations found"
+    And I should see "Nothing to display"
     And I click on "Allocation settings" "link" in the ".secondary-navigation" "css_element"
     And I click on "Update Automatic cohort allocation" "link"
     And I set the following muform fields in the "dialog[open]" "css_element":

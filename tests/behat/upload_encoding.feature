@@ -52,7 +52,7 @@ Feature: Program encoding upload tests
       | PČ1      | OK     | Programíček 01 | -          |
       | PČ2      | OK     | Programíček 02 | -          |
     And I press "Upload programs"
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the following should exist in the mureport:
       | Program name     | Program ID | Allocations |
       | Programíček 00   | PČ0        | 0           |
       | Programíček 01   | PČ1        | 0           |

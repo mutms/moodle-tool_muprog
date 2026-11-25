@@ -16,6 +16,7 @@
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 // phpcs:disable moodle.Files.LineLength.TooLong
+// phpcs:disable moodle.Files.RequireLogin.Missing
 
 /**
  * Program management interface.
@@ -39,15 +40,15 @@ require('../../../../config.php');
 
 $id = required_param('id', PARAM_INT);
 
-require_login();
-
-$program = $DB->get_record('tool_muprog_program', ['id' => $id], '*', MUST_EXIST);
-$context = context::instance_by_id($program->contextid);
-require_capability('tool/muprog:view', $context);
+$report = \tool_muprog\mureport\system_report\program_allocations::make_instance($id);
+$report->require_access();
+$program = $report->get_constraint_record('tool_muprog_program', 'programid');
+$context = $report->get_context();
 
 $currenturl = new core\url('/admin/tool/muprog/management/program_users.php', ['id' => $program->id]);
 
 management::setup_program_page($currenturl, $context, $program, 'program_users');
+$report->init_page($currenturl);
 $PAGE->set_docs_path('https://github.com/mutms/moodle-tool_muprog/wiki/Program-users');
 
 /** @var \tool_muprog\output\management\renderer $managementoutput */
@@ -82,19 +83,6 @@ if ($actions->has_items()) {
 
 echo $OUTPUT->header();
 
-$report = \core_reportbuilder\system_report_factory::create(
-    \tool_muprog\reportbuilder\local\systemreports\allocations::class,
-    $context,
-    parameters:['programid' => $program->id]
-);
-echo $OUTPUT->render(new \tool_mulib\output\report_filter_bar($report, pinned: [
-    'user:fullname' => null,
-    'allocation:status' => null,
-    'allocation:archived' => null,
-], defaults: [
-    'allocation:archived' => ['operator' => \core_reportbuilder\local\filters\boolean_select::NOT_CHECKED],
-]));
-echo $report->output();
-echo $OUTPUT->render(new \tool_mulib\output\report_pager($report));
+echo $OUTPUT->render(new \tool_mureport\output\report_full($report));
 
 echo $OUTPUT->footer();

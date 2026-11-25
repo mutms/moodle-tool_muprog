@@ -28,15 +28,18 @@ The format of this change log follows the advice given at [Keep a CHANGELOG](htt
   _tool/muprog:viewcatalogue_ capability was removed
 - _publicaccess_ and _cohortids_ were removed from _tool_muprog_get_programs_ web service
 - _publicaccess_ was removed from program export, it is ignored in program upload
+- program management list, program users, approval requests and user programs use the Advanced report builder:
+  general search, filter chips, saved filters, configurable columns and filters; only programs the user may view
+  in their own category are listed
 - migration to new forms library
 - program scheduling delays are entered as intervals with a single time unit
 - cohort names link to cohort management, the advanced cohort management page is used when installed
 - allocation and completion evidence uploads are wizards that accept pasted data and show a dry run,
   rows with problems block the upload unless they are skipped
-- reports have an always visible filter bar, the standard filters form is available as Advanced filtering
 
 ### Fixed
 
+- use of _tool/muprog:deallocate_ capability when deleting program allocations
 - program notifications and Catalogue visibility tables use the same styling as other management tables
 - custom field data context not updated when moving programs
 - editing of self allocation settings always enabled sign-ups

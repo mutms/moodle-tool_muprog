@@ -82,7 +82,7 @@ if ($data = $form->get_data()) {
     unset($record->timeallocated);
     $sourceclass::allocation_update($record);
     $form->get_element('customfields')->save($allocation->id);
-    $handler->submitted($returnurl);
+    $handler->submitted($returnurl, ['changed' => 'rows']);
 }
 
 $handler->render($form);

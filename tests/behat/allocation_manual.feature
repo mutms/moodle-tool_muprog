@@ -87,8 +87,10 @@ Feature: Manual program allocation tests
     And I set the following muform fields in the "dialog[open]" "css_element":
       | Users | Student 1, Student 5 |
     And I click on "Allocate users" "button" in the "dialog[open]" "css_element"
-    Then "Student 1" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
-    And "Student 5" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
+    Then the following should exist in the mureport:
+      | Full name | Source            |
+      | Student 1 | Manual allocation |
+      | Student 5 | Manual allocation |
     And I should not see "Student 2"
     And I should not see "Student 3"
     And I should not see "Student 4"
@@ -97,19 +99,21 @@ Feature: Manual program allocation tests
     And I set the following muform fields in the "dialog[open]" "css_element":
       | Cohort | Cohort 2 |
     And I click on "Allocate users" "button" in the "dialog[open]" "css_element"
-    Then "Student 1" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
-    And "Student 2" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
-    And "Student 5" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
+    Then the following should exist in the mureport:
+      | Full name | Source            |
+      | Student 1 | Manual allocation |
+      | Student 2 | Manual allocation |
+      | Student 5 | Manual allocation |
     And I should not see "Student 3"
     And I should not see "Student 4"
 
-    When I click on "Actions" "link" in the "Student 2" "table_row"
-    And I click on "Delete program allocation" "link" in the "Student 2" "table_row"
+    When I click on "Delete program allocation" action in the "Student 2" mureport row
     And I click on "Cancel" "button" in the "dialog[open]" "css_element"
-    Then "Student 2" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
+    Then the following should exist in the mureport:
+      | Full name | Source            |
+      | Student 2 | Manual allocation |
 
-    When I click on "Actions" "link" in the "Student 2" "table_row"
-    And I click on "Delete program allocation" "link" in the "Student 2" "table_row"
+    When I click on "Delete program allocation" action in the "Student 2" mureport row
     And I click on "Delete program allocation" "button" in the "dialog[open]" "css_element"
     Then I should not see "Student 2"
 
@@ -139,7 +143,9 @@ Feature: Manual program allocation tests
     And I set the following muform fields in the "dialog[open]" "css_element":
       | Users | Student 1 |
     And I click on "Allocate users" "button" in the "dialog[open]" "css_element"
-    Then "Student 1" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
+    Then the following should exist in the mureport:
+      | Full name | Source            |
+      | Student 1 | Manual allocation |
 
     And I am on the "tool_muprog > All programs management" page
     And I follow "Program 001"
@@ -155,7 +161,9 @@ Feature: Manual program allocation tests
     And I set the following muform fields in the "dialog[open]" "css_element":
       | Users | Student 1 |
     And I click on "Allocate users" "button" in the "dialog[open]" "css_element"
-    And "Student 1" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
+    And the following should exist in the mureport:
+      | Full name | Source            |
+      | Student 1 | Manual allocation |
 
     And I click on "Switch tenant" "link"
     And I set the following muform fields in the "dialog[open]" "css_element":
@@ -170,7 +178,9 @@ Feature: Manual program allocation tests
     And I set the following muform fields in the "dialog[open]" "css_element":
       | Users | Tenant 1 Student |
     And I click on "Allocate users" "button" in the "dialog[open]" "css_element"
-    Then "Tenant 1 Student" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
+    Then the following should exist in the mureport:
+      | Full name        | Source            |
+      | Tenant 1 Student | Manual allocation |
 
     And I am on the "tool_muprog > All programs management" page
     And I follow "Program 001"
@@ -180,7 +190,9 @@ Feature: Manual program allocation tests
     And I set the following muform fields in the "dialog[open]" "css_element":
       | Users | Tenant 1 Student |
     And I click on "Allocate users" "button" in the "dialog[open]" "css_element"
-    Then "Tenant 1 Student" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
+    Then the following should exist in the mureport:
+      | Full name        | Source            |
+      | Tenant 1 Student | Manual allocation |
 
   @javascript @_file_upload
   Scenario: Manager may upload CSV file with manual allocations without dates
@@ -207,9 +219,11 @@ Feature: Manual program allocation tests
     And I should see "Ready to allocate: 3. Skipped: 0. Problems: 0."
     And I press "Upload allocations"
     Then I should see "Allocated 3 users, skipped 0."
-    And "Student 1" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
-    And "Student 2" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
-    And "Student 3" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
+    And the following should exist in the mureport:
+      | Full name | Source            |
+      | Student 1 | Manual allocation |
+      | Student 2 | Manual allocation |
+      | Student 3 | Manual allocation |
 
     When I click on "Upload allocations" action from "Users actions" dropdown
     And I upload "admin/tool/muprog/tests/fixtures/upload2.csv" file to "sourcefile" muform filemanager
@@ -232,10 +246,12 @@ Feature: Manual program allocation tests
     And I press "Refresh preview"
     And I press "Upload allocations"
     Then I should see "Allocated 1 users, skipped 3."
-    And "Student 1" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
-    And "Student 2" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
-    And "Student 3" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
-    And "Student 4" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
+    And the following should exist in the mureport:
+      | Full name | Source            |
+      | Student 1 | Manual allocation |
+      | Student 2 | Manual allocation |
+      | Student 3 | Manual allocation |
+      | Student 4 | Manual allocation |
 
     When I click on "Upload allocations" action from "Users actions" dropdown
     And I upload "admin/tool/muprog/tests/fixtures/upload3.csv" file to "sourcefile" muform filemanager
@@ -249,11 +265,13 @@ Feature: Manual program allocation tests
     And I should see "Ready to allocate: 1. Skipped: 1. Problems: 0."
     And I press "Upload allocations"
     Then I should see "Allocated 1 users, skipped 1."
-    And "Student 1" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
-    And "Student 2" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
-    And "Student 3" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
-    And "Student 4" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
-    And "Student 5" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
+    And the following should exist in the mureport:
+      | Full name | Source            |
+      | Student 1 | Manual allocation |
+      | Student 2 | Manual allocation |
+      | Student 3 | Manual allocation |
+      | Student 4 | Manual allocation |
+      | Student 5 | Manual allocation |
 
   @javascript
   Scenario: Manager may paste users to allocate
@@ -291,8 +309,10 @@ Feature: Manual program allocation tests
     And I press "Continue"
     And I press "Upload allocations"
     Then I should see "Allocated 2 users, skipped 0."
-    And "Student 1" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
-    And "Student 2" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
+    And the following should exist in the mureport:
+      | Full name | Source            |
+      | Student 1 | Manual allocation |
+      | Student 2 | Manual allocation |
 
   @javascript @_file_upload
   Scenario: Manager may upload CSV file with manual allocations including program dates
@@ -330,8 +350,8 @@ Feature: Manual program allocation tests
     And I should see "Program dates are not valid."
     And I press "Upload allocations"
     Then I should see "Allocated 3 users, skipped 3."
-    Then the following should exist in the "reportbuilder-table" table:
-      | First name          | Program start   | Due date        | Program end     | Source            |
+    Then the following should exist in the mureport:
+      | Full name           | Program start   | Due date        | Program end     | Source            |
       | Student 1           | 5/11/22, 09:00  | 22/01/23, 09:00 | 31/12/23, 09:00 | Manual allocation |
       | Student 2           | 11/10/22, 00:00 | 31/12/22, 00:00 | 31/01/23, 23:52 | Manual allocation |
       | Student 3           | 11/10/22, 00:00 | 22/01/23, 09:00 | 31/12/23, 09:00 | Manual allocation |

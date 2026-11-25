@@ -54,10 +54,12 @@ Feature: Program approval allocations tests
       | tool/muprog:addcourse        | Allow      | pmanager  | System       |           |
       | tool/muprog:allocate         | Allow      | pmanager  | System       |           |
       | tool/muprog:manageallocation | Allow      | pmanager  | System       |           |
+      | tool/muprog:deallocate       | Allow      | pmanager  | System       |           |
       | moodle/cohort:view           | Allow      | pmanager  | System       |           |
       | tool/muprog:view             | Allow      | allocator | System       |           |
       | tool/muprog:allocate         | Allow      | allocator | System       |           |
       | tool/muprog:manageallocation | Allow      | allocator | System       |           |
+      | tool/muprog:deallocate       | Allow      | allocator | System       |           |
     And the following "role assigns" exist:
       | user      | role          | contextlevel | reference |
       | manager1  | pmanager      | System       |           |
@@ -125,25 +127,27 @@ Feature: Program approval allocations tests
     And I am on the "Cat 1" "tool_muprog > Program management" page
     And I follow "Program 001"
     And I follow "Requests"
-    And I click on "Actions" "link" in the "Student 2" "table_row"
-    And I click on "Approve request" "link" in the "Student 2" "table_row"
+    And I click on "Approve request" action in the "Student 2" mureport row
     And I click on "Approve request" "button" in the "dialog[open]" "css_element"
     Then I should not see "Student 2"
     And I follow "Users"
-    And "Student 2" row "Source" column of "reportbuilder-table" table should contain "Requests with approval"
+    And the following should exist in the mureport:
+      | Full name | Source                 |
+      | Student 2 | Requests with approval |
     And I log out
 
     When I log in as "student2"
     And I am on the "tool_muprog > My programs" page
-    And "Program 001" row "Program status" column of "reportbuilder-table" table should contain "Open"
+    And the following should exist in the mureport:
+      | Program name | Program status |
+      | Program 001  | Open           |
     And I log out
 
     When I log in as "allocator"
     And I am on the "Cat 1" "tool_muprog > Program management" page
     And I follow "Program 001"
     And I follow "Users"
-    And I click on "Actions" "link" in the "Student 2" "table_row"
-    And I click on "Delete program allocation" "link" in the "Student 2" "table_row"
+    And I click on "Delete program allocation" action in the "Student 2" mureport row
     And I click on "Delete program allocation" "button" in the "dialog[open]" "css_element"
     Then I should not see "Student 2"
     And I log out
@@ -179,8 +183,7 @@ Feature: Program approval allocations tests
     And I am on the "Cat 1" "tool_muprog > Program management" page
     And I follow "Program 001"
     And I follow "Requests"
-    And I click on "Actions" "link" in the "Student 2" "table_row"
-    And I click on "Reject request" "link" in the "Student 2" "table_row"
+    And I click on "Reject request" action in the "Student 2" mureport row
     And I set the following muform fields in the "dialog[open]" "css_element":
       | Rejection reason | Sorry mate! |
     And I click on "Reject request" "button" in the "dialog[open]" "css_element"
@@ -199,8 +202,7 @@ Feature: Program approval allocations tests
     And I am on the "Cat 1" "tool_muprog > Program management" page
     And I follow "Program 001"
     And I follow "Requests"
-    And I click on "Actions" "link" in the "Student 2" "table_row"
-    And I click on "Delete request" "link" in the "Student 2" "table_row"
+    And I click on "Delete request" action in the "Student 2" mureport row
     And I click on "Delete request" "button" in the "dialog[open]" "css_element"
     Then I should not see "Student 2"
     And I log out

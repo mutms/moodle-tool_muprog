@@ -117,9 +117,9 @@ Feature: General programs management tests
     And I should see "Mathematics" in the "Tags" definition list item
     And I should see "Algebra" in the "Tags" definition list item
     And I am on the "Cat 2" "tool_muprog > Program management" page
-    And "PR01" row "Program name" column of "reportbuilder-table" table should contain "Program 001"
-    And "PR01" row "Courses" column of "reportbuilder-table" table should contain "0"
-    And "PR01" row "Allocations" column of "reportbuilder-table" table should contain "0"
+    And the following should exist in the mureport:
+      | Program name | Program ID | Category | Courses | Allocations |
+      | Program 001  | PR01       | Cat 2    | 0       | 0           |
 
   @javascript
   Scenario: Manager may update basic general settings of an existing program
@@ -199,7 +199,7 @@ Feature: General programs management tests
 
     When I click on "Delete program" action from "Program actions" dropdown
     And I click on "Delete program" "button" in the "dialog[open]" "css_element"
-    Then I should see "No programs found"
+    Then I should see "Nothing to display"
 
   @javascript @_file_upload
   Scenario: Manager may update all general settings of an existing program
@@ -286,9 +286,13 @@ Feature: General programs management tests
 
     When I log in as "manager1"
     And I am on the "tool_muprog > All programs management" page
-    Then "PR01" row "Courses" column of "reportbuilder-table" table should contain "Missing courses: 2"
-    And "PR02" row "Courses" column of "reportbuilder-table" table should contain "Missing courses: 1"
-    And "PR03" row "Courses" column of "reportbuilder-table" table should not contain "Missing courses"
+    Then the following should exist in the mureport:
+      | Program ID | Courses            |
+      | PR01       | Missing courses: 2 |
+      | PR02       | Missing courses: 1 |
+    And the following should not exist in the mureport:
+      | Program ID | Courses         |
+      | PR03       | Missing courses |
 
   @javascript
   Scenario: Manager may create, release and delete draft programs

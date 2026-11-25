@@ -67,7 +67,7 @@ if ($form->is_cancelled()) {
 
 if ($data = $form->get_data()) {
     tool_muprog\local\source\approval::reject_request($request->id, $data->reason);
-    $handler->submitted($returnurl);
+    $handler->submitted($returnurl, ['changed' => 'rows']);
 }
 
 $handler->render($form);

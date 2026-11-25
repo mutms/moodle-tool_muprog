@@ -49,7 +49,7 @@ Feature: Program upload full tests
       | P01      | OK     | Program 01 | Category 1 |              | Yes          |                           |                           | Start immediately after allocation    | Not set                   | Not set                    |
       | P02      | OK     | Program 02 | Category 2 |              | No           |                           |                           | 2024-10-01T18:09:00+01:00             | 2024-11-01T18:09:00+00:00 | 2024-12-01T18:09:00+00:00  |
     And I press "Upload programs"
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the following should exist in the mureport:
       | Program name | Category   | Program ID | Courses | Allocations |
       | Program 00   | System     | P00        | 5       | 0           |
       | Program 01   | Category 1 | P01        | 3       | 0           |
@@ -131,7 +131,7 @@ Feature: Program upload full tests
       | P01      | OK     | Program 01 | Category 1 |              | Yes          |                           |                           | Start immediately after allocation    | Not set                   | Not set                    |
       | P02      | OK     | Program 02 | Category 2 |              | No           |                           |                           | 2024-10-01T18:09:00+01:00             | 2024-11-01T18:09:00+00:00 | 2024-12-01T18:09:00+00:00  |
     And I press "Upload programs"
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the following should exist in the mureport:
       | Program name | Category   | Program ID | Courses | Allocations |
       | Program 00   | System     | P00        | 5       | 0           |
       | Program 01   | Category 1 | P01        | 3       | 0           |
@@ -220,7 +220,7 @@ Feature: Program upload full tests
       | P01      | OK     | Program 01 | Category 1 |              | Yes          |                           |                           | Start immediately after allocation    | Not set                   | Not set                    |
       | P02      | OK     | Program 02 | Category 2 |              | No           |                           |                           | 2024-10-01T18:09:00+01:00             | 2024-11-01T18:09:00+00:00 | 2024-12-01T18:09:00+00:00  |
     And I press "Upload programs"
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the following should exist in the mureport:
       | Program name | Category   | Program ID | Courses | Allocations |
       | Program 00   | System     | P00        | 5       | 0           |
       | Program 01   | Category 1 | P01        | 3       | 0           |
@@ -306,7 +306,7 @@ Feature: Program upload full tests
       | P01      | OK     | Program 01 | Category 1 |              | Yes          |                           |                           | Start immediately after allocation    | Not set                   | Not set                    |
       | P02      | OK     | Program 02 | Category 2 |              | No           |                           |                           | 2024-10-01T18:09:00+01:00             | 2024-11-01T18:09:00+00:00 | 2024-12-01T18:09:00+00:00  |
     And I press "Upload programs"
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the following should exist in the mureport:
       | Program name | Category   | Program ID | Courses | Allocations |
       | Program 00   | System     | P00        | 5       | 0           |
       | Program 01   | Category 1 | P01        | 3       | 0           |
@@ -389,7 +389,7 @@ Feature: Program upload full tests
       | P01      | OK     | Program 01 | Category 1 |              | Yes          |                           |                           | Start immediately after allocation    | Not set                   | Not set                    |
       | P02      | OK     | Program 02 | Category 2 |              | No           |                           |                           | 2024-10-01T18:09:00+01:00             | 2024-11-01T18:09:00+00:00 | 2024-12-01T18:09:00+00:00  |
     And I press "Upload programs"
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the following should exist in the mureport:
       | Program name | Category   | Program ID | Courses | Allocations |
       | Program 00   | System     | P00        | 5       | 0           |
       | Program 01   | Category 1 | P01        | 3       | 0           |
@@ -472,7 +472,7 @@ Feature: Program upload full tests
       | P01      | OK     | Program 01 | Category 1 |              | Yes          |                           |                           | Start immediately after allocation    | Not set                   | Not set                    |
       | P02      | OK     | Program 02 | Category 2 |              | No           |                           |                           | 2024-10-01T18:09:00+01:00             | 2024-11-01T18:09:00+00:00 | 2024-12-01T18:09:00+00:00  |
     And I press "Upload programs"
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the following should exist in the mureport:
       | Program name | Category   | Program ID | Courses | Allocations |
       | Program 00   | System     | P00        | 5       | 0           |
       | Program 01   | Category 1 | P01        | 3       | 0           |
@@ -557,7 +557,7 @@ Feature: Program upload full tests
       | P01      | OK     | Program 01 | Category 1 |              | Yes          |                           |                           | Start immediately after allocation    | Not set                   | Not set                    |
       | P02      | OK     | Program 02 | Category 2 |              | No           |                           |                           | 2024-10-01T18:09:00+01:00             | 2024-11-01T18:09:00+00:00 | 2024-12-01T18:09:00+00:00  |
     And I press "Upload programs"
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the following should exist in the mureport:
       | Program name | Category   | Program ID | Courses | Allocations |
       | Program 00   | System     | P00        | 5       | 0           |
       | Program 01   | Category 1 | P01        | 3       | 0           |
@@ -648,7 +648,7 @@ Feature: Program upload full tests
       | P01      | OK     | Program 01 | Category 1 |              | Yes          |                           |                           | Start immediately after allocation    | Not set                   | Not set                    |
       | P02      | OK     | Program 02 | Category 2 |              | No           |                           |                           | 2024-10-01T18:09:00+01:00             | 2024-11-01T18:09:00+00:00 | 2024-12-01T18:09:00+00:00  |
     And I press "Upload programs"
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the following should exist in the mureport:
       | Program name | Category   | Program ID | Courses | Allocations |
       | Program 00   | System     | P00        | 5       | 0           |
       | Program 01   | Category 1 | P01        | 3       | 0           |

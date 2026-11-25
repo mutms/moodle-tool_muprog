@@ -34,6 +34,7 @@ Required plugins:
 * [Additional tools library plugin](https://github.com/mutms/moodle-tool_mulib)
 * [Universal catalogue plugin](https://github.com/mutms/moodle-tool_mucatalog)
 * [Program enrolment plugin](https://github.com/mutms/moodle-enrol_muprog)
+* [Advanced report builder plugin](https://github.com/mutms/moodle-tool_mureport)
 
 Recommended plugins:
 

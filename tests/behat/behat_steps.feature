@@ -59,22 +59,14 @@ Feature: Programs navigation behat steps test
     And I should see "Program 000"
     And I should see "Program 001"
     And I should see "Program 002"
-    And I click on "Remove filter: Archived" "button"
-    And I should see "Program 003"
-
-    When I click on "Exclude sub-categories: Any" "button"
-    And I click on "Yes" "button" in the ".tool_mulib-report-filter-bar-popover" "css_element"
-    Then I should see "Programs"
-    And I should see "Program 000"
-    And I should not see "Program 001"
-    And I should not see "Program 002"
+    And I remove the "Archived" mureport filter
     And I should see "Program 003"
 
     When I am on the "System" "tool_muprog > Program management" page
     Then I should see "Programs"
     And I should see "Program 000"
-    And I should not see "Program 001"
-    And I should not see "Program 002"
+    And I should see "Program 001"
+    And I should see "Program 002"
     And I should see "Program 003"
 
     When I am on the "Cat 1" "tool_muprog > Program management" page
@@ -84,6 +76,7 @@ Feature: Programs navigation behat steps test
     And I should not see "Program 002"
     And I should not see "Program 003"
 
+  @javascript
   Scenario: Admin navigates to programs the normal way
     Given I log in as "admin"
 
@@ -101,6 +94,7 @@ Feature: Programs navigation behat steps test
     And I should not see "Program 002"
     And I should not see "Program 003"
 
+  @javascript
   Scenario: Full manager navigates to programs via behat step
     Given I log in as "manager1"
 
@@ -125,6 +119,7 @@ Feature: Programs navigation behat steps test
     And I should not see "Program 002"
     And I should not see "Program 003"
 
+  @javascript
   Scenario: Full manager navigates to programs the normal way
     Given I log in as "manager1"
 
@@ -142,6 +137,7 @@ Feature: Programs navigation behat steps test
     And I should not see "Program 002"
     And I should not see "Program 003"
 
+  @javascript
   Scenario: Category manager navigates to programs via behat step
     Given I log in as "manager2"
 
@@ -152,6 +148,7 @@ Feature: Programs navigation behat steps test
     And I should not see "Program 002"
     And I should not see "Program 003"
 
+  @javascript
   Scenario: Full viewer navigates to programs via behat step
     Given the following "permission overrides" exist:
       | capability                     | permission | role         | contextlevel | reference |
@@ -191,6 +188,7 @@ Feature: Programs navigation behat steps test
     And I should not see "Program 002"
     And I should not see "Program 003"
 
+  @javascript
   Scenario: Full viewer navigates to programs the normal way
     Given I log in as "viewer1"
 
@@ -218,6 +216,7 @@ Feature: Programs navigation behat steps test
     And I should not see "Program 003"
     And I should not see "Program 003"
 
+  @javascript
   Scenario: Category viewer navigates to programs via behat step
     Given I log in as "viewer2"
 
@@ -228,13 +227,15 @@ Feature: Programs navigation behat steps test
     And I should not see "Program 002"
     And I should not see "Program 003"
 
+  @javascript
   Scenario: Student navigates to My programs via behat step
     Given I log in as "student1"
 
     When I am on the "tool_muprog > My programs" page
     Then I should see "My programs"
-    And I should see "You are not allocated to any programs."
+    And I should see "Nothing to display"
 
+  @javascript
   Scenario: User viewer navigates to User programs via behat step
     Given I log in as "viewer3"
     And the following "tool_muprog > program_allocations" exist:
@@ -243,11 +244,12 @@ Feature: Programs navigation behat steps test
       | Program 002 | student1 |
 
     When I am on the "student1" "tool_muprog > User programs" page
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the following should exist in the mureport:
       | Program name   | Program ID | Program status |
       | Program 001    | PR1        | Open           |
       | Program 002    | PR2        | Open           |
 
+  @javascript
   Scenario: User viewer navigates to User programs via UI
     Given I log in as "viewer3"
     And the following "tool_muprog > program_allocations" exist:
@@ -257,11 +259,12 @@ Feature: Programs navigation behat steps test
 
     When I am on the "student1" "user > profile" page
     And I follow "Programs"
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the following should exist in the mureport:
       | Program name   | Program ID | Program status |
       | Program 001    | PR1        | Open           |
       | Program 002    | PR2        | Open           |
 
+  @javascript
   Scenario: Program admin or site config capabilities are needed to see program settings
     Given the following "permission overrides" exist:
       | capability                    | permission | role         | contextlevel | reference |

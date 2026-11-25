@@ -115,9 +115,9 @@ Feature: Upload program completion evidence using csv
     And I should see "No user matches \"studentz\"."
     And I press "Upload completion evidence"
     Then I should see "Completion evidence updated for 2 users, skipped 4."
-    And I click on "Remove filter: Archived" "button"
-    And the following should exist in the "reportbuilder-table" table:
-      | First name             | Program status |
+    And I remove the "Archived" mureport filter
+    And the following should exist in the mureport:
+      | Full name              | Program status |
       | Student 1              | Completed      |
       | Student 2              | Completed      |
       | Student 3              | Archived       |

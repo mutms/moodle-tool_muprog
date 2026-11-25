@@ -35,6 +35,7 @@ Feature: Programs behat generator tests
       | user     | role          | contextlevel | reference |
       | viewer1  | pviewer       | System       |           |
 
+  @javascript
   Scenario: Programs Behat generator creates programs
     When the following "tool_muprog > programs" exist:
       | fullname    | idnumber | category |
@@ -44,7 +45,7 @@ Feature: Programs behat generator tests
 
     And I log in as "viewer1"
     And I am on the "tool_muprog > All programs management" page
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the following should exist in the mureport:
       | Program name  | Category   | Program ID | Courses | Allocations |
       | Program 000   | System     | PR0        | 0       | 0           |
       | Program 001   | Cat 1      | PR1        | 0       | 0           |
@@ -138,6 +139,7 @@ Feature: Programs behat generator tests
       | Framework 2 | 3      | Required credits: 7       |
       | Framework 2 | 3      | Completion delay: 1 hours |
 
+  @javascript
   Scenario: Programs Behat generator creates allocations
     Given the following "tool_muprog > programs" exist:
       | fullname    | idnumber | category |
@@ -151,5 +153,6 @@ Feature: Programs behat generator tests
     And I log in as "viewer1"
     And I am on the "Program 002" "tool_muprog > Program" page
     And I follow "Users"
-    Then  "Student 1" row "Source" column of "reportbuilder-table" table should contain "Manual allocation"
-    And  "Student 1" row "Program status" column of "reportbuilder-table" table should contain "Open"
+    Then the following should exist in the mureport:
+      | Full name | Source            | Program status |
+      | Student 1 | Manual allocation | Open           |

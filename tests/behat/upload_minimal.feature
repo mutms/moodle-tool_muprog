@@ -50,7 +50,7 @@ Feature: Program minimal upload tests
       | P01      | OK     | Program 01 | -          |
       | P02      | OK     | Program 02 | -          |
     And I press "Upload programs"
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the following should exist in the mureport:
       | Program name | Program ID | Courses | Allocations |
       | Program 00   | P00        | 2       | 0           |
       | Program 01   | P01        | 0       | 0           |
@@ -92,7 +92,7 @@ Feature: Program minimal upload tests
       | P01      | OK     | Program 01 | -          |
       | P02      | OK     | Program 02 | -          |
     And I press "Upload programs"
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the following should exist in the mureport:
       | Program name | Program ID | Courses | Allocations |
       | Program 00   | P00        | 0       | 0           |
       | Program 01   | P01        | 0       | 0           |

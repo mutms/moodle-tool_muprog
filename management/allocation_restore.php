@@ -75,7 +75,7 @@ if ($form->is_cancelled()) {
 
 if ($data = $form->get_data()) {
     $sourceclass::allocation_restore($allocation->id);
-    $handler->submitted($returnurl);
+    $handler->submitted($returnurl, ['changed' => 'rows']);
 }
 
 $handler->render($form);

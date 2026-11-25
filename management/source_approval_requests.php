@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
+// phpcs:disable moodle.Files.RequireLogin.Missing
 // phpcs:disable moodle.Files.LineLength.TooLong
 
 /**
@@ -39,28 +40,18 @@ require('../../../../config.php');
 
 $id = required_param('id', PARAM_INT);
 
-require_login();
-
-$program = $DB->get_record('tool_muprog_program', ['id' => $id], '*', MUST_EXIST);
-$context = context::instance_by_id($program->contextid);
-require_capability('tool/muprog:view', $context);
+$report = \tool_muprog\mureport\system_report\program_requests::make_instance($id);
+$report->require_access();
+$program = $report->get_constraint_record('tool_muprog_program', 'programid');
+$context = $report->get_context();
 
 $currenturl = new core\url('/admin/tool/muprog/management/source_approval_requests.php', ['id' => $program->id]);
 
 management::setup_program_page($currenturl, $context, $program, 'program_approval_requests');
+$report->init_page($currenturl);
 
 echo $OUTPUT->header();
 
-$report = \core_reportbuilder\system_report_factory::create(
-    \tool_muprog\reportbuilder\local\systemreports\requests::class,
-    $context,
-    parameters:['programid' => $program->id]
-);
-echo $OUTPUT->render(new \tool_mulib\output\report_filter_bar($report, pinned: [
-    'user:fullname' => null,
-    'request:status' => null,
-]));
-echo $report->output();
-echo $OUTPUT->render(new \tool_mulib\output\report_pager($report));
+echo $OUTPUT->render(new \tool_mureport\output\report_full($report));
 
 echo $OUTPUT->footer();

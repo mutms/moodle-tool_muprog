@@ -16,6 +16,7 @@
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 // phpcs:disable moodle.Files.LineLength.TooLong
+// phpcs:disable moodle.Files.RequireLogin.Missing
 
 /**
  * Program management interface.
@@ -40,26 +41,14 @@ require('../../../../config.php');
 
 $contextid = optional_param('contextid', 0, PARAM_INT);
 
-if ($contextid) {
-    $context = context::instance_by_id($contextid, MUST_EXIST);
-} else {
-    $context = context_system::instance();
-}
-
-require_login();
-require_capability('tool/muprog:view', $context);
-
-if ($context->contextlevel == CONTEXT_SYSTEM) {
-    $category = null;
-} else if ($context->contextlevel == CONTEXT_COURSECAT) {
-    $category = $DB->get_record('course_categories', ['id' => $context->instanceid], '*', MUST_EXIST);
-} else {
-    throw new moodle_exception('invalidcontext');
-}
+$report = \tool_muprog\mureport\system_report\programs::make_instance($contextid ?: context_system::instance()->id);
+$report->require_access();
+$context = $report->get_context();
 
 $currenturl = new core\url('/admin/tool/muprog/management/index.php', ['contextid' => $context->id]);
 
 management::setup_index_page($currenturl, $context);
+$report->init_page($currenturl);
 $PAGE->set_docs_path('https://github.com/mutms/moodle-tool_muprog/wiki/Program-management');
 
 $actions = new header_actions(get_string('management_index_actions', 'tool_muprog'));
@@ -85,19 +74,6 @@ if ($actions->has_items()) {
 
 echo $OUTPUT->header();
 
-$report = \core_reportbuilder\system_report_factory::create(
-    \tool_muprog\reportbuilder\local\systemreports\programs::class,
-    $context
-);
-echo $OUTPUT->render(new \tool_mulib\output\report_filter_bar($report, pinned: [
-    'program:fullname' => null,
-    'program:currentcontextonly' => null,
-    'program:draft' => null,
-    'program:archived' => null,
-], defaults: [
-    'program:archived' => ['operator' => \core_reportbuilder\local\filters\boolean_select::NOT_CHECKED],
-]));
-echo $report->output();
-echo $OUTPUT->render(new \tool_mulib\output\report_pager($report));
+echo $OUTPUT->render(new \tool_mureport\output\report_full($report));
 
 echo $OUTPUT->footer();

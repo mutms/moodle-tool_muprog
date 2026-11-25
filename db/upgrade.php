@@ -336,5 +336,21 @@ function xmldb_tool_muprog_upgrade($oldversion): bool {
         upgrade_plugin_savepoint(true, 2026100753, 'tool', 'muprog');
     }
 
+    if ($oldversion < 2026112653) {
+        $classes = [
+            'tool_muprog\\reportbuilder\\local\\systemreports\\programs',
+            'tool_muprog\\reportbuilder\\local\\systemreports\\allocations_user',
+            'tool_muprog\\reportbuilder\\local\\systemreports\\allocations',
+            'tool_muprog\\reportbuilder\\local\\systemreports\\requests',
+        ];
+        foreach ($classes as $classname) {
+            foreach (\core_reportbuilder\local\models\report::get_records(['source' => $classname]) as $report) {
+                $report->delete();
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2026112653, 'tool', 'muprog');
+    }
+
     return true;
 }

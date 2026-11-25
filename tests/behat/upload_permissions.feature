@@ -50,7 +50,7 @@ Feature: Program upload permissions tests
       | P01      | OK     | Program 01 | -          |              | Yes          |                           |                           | Start immediately after allocation    | Not set                   | Not set                    |
       | P02      | OK     | Program 02 | Category 2 |              | No           |                           |                           | 2024-10-01T18:09:00+01:00             | 2024-11-01T18:09:00+00:00 | 2024-12-01T18:09:00+00:00  |
     And I press "Upload programs"
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the following should exist in the mureport:
       | Program name | Program ID | Courses | Allocations |
       | Program 00   | P00        | 5       | 0           |
       | Program 01   | P01        | 3       | 0           |
