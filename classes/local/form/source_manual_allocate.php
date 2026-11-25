@@ -26,8 +26,8 @@ use tool_mulib\muform\element\submit;
 use tool_mulib\muform\element\userpickermany;
 use tool_mulib\muform\form;
 use tool_muprog\customfield\allocation_handler;
-use tool_muprog\muform\cohortpicker\source_manual_allocate_cohortid;
-use tool_muprog\muform\userpicker\source_manual_allocate_users;
+use tool_muprog\picker\cohort\source_manual_allocate_cohortid;
+use tool_muprog\picker\user\source_manual_allocate_users;
 
 /**
  * Allocate users and cohorts manually.

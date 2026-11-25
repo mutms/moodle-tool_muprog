@@ -16,19 +16,18 @@
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace tool_muprog\muform\userpicker;
+namespace tool_muprog\picker\cohort;
 
 use core\context;
-use tool_mulib\local\sql;
 
 /**
- * Users that may be allocated to a program manually.
+ * Cohort whose members are allocated to a program manually.
  *
  * @package     tool_muprog
  * @copyright   2026 Petr Skoda
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class source_manual_allocate_users extends \tool_mulib\muform\userpicker\base {
+final class source_manual_allocate_cohortid extends \tool_mulib\picker\cohort\base {
     /** @var context program context */
     private context $context;
 
@@ -55,18 +54,5 @@ final class source_manual_allocate_users extends \tool_mulib\muform\userpicker\b
     #[\Override]
     protected function get_context(): context {
         return $this->context;
-    }
-
-    /**
-     * Users already allocated are not candidates.
-     *
-     * @return sql|null
-     */
-    #[\Override]
-    protected function get_candidates_sql(): ?sql {
-        return new sql(
-            "NOT EXISTS (SELECT 'x' FROM {tool_muprog_allocation} pa WHERE pa.userid = u.id AND pa.programid = :aprogid)",
-            ['aprogid' => $this->programid]
-        );
     }
 }

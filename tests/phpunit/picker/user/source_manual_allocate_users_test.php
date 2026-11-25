@@ -16,9 +16,9 @@
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace tool_muprog\phpunit\muform\userpicker;
+namespace tool_muprog\phpunit\picker\user;
 
-use tool_muprog\muform\userpicker\source_manual_allocate_users;
+use tool_muprog\picker\user\source_manual_allocate_users;
 use tool_mulib\local\mulib;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -30,7 +30,7 @@ use PHPUnit\Framework\Attributes\Group;
  * @copyright  2026 Petr Skoda
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-#[CoversClass(\tool_muprog\muform\userpicker\source_manual_allocate_users::class)]
+#[CoversClass(\tool_muprog\picker\user\source_manual_allocate_users::class)]
 #[Group('MuTMS')]
 final class source_manual_allocate_users_test extends \advanced_testcase {
     #[\Override]

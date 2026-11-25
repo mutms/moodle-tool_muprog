@@ -16,10 +16,10 @@
 
 // phpcs:disable moodle.Files.BoilerplateComment.CommentEndedTooSoon
 
-namespace tool_muprog\phpunit\muform\cohortpicker;
+namespace tool_muprog\phpunit\picker\cohort;
 
-use tool_muprog\muform\cohortpicker\source_cohort_edit_cohortids;
-use tool_muprog\muform\cohortpicker\source_manual_allocate_cohortid;
+use tool_muprog\picker\cohort\source_cohort_edit_cohortids;
+use tool_muprog\picker\cohort\source_manual_allocate_cohortid;
 use tool_mulib\local\mulib;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -44,12 +44,12 @@ final class sources_test extends \advanced_testcase {
     /**
      * Ids of cohorts offered by a source.
      *
-     * @param \tool_mulib\muform\cohortpicker\base $source
+     * @param \tool_mulib\picker\cohort\base $source
      * @param string $query
      * @param string[] $exclude
      * @return int[]
      */
-    private function search(\tool_mulib\muform\cohortpicker\base $source, string $query, array $exclude = []): array {
+    private function search(\tool_mulib\picker\cohort\base $source, string $query, array $exclude = []): array {
         return array_column($source->search($query, $exclude)['cohorts'], 'id');
     }
 
