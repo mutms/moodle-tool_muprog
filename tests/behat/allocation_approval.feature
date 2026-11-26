@@ -54,10 +54,12 @@ Feature: Program approval allocations tests
       | tool/muprog:addcourse        | Allow      | pmanager  | System       |           |
       | tool/muprog:allocate         | Allow      | pmanager  | System       |           |
       | tool/muprog:manageallocation | Allow      | pmanager  | System       |           |
+      | tool/muprog:deallocate       | Allow      | pmanager  | System       |           |
       | moodle/cohort:view           | Allow      | pmanager  | System       |           |
       | tool/muprog:view             | Allow      | allocator | System       |           |
       | tool/muprog:allocate         | Allow      | allocator | System       |           |
       | tool/muprog:manageallocation | Allow      | allocator | System       |           |
+      | tool/muprog:deallocate       | Allow      | allocator | System       |           |
     And the following "role assigns" exist:
       | user      | role          | contextlevel | reference |
       | manager1  | pmanager      | System       |           |
