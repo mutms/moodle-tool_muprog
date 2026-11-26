@@ -62,7 +62,7 @@ final class programs extends system_report {
 
     #[\Override]
     protected function define(): void {
-        $this->set_main_entity(new program('program'));
+        $this->set_main_entity((new program('program'))->set_customfields_managed());
         $this->set_row_muted('program.archived = 1', ['program']);
         $this->add_capability_restriction('program', 'tool/muprog:view');
 
@@ -84,6 +84,7 @@ final class programs extends system_report {
             'program:archived',
             'program:creategroups',
             'program:timecreated',
+            'program:allcustomfields',
         ]);
         $this->set_preset_filters(['program:archived' => ['value' => 0]]);
         $this->set_multisearch_label(new lang_string('programsearch', 'tool_muprog'));

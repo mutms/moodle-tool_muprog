@@ -117,4 +117,48 @@ final class user_programs_test extends \advanced_testcase {
         $this->expectException(\core\exception\invalid_parameter_exception::class);
         user_programs::make_instance(-1)->require_access();
     }
+
+    public function test_customfields(): void {
+        /** @var \tool_muprog_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
+        /** @var \core_customfield_generator $cfgenerator */
+        $cfgenerator = $this->getDataGenerator()->get_plugin_generator('core_customfield');
+        /** @var \tool_mureport_generator $mureportgenerator */
+        $mureportgenerator = $this->getDataGenerator()->get_plugin_generator('tool_mureport');
+        $programcategory = $cfgenerator->create_category(['component' => 'tool_muprog', 'area' => 'program']);
+        $allocationcategory = $cfgenerator->create_category(['component' => 'tool_muprog', 'area' => 'allocation']);
+        $fields = [
+            'program:customfield:pallocated' => $cfgenerator->create_field(['categoryid' => $programcategory->get('id'),
+                'shortname' => 'pallocated', 'configdata' => ['visibilityallocated' => 1]]),
+            'program:customfield:pprivate' => $cfgenerator->create_field(['categoryid' => $programcategory->get('id'),
+                'shortname' => 'pprivate']),
+            'allocation:customfield:aallocatee' => $cfgenerator->create_field(['categoryid' => $allocationcategory->get('id'),
+                'shortname' => 'aallocatee', 'configdata' => ['visibilityallocatee' => 1]]),
+            'allocation:customfield:aprivate' => $cfgenerator->create_field(['categoryid' => $allocationcategory->get('id'),
+                'shortname' => 'aprivate']),
+        ];
+        $mureportgenerator->create_report_column(['report' => user_programs::class, 'selector' => 'program:idnumber']);
+        foreach ($fields as $selector => $field) {
+            $mureportgenerator->create_report_column(['report' => user_programs::class, 'selector' => $selector]);
+        }
+        $user = $this->getDataGenerator()->create_user();
+        $program = $generator->create_program(['idnumber' => 'P1', 'sources' => ['manual' => []]]);
+        $allocation = $generator->create_program_allocation(['programid' => $program->id, 'userid' => $user->id]);
+        foreach ($fields as $selector => $field) {
+            $instanceid = str_starts_with($selector, 'program:') ? $program->id : $allocation->id;
+            $cfgenerator->add_instance_data($field, (int)$instanceid, $field->get('shortname') . ' value');
+        }
+
+        $this->setUser($user);
+        $cells = $this->get_rows($user->id)[0]['cells'];
+        $this->assertSame('pallocated value', $cells['program:customfield:pallocated']);
+        $this->assertStringContainsString(get_string('cellhidden', 'tool_mureport'), $cells['program:customfield:pprivate']);
+        $this->assertSame('aallocatee value', $cells['allocation:customfield:aallocatee']);
+        $this->assertStringContainsString(get_string('cellhidden', 'tool_mureport'), $cells['allocation:customfield:aprivate']);
+
+        $this->setAdminUser();
+        $cells = $this->get_rows($user->id)[0]['cells'];
+        $this->assertSame('pprivate value', $cells['program:customfield:pprivate']);
+        $this->assertSame('aprivate value', $cells['allocation:customfield:aprivate']);
+    }
 }

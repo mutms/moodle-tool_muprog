@@ -68,7 +68,7 @@ final class program_allocations extends system_report {
 
     #[\Override]
     protected function define(): void {
-        $this->set_main_entity(new allocation('allocation'));
+        $this->set_main_entity((new allocation('allocation'))->set_customfields_managed());
         $this->set_row_muted('allocation.archived = 1', ['allocation']);
         $this->add_entity(new user('auser'), new join('allocation', 'auser.id = allocation.userid', inner: true));
 
@@ -99,6 +99,7 @@ final class program_allocations extends system_report {
             'allocation:timedue',
             'allocation:timeend',
             'allocation:timecompleted',
+            'allocation:allcustomfields',
             'auser:allprofilefields',
         ]);
         $this->set_preset_filters(['allocation:archived' => ['value' => 0]]);

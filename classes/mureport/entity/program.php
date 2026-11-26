@@ -20,12 +20,15 @@ namespace tool_muprog\mureport\entity;
 
 use tool_mureport\mureport\cell;
 use tool_mureport\mureport\column;
+use tool_mureport\mureport\customfields;
 use tool_mureport\mureport\entity;
 use tool_mureport\mureport\export_value;
 use tool_mureport\mureport\filter;
+use tool_mureport\mureport\row;
 use tool_mulib\local\sql;
 use core\lang_string;
 use core\url;
+use core_customfield\field_controller;
 use stdClass;
 
 /**
@@ -36,6 +39,12 @@ use stdClass;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class program extends entity {
+    /** @var customfields|null */
+    private ?customfields $customfields = null;
+
+    /** @var bool rows are restricted to programs the user may view */
+    private bool $customfieldsmanaged = false;
+
     #[\Override]
     public function get_default_source(): sql {
         return new sql('{tool_muprog_program}');
@@ -62,12 +71,16 @@ class program extends entity {
     public function get_column_names(): array {
         return [
             'fullname', 'idnumber', 'id', 'category', 'coursecount', 'allocationcount', 'draft', 'archived', 'creategroups',
-            'timecreated',
+            'timecreated', ...$this->get_customfields()->get_column_names(),
         ];
     }
 
     #[\Override]
     protected function define_columns(string $selector): array {
+        $customfields = $this->get_customfields()->define_columns($selector);
+        if ($customfields !== null) {
+            return $customfields;
+        }
         $alias = $this->alias;
         $column = match ($selector) {
             'fullname' => $this->define_fullname_column(),
@@ -101,11 +114,18 @@ class program extends entity {
 
     #[\Override]
     public function get_filter_names(): array {
-        return ['fullname', 'idnumber', 'id', 'category', 'draft', 'archived', 'creategroups', 'timecreated'];
+        return [
+            'fullname', 'idnumber', 'id', 'category', 'draft', 'archived', 'creategroups', 'timecreated',
+            ...$this->get_customfields()->get_filter_names(),
+        ];
     }
 
     #[\Override]
     protected function define_filters(string $selector): array {
+        $customfields = $this->get_customfields()->define_filters($selector);
+        if ($customfields !== null) {
+            return $customfields;
+        }
         $alias = $this->alias;
         $filter = match ($selector) {
             'fullname' => new filter\text($alias, 'fullname', new lang_string('programname', 'tool_muprog'), "$alias.fullname"),
@@ -130,6 +150,53 @@ class program extends entity {
             default => null,
         };
         return $filter ? [$filter] : [];
+    }
+
+    /**
+     * Program custom fields visible to managers are not checked in each row,
+     * for reports with rows restricted to programs the user may view.
+     *
+     * @return self
+     */
+    public function set_customfields_managed(): self {
+        $this->customfieldsmanaged = true;
+        return $this;
+    }
+
+    /**
+     * Returns program custom fields.
+     *
+     * @return customfields
+     */
+    public function get_customfields(): customfields {
+        if ($this->customfields === null) {
+            $this->customfields = (new customfields($this, 'tool_muprog', 'program'))
+                ->set_unrestricted(fn(field_controller $field): bool => $field->get_configdata_property('visibilityeveryone')
+                    || ($this->customfieldsmanaged && $field->get_configdata_property('visibilitymanagers'))
+                    || has_capability('tool/muprog:edit', \core\context\system::instance()))
+                ->set_cell_visibility(function (field_controller $field, row $row): bool {
+                    $context = $row->get_context($this->alias);
+                    if (!$context) {
+                        return false;
+                    }
+                    if ($field->get_configdata_property('visibilitymanagers') && has_capability('tool/muprog:view', $context)) {
+                        return true;
+                    }
+                    if (has_capability('tool/muprog:edit', $context)) {
+                        return true;
+                    }
+                    if ($field->get_configdata_property('visibilityallocated')) {
+                        return $this->customfields->get_handler()->can_view($field, (int)$row->get_entity_key($this->alias));
+                    }
+                    return false;
+                });
+        }
+        return $this->customfields;
+    }
+
+    #[\Override]
+    public function get_helper_join(string $helperalias): sql {
+        return $this->get_customfields()->get_helper_join($helperalias) ?? parent::get_helper_join($helperalias);
     }
 
     /**

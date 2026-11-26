@@ -121,6 +121,74 @@ final class programs_test extends \advanced_testcase {
         $this->assertSame($catcontext1->id, (int)$DB->get_field('tool_muprog_program', 'contextid', ['id' => $program1->id]));
     }
 
+    public function test_customfields(): void {
+        /** @var \tool_muprog_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
+        /** @var \core_customfield_generator $cfgenerator */
+        $cfgenerator = $this->getDataGenerator()->get_plugin_generator('core_customfield');
+        /** @var \tool_mureport_generator $mureportgenerator */
+        $mureportgenerator = $this->getDataGenerator()->get_plugin_generator('tool_mureport');
+        $syscontext = \context_system::instance();
+        $category = $cfgenerator->create_category(['component' => 'tool_muprog', 'area' => 'program']);
+        $fields = [
+            'ftext' => ['type' => 'text', 'configdata' => ['defaultvalue' => 'Nothing', 'visibilityeveryone' => 1]],
+            'fcheck' => ['type' => 'checkbox', 'configdata' => ['visibilitymanagers' => 1]],
+            'fselect' => ['type' => 'select', 'configdata' => ['options' => "Red\nBlue", 'visibilitymanagers' => 1]],
+            'fdate' => ['type' => 'date', 'configdata' => ['includetime' => 0, 'visibilitymanagers' => 1]],
+            'fnumber' => ['type' => 'number', 'configdata' => ['decimalplaces' => 1, 'visibilitymanagers' => 1]],
+            'fprivate' => ['type' => 'text', 'configdata' => []],
+        ];
+        foreach ($fields as $shortname => $record) {
+            $fields[$shortname] = $cfgenerator->create_field($record + ['categoryid' => $category->get('id'), 'shortname' => $shortname]);
+            $mureportgenerator->create_report_column(['report' => programs::class, 'selector' => "program:customfield:$shortname"]);
+        }
+        $mureportgenerator->create_report_column(['report' => programs::class, 'selector' => 'program:idnumber']);
+        $program1 = $generator->create_program(['idnumber' => 'P1', 'fullname' => 'Alpha']);
+        $generator->create_program(['idnumber' => 'P2', 'fullname' => 'Beta']);
+        $cfgenerator->add_instance_data($fields['ftext'], (int)$program1->id, 'Some text');
+        $cfgenerator->add_instance_data($fields['fcheck'], (int)$program1->id, 1);
+        $cfgenerator->add_instance_data($fields['fselect'], (int)$program1->id, 2);
+        $cfgenerator->add_instance_data($fields['fdate'], (int)$program1->id, make_timestamp(2026, 3, 23));
+        $cfgenerator->add_instance_data($fields['fnumber'], (int)$program1->id, 12.5);
+        $cfgenerator->add_instance_data($fields['fprivate'], (int)$program1->id, 'Secret');
+
+        $this->setAdminUser();
+        $rows = programs::make_instance($syscontext->id)->get_query()->get_page(new request([]))->export_rows();
+        $cells = $rows[0]['cells'];
+        $this->assertSame('Some text', $cells['program:customfield:ftext']);
+        $this->assertSame('Yes', $cells['program:customfield:fcheck']);
+        $this->assertSame('Blue', $cells['program:customfield:fselect']);
+        $this->assertSame(userdate(make_timestamp(2026, 3, 23), get_string('strftimedate', 'core_langconfig')), $cells['program:customfield:fdate']);
+        $this->assertSame('12.5', $cells['program:customfield:fnumber']);
+        $this->assertSame('Secret', $cells['program:customfield:fprivate']);
+        $cells = $rows[1]['cells'];
+        $this->assertSame('Nothing', $cells['program:customfield:ftext']);
+        $this->assertSame('No', $cells['program:customfield:fcheck']);
+        $this->assertSame('', $cells['program:customfield:fselect']);
+        $this->assertSame('', $cells['program:customfield:fdate']);
+        $this->assertSame('', $cells['program:customfield:fprivate']);
+
+        $this->assertSame(['P1'], $this->get_idnumbers($syscontext->id, new request(['program:customfield:ftext' => ['value' => 'some']])));
+        $this->assertSame(['P2'], $this->get_idnumbers($syscontext->id, new request(['program:customfield:ftext' => ['value' => 'nothing']])));
+        $this->assertSame(['P2'], $this->get_idnumbers($syscontext->id, new request(['program:customfield:fcheck' => ['value' => 0]])));
+        $this->assertSame(['P1'], $this->get_idnumbers($syscontext->id, new request(['program:customfield:fselect' => ['values' => ['2']]])));
+        $this->assertSame(['P1'], $this->get_idnumbers($syscontext->id, new request(['program:customfield:fnumber' => ['from' => 10]])));
+        $this->assertSame(['P1'], $this->get_idnumbers($syscontext->id, new request(['program:customfield:fprivate' => ['value' => 'secret']])));
+
+        $user = $this->getDataGenerator()->create_user();
+        $roleid = $this->getDataGenerator()->create_role();
+        assign_capability('tool/muprog:view', CAP_ALLOW, $roleid, $syscontext);
+        role_assign($roleid, $user->id, $syscontext->id);
+        $this->setUser($user);
+        $rows = programs::make_instance($syscontext->id)->get_query()->get_page(new request([]))->export_rows();
+        $cells = $rows[0]['cells'];
+        $this->assertSame('Some text', $cells['program:customfield:ftext']);
+        $this->assertSame('Blue', $cells['program:customfield:fselect']);
+        $this->assertStringContainsString(get_string('cellhidden', 'tool_mureport'), $cells['program:customfield:fprivate']);
+        $this->assertSame(['P1'], $this->get_idnumbers($syscontext->id, new request(['program:customfield:fselect' => ['values' => ['2']]])));
+        $this->assertSame(['P1', 'P2'], $this->get_idnumbers($syscontext->id, new request(['program:customfield:fprivate' => ['value' => 'secret']])));
+    }
+
     public function test_invalid_context(): void {
         $this->setAdminUser();
         $course = $this->getDataGenerator()->create_course();

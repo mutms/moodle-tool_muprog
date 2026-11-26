@@ -135,4 +135,48 @@ final class program_allocations_test extends \advanced_testcase {
         $this->expectException(\core\exception\invalid_parameter_exception::class);
         program_allocations::make_instance(-1)->require_access();
     }
+
+    public function test_customfields(): void {
+        /** @var \tool_muprog_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('tool_muprog');
+        /** @var \core_customfield_generator $cfgenerator */
+        $cfgenerator = $this->getDataGenerator()->get_plugin_generator('core_customfield');
+        /** @var \tool_mureport_generator $mureportgenerator */
+        $mureportgenerator = $this->getDataGenerator()->get_plugin_generator('tool_mureport');
+        $category = $cfgenerator->create_category(['component' => 'tool_muprog', 'area' => 'allocation']);
+        $managers = $cfgenerator->create_field(['categoryid' => $category->get('id'), 'shortname' => 'fmanagers',
+            'configdata' => ['visibilitymanagers' => 1]]);
+        $private = $cfgenerator->create_field(['categoryid' => $category->get('id'), 'shortname' => 'fprivate']);
+        $mureportgenerator->create_report_column(['report' => program_allocations::class, 'selector' => 'auser:fullname']);
+        $mureportgenerator->create_report_column(['report' => program_allocations::class, 'selector' => 'allocation:customfield:fmanagers']);
+        $mureportgenerator->create_report_column(['report' => program_allocations::class, 'selector' => 'allocation:customfield:fprivate']);
+        $user1 = $this->getDataGenerator()->create_user(['firstname' => 'Anna', 'lastname' => 'Alpha']);
+        $user2 = $this->getDataGenerator()->create_user(['firstname' => 'Bob', 'lastname' => 'Beta']);
+        $program = $generator->create_program(['sources' => ['manual' => []]]);
+        $allocation1 = $generator->create_program_allocation(['programid' => $program->id, 'userid' => $user1->id]);
+        $allocation2 = $generator->create_program_allocation(['programid' => $program->id, 'userid' => $user2->id]);
+        foreach ([[$allocation1, 'one'], [$allocation2, 'two']] as [$allocation, $suffix]) {
+            $cfgenerator->add_instance_data($managers, (int)$allocation->id, "managers $suffix");
+            $cfgenerator->add_instance_data($private, (int)$allocation->id, "private $suffix");
+        }
+        $viewer = $this->getDataGenerator()->create_user();
+        $roleid = $this->getDataGenerator()->create_role();
+        assign_capability('tool/muprog:view', CAP_ALLOW, $roleid, \context_system::instance());
+        role_assign($roleid, $viewer->id, \context_system::instance()->id);
+
+        $filter = fn(string $name, string $value): array => array_map(
+            fn(array $row): string => strip_tags($row['cells']['auser:fullname']),
+            $this->get_rows($program->id, new request(["allocation:customfield:$name" => ['value' => $value]]))
+        );
+        $this->setAdminUser();
+        $this->assertSame(['Anna Alpha'], $filter('fmanagers', 'one'));
+        $this->assertSame(['Anna Alpha'], $filter('fprivate', 'one'));
+
+        $this->setUser($viewer);
+        $this->assertSame(['Anna Alpha'], $filter('fmanagers', 'one'));
+        $this->assertSame(['Anna Alpha', 'Bob Beta'], $filter('fprivate', 'one'));
+        $cells = $this->get_rows($program->id)[0]['cells'];
+        $this->assertSame('managers one', $cells['allocation:customfield:fmanagers']);
+        $this->assertStringContainsString(get_string('cellhidden', 'tool_mureport'), $cells['allocation:customfield:fprivate']);
+    }
 }

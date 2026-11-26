@@ -21,12 +21,14 @@ namespace tool_muprog\mureport\entity;
 use tool_mureport\mureport\action;
 use tool_mureport\mureport\cell;
 use tool_mureport\mureport\column;
+use tool_mureport\mureport\customfields;
 use tool_mureport\mureport\entity;
 use tool_mureport\mureport\export_value;
 use tool_mureport\mureport\filter;
 use tool_mureport\mureport\row;
 use tool_mulib\local\sql;
 use core\lang_string;
+use core_customfield\field_controller;
 use core\url;
 use stdClass;
 
@@ -40,6 +42,12 @@ use stdClass;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class allocation extends entity {
+    /** @var customfields|null */
+    private ?customfields $customfields = null;
+
+    /** @var bool rows are restricted to allocations of programs the user may view */
+    private bool $customfieldsmanaged = false;
+
     #[\Override]
     public function get_default_source(): sql {
         return new sql('{tool_muprog_allocation}');
@@ -55,11 +63,16 @@ class allocation extends entity {
         return [
             'timeallocated', 'timestart', 'timedue', 'timeend', 'timecompleted', 'source', 'progress', 'status', 'archived',
             'actions',
+            ...$this->get_customfields()->get_column_names(),
         ];
     }
 
     #[\Override]
     protected function define_columns(string $selector): array {
+        $customfields = $this->get_customfields()->define_columns($selector);
+        if ($customfields !== null) {
+            return $customfields;
+        }
         $alias = $this->alias;
         $column = match ($selector) {
             'timeallocated', 'timestart', 'timedue', 'timeend', 'timecompleted' => $this->create_column(
@@ -83,11 +96,18 @@ class allocation extends entity {
 
     #[\Override]
     public function get_filter_names(): array {
-        return ['status', 'source', 'archived', 'timeallocated', 'timestart', 'timedue', 'timeend', 'timecompleted'];
+        return [
+            'status', 'source', 'archived', 'timeallocated', 'timestart', 'timedue', 'timeend', 'timecompleted',
+            ...$this->get_customfields()->get_filter_names(),
+        ];
     }
 
     #[\Override]
     protected function define_filters(string $selector): array {
+        $customfields = $this->get_customfields()->define_filters($selector);
+        if ($customfields !== null) {
+            return $customfields;
+        }
         $alias = $this->alias;
         $filter = match ($selector) {
             'status' => (new filter\checkboxes(
@@ -114,6 +134,48 @@ class allocation extends entity {
         return $filter ? [$filter] : [];
     }
 
+    /**
+     * Allocation custom fields visible to managers are not checked in each row,
+     * for reports with rows restricted to allocations of programs the user may view.
+     *
+     * @return self
+     */
+    public function set_customfields_managed(): self {
+        $this->customfieldsmanaged = true;
+        return $this;
+    }
+
+    /**
+     * Returns allocation custom fields.
+     *
+     * @return customfields
+     */
+    public function get_customfields(): customfields {
+        if ($this->customfields === null) {
+            $this->customfields = (new customfields($this, 'tool_muprog', 'allocation'))
+                ->set_unrestricted(fn(field_controller $field): bool => $field->get_configdata_property('visibilityeveryone')
+                    || ($this->customfieldsmanaged && $field->get_configdata_property('visibilitymanagers'))
+                    || has_any_capability(['tool/muprog:allocate', 'tool/muprog:admin'], \core\context\system::instance()))
+                ->set_cell_visibility(function (field_controller $field, row $row): bool {
+                    $context = $row->get_context($this->alias);
+                    if (!$context) {
+                        return false;
+                    }
+                    if ($field->get_configdata_property('visibilitymanagers') && has_capability('tool/muprog:view', $context)) {
+                        return true;
+                    }
+                    if (has_capability('tool/muprog:allocate', $context) || has_capability('tool/muprog:admin', $context)) {
+                        return true;
+                    }
+                    if ($field->get_configdata_property('visibilityallocatee')) {
+                        return $this->customfields->get_handler()->can_view($field, (int)$row->get_entity_key($this->alias));
+                    }
+                    return false;
+                });
+        }
+        return $this->customfields;
+    }
+
     #[\Override]
     public function get_helper_join(string $helperalias): sql {
         if ($helperalias === "{$this->alias}_program") {
@@ -122,7 +184,7 @@ class allocation extends entity {
         if ($helperalias === "{$this->alias}_source") {
             return new sql("JOIN {tool_muprog_source} $helperalias ON $helperalias.id = {$this->alias}.sourceid");
         }
-        return parent::get_helper_join($helperalias);
+        return $this->get_customfields()->get_helper_join($helperalias) ?? parent::get_helper_join($helperalias);
     }
 
     #[\Override]
