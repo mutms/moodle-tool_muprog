@@ -236,7 +236,7 @@ Feature: Program visibility management tests
 
     When I click on "Draft section" "link" in the "Draft section" "table_row"
     And I click on "Items" "link" in the ".secondary-navigation" "css_element"
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the following should exist in the mureport:
       | Item name   | Item type |
       | Program 000 | Program   |
 
