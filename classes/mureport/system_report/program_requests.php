@@ -67,6 +67,7 @@ final class program_requests extends system_report {
     #[\Override]
     protected function define(): void {
         $this->set_main_entity(new request('request'));
+        $this->set_row_muted('request.timerejected IS NOT NULL', ['request']);
         $this->add_entity(new user('auser'), new join('request', 'auser.id = request.userid', inner: true));
 
         $this->set_default_columns([

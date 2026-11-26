@@ -63,6 +63,7 @@ final class programs extends system_report {
     #[\Override]
     protected function define(): void {
         $this->set_main_entity(new program('program'));
+        $this->set_row_muted('program.archived = 1', ['program']);
         $this->add_capability_restriction('program', 'tool/muprog:view');
 
         $this->set_default_columns([

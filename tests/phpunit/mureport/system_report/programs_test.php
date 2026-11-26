@@ -76,6 +76,8 @@ final class programs_test extends \advanced_testcase {
 
         $this->setAdminUser();
         $this->assertSame(['P0', 'P1', 'P3', 'P2', 'P4'], $this->get_idnumbers($syscontext->id));
+        $rows = programs::make_instance($syscontext->id)->get_query()->get_page(new request([]))->export_rows();
+        $this->assertSame([false, false, false, false, true], array_column($rows, 'muted'));
         $this->assertSame(['P0', 'P1', 'P3', 'P2'], $this->get_idnumbers($syscontext->id, new request(['program:archived' => ['value' => 0]])));
         $this->assertSame(['P1', 'P2'], $this->get_idnumbers($catcontext1->id));
         $this->assertSame(['P2'], $this->get_idnumbers($catcontext2->id));

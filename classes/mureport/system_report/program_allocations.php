@@ -69,6 +69,7 @@ final class program_allocations extends system_report {
     #[\Override]
     protected function define(): void {
         $this->set_main_entity(new allocation('allocation'));
+        $this->set_row_muted('allocation.archived = 1', ['allocation']);
         $this->add_entity(new user('auser'), new join('allocation', 'auser.id = allocation.userid', inner: true));
 
         $this->set_default_columns([

@@ -99,6 +99,7 @@ final class program_requests_test extends \advanced_testcase {
         $this->assertSame(['Anna Alpha', 'Cyril Gamma'], array_keys($this->get_actions($program1->id, new request(['request:status' => ['value' => 'pending']]))));
         $this->assertSame(['Bob Beta'], array_keys($this->get_actions($program1->id, new request(['request:status' => ['value' => 'rejected']]))));
         $this->assertSame(['Anna Alpha'], array_keys($this->get_actions($program2->id)));
+        $this->assertSame([false, true, false], array_column($this->get_rows($program1->id), 'muted'));
 
         $DB->set_field('tool_muprog_program', 'archived', 1, ['id' => $program1->id]);
         $this->assertSame(['reject'], $this->get_actions($program1->id)['Anna Alpha']);

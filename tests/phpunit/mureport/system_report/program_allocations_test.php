@@ -101,6 +101,7 @@ final class program_allocations_test extends \advanced_testcase {
         $this->assertStringContainsString('/admin/tool/muprog/management/allocation.php?id=' . $allocation1->id, $rows[0]['cells']['auser:fullname']);
         $this->assertSame(['update', 'archive', 'delete'], $this->get_actions($rows[0]));
         $this->assertSame(['restore', 'delete'], $this->get_actions($rows[1]));
+        $this->assertSame([false, true], array_column($rows, 'muted'));
 
         $DB->set_field('tool_muprog_program', 'archived', 1, ['id' => $program1->id]);
         $rows = $this->get_rows($program1->id);
