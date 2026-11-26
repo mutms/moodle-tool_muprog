@@ -146,7 +146,7 @@ Feature: Credits program completion by students tests
     And I should see "Current credits: 4/5"
 
     When I click on "Current credits: 4/5" "link" in the "Framework 1" "table_row"
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the following should exist in the mureport:
       | Type              | Name     | Credits |
       | Course completion | Course 1 | 4       |
 
@@ -164,7 +164,7 @@ Feature: Credits program completion by students tests
     And I follow "Users"
     And I follow "Student 1"
     And I click on "Current credits: 12/5" "link" in the "Framework 1" "table_row"
-    Then the following should exist in the "reportbuilder-table" table:
+    Then the following should exist in the mureport:
       | Type              | Name     | Credits |
       | Course completion | Course 1 | 4       |
       | Course completion | Course 2 | 8       |
