@@ -166,6 +166,7 @@ $string['exportformat_json'] = 'JSON';
 $string['extdb_query_allocation'] = 'Alocação a programas';
 $string['favourite'] = 'Programa com estrela';
 $string['fixeddate'] = 'Numa data fixa';
+$string['formatter_allocationlink'] = 'Nome com ligação à alocação';
 $string['importallocationend'] = 'Fim da alocação ({$a})';
 $string['importallocationstart'] = 'Início da alocação ({$a})';
 $string['importprogramallocation'] = 'Importar configurações de alocação';

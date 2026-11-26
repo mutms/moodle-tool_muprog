@@ -162,6 +162,7 @@ $string['exportformat_json'] = 'JSON';
 $string['extdb_query_allocation'] = 'Přidělení do programu';
 $string['favourite'] = 'Program označený hvězdičkou';
 $string['fixeddate'] = 'K pevnému datu';
+$string['formatter_allocationlink'] = 'Jméno s odkazem na přidělení';
 $string['importallocationend'] = 'Konec přidělování ({$a})';
 $string['importallocationstart'] = 'Začátek přidělování ({$a})';
 $string['importprogramallocation'] = 'Importovat nastavení přidělení';

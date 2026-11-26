@@ -147,7 +147,8 @@ final class program_allocations extends system_report {
                 fn(cell $cell): export_value => export_value::link($url($cell), fullname(
                     $cell->get_fields(),
                     has_capability('moodle/site:viewfullnames', $this->get_context())
-                ))
+                )),
+                new lang_string('formatter_allocationlink', 'tool_muprog')
             )
             ->set_default_formatter('allocationlink');
         return $columns;

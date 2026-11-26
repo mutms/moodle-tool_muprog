@@ -166,6 +166,7 @@ $string['exportformat_json'] = 'JSON';
 $string['extdb_query_allocation'] = 'Affectation à un programme';
 $string['favourite'] = 'Programme favori';
 $string['fixeddate'] = 'À une date fixe';
+$string['formatter_allocationlink'] = 'Nom avec lien vers l\'affectation';
 $string['importallocationend'] = 'Fin des affectations ({$a})';
 $string['importallocationstart'] = 'Début des affectations ({$a})';
 $string['importprogramallocation'] = 'Importer les réglages d’affectation';

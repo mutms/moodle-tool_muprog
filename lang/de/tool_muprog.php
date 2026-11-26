@@ -166,6 +166,7 @@ $string['exportformat_json'] = 'JSON';
 $string['extdb_query_allocation'] = 'Programmzuordnung';
 $string['favourite'] = 'Mit Stern markiertes Programm';
 $string['fixeddate'] = 'An einem festen Datum';
+$string['formatter_allocationlink'] = 'Name mit Link zur Zuordnung';
 $string['importallocationend'] = 'Ende der Zuordnung ({$a})';
 $string['importallocationstart'] = 'Beginn der Zuordnung ({$a})';
 $string['importprogramallocation'] = 'Zuordnungseinstellungen importieren';

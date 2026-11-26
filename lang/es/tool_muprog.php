@@ -166,6 +166,7 @@ $string['exportformat_json'] = 'JSON';
 $string['extdb_query_allocation'] = 'Adscripción a programa';
 $string['favourite'] = 'Programa destacado';
 $string['fixeddate'] = 'En una fecha fija';
+$string['formatter_allocationlink'] = 'Nombre con enlace a la adscripción';
 $string['importallocationend'] = 'Fin de la adscripción ({$a})';
 $string['importallocationstart'] = 'Inicio de la adscripción ({$a})';
 $string['importprogramallocation'] = 'Importar ajustes de adscripción';

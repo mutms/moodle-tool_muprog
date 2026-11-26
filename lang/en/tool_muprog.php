@@ -164,6 +164,7 @@ $string['exportformat_json'] = 'JSON';
 $string['extdb_query_allocation'] = 'Program allocation';
 $string['favourite'] = 'Starred program';
 $string['fixeddate'] = 'At a fixed date';
+$string['formatter_allocationlink'] = 'Name linked to allocation';
 $string['importallocationend'] = 'Allocation end ({$a})';
 $string['importallocationstart'] = 'Allocation start ({$a})';
 $string['importprogramallocation'] = 'Import allocation settings';

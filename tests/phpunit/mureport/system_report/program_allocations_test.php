@@ -121,6 +121,15 @@ final class program_allocations_test extends \advanced_testcase {
         $this->get_rows($program1->id);
     }
 
+    public function test_fullname_formatters(): void {
+        $column = program_allocations::make_inspector()->get_selector_columns('auser:fullname')['auser:fullname'];
+        $this->assertSame('allocationlink', $column->get_default_formatter_id());
+        $this->assertSame(
+            ['fullname', 'link', 'picturelink', 'picturelinkstatus', 'allocationlink'],
+            array_keys($column->get_formatter_choices())
+        );
+    }
+
     public function test_invalid_program(): void {
         $this->setAdminUser();
         $this->expectException(\core\exception\invalid_parameter_exception::class);
