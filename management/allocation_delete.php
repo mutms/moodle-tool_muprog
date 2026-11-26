@@ -48,7 +48,7 @@ $program = $DB->get_record('tool_muprog_program', ['id' => $allocation->programi
 $source = $DB->get_record('tool_muprog_source', ['id' => $allocation->sourceid], '*', MUST_EXIST);
 
 $context = context::instance_by_id($program->contextid);
-require_capability('tool/muprog:manageallocation', $context);
+require_capability('tool/muprog:deallocate', $context);
 
 $currenturl = new core\url('/admin/tool/muprog/management/allocation_delete.php', ['id' => $allocation->id]);
 $PAGE->set_context($context);

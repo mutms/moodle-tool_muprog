@@ -54,6 +54,7 @@ Feature: Visible cohorts program allocation tests
       | tool/muprog:addcourse        | Allow      | pmanager | System       |           |
       | tool/muprog:allocate         | Allow      | pmanager | System       |           |
       | tool/muprog:manageallocation | Allow      | pmanager | System       |           |
+      | tool/muprog:deallocate       | Allow      | pmanager | System       |           |
       | moodle/cohort:view           | Allow      | pmanager | System       |           |
     And the following "role assigns" exist:
       | user      | role          | contextlevel | reference |

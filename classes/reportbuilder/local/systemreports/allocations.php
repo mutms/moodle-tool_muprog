@@ -271,7 +271,7 @@ final class allocations extends system_report {
                 if (!$sourceclass) {
                     return false;
                 }
-                if (!has_capability('tool/muprog:manageallocation', \context::instance_by_id($row->contextid))) {
+                if (!has_capability('tool/muprog:deallocate', \context::instance_by_id($row->contextid))) {
                     return false;
                 }
                 $source = $DB->get_record('tool_muprog_source', ['id' => $row->sourceid]);
