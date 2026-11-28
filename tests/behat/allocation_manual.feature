@@ -208,6 +208,14 @@ Feature: Manual program allocation tests
     And I click on "Users" "link" in the ".secondary-navigation" "css_element"
 
     When I click on "Upload allocations" action from "Users actions" dropdown
+    And I upload "admin/tool/muprog/tests/fixtures/upload2.csv" file to "sourcefile" muform filemanager
+    And I press "Continue"
+    And I should see "Step 2 of 3" in the ".muform-wizardbuttons" "css_element"
+    And I press "Back"
+    And I should see "Use Start again to read different data."
+    And I press "Start again"
+    And I click on "Yes" "button" in the ".modal-dialog" "css_element"
+    And I should see "Step 1 of 3" in the ".muform-wizardbuttons" "css_element"
     And I upload "admin/tool/muprog/tests/fixtures/upload1.csv" file to "sourcefile" muform filemanager
     And I press "Continue"
     Then I should see "4 rows were read"

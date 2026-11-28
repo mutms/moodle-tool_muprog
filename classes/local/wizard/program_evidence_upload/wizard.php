@@ -76,6 +76,11 @@ final class wizard extends \tool_mulib\muform\wizard_page {
     }
 
     #[\Override]
+    protected function is_reset_allowed(): bool {
+        return true;
+    }
+
+    #[\Override]
     protected function get_page_url(): url {
         return new url('/admin/tool/muprog/management/program_evidence_upload.php', ['programid' => $this->program->id]);
     }

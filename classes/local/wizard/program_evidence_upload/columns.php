@@ -18,13 +18,13 @@
 
 namespace tool_muprog\local\wizard\program_evidence_upload;
 
-use tool_mulib\muform\element\buttons;
 use tool_mulib\muform\element\cancel;
 use tool_mulib\muform\element\checkbox;
 use tool_mulib\muform\element\info;
 use tool_mulib\muform\element\inforawhtml;
 use tool_mulib\muform\element\select;
 use tool_mulib\muform\element\wizardback;
+use tool_mulib\muform\element\wizardbuttons;
 use tool_mulib\muform\element\wizardcontinue;
 use tool_mulib\muform\form;
 use tool_muprog\local\evidence_upload;
@@ -59,10 +59,10 @@ final class columns extends form {
             $this->add($column);
         }
 
-        $this->add(new buttons('buttons'));
-        $this->add(new wizardcontinue(), 'buttons');
-        $this->add(new wizardback(), 'buttons');
-        $this->add(new cancel(), 'buttons');
+        $this->add(new wizardbuttons());
+        $this->add(new wizardcontinue(), wizardbuttons::NAME);
+        $this->add(new wizardback(), wizardbuttons::NAME);
+        $this->add(new cancel(), wizardbuttons::NAME);
     }
 
     /**

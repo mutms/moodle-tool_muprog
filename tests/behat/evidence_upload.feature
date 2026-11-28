@@ -81,6 +81,14 @@ Feature: Upload program completion evidence using csv
     And I should not see "Upload completion evidence"
 
     And I click on "Upload allocations" "link"
+    And I upload "admin/tool/muprog/tests/fixtures/evidence2.csv" file to "sourcefile" muform filemanager
+    And I press "Continue"
+    And I should see "Step 2 of 3" in the ".muform-wizardbuttons" "css_element"
+    And I press "Back"
+    And I should see "Use Start again to read different data."
+    And I press "Start again"
+    And I click on "Yes" "button" in the ".modal-dialog" "css_element"
+    And I should see "Step 1 of 3" in the ".muform-wizardbuttons" "css_element"
     And I upload "admin/tool/muprog/tests/fixtures/evidence1.csv" file to "sourcefile" muform filemanager
     And I press "Continue"
     And I press "Continue"

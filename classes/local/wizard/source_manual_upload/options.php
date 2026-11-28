@@ -18,7 +18,6 @@
 
 namespace tool_muprog\local\wizard\source_manual_upload;
 
-use tool_mulib\muform\element\buttons;
 use tool_mulib\muform\element\cancel;
 use tool_mulib\muform\element\checkbox;
 use tool_mulib\muform\element\info;
@@ -26,6 +25,7 @@ use tool_mulib\muform\element\inforawhtml;
 use tool_mulib\muform\element\reload;
 use tool_mulib\muform\element\submit;
 use tool_mulib\muform\element\wizardback;
+use tool_mulib\muform\element\wizardbuttons;
 use tool_mulib\muform\form;
 use tool_muprog\local\source\manual_upload;
 
@@ -62,13 +62,13 @@ final class options extends form {
         $this->add(new inforawhtml('preview', '', $this->render_preview($outcomes)));
 
         // The upload button comes first so that Enter never skips the dry run of other options.
-        $this->add(new buttons('buttons'));
+        $this->add(new wizardbuttons());
         if (self::is_importable($outcomes)) {
-            $this->add(new submit('submit', get_string('source_manual_uploadusers', 'tool_muprog')), 'buttons');
+            $this->add(new submit('submit', get_string('source_manual_uploadusers', 'tool_muprog')), wizardbuttons::NAME);
         }
-        $this->add(new reload('refresh', get_string('source_manual_upload_refresh', 'tool_muprog')), 'buttons');
-        $this->add(new wizardback(validate: false), 'buttons');
-        $this->add(new cancel(), 'buttons');
+        $this->add(new reload('refresh', get_string('source_manual_upload_refresh', 'tool_muprog')), wizardbuttons::NAME);
+        $this->add(new wizardback(validate: false), wizardbuttons::NAME);
+        $this->add(new cancel(), wizardbuttons::NAME);
     }
 
     /**
